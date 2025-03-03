@@ -1,45 +1,84 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
+import { View, Text, Image, ImageSourcePropType } from "react-native";
+import React from "react";
+import { Tabs, Redirect } from "expo-router";
+import icons from "../../constants/icons";
 
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
+const TabIcon = ({
+  icon,
+  color,
+  name,
+  focused,
+}: {
+  icon: ImageSourcePropType;
+  color: string;
+  name: string;
+  focused: boolean;
+}) => {
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
+    <View className="items-center top-[5]">
+      <Image
+        source={icon}
+        resizeMode="contain"
+        style={{ tintColor: color, width: 24, height: 24 }}
       />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
-    </Tabs>
+    </View>
   );
-}
+};
+
+const TabsLayout = () => {
+  return (
+    <>
+      <Tabs screenOptions={{ tabBarShowLabel: false }}>
+        {Page({
+          name: "home",
+          title: "Home",
+          icon: icons.home,
+          iconName: "Home",
+        })}
+        {Page({
+          name: "explore",
+          title: "Explore",
+          icon: icons.search,
+          iconName: "Explore",
+        })}
+      </Tabs>
+    </>
+  );
+};
+
+export default TabsLayout;
+
+const Page = ({
+  name,
+  title,
+  icon,
+  iconName,
+}: {
+  name: string;
+  title: string;
+  icon: ImageSourcePropType;
+  iconName: string;
+}) => {
+  return (
+    <Tabs.Screen
+      name={name}
+      options={{
+        title: title,
+        headerShown: false,
+        tabBarStyle: {
+          backgroundColor: "black",
+          height: 55,
+        },
+        tabBarActiveTintColor: "#F8BFBF",
+        tabBarIcon: ({ color, focused }) => (
+          <TabIcon
+            icon={icon}
+            name={iconName}
+            color={color}
+            focused={focused}
+          />
+        ),
+      }}
+    />
+  );
+};

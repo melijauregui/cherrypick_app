@@ -4,30 +4,37 @@
     "slug": "cherrypick",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "icon": "./assets/images/small_logo.png",
+    "scheme": "cherrypick",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "bundleIdentifier": "com.cherrypickapp.googleauthern",
+      "supportsTablet": true,
+      "infoPlist": {
+        "CFBundleURLTypes" :{
+          "CFBundleURLSchemes": ["com.googleusercontent.apps.321366117154-gq34d2c6r30i8tl8r45dpte4i0ba8nk9"]
+        }
+      }
     },
     "android": {
+      "package": "com.cherrypickapp.googleauthern",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/small_logo.png",
         "backgroundColor": "#ffffff"
       }
     },
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/small_logo.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/small_logo.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
@@ -36,6 +43,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "ced3d184-554f-4257-9206-3ea6a9b6eb27"
+      }
     }
   }
 }

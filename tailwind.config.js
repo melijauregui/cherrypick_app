@@ -1,0 +1,50 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  // NOTE: Update this to include the paths to all of your component files.
+  content: ["./app/**/*.{js,jsx,ts,tsx}"],
+  presets: [require("nativewind/preset")],
+  theme: {
+    extend: {
+      colors: {
+        black: "#000000",
+        white : "#ffffff",
+        grey: {
+          light : "#909497",
+          strong : "#909497",
+        },
+        brown : {
+          light : "#af785a",
+          strong : "#301c11",
+        } ,
+        pink : {
+          light: "#F8BFBF",
+          strong: "#DE7070",
+        },
+      },
+      fontFamily: {
+        pthin: ["Poppins-Thin", "sans-serif"],
+        pextralight: ["Poppins-ExtraLight", "sans-serif"],
+        plight: ["Poppins-Light", "sans-serif"],
+        pregular: ["Poppins-Regular", "sans-serif"],
+        pmedium: ["Poppins-Medium", "sans-serif"],
+        psemibold: ["Poppins-SemiBold", "sans-serif"],
+        pbold: ["Poppins-Bold", "sans-serif"],
+        pextrabold: ["Poppins-ExtraBold", "sans-serif"],
+        pblack: ["Poppins-Black", "sans-serif"],
+        gibold: ["GlacialIndifference-Bold", "sans-serif"],
+        giregular: ["GlacialIndifference-Regular", "sans-serif"],
+        giitalic: ["GlacialIndifference-Italic", "sans-serif"],
+      },
+    },
+  },
+  plugins: [],
+}

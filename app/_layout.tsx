@@ -1,39 +1,58 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
+import { Stack } from "expo-router";
+import { SplashScreen } from "expo-router";
+import { useFonts } from "expo-font";
+import { useEffect } from "react";
 
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+const RootLayout = () => {
+  const [fontsLoaded, error] = useFonts({
+    "Poppins-Black": require("../assets/fonts/poppins/Poppins-Black.ttf"),
+    "Poppins-Bold": require("../assets/fonts/poppins/Poppins-Bold.ttf"),
+    "Poppins-ExtraBold": require("../assets/fonts/poppins/Poppins-ExtraBold.ttf"),
+    "Poppins-ExtraLight": require("../assets/fonts/poppins/Poppins-ExtraLight.ttf"),
+    "Poppins-Light": require("../assets/fonts/poppins/Poppins-Light.ttf"),
+    "Poppins-Medium": require("../assets/fonts/poppins/Poppins-Medium.ttf"),
+    "Poppins-Regular": require("../assets/fonts/poppins/Poppins-Regular.ttf"),
+    "Poppins-SemiBold": require("../assets/fonts/poppins/Poppins-SemiBold.ttf"),
+    "Poppins-Thin": require("../assets/fonts/poppins/Poppins-Thin.ttf"),
+    "GlacialIndifference-Regular": require("../assets/fonts/glacial-indifference/GlacialIndifference-Regular.otf"),
+    "GlacialIndifference-Bold": require("../assets/fonts/glacial-indifference/GlacialIndifference-Bold.otf"),
+    "GlacialIndifference-Italic": require("../assets/fonts/glacial-indifference/GlacialIndifference-Italic.otf"),
   });
 
   useEffect(() => {
-    if (loaded) {
+    if (error) throw error;
+
+    if (fontsLoaded) {
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [fontsLoaded, error]);
 
-  if (!loaded) {
+  if (!fontsLoaded) {
+    return null;
+  }
+
+  if (!fontsLoaded && !error) {
     return null;
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <Stack>
+      <Stack.Screen
+        name="index"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="(auth)"
+        options={{
+          headerShown: false,
+        }}
+      />
+    </Stack>
   );
-}
+};
+
+export default RootLayout;
