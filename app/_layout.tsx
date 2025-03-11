@@ -38,7 +38,11 @@ const RootLayout = () => {
   }
 
   return (
-    <Stack>
+    <Stack
+      screenOptions={{
+        animation: "fade",
+      }}
+    >
       <Stack.Screen
         name="index"
         options={{
@@ -47,6 +51,12 @@ const RootLayout = () => {
       />
       <Stack.Screen
         name="(auth)"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="(tabs)"
         options={{
           headerShown: false,
         }}
