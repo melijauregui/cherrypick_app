@@ -3,27 +3,6 @@ import React from "react";
 import { Tabs, Redirect } from "expo-router";
 import icons from "../../constants/icons";
 
-const TabIcon = ({
-  icon,
-  color,
-  name,
-  focused,
-}: {
-  icon: ImageSourcePropType;
-  color: string;
-  name: string;
-  focused: boolean;
-}) => {
-  return (
-    <View className="items-center top-[5]">
-      <Image
-        source={icon}
-        resizeMode="contain"
-        style={{ tintColor: color, width: 24, height: 24 }}
-      />
-    </View>
-  );
-};
 
 const TabsLayout = () => {
   return (
@@ -80,5 +59,27 @@ const Page = ({
         ),
       }}
     />
+  );
+};
+
+const TabIcon = ({
+  icon,
+  color,
+  name,
+  focused,
+}: {
+  icon: ImageSourcePropType;
+  color: string;
+  name: string;
+  focused: boolean;
+}) => {
+  return (
+    <View className="items-center top-[5]">
+      <Image
+        source={icon}
+        resizeMode="contain"
+        style={{ tintColor: color, width: 24, height: 24 }}
+      />
+    </View>
   );
 };
