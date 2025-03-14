@@ -30,3 +30,45 @@ export default function App() {
     </SafeAreaView>
   );
 }
+
+// import React, { useEffect, useState } from 'react'
+// import { View, Text, ActivityIndicator } from 'react-native'
+
+// const API_URL = 'http://localhost:3000/users/123' // Replace with your actual server URL
+
+// const UserScreen = () => {
+//   const [user, setUser] = useState<{ id: string; name: string; age: number } | null>(null)
+//   const [loading, setLoading] = useState(true)
+//   const [error, setError] = useState<string | null>(null)
+
+//   useEffect(() => {
+//     const fetchUser = async () => {
+//       try {
+//         const response = await fetch(API_URL)
+//         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`)
+        
+//         const data = await response.json()
+//         setUser(data)
+//       } catch (err) {
+//         setError((err as Error).message)
+//       } finally {
+//         setLoading(false)
+//       }
+//     }
+
+//     fetchUser()
+//   }, [])
+
+//   if (loading) return <ActivityIndicator size="large" />
+//   if (error) return <Text>Error: {error}</Text>
+
+//   return (
+//     <View>
+//       <Text>User ID: {user?.id}</Text>
+//       <Text>Name: {user?.name}</Text>
+//       <Text>Age: {user?.age}</Text>
+//     </View>
+//   )
+// }
+
+// export default UserScreen

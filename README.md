@@ -1,3 +1,36 @@
+# Run 
+- front:  npx expo start --clear   
+- server: npx ts-node server/index.ts
+- database: (dentro de database) uvicorn server:app --reload
+
+# Ejemplo en endpoint 3000 en server
+http://localhost:3000/images/jean.webp
+
+deberia devolver:
+[
+  {
+    "id": "9.jpg",
+    "score": 0.699426651,
+    "values": [],
+    "brand": "pinterest",
+    "type": "jean"
+  },
+  {
+    "id": "14.jpg",
+    "score": 0.697699,
+    "values": [],
+    "brand": "pinterest",
+    "type": "jean"
+  },
+  {
+    "id": "11.jpg",
+    "score": 0.661187947,
+    "values": [],
+    "brand": "pinterest",
+    "type": "jean"
+  }
+]
+
 # Welcome to your Expo app 👋
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
@@ -48,3 +81,4 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+

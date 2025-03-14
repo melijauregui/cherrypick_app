@@ -43,9 +43,9 @@ export default SignIn;
 const googleSignInButton = () => {
   const [request, response, promptAsync] = Google.useAuthRequest({
     androidClientId:
-      "321366117154-pjul3132tfs37empssra1ll9mogl8ski.apps.googleusercontent.com",
+      process.env.ANDROID_CLIENT_ID,
     iosClientId:
-      "321366117154-gq34d2c6r30i8tl8r45dpte4i0ba8nk9.apps.googleusercontent.com",
+      process.env.IOS_CLIENT_ID,
   });
 
   useEffect(() => {

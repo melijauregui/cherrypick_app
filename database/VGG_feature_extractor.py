@@ -14,16 +14,18 @@ and the output from the final layer has a shape of 512 - our feature vector leng
 import numpy as np
 from numpy import linalg as LA
 
-from tensorflow.keras.applications.vgg16 import VGG16
-from tensorflow.keras.preprocessing import image
-from tensorflow.keras.applications.vgg16 import preprocess_input
+from tensorflow import keras
+from keras._tf_keras.keras.applications.vgg16 import VGG16
+
+from keras._tf_keras.keras.preprocessing import image
+from keras._tf_keras.keras.applications.vgg16 import preprocess_input
+from io import BytesIO
+from PIL import Image
+
 
 
 class VGGNet:
     def __init__(self):
-        # weights: 'imagenet'
-        # pooling: 'max' or 'avg'
-        # input_shape: (width, height, 3), width and height should >= 48
         self.input_shape = (224, 224, 3)
         self.weight = 'imagenet'
         self.pooling = 'max'
@@ -43,4 +45,21 @@ class VGGNet:
         feat = self.model.predict(img)
         norm_feat = feat[0]/LA.norm(feat[0])
         return norm_feat
+    
+    def extract_feat_image(self, image_bytes):
+        print(f"Received image fuction: {len(image_bytes)} bytes")
+        try:
+            img = Image.open(BytesIO(image_bytes))
+            img = img.convert("RGB")
+            img = img.resize((224, 224))
+            img = image.img_to_array(img)
+            img = np.expand_dims(img, axis=0)
+            img = preprocess_input(img)
+            feat = self.model.predict(img)
+            norm_feat = feat[0]/LA.norm(feat[0])
+            return norm_feat
+        
+        except Exception as e:
+            print(f"Error loading image: {str(e)}")
+            return None
 
