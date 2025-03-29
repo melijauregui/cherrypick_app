@@ -45,10 +45,11 @@ const Page = ({
         title: title,
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: "black",
+          backgroundColor: "#301c11",
           height: 55,
+          borderColor: "#301c11",
         },
-        tabBarActiveTintColor: "#F8BFBF",
+        tabBarActiveTintColor: "#FFFFFF",
         tabBarIcon: ({ color, focused }) => (
           <TabIcon
             icon={icon}

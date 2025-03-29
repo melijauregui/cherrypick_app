@@ -1,120 +1,13 @@
-import { z } from '@hono/zod-openapi'
-import { Pinecone, RecordMetadata } from "@pinecone-database/pinecone";
 import fs from "fs";
-
-
-//funcion para llamar a la red neuronal
-async function callVGGNet(imagePath: string) : Promise<number[]> {
-  const formData = new FormData();
-  const fs  = require("fs");
-  const fileBuffer = fs.readFileSync(imagePath);
-  const fileBlob = new Blob([fileBuffer]);
-  formData.append("file", fileBlob, imagePath);
-  
-  const response = await fetch("http://127.0.0.1:8000/predict/", {
-      method: "POST",
-      body: formData,
-  });
-
-  const result = await response.json();
-  return result;
-}
-
-interface Metadata {
-  id: string;
-  score: number;
-  values: number[];
-  brand : string;
-  type : string;
-}
-
-//funcion para hacer query a pinecone
-async function queryPinecone(queryVector: number[]) : Promise<Metadata[]>  {
-  try {
-    const pc = new Pinecone({
-      apiKey: process.env.PINECONE_API_KEY?.toString() || "",
-     });
-
-    const index = pc.Index(process.env.PINECONE_INDEX_NAME?.toString() || "");
-    const queryResponse  = await index.namespace('example-namespace').query({
-      topK: 3, 
-      vector: queryVector,
-      includeMetadata: true,
-    });
-
-    if (!queryResponse || !queryResponse.matches || queryResponse.matches.length === 0) {
-      console.log("No results found");
-      return [];
-    }
-    
-    const topResults: Metadata[] = queryResponse.matches.map((match) => {
-      if (!match.id || typeof match.score !== "number" || !Array.isArray(match.values)) {
-        console.error("Invalid metadata format", match);
-        return null;
-      }
-    
-      return {
-        id: match.id,
-        score: match.score,
-        values: match.values,
-        brand: match.metadata?.brand || "Unknown",
-        type: match.metadata?.type || "Unknown",
-      };
-    }).filter((item): item is Metadata => item !== null);
-    
-    return topResults;
-
-  } catch (error) {
-    console.error("Error querying Pinecone:", error);
-    return [];
-  }
-}
-
-//schema para el parametro del endpoint (image_path)
-const ImageParamSchema = z.object({
-  image_path: z.string().openapi({
-    param: { name: 'image_path', in: 'path' },
-    example: 'jean.webp',
-  }),
-})
-
-//schema para la respuesta del endpoint (Top 3 Matches)
-const TopMatchSchema = z
-  .object({
-    id: z.string().openapi({
-      example: '13.jpg',
-    }),
-    score: z.number().openapi({
-      example: 0.98,
-    }),
-    values: z.array(z.number()).openapi({
-      example: [0.1, 0.2, 0.3],
-    }),
-    brand: z.string().openapi({
-      example: 'Levis',
-    }),
-    type: z.string().openapi({
-      example: 'Jeans',
-    }),
-  })
-  .openapi('User')
-
-const TopMatchesSchema = z.array(TopMatchSchema).openapi({
-  example: [
-    {
-      id: '13.jpg',
-      score: 0.98,
-      values: [0.1, 0.2, 0.3],
-      brand: 'Levis',
-      type: 'Jeans',
-    },
-  ],
-})
-
-
+import { OpenAPIHono } from '@hono/zod-openapi'
+import { callVGGNet, ImageParamSchema, queryPinecone, TopMatchesSchema } from './app/routeVector';
 import { createRoute } from '@hono/zod-openapi'
+import { PaginatedResponseSchema, PaginationSchema } from "./app/allDatabase";
 
-const route = createRoute({
+const app = new OpenAPIHono()
+export default app
+
+const routeVector = createRoute({
   method: 'get',
   path: '/images/{image_path}',
   request: {
@@ -132,12 +25,7 @@ const route = createRoute({
   },
 })
 
-
-import { OpenAPIHono } from '@hono/zod-openapi'
-
-const app = new OpenAPIHono()
-
-app.openapi(route, async (c) => {
+app.openapi(routeVector, async (c) => {
   const { image_path } = c.req.valid('param')
   const image_path_complete = `./server/images/${image_path}`;
   const queryVector = await callVGGNet(image_path_complete);
@@ -149,12 +37,46 @@ app.openapi(route, async (c) => {
   )
 })
 
-app.doc('/doc', {
-  openapi: '3.0.0',
-  info: {
-    version: '1.0.0',
-    title: 'My API',
+const paginatedRoute = createRoute({
+  method: 'get',
+  path: '/database',
+  request: {
+    query: PaginationSchema,
+  },
+  responses: {
+    200: {
+      content: {
+        'application/json': {
+          schema: PaginatedResponseSchema,
+        },
+      },
+      description: 'Devuelve los datos de la base de datos de forma paginada',
+    },
   },
 })
 
-export default app
+// Registrar el endpoint en la aplicación
+app.openapi(paginatedRoute, async (c) => {
+  const { page, limit } = c.req.valid('query')
+
+  // const data = await getPaginatedData(page, limit) // Función que retorna un array con los datos de la página solicitada
+
+  return c.json(
+    {
+      page,
+      limit,
+      total: 4, 
+      data: ["https://i.pinimg.com/474x/72/ec/8e/72ec8eb21c671a640a92c0a24c76bad8.jpg",
+              "https://i.pinimg.com/474x/e3/87/4b/e3874b60b2bd8c354b80f74b768ff45a.jpg",
+              "https://i.pinimg.com/736x/32/be/3e/32be3e7fa9aa0f103599845cf1778d46.jpg",
+              "https://i.pinimg.com/474x/1f/21/16/1f2116d0a2d253fea8853cbcc7c6820b.jpg",
+              "https://i.pinimg.com/736x/32/be/3e/32be3e7fa9aa0f103599845cf1778d46.jpg",
+              "https://i.pinimg.com/474x/72/ec/8e/72ec8eb21c671a640a92c0a24c76bad8.jpg",
+              "https://i.pinimg.com/474x/e3/87/4b/e3874b60b2bd8c354b80f74b768ff45a.jpg",
+              "https://i.pinimg.com/736x/32/be/3e/32be3e7fa9aa0f103599845cf1778d46.jpg",
+              "https://i.pinimg.com/474x/1f/21/16/1f2116d0a2d253fea8853cbcc7c6820b.jpg",
+              "https://i.pinimg.com/736x/32/be/3e/32be3e7fa9aa0f103599845cf1778d46.jpg"], 
+    },
+    200
+  )
+})

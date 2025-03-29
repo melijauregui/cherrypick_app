@@ -1,31 +1,37 @@
-import { View, Text, Image, StatusBar, FlatList } from "react-native";
+import { View, Text, Image, StatusBar, FlatList, Dimensions } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import React, { useEffect, useState } from "react";
-import ScrollViewFullHeight from "../../components/ScrollViewFullHeight";
 import { MasonryFlashList } from "@shopify/flash-list";
 
 const Home = () => {
-  const clothingItems: { id: string; url: string }[] = getClothingItems();
+  const [clothingItems, setClothingItems] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchClothingItems = async () => {
+      const items = await getClothingItems();
+      setClothingItems(items);
+      console.log("Datos paginados:", items);
+    };
+
+    fetchClothingItems();
+  }, []);
 
   return (
       <SafeAreaProvider>
-    <SafeAreaView className="bg-brown-strong w-full" style={{
-    flex: 1,
-    marginTop: StatusBar.currentHeight || 0,
-  }}>
+    <SafeAreaView className="bg-brown-strong w-full flex-1 "  >
       <MasonryFlashList
-  data={clothingItems}
-  numColumns={2}
-  showsVerticalScrollIndicator={false}
-  contentContainerStyle={{ }}
-  renderItem={({item, index}: {item: {id: string, url: string}, index: number}) => <ClothingItemComponent
-    i={index}
-    key={index}
-    id={(index).toString()}
-    url={item.url}
-  />}
-  onEndReachedThreshold={0.1}
-/>
+        data={clothingItems}
+        numColumns={2}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingVertical: 10}}
+        renderItem={({item, index}: {item: string, index: number}) => <ClothingItemComponent
+          i={index}
+          key={index}
+          id={(index).toString()}
+          url={item}
+        />}
+        onEndReachedThreshold={0.1}
+      />
     </SafeAreaView>
   </SafeAreaProvider>
   );
@@ -37,7 +43,9 @@ const ClothingItemComponent = ({ i, id, url }: { i:number, id: string; url: stri
     width: 0,
     height: 0,
   });
-  const widthDetermined = 190; //width hard coded
+
+  const { width, height } = Dimensions.get("window");
+  const widthDetermined = (width/2)-10; //width hard coded
 
   useEffect(() => {
     Image.getSize(
@@ -54,7 +62,7 @@ const ClothingItemComponent = ({ i, id, url }: { i:number, id: string; url: stri
     : widthDetermined;
 
   return (
-    <View style={{ width: widthDetermined, borderRadius: 8, overflow: "hidden" ,marginTop: i < 2 ? 0 : 18 , marginLeft: i % 2 === 0 ? 0 : 4 }}>
+    <View className="mx-auto" style={{ width: widthDetermined, borderRadius: 8, overflow: "hidden", marginTop: i < 2 ? 0 : 18 }}>
       <Image
         source={{ uri: url }}
         style={{ width: widthDetermined, height: imageHeight }}
@@ -63,14 +71,35 @@ const ClothingItemComponent = ({ i, id, url }: { i:number, id: string; url: stri
     </View>
   );
 };
-function getClothingItems(): { id: string; url: string }[]  {
-  const clothingItems: { id: string; url: string }[] = Array.from({ length: 0 }, () => ({ id: "", url: "" }));
-  clothingItems.push({ id: "1", url: "https://i.pinimg.com/474x/72/ec/8e/72ec8eb21c671a640a92c0a24c76bad8.jpg" });
-  clothingItems.push({ id: "2", url: "https://i.pinimg.com/474x/e3/87/4b/e3874b60b2bd8c354b80f74b768ff45a.jpg" });
-  clothingItems.push({ id: "3", url: "https://i.pinimg.com/736x/32/be/3e/32be3e7fa9aa0f103599845cf1778d46.jpg" });
-  clothingItems.push({ id: "4", url: "https://i.pinimg.com/474x/1f/21/16/1f2116d0a2d253fea8853cbcc7c6820b.jpg" });
-  clothingItems.push({ id: "5", url: "https://i.pinimg.com/736x/32/be/3e/32be3e7fa9aa0f103599845cf1778d46.jpg" });
 
-  return clothingItems;
+async function getClothingItems(): Promise<string[]>  {
+  const page = "2";
+  const limit = "10";
+
+  try {
+    const response: Response = await fetch(
+      `http://localhost:3000/database?page=${page}&limit=${limit}`,
+      {
+        method: "GET",
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Error al obtener los datos");
+    }
+
+    const jsonResponse: any = await response.json();
+    const clothingItems: string[] = jsonResponse.data;
+    console.log("Clothing items:", clothingItems);
+    return clothingItems;
+
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Error:", error.message);
+    } else {
+      console.error("Error desconocido");
+    }
+    return [];
+  }
 }
 
