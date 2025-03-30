@@ -99,16 +99,16 @@ index = pc.Index(config.PINECONE_INDEX_NAME)
 vectors = []
     
 for _, row in df.iterrows():
-    print(f'Processing {row["uuid"]}...')
-    print(f'Image URL: {row["image"]}')
-    print(f'Image embedding: {row["image_embedding"]}')
-    print(f'Text embedding: {row["text_embedding"]}')
-    print(f'Brand: {row["brand"]}')
-    print(f'URL: {row["url"]}')
-    print(f'Title: {row["title"]}')
-    print(f'Selling price: {row["selling_price"]}')
-    print(f'Product details: {row["product_details"]}')
-    print('-----------------------------------')
+    # print(f'Processing {row["uuid"]}...')
+    # print(f'Image URL: {row["image"]}')
+    # print(f'Image embedding: {row["image_embedding"]}')
+    # print(f'Text embedding: {row["text_embedding"]}')
+    # print(f'Brand: {row["brand"]}')
+    # print(f'URL: {row["url"]}')
+    # print(f'Title: {row["title"]}')
+    # print(f'Selling price: {row["selling_price"]}')
+    # print(f'Product details: {row["product_details"]}')
+    # print('-----------------------------------')
     vectors.append(
         {
         "id": f'{row["uuid"]}_image', 
