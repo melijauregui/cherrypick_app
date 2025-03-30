@@ -5,9 +5,10 @@ import numpy as np
 
 # Configurar dispositivo
 device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+model_name = "melijauregui/fashionclip-finetuned"
 
 # Cargar modelo y processor
-model = AutoModel.from_pretrained("fashionclip-finetuned", trust_remote_code=True).to(device)
+model = AutoModel.from_pretrained(model_name, trust_remote_code=True).to(device)
 processor = AutoProcessor.from_pretrained("Marqo/marqo-fashionCLIP", trust_remote_code=True)
 
 # model = AutoModel.from_pretrained("Marqo/marqo-fashionCLIP", trust_remote_code=True).to(device)

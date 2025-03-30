@@ -107,8 +107,13 @@ for epoch in range(EPOCHS):
     avg_loss = running_loss / len(dataloader)
     print(f"✅ Epoch {epoch+1} - Loss: {avg_loss:.4f}")
 
+from huggingface_hub import HfApi, HfFolder, Repository
 
 # --- GUARDADO DEL MODELO ---
-model.save_pretrained(SAVE_PATH)
-processor.save_pretrained(SAVE_PATH)
-print(f"\n📦 Modelo guardado en: {SAVE_PATH}")
+# model.save_pretrained(SAVE_PATH)
+# processor.save_pretrained(SAVE_PATH)
+# print(f"\n📦 Modelo guardado en: {SAVE_PATH}")
+model_name = "melijauregui/fashionclip-finetuned"
+
+model.push_to_hub(model_name)
+processor.push_to_hub(model_name)
