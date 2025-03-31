@@ -1,3 +1,4 @@
+from torch.nn.functional import cosine_similarity
 from huggingface_hub import HfApi, HfFolder, Repository
 from io import BytesIO
 import os
@@ -10,6 +11,7 @@ from transformers import AutoProcessor, AutoModel
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from torch.nn.functional import cosine_similarity
 
 # --- CONFIGURACIÓN ---
 MODEL_NAME = "Marqo/marqo-fashionCLIP"
@@ -18,7 +20,6 @@ IMAGE_DIR = "images"
 BATCH_SIZE = 8
 EPOCHS = 5
 LR = 1e-5
-SAVE_PATH = "fashionclip-finetuned"
 DEVICE = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 
 
@@ -43,6 +44,13 @@ class FashionDataset(Dataset):
 def collate_fn(batch):
     images, texts = zip(*batch)
     return list(images), list(texts)
+
+
+def contrastive_loss(image_embeds, text_embeds, margin=0.5):
+    positive = cosine_similarity(image_embeds, text_embeds)
+    negative = 1 - positive
+    loss = torch.mean(torch.relu(margin - positive + negative))
+    return loss
 
 
 def cosine_similarity_loss(image_embeds, text_embeds):
@@ -99,7 +107,7 @@ for epoch in range(EPOCHS):
         text_embeds = text_embeds / text_embeds.norm(p=2, dim=-1, keepdim=True)
 
         # Calcular loss
-        loss = cosine_similarity_loss(image_embeds, text_embeds)
+        loss = contrastive_loss(image_embeds, text_embeds)
 
         optimizer.zero_grad()
         loss.backward()
@@ -115,7 +123,8 @@ for epoch in range(EPOCHS):
 # model.save_pretrained(SAVE_PATH)
 # processor.save_pretrained(SAVE_PATH)
 # print(f"\n📦 Modelo guardado en: {SAVE_PATH}")
-model_name = "Sofia-gb/fashionclip-finetuned"
+model_name = "Sofia-gb/fashionclip-finetuned2"
+# model_name = "Sofia-gb/fashionclip-finetuned" # uses cosine_similarity_loss
 
 model.push_to_hub(model_name)
 processor.push_to_hub(model_name)

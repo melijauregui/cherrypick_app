@@ -68,7 +68,9 @@ gallery_paths = [
     "sinRotura.png",
     "roturas_negro1.jpg",
 ]
-find_most_similar_image(query_image_path, gallery_paths, model_name)
+# find_most_similar_image(query_image_path, gallery_paths, model_name)
+find_most_similar_image(query_image_path, gallery_paths,
+                        model_name="Sofia-gb/fashionclip-finetuned2")
 
 query_image_path = "rotura1.png"
 gallery_paths = [
@@ -78,4 +80,6 @@ gallery_paths = [
     "roturas_negro1.jpg",
     "roturas_negro2.jpg",
 ]
-find_most_similar_image(query_image_path, gallery_paths, model_name)
+# find_most_similar_image(query_image_path, gallery_paths, model_name)
+# find_most_similar_image(query_image_path, gallery_paths,
+#                        model_name="Sofia-gb/fashionclip-finetuned2")
