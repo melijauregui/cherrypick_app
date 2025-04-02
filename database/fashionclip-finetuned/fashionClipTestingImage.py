@@ -39,7 +39,7 @@ def find_most_similar_image(query_image_path, gallery_paths, model_name):
 
     print(f"📸 Imagen más similar para image:{query_image_path}: {gallery_paths[np.argmax(similarities)]}\n")
 
-model_name="melijauregui/fashionclip-roturas"
+model_name="melijauregui/fashionclip-roturas2"
 query_image_path = "roturas-negro2.jpg"
 gallery_paths = [
     "rotura1.png",

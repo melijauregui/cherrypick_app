@@ -6,25 +6,22 @@ import numpy as np
 # Configurar dispositivo
 device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 
+model_name="melijauregui/fashionclip-roturas4"
 # Cargar modelo y processor
-model = AutoModel.from_pretrained("fashionclip-finetuned", trust_remote_code=True).to(device)
+model = AutoModel.from_pretrained(model_name, trust_remote_code=True).to(device)
 processor = AutoProcessor.from_pretrained("Marqo/marqo-fashionCLIP", trust_remote_code=True)
 
 # model = AutoModel.from_pretrained("Marqo/marqo-fashionCLIP", trust_remote_code=True).to(device)
 # processor = AutoProcessor.from_pretrained("Marqo/marqo-fashionCLIP", trust_remote_code=True)
 
 # Tu imagen
-image_path = "image.png"
+image_path = "images-testing/sin-rotura.png"
 image = Image.open(image_path).convert("RGB")
 
 # Lista de descripciones posibles
 descriptions = [
-    "Jean wide leg celeste sin roturas",
-    "Jean wide leg con rotura",
-    "Jean holgado de corte recto",
-    "Jean celeste de pierna ancha",
-    "Jean claro sin detalles",
-    "Jean casual estilo urbano"
+    "jean sin rotura",
+    "jean con rotura",
 ]
 
 # Procesar imagen

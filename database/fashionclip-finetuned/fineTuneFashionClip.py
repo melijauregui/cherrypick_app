@@ -13,11 +13,12 @@ import torch.nn as nn
 import torch.optim as optim
 
 # --- CONFIGURACIÓN ---
+ORIGINAL_MODEL_NAME = "Marqo/marqo-fashionCLIP"
 MODEL_NAME = "Marqo/marqo-fashionCLIP"
-MODEL_NAME_TO_PUSH = "melijauregui/fashionclip-roturas"
-CSV_PATH = "datasets/roturas.csv"
-BATCH_SIZE = 8
-EPOCHS = 5
+MODEL_NAME_TO_PUSH = "melijauregui/fashionclip-roturas4"
+CSV_PATH = "datasets/roturas-vs-sin.csv"
+BATCH_SIZE = 50
+EPOCHS = 40
 LR = 1e-5
 DEVICE = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 
@@ -53,7 +54,7 @@ def contrastive_loss(image_embeds, text_embeds, margin=0.5):
 
 # --- CARGA DE DATOS Y MODELO ---
 df = pd.read_csv(CSV_PATH)
-processor = AutoProcessor.from_pretrained(MODEL_NAME, trust_remote_code=True)
+processor = AutoProcessor.from_pretrained(ORIGINAL_MODEL_NAME, trust_remote_code=True)
 model = AutoModel.from_pretrained(MODEL_NAME, trust_remote_code=True).to(DEVICE)
 
 dataset = FashionDataset(df, processor)
