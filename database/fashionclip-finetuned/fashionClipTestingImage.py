@@ -16,9 +16,11 @@ def find_most_similar_image(query_image_path, gallery_paths, model_name):
     processor = AutoProcessor.from_pretrained(
         "Marqo/marqo-fashionCLIP", trust_remote_code=True)
 
-    query_image = Image.open(f'{folder_path}/{query_image_path}').convert("RGB")
+    query_image = Image.open(
+        f'{folder_path}/{query_image_path}').convert("RGB")
 
-    gallery_images = [Image.open(f'{folder_path}/{p}').convert("RGB") for p in gallery_paths]
+    gallery_images = [Image.open(
+        f'{folder_path}/{p}').convert("RGB") for p in gallery_paths]
 
     with torch.no_grad():
         # Procesar query
@@ -27,19 +29,24 @@ def find_most_similar_image(query_image_path, gallery_paths, model_name):
         query_emb = model.model.encode_image(query_inputs["pixel_values"])
         query_emb = query_emb / query_emb.norm(p=2, dim=-1, keepdim=True)
 
-        gallery_inputs = processor(images=gallery_images, return_tensors="pt").to(device)
+        gallery_inputs = processor(
+            images=gallery_images, return_tensors="pt").to(device)
         gallery_embs = model.model.encode_image(gallery_inputs["pixel_values"])
-        gallery_embs = gallery_embs / gallery_embs.norm(p=2, dim=-1, keepdim=True)
+        gallery_embs = gallery_embs / \
+            gallery_embs.norm(p=2, dim=-1, keepdim=True)
 
     similarities = torch.matmul(
         query_emb, gallery_embs.T).squeeze().cpu().numpy()
 
-    for i, path in enumerate(gallery_paths):
-        print(f"Similitud con '{path}': {similarities[i]:.4f}")
+    sorted_indices = np.argsort(similarities)[::-1]
+    for i in sorted_indices:
+        print(f"Similitud con '{gallery_paths[i]}': {similarities[i]}")
 
-    print(f"📸 Imagen más similar para image:{query_image_path}: {gallery_paths[np.argmax(similarities)]}\n")
+    print(
+        f"📸 Imagen más similar para :{query_image_path}: {gallery_paths[np.argmax(similarities)]}\n")
 
-model_name="melijauregui/fashionclip-roturas2"
+
+model_name = "Sofia-gb/fashionclip-roturas2"
 query_image_path = "roturas-negro2.jpg"
 gallery_paths = [
     "rotura1.png",
@@ -62,4 +69,4 @@ gallery_paths = [
     "skinny-rotura.png"
 ]
 find_most_similar_image(query_image_path, gallery_paths,
-                       model_name=model_name)
+                        model_name=model_name)

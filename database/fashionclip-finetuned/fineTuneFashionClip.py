@@ -17,8 +17,8 @@ ORIGINAL_MODEL_NAME = "Marqo/marqo-fashionCLIP"
 MODEL_NAME = "Marqo/marqo-fashionCLIP"
 MODEL_NAME_TO_PUSH = "melijauregui/fashionclip-roturas4"
 CSV_PATH = "datasets/roturas-vs-sin.csv"
-BATCH_SIZE = 50
-EPOCHS = 40
+BATCH_SIZE = 20
+EPOCHS = 30
 LR = 1e-5
 DEVICE = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 
@@ -53,56 +53,70 @@ def contrastive_loss(image_embeds, text_embeds, margin=0.5):
     return loss
 
 # --- CARGA DE DATOS Y MODELO ---
-df = pd.read_csv(CSV_PATH)
-processor = AutoProcessor.from_pretrained(ORIGINAL_MODEL_NAME, trust_remote_code=True)
-model = AutoModel.from_pretrained(MODEL_NAME, trust_remote_code=True).to(DEVICE)
-
-dataset = FashionDataset(df, processor)
-dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, collate_fn=collate_fn)
-
-optimizer = optim.AdamW(model.parameters(), lr=LR)
-
-# --- ENTRENAMIENTO ---
-model.train()
-for epoch in range(EPOCHS):
-    running_loss = 0.0
-    for images, texts in tqdm(dataloader, desc=f"Epoch {epoch+1}/{EPOCHS}"):
-        inputs = processor(
-            images=images,
-            text=texts,
-            return_tensors="pt",
-            padding="max_length",
-            truncation=True,
-            max_length=77
-        ).to(DEVICE)
-
-        pixel_values = inputs["pixel_values"]
-        input_ids = inputs["input_ids"]
-        attention_mask = inputs["attention_mask"]
-
-        image_embeds = model.model.encode_image(pixel_values)
-        text_embeds = model.get_text_features(
-            input_ids=input_ids,
-            attention_mask=attention_mask,
-            normalize=True
-        )
-
-        # Normalizar (igual que get_*_features)
-        image_embeds = image_embeds / image_embeds.norm(p=2, dim=-1, keepdim=True)
-        text_embeds = text_embeds / text_embeds.norm(p=2, dim=-1, keepdim=True)
-
-        # Calcular loss
-        loss = contrastive_loss(image_embeds, text_embeds)
-
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-
-        running_loss += loss.item()
-
-    avg_loss = running_loss / len(dataloader)
-    print(f"✅ Epoch {epoch+1} - Loss: {avg_loss:.4f}")
 
 
-model.push_to_hub(MODEL_NAME_TO_PUSH)
-processor.push_to_hub(MODEL_NAME_TO_PUSH)
+def fine_tune(csv_path, model_name, model_name_to_push):
+    df = pd.read_csv(csv_path)
+    processor = AutoProcessor.from_pretrained(
+        ORIGINAL_MODEL_NAME, trust_remote_code=True)
+    model = AutoModel.from_pretrained(
+        model_name, trust_remote_code=True).to(DEVICE)
+
+    dataset = FashionDataset(df, processor)
+    dataloader = DataLoader(dataset, batch_size=BATCH_SIZE,
+                            shuffle=True, collate_fn=collate_fn)
+
+    optimizer = optim.AdamW(model.parameters(), lr=LR)
+
+    # --- ENTRENAMIENTO ---
+    model.train()
+    for epoch in range(EPOCHS):
+        running_loss = 0.0
+        for images, texts in tqdm(dataloader, desc=f"Epoch {epoch+1}/{EPOCHS}"):
+            inputs = processor(
+                images=images,
+                text=texts,
+                return_tensors="pt",
+                padding="max_length",
+                truncation=True,
+                max_length=77
+            ).to(DEVICE)
+
+            pixel_values = inputs["pixel_values"]
+            input_ids = inputs["input_ids"]
+            attention_mask = inputs["attention_mask"]
+
+            image_embeds = model.model.encode_image(pixel_values)
+            text_embeds = model.get_text_features(
+                input_ids=input_ids,
+                attention_mask=attention_mask,
+                normalize=True
+            )
+
+            # Normalizar (igual que get_*_features)
+            image_embeds = image_embeds / \
+                image_embeds.norm(p=2, dim=-1, keepdim=True)
+            text_embeds = text_embeds / \
+                text_embeds.norm(p=2, dim=-1, keepdim=True)
+
+            # Calcular loss
+            loss = contrastive_loss(image_embeds, text_embeds)
+
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+            running_loss += loss.item()
+
+        avg_loss = running_loss / len(dataloader)
+        print(f"✅ Epoch {epoch+1} - Loss: {avg_loss:.4f}")
+
+    print(f'Pushing model to {model_name_to_push}')
+    # --- GUARDAR MODELO ---
+    model.push_to_hub(model_name_to_push)
+    processor.push_to_hub(model_name_to_push)
+
+
+# fine_tune(CSV_PATH, MODEL_NAME, MODEL_NAME_TO_PUSH)
+fine_tune(csv_path="datasets/roturas.csv", model_name=ORIGINAL_MODEL_NAME,
+          model_name_to_push="Sofia-gb/fashionclip-roturas2")
