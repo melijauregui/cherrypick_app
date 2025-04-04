@@ -7,12 +7,12 @@ import numpy as np
 device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 
 
-def find_most_similar_description(model_name, image_path, descriptions):
+def find_most_similar_description(model_name, pretrained_model_name, image_path, descriptions):
     # Cargar modelo y processor
     model = AutoModel.from_pretrained(
         model_name, trust_remote_code=True).to(device)
     processor = AutoProcessor.from_pretrained(
-        "Marqo/marqo-fashionCLIP", trust_remote_code=True)
+        pretrained_model_name, trust_remote_code=True)
 
     # Tu imagen
     image = Image.open(image_path).convert("RGB")
@@ -24,14 +24,19 @@ def find_most_similar_description(model_name, image_path, descriptions):
         image_features = image_features / \
             image_features.norm(p=2, dim=-1, keepdim=True)
 
-    # Procesar textos
-    text_inputs = processor(
-        text=descriptions,
-        return_tensors="pt",
-        padding="max_length",
-        truncation=True,
-        max_length=77
-    ).to(device)
+    if pretrained_model_name.endswith("SigLIP"):
+        text_inputs = processor(
+            text=descriptions, return_tensors="pt",
+            padding=True,
+            truncation=True,
+        ).to(device)
+    else:
+        text_inputs = processor(text=descriptions, return_tensors="pt",
+                                padding="max_length",
+                                truncation=True,
+                                max_length=77
+                                ).to(device)
+
     with torch.no_grad():
         text_features = model.get_text_features(**text_inputs)
         text_features = text_features / \
@@ -51,9 +56,53 @@ def find_most_similar_description(model_name, image_path, descriptions):
 # model_name = "melijauregui/fashionclip-roturas4"
 model_name = "Sofia-gb/fashionclip-roturas2"
 image_path = "images-testing/sin-rotura.png"
+pretrained_model_name = "Marqo/marqo-fashionCLIP"
 # Lista de descripciones posibles
 descriptions = [
-    "jean sin rotura",
-    "jean con rotura",
+    "jean sin roturas",
+    "jean con roturas"
 ]
-find_most_similar_description(model_name, image_path, descriptions)
+
+find_most_similar_description(
+    model_name, pretrained_model_name, image_path, descriptions)
+
+find_most_similar_description("Sofia-gb/fashionSigLIP-roturas",
+                              "Marqo/marqo-fashionSigLIP",
+                              image_path, descriptions)
+
+""" 
+Resultados:
+
+descriptions = [
+    "jean sin roturas",
+    "jean con roturas visibles"
+]
+
+FASHIONCLIP:
+Similitud con 'jean con roturas visibles': 0.4796622097492218
+Similitud con 'jean sin roturas': 0.31197893619537354
+Descripción más similar: jean con roturas visibles
+
+FASHIONSIGLIP:
+Similitud con 'jean sin roturas': 0.13367873430252075
+Similitud con 'jean con roturas visibles': 0.11075586080551147
+Descripción más similar: jean sin roturas
+
+-----------------------
+
+descriptions = [
+    "jean sin roturas",
+    "jean con roturas visibles"
+]
+
+FASHIONCLIP:
+Similitud con 'jean con roturas': 0.42065301537513733
+Similitud con 'jean sin roturas': 0.31197893619537354
+Descripción más similar: jean con roturas
+
+FASHIONSIGLIP:
+Similitud con 'jean con roturas': 0.17554162442684174
+Similitud con 'jean sin roturas': 0.13367873430252075
+Descripción más similar: jean con roturas
+
+"""

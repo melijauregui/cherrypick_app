@@ -4,7 +4,7 @@ from transformers import AutoModel, AutoProcessor
 import numpy as np
 
 
-def find_most_similar_image(query_image_path, gallery_paths, model_name):
+def find_most_similar_image(query_image_path, pretrained_model_name, gallery_paths, model_name):
     folder_path = "images-testing"
     # Configurar dispositivo
     device = torch.device(
@@ -14,7 +14,7 @@ def find_most_similar_image(query_image_path, gallery_paths, model_name):
     model = AutoModel.from_pretrained(
         model_name, trust_remote_code=True).to(device)
     processor = AutoProcessor.from_pretrained(
-        "Marqo/marqo-fashionCLIP", trust_remote_code=True)
+        pretrained_model_name, trust_remote_code=True)
 
     query_image = Image.open(
         f'{folder_path}/{query_image_path}').convert("RGB")
@@ -46,7 +46,10 @@ def find_most_similar_image(query_image_path, gallery_paths, model_name):
         f"📸 Imagen más similar para :{query_image_path}: {gallery_paths[np.argmax(similarities)]}\n")
 
 
-model_name = "Sofia-gb/fashionclip-roturas2"
+# pretrained_model_name_or_path = "Marqo/marqo-fashionCLIP"
+pretrained_model_name_or_path = "Marqo/marqo-fashionSigLIP"
+# model_name = "Sofia-gb/fashionclip-roturas2"
+model_name = "Sofia-gb/fashionSigLIP-roturas"
 query_image_path = "roturas-negro2.jpg"
 gallery_paths = [
     "rotura1.png",
@@ -56,7 +59,7 @@ gallery_paths = [
     "roturas-negro1.jpg",
     "skinny-rotura.png"
 ]
-find_most_similar_image(query_image_path, gallery_paths,
+find_most_similar_image(query_image_path, pretrained_model_name_or_path, gallery_paths,
                         model_name=model_name)
 
 query_image_path = "rotura1.png"
@@ -68,5 +71,26 @@ gallery_paths = [
     "roturas-negro2.jpg",
     "skinny-rotura.png"
 ]
-find_most_similar_image(query_image_path, gallery_paths,
+find_most_similar_image(query_image_path, pretrained_model_name_or_path, gallery_paths,
                         model_name=model_name)
+
+""" 
+pretrained_model_name_or_path = "Marqo/marqo-fashionSigLIP"
+model_name = "Sofia-gb/fashionSigLIP-roturas"
+
+Similitud con 'roturas-negro1.jpg': 0.9825956225395203
+Similitud con 'rotura1.png': 0.9593182802200317
+Similitud con 'rotura2.png': 0.9545838832855225
+Similitud con 'rotura3.png': 0.9480644464492798
+Similitud con 'sin-rotura.png': 0.8960565328598022
+Similitud con 'skinny-rotura.png': 0.8698640465736389
+📸 Imagen más similar para :roturas-negro2.jpg: roturas-negro1.jpg
+
+Similitud con 'rotura3.png': 0.9768972396850586
+Similitud con 'rotura2.png': 0.9755618572235107
+Similitud con 'roturas-negro1.jpg': 0.9666265249252319
+Similitud con 'roturas-negro2.jpg': 0.9593180418014526
+Similitud con 'skinny-rotura.png': 0.903894305229187
+Similitud con 'sin-rotura.png': 0.8768881559371948
+📸 Imagen más similar para :rotura1.png: rotura3.png
+"""

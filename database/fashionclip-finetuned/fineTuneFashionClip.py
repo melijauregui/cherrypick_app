@@ -55,10 +55,10 @@ def contrastive_loss(image_embeds, text_embeds, margin=0.5):
 # --- CARGA DE DATOS Y MODELO ---
 
 
-def fine_tune(csv_path, model_name, model_name_to_push):
+def fine_tune(csv_path, original_model_name, model_name, model_name_to_push):
     df = pd.read_csv(csv_path)
     processor = AutoProcessor.from_pretrained(
-        ORIGINAL_MODEL_NAME, trust_remote_code=True)
+        original_model_name, trust_remote_code=True)
     model = AutoModel.from_pretrained(
         model_name, trust_remote_code=True).to(DEVICE)
 
@@ -73,13 +73,27 @@ def fine_tune(csv_path, model_name, model_name_to_push):
     for epoch in range(EPOCHS):
         running_loss = 0.0
         for images, texts in tqdm(dataloader, desc=f"Epoch {epoch+1}/{EPOCHS}"):
+            if original_model_name.endswith("SigLIP"):
+                inputs = processor(
+                    images=images, text=texts, return_tensors="pt",
+                    padding=True,
+                    truncation=True,
+                ).to(DEVICE)
+        else:
+            inputs = processor(images=images, text=texts, return_tensors="pt",
+                               padding="max_length",
+                               truncation=True,
+                               max_length=77
+                               ).to(DEVICE)
             inputs = processor(
                 images=images,
                 text=texts,
                 return_tensors="pt",
-                padding="max_length",
-                truncation=True,
-                max_length=77
+                padding=True,
+                truncation=True
+                # padding="max_length",
+                # max_length=77
+
             ).to(DEVICE)
 
             pixel_values = inputs["pixel_values"]
@@ -117,6 +131,9 @@ def fine_tune(csv_path, model_name, model_name_to_push):
     processor.push_to_hub(model_name_to_push)
 
 
-# fine_tune(CSV_PATH, MODEL_NAME, MODEL_NAME_TO_PUSH)
-fine_tune(csv_path="datasets/roturas.csv", model_name=ORIGINAL_MODEL_NAME,
-          model_name_to_push="Sofia-gb/fashionclip-roturas2")
+# fine_tune(CSV_PATH, ORIGINAL_MODEL_NAME, MODEL_NAME, MODEL_NAME_TO_PUSH)
+# fine_tune(csv_path="datasets/roturas.csv",original_model_name=ORIGINAL_MODEL_NAME, model_name=ORIGINAL_MODEL_NAME,
+#          model_name_to_push="Sofia-gb/fashionclip-roturas2")
+
+fine_tune(csv_path="datasets/roturas.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
+          model_name_to_push="Sofia-gb/fashionSigLIP-roturas")
