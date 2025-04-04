@@ -79,22 +79,12 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push):
                     padding=True,
                     truncation=True,
                 ).to(DEVICE)
-        else:
-            inputs = processor(images=images, text=texts, return_tensors="pt",
-                               padding="max_length",
-                               truncation=True,
-                               max_length=77
-                               ).to(DEVICE)
-            inputs = processor(
-                images=images,
-                text=texts,
-                return_tensors="pt",
-                padding=True,
-                truncation=True
-                # padding="max_length",
-                # max_length=77
-
-            ).to(DEVICE)
+            else:
+                inputs = processor(images=images, text=texts, return_tensors="pt",
+                                   padding="max_length",
+                                   truncation=True,
+                                   max_length=77
+                                   ).to(DEVICE)
 
             pixel_values = inputs["pixel_values"]
             input_ids = inputs["input_ids"]
