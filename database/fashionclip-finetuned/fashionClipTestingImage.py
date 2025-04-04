@@ -49,7 +49,7 @@ def find_most_similar_image(query_image_path, pretrained_model_name, gallery_pat
 # pretrained_model_name_or_path = "Marqo/marqo-fashionCLIP"
 pretrained_model_name_or_path = "Marqo/marqo-fashionSigLIP"
 # model_name = "Sofia-gb/fashionclip-roturas2"
-model_name = "Sofia-gb/fashionSigLIP-roturas"
+model_name = "Sofia-gb/fashionSigLIP-roturas2"
 query_image_path = "roturas-negro2.jpg"
 gallery_paths = [
     "rotura1.png",
@@ -92,5 +92,26 @@ Similitud con 'roturas-negro1.jpg': 0.9666265249252319
 Similitud con 'roturas-negro2.jpg': 0.9593180418014526
 Similitud con 'skinny-rotura.png': 0.903894305229187
 Similitud con 'sin-rotura.png': 0.8768881559371948
+📸 Imagen más similar para :rotura1.png: rotura3.png
+
+------------------------
+
+pretrained_model_name_or_path = "Marqo/marqo-fashionSigLIP"
+model_name = "Sofia-gb/fashionSigLIP-roturas2"
+
+Similitud con 'roturas-negro1.jpg': 0.9772899746894836
+Similitud con 'rotura2.png': 0.9400231838226318
+Similitud con 'rotura3.png': 0.9360625743865967
+Similitud con 'rotura1.png': 0.9252451658248901
+Similitud con 'sin-rotura.png': 0.9028607606887817
+Similitud con 'skinny-rotura.png': 0.8645125031471252
+📸 Imagen más similar para :roturas-negro2.jpg: roturas-negro1.jpg
+
+Similitud con 'rotura3.png': 0.9816862344741821
+Similitud con 'rotura2.png': 0.9697244167327881
+Similitud con 'sin-rotura.png': 0.9368839263916016
+Similitud con 'roturas-negro1.jpg': 0.9331836104393005
+Similitud con 'skinny-rotura.png': 0.9270892143249512
+Similitud con 'roturas-negro2.jpg': 0.9252451658248901
 📸 Imagen más similar para :rotura1.png: rotura3.png
 """

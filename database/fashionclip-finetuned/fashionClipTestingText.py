@@ -49,6 +49,9 @@ def find_most_similar_description(model_name, pretrained_model_name, image_path,
     sorted_indices = np.argsort(similarities)[::-1]
     for i in sorted_indices:
         print(f"Similitud con '{descriptions[i]}': {similarities[i]}")
+    if len(similarities) == 2:
+        delta = abs(similarities[0] - similarities[1])
+        print(f"Diferencia: {delta}")
 
     print(f"Descripción más similar: {descriptions[np.argmax(similarities)]}")
 
@@ -59,14 +62,18 @@ image_path = "images-testing/sin-rotura.png"
 pretrained_model_name = "Marqo/marqo-fashionCLIP"
 # Lista de descripciones posibles
 descriptions = [
-    "jean sin roturas",
-    "jean con roturas"
+    "jean wide leg sin roturas. Color celeste.",
+    "jean wide leg con roturas. Color celeste."
 ]
 
 find_most_similar_description(
     model_name, pretrained_model_name, image_path, descriptions)
 
 find_most_similar_description("Sofia-gb/fashionSigLIP-roturas",
+                              "Marqo/marqo-fashionSigLIP",
+                              image_path, descriptions)
+
+find_most_similar_description("Sofia-gb/fashionSigLIP-roturas2",
                               "Marqo/marqo-fashionSigLIP",
                               image_path, descriptions)
 
@@ -92,7 +99,7 @@ Descripción más similar: jean sin roturas
 
 descriptions = [
     "jean sin roturas",
-    "jean con roturas visibles"
+    "jean con roturas"
 ]
 
 FASHIONCLIP:
@@ -105,4 +112,25 @@ Similitud con 'jean con roturas': 0.17554162442684174
 Similitud con 'jean sin roturas': 0.13367873430252075
 Descripción más similar: jean con roturas
 
+----------------------
+
+descriptions = [
+    "jean wide leg sin roturas. Color celeste.",
+    "jean wide leg con roturas. Color celeste."
+]
+
+Sofia-gb/fashionclip-roturas2:
+Similitud con 'jean wide leg con roturas. Color celeste.': 0.7467606067657471
+Similitud con 'jean wide leg sin roturas. Color celeste.': 0.7414008975028992
+Descripción más similar: jean wide leg con roturas. Color celeste.
+
+Sofia-gb/fashionBlip-roturas:
+Similitud con 'jean wide leg sin roturas. Color celeste.': 0.11929132044315338
+Similitud con 'jean wide leg con roturas. Color celeste.': 0.0963045060634613
+Descripción más similar: jean wide leg sin roturas. Color celeste.
+
+Sofia-gb/fashionBlip-roturas2:
+Similitud con 'jean wide leg sin roturas. Color celeste.': 0.0039484696462750435
+Similitud con 'jean wide leg con roturas. Color celeste.': -0.015217212960124016
+Descripción más similar: jean wide leg sin roturas. Color celeste.
 """
