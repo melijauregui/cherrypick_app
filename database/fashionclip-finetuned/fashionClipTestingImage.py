@@ -48,8 +48,8 @@ def find_most_similar_image(query_image_path, pretrained_model_name, gallery_pat
 
 # pretrained_model_name_or_path = "Marqo/marqo-fashionCLIP"
 pretrained_model_name_or_path = "Marqo/marqo-fashionSigLIP"
-# model_name = "Sofia-gb/fashionclip-roturas2"
-model_name = "Sofia-gb/fashionSigLIP-roturas2"
+# model_name = "Sofia-gb/fashionclip-roturas3"
+model_name = "Sofia-gb/fashionSigLIP-roturas3"
 query_image_path = "roturas-negro2.jpg"
 gallery_paths = [
     "rotura1.png",
@@ -114,4 +114,47 @@ Similitud con 'roturas-negro1.jpg': 0.9331836104393005
 Similitud con 'skinny-rotura.png': 0.9270892143249512
 Similitud con 'roturas-negro2.jpg': 0.9252451658248901
 📸 Imagen más similar para :rotura1.png: rotura3.png
+
+--------------------------
+
+pretrained_model_name_or_path = "Marqo/marqo-fashionSigLIP"
+model_name = "Sofia-gb/fashionSigLIP-roturas3"
+
+Similitud con 'roturas-negro1.jpg': 0.9869186878204346
+Similitud con 'rotura2.png': 0.9609938263893127
+Similitud con 'rotura3.png': 0.9580990076065063
+Similitud con 'rotura1.png': 0.9506805539131165
+Similitud con 'sin-rotura.png': 0.917148232460022
+Similitud con 'skinny-rotura.png': 0.8671223521232605
+📸 Imagen más similar para :roturas-negro2.jpg: roturas-negro1.jpg
+
+Similitud con 'rotura3.png': 0.9871813654899597
+Similitud con 'rotura2.png': 0.97878098487854
+Similitud con 'roturas-negro1.jpg': 0.9603569507598877
+Similitud con 'roturas-negro2.jpg': 0.9506804943084717
+Similitud con 'sin-rotura.png': 0.925117552280426
+Similitud con 'skinny-rotura.png': 0.9138990640640259
+📸 Imagen más similar para :rotura1.png: rotura3.png
+
+-------------------------
+
+pretrained_model_name_or_path = "Marqo/marqo-fashionCLIP"
+model_name = "Sofia-gb/fashionclip-roturas3"
+
+Similitud con 'roturas-negro1.jpg': 0.9827072620391846
+Similitud con 'rotura2.png': 0.8716366291046143
+Similitud con 'rotura3.png': 0.8712751269340515
+Similitud con 'rotura1.png': 0.866313099861145
+Similitud con 'sin-rotura.png': 0.8477672934532166
+Similitud con 'skinny-rotura.png': 0.8231112957000732
+📸 Imagen más similar para :roturas-negro2.jpg: roturas-negro1.jpg
+
+Similitud con 'rotura3.png': 0.986778974533081
+Similitud con 'rotura2.png': 0.9802199602127075
+Similitud con 'sin-rotura.png': 0.9763138890266418
+Similitud con 'skinny-rotura.png': 0.9402551651000977
+Similitud con 'roturas-negro2.jpg': 0.8663132190704346
+Similitud con 'roturas-negro1.jpg': 0.8636921644210815
+📸 Imagen más similar para :rotura1.png: rotura3.png
+
 """
