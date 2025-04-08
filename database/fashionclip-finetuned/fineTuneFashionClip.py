@@ -55,7 +55,7 @@ def contrastive_loss(image_embeds, text_embeds, margin=0.5):
 # --- CARGA DE DATOS Y MODELO ---
 
 
-def fine_tune(csv_path, original_model_name, model_name, model_name_to_push):
+def fine_tune(csv_path, original_model_name, model_name, model_name_to_push, batch_size=BATCH_SIZE, epochs=EPOCHS):
     df = pd.read_csv(csv_path)
     processor = AutoProcessor.from_pretrained(
         original_model_name, trust_remote_code=True)
@@ -63,16 +63,16 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push):
         model_name, trust_remote_code=True).to(DEVICE)
 
     dataset = FashionDataset(df, processor)
-    dataloader = DataLoader(dataset, batch_size=BATCH_SIZE,
+    dataloader = DataLoader(dataset, batch_size=batch_size,
                             shuffle=True, collate_fn=collate_fn)
 
     optimizer = optim.AdamW(model.parameters(), lr=LR)
 
     # --- ENTRENAMIENTO ---
     model.train()
-    for epoch in range(EPOCHS):
+    for epoch in range(epochs):
         running_loss = 0.0
-        for images, texts in tqdm(dataloader, desc=f"Epoch {epoch+1}/{EPOCHS}"):
+        for images, texts in tqdm(dataloader, desc=f"Epoch {epoch+1}/{epochs}"):
             if original_model_name.endswith("SigLIP"):
                 inputs = processor(
                     images=images, text=texts, return_tensors="pt",
@@ -128,5 +128,5 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push):
 # fine_tune(csv_path="datasets/roturas.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
 #           model_name_to_push="Sofia-gb/fashionSigLIP-roturas")
 
-fine_tune(csv_path="datasets/con-sin-roturas.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
-          model_name_to_push="Sofia-gb/fashionSigLIP-roturas2")
+fine_tune(csv_path="datasets/con-sin-roturas.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="melijauregui/fashionSigLIP-roturas2",
+        model_name_to_push="melijauregui/fashionSigLIP-roturas3")
