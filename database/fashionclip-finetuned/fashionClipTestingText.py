@@ -24,23 +24,27 @@ def find_most_similar_description(model_name, pretrained_model_name, image_path,
         image_features = image_features / \
             image_features.norm(p=2, dim=-1, keepdim=True)
 
-    if pretrained_model_name.endswith("SigLIP"):
-        text_inputs = processor(
-            text=descriptions, return_tensors="pt",
-            padding=True,
-            truncation=True,
-        ).to(device)
-    else:
-        text_inputs = processor(text=descriptions, return_tensors="pt",
-                                padding="max_length",
-                                truncation=True,
-                                max_length=77
-                                ).to(device)
+    # text_inputs = processor(
+    #         text=descriptions, return_tensors="pt",
+    #         padding=True,
+    #         truncation=True,
+    #         max_length=77
+    # ).to(device)
+    text_features = []
 
     with torch.no_grad():
-        text_features = model.get_text_features(**text_inputs)
-        text_features = text_features / \
-            text_features.norm(p=2, dim=-1, keepdim=True)
+        for desc in descriptions:
+            inputs = processor(text=desc, return_tensors="pt", padding=True, truncation=True).to(device)
+            emb = model.get_text_features(**inputs)
+            emb = emb / emb.norm(p=2, dim=-1, keepdim=True)
+            text_features.append(emb.squeeze(0))  # quitar dimensión batch
+
+    text_features = torch.stack(text_features)
+
+    # with torch.no_grad():
+    #     text_features = model.get_text_features(**text_inputs)
+    #     text_features = text_features / \
+    #         text_features.norm(p=2, dim=-1, keepdim=True)
 
     # Calcular similitudes
     similarities = torch.matmul(
@@ -54,28 +58,90 @@ def find_most_similar_description(model_name, pretrained_model_name, image_path,
         print(f"Diferencia: {delta}")
 
     print(f"Descripción más similar: {descriptions[np.argmax(similarities)]}")
+    
+    
+
+def find_similarities_matrix(model_name, pretrained_model_name, image_paths, descriptions):
+    # Cargar modelo y processor
+    model = AutoModel.from_pretrained(model_name, trust_remote_code=True).to(device)
+    processor = AutoProcessor.from_pretrained(pretrained_model_name, trust_remote_code=True)
+    model.eval()
+    torch.manual_seed(42)  # para asegurarte aún más
+
+
+    # Cargar y procesar imágenes
+    images = [Image.open(p).convert("RGB") for p in image_paths]
+    image_inputs = processor(images=images, return_tensors="pt", padding=True).to(device)
+
+    with torch.no_grad():
+        image_features = model.get_image_features(**image_inputs)
+        image_features = image_features / image_features.norm(p=2, dim=-1, keepdim=True) 
+
+    # # Procesar descripciones
+    # text_inputs = processor(text=descriptions, return_tensors="pt", padding=True, truncation=True).to(device)
+
+    # with torch.no_grad():
+    #     text_features = model.get_text_features(**text_inputs)
+    #     text_features = text_features / text_features.norm(p=2, dim=-1, keepdim=True)  # [M, D]
+    
+    text_features = []
+
+    with torch.no_grad():
+        for desc in descriptions:
+            inputs = processor(text=desc, return_tensors="pt", padding=True, truncation=True).to(device)
+            emb = model.get_text_features(**inputs)
+            emb = emb / emb.norm(p=2, dim=-1, keepdim=True)
+            text_features.append(emb.squeeze(0))  # quitar dimensión batch
+
+    text_features = torch.stack(text_features)
+
+    # Calcular matriz de similitud: [N imágenes, M textos]
+    similarity_matrix = torch.matmul(text_features , image_features.T).cpu().numpy()
+        
+    for i, description in enumerate(descriptions):
+        print(f"\n📝 SIMILITUD CON DESCRIPCIÓN: '{description}'\n")
+        sorted_indices = np.argsort(similarity_matrix[i])[::-1]
+        for rank, img_idx in enumerate(sorted_indices):
+            similarity = similarity_matrix[i][img_idx]
+            print(f"   {rank+1}. {image_paths[img_idx]} → Similitud: {similarity:.3f}")
+
+    return similarity_matrix
 
 
 # model_name = "melijauregui/fashionclip-roturas4"
-model_name = "Sofia-gb/fashionclip-roturas2"
-image_path = "images-testing/sin-rotura.png"
-pretrained_model_name = "Marqo/marqo-fashionCLIP"
+# model_name = "Sofia-gb/fashionclip-roturas2"
+image_paths = [
+    "images-testing/rotura1.png",
+    "images-testing/rotura2.png",
+    "images-testing/rotura3.png",
+    "images-testing/roturas-negro1.jpg",
+    "images-testing/roturas-negro2.jpg",
+    "images-testing/sin-rotura.png",
+    "images-testing/skinny-rotura.png",
+]
+# pretrained_model_name = "Marqo/marqo-fashionCLIP"
 # Lista de descripciones posibles
 descriptions = [
-    "jean wide leg sin roturas. Color celeste.",
-    "jean wide leg con roturas. Color celeste."
+    "jean clásico, sin cortes ni marcas. No tiene rotura visible en ninguna pierna.",
+    "jean wide leg con roturas."
 ]
+find_similarities_matrix("melijauregui/fashionSigLIP-roturas2",
+                        "Marqo/marqo-fashionSigLIP",
+                        image_paths, descriptions)
+# find_most_similar_description(
+#     model_name, pretrained_model_name, image_path, descriptions)
 
-find_most_similar_description(
-    model_name, pretrained_model_name, image_path, descriptions)
+# find_most_similar_description("melijauregui/fashionSigLIP-roturas",
+#                               "Marqo/marqo-fashionSigLIP",
+#                               image_path, descriptions)
 
-find_most_similar_description("Sofia-gb/fashionSigLIP-roturas",
-                              "Marqo/marqo-fashionSigLIP",
-                              image_path, descriptions)
+# find_most_similar_description("Sofia-gb/fashionSigLIP-roturas",
+#                               "Marqo/marqo-fashionSigLIP",
+#                               image_path, descriptions)
 
-find_most_similar_description("Sofia-gb/fashionSigLIP-roturas2",
-                              "Marqo/marqo-fashionSigLIP",
-                              image_path, descriptions)
+# find_most_similar_description("Sofia-gb/fashionSigLIP-roturas2",
+#                               "Marqo/marqo-fashionSigLIP",
+#                               image_path, descriptions)
 
 """ 
 Resultados:
