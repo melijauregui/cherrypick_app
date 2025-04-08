@@ -190,13 +190,25 @@ Similitud con 'jean wide leg con roturas. Color celeste.': 0.7467606067657471
 Similitud con 'jean wide leg sin roturas. Color celeste.': 0.7414008975028992
 Descripción más similar: jean wide leg con roturas. Color celeste.
 
-Sofia-gb/fashionBlip-roturas:
+Sofia-gb/fashionclip-roturas3:
+Similitud con 'jean wide leg con roturas. Color celeste.': 0.7874948382377625
+Similitud con 'jean wide leg sin roturas. Color celeste.': 0.7807509899139404
+Diferencia: 0.0067438483238220215
+Descripción más similar: jean wide leg con roturas. Color celeste.
+
+Sofia-gb/fashionSigLIP-roturas:
 Similitud con 'jean wide leg sin roturas. Color celeste.': 0.11929132044315338
 Similitud con 'jean wide leg con roturas. Color celeste.': 0.0963045060634613
 Descripción más similar: jean wide leg sin roturas. Color celeste.
 
-Sofia-gb/fashionBlip-roturas2:
+Sofia-gb/fashionSigLIP-roturas2:
 Similitud con 'jean wide leg sin roturas. Color celeste.': 0.0039484696462750435
 Similitud con 'jean wide leg con roturas. Color celeste.': -0.015217212960124016
 Descripción más similar: jean wide leg sin roturas. Color celeste.
+
+Sofia-gb/fashionSigLIP-roturas3:
+Similitud con 'jean wide leg sin roturas. Color celeste.': 0.14181290566921234
+Similitud con 'jean wide leg con roturas. Color celeste.': 0.11660870164632797
+Diferencia: 0.02520420402288437
+Descripción más similar: jean wide leg sin roturas. Color celeste
 """
