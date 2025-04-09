@@ -46,10 +46,8 @@ def find_most_similar_image(query_image_path, pretrained_model_name, gallery_pat
         f"📸 Imagen más similar para :{query_image_path}: {gallery_paths[np.argmax(similarities)]}\n")
 
 
-# pretrained_model_name_or_path = "Marqo/marqo-fashionCLIP"
 pretrained_model_name_or_path = "Marqo/marqo-fashionSigLIP"
-# model_name = "Sofia-gb/fashionclip-roturas3"
-model_name = "Sofia-gb/fashionSigLIP-roturas3"
+model_name = "melijauregui/fashionSigLIP-roturas2"
 query_image_path = "roturas-negro2.jpg"
 gallery_paths = [
     "rotura1.png",

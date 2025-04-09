@@ -12,62 +12,46 @@ from PIL import Image
 import requests
 from io import BytesIO
 
+device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+
+
 def extract_image_features(url):
     if url is None :
         return None
     try:
-        response = requests.get(url)
-        image = Image.open(BytesIO(response.content))
-        processed = processor(images=image, return_tensors="pt")
+        # response = requests.get(url)
+        # image = Image.open(BytesIO(response.content))
+        image = Image.open(url).convert("RGB")
+        image_inputs = processor(images=image, return_tensors="pt", padding=True).to(device)
     
         with torch.no_grad():
-            image_features = model.get_image_features(processed['pixel_values'], normalize=True)
-        
-        res = image_features.numpy().flatten()
-        if np.isnan(res).any():
-            return None 
-        return res
+            image_features = model.get_image_features(**image_inputs)
+            image_features = image_features / image_features.norm(p=2, dim=-1, keepdim=True) 
+    
+        return image_features.flatten()
     except Exception as e:
         df.loc[df['image'] == url, 'image'] = None
 
 def extract_text_features(text):
-    if isinstance(text, str):
-        text = [text]  # convertir en lista de 1 elemento si no lo es
-
-    processed = processor(
-        text=text,
-        return_tensors="pt",
-        padding="max_length",  # fuerza que todos tengan largo 77
-        truncation=True,
-        max_length=77
-    )
-
+    emb=[]
     with torch.no_grad():
-        text_features = model.get_text_features(
-            input_ids=processed["input_ids"],
-            attention_mask=processed["attention_mask"]
-        )
-
-    # normalización
-    text_features = text_features / text_features.norm(p=2, dim=-1, keepdim=True)
-    res = text_features[0].numpy() 
-    if np.isnan(res).any():
-        return None 
-    return res
+        inputs = processor(text=text, return_tensors="pt", padding=True, truncation=True).to(device)
+        emb = model.get_text_features(**inputs)
+        emb = emb / emb.norm(p=2, dim=-1, keepdim=True)
+        emb = emb.squeeze(0)
+    return emb
 
 
-
-csv_filename = "fashion_data2.csv"
+csv_filename = "fashion_data.csv"
 df = pd.read_csv(csv_filename)
 
-model = AutoModel.from_pretrained('Marqo/marqo-fashionCLIP', trust_remote_code=True)
-processor = AutoProcessor.from_pretrained('Marqo/marqo-fashionCLIP', trust_remote_code=True)
-
+model = AutoModel.from_pretrained("melijauregui/fashionSigLIP-roturas2", trust_remote_code=True).to(device)
+processor = AutoProcessor.from_pretrained("Marqo/marqo-fashionSigLIP", trust_remote_code=True)
+model.eval()
+torch.manual_seed(42) 
 df['image_embedding'] = df['image'].apply(extract_image_features)
-df['text_embedding'] = df['product_details'].apply(extract_text_features)
+df['text_embedding'] = df['description'].apply(extract_text_features)
 df.dropna(subset=['image_embedding', 'text_embedding', 'image'], inplace=True)
-#df.to_csv(csv_filename, index=False)
-
 
 # ---- pinecone ----
 
@@ -80,7 +64,7 @@ if config.PINECONE_INDEX_NAME in pc.list_indexes().names():
 
 pc.create_index(
     name=config.PINECONE_INDEX_NAME,
-    dimension=512,
+    dimension=768,
     metric="cosine",
     spec=ServerlessSpec(
         cloud="aws",
@@ -95,33 +79,23 @@ while not pc.describe_index(config.PINECONE_INDEX_NAME).status['ready']:
 index = pc.Index(config.PINECONE_INDEX_NAME)
 
 
-# ---- upsert fashion data ----
+# ---- upsert ----
 vectors = []
     
-for _, row in df.iterrows():
-    # print(f'Processing {row["uuid"]}...')
-    # print(f'Image URL: {row["image"]}')
-    # print(f'Image embedding: {row["image_embedding"]}')
-    # print(f'Text embedding: {row["text_embedding"]}')
-    # print(f'Brand: {row["brand"]}')
-    # print(f'URL: {row["url"]}')
-    # print(f'Title: {row["title"]}')
-    # print(f'Selling price: {row["selling_price"]}')
-    # print(f'Product details: {row["product_details"]}')
-    # print('-----------------------------------')
+for i, row in df.iterrows():
     vectors.append(
         {
-        "id": f'{row["uuid"]}_image', 
+        "id": f'{i}_image',
         "values": row['image_embedding'].tolist(), 
-        "metadata": {"brand": row['brand'], "url" : row['url'], "title": row['title'], "selling_price": row['selling_price'], "product_details": row['product_details']}
+        "metadata": {"image": row['image'],"description": row['description'], "type": "image"}
         }
     )  
     
     vectors.append(
         {
-        "id": f'{row["uuid"]}_text', 
-        "values": row['text_embedding'].tolist(), 
-        "metadata": {"brand": row['brand'], "url" : row['url'], "title": row['title'], "selling_price": row['selling_price'], "product_details": row['product_details']}
+        "id": f'{i}_text', 
+        "values": row['text_embedding'], 
+        "metadata": {"image": row['image'],"description": row['description'], "type": "text"}
         }
     )  
      
