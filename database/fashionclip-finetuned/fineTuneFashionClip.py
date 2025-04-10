@@ -11,6 +11,8 @@ from transformers import AutoProcessor, AutoModel
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from huggingface_hub import create_repo, upload_file
+
 
 # --- CONFIGURACIÓN ---
 ORIGINAL_MODEL_NAME = "Marqo/marqo-fashionCLIP"
@@ -52,9 +54,20 @@ def contrastive_loss(image_embeds, text_embeds, margin=0.5):
     loss = torch.mean(torch.relu(margin - positive + negative))
     return loss
 
+
+def store_csv(username, dataset_name, csv_path):
+    repo_id = f"{username}/roturas"  # nombre del repo
+    create_repo(repo_id, repo_type="dataset", exist_ok=True)
+    upload_file(
+        path_or_fileobj=csv_path,
+        path_in_repo=dataset_name,  # cómo se llamará el archivo en el repo
+        repo_id=repo_id,
+        repo_type="dataset"
+    )
+    print(f"Dataset subido: https://huggingface.co/datasets/{repo_id}")
+
+
 # --- CARGA DE DATOS Y MODELO ---
-
-
 def fine_tune(csv_path, original_model_name, model_name, model_name_to_push, batch_size=BATCH_SIZE, epochs=EPOCHS):
     df = pd.read_csv(csv_path)
     processor = AutoProcessor.from_pretrained(
@@ -121,12 +134,8 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push, bat
     processor.push_to_hub(model_name_to_push)
 
 
-# fine_tune(CSV_PATH, ORIGINAL_MODEL_NAME, MODEL_NAME, MODEL_NAME_TO_PUSH)
-# fine_tune(csv_path="datasets/roturas.csv",original_model_name=ORIGINAL_MODEL_NAME, model_name=ORIGINAL_MODEL_NAME,
-#          model_name_to_push="Sofia-gb/fashionclip-roturas2")
+# fine_tune(csv_path="datasets/roturas-vs-sin.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
+#         model_name_to_push="melijauregui/fashionSigLIP-roturas")
+# store_csv("melijauregui", "roturas-vs-sin-roturas.csv", "datasets/roturas-vs-sin.csv")
 
-# fine_tune(csv_path="datasets/roturas.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
-#           model_name_to_push="Sofia-gb/fashionSigLIP-roturas")
 
-fine_tune(csv_path="datasets/con-sin-roturas.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="melijauregui/fashionSigLIP-roturas2",
-        model_name_to_push="melijauregui/fashionSigLIP-roturas3")

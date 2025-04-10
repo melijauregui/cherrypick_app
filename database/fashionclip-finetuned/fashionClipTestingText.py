@@ -63,11 +63,6 @@ def find_similarities_matrix(model_name, pretrained_model_name, image_paths, des
     with torch.no_grad():
         image_features = model.get_image_features(**image_inputs)
         image_features = image_features / image_features.norm(p=2, dim=-1, keepdim=True) 
-        
-    #imprimo en un archivo los image_features
-    with open('image_features2.txt', 'a') as f:
-        for i, image_path in enumerate(image_paths):
-            f.write(f"{image_path}: {image_features[i]}\n")
     
     # Procesar descripciones
     text_features = []
@@ -103,10 +98,10 @@ image_paths = [
     "images-testing/skinny-rotura.png",
 ]
 descriptions = [
-    "jean no tiene rotura visible",
-    "jean con rotura"
+    "jean sin rotura.",
+    "jean con roturas."
 ]
-find_similarities_matrix("melijauregui/fashionSigLIP-roturas4",
+find_similarities_matrix("melijauregui/fashionSigLIP-roturas",
                         "Marqo/marqo-fashionSigLIP",
                         image_paths, descriptions)
 # find_most_similar_description(
