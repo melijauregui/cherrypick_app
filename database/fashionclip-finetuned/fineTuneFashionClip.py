@@ -134,8 +134,8 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push, bat
     processor.push_to_hub(model_name_to_push)
 
 
-# fine_tune(csv_path="datasets/roturas-vs-sin.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
-#         model_name_to_push="melijauregui/fashionSigLIP-roturas")
-# store_csv("melijauregui", "roturas-vs-sin-roturas.csv", "datasets/roturas-vs-sin.csv")
+fine_tune(csv_path="datasets/roturas-vs-sin.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="melijauregui/fashionSigLIP-roturas",
+        model_name_to_push="melijauregui/fashionSigLIP-roturas3")
+store_csv("melijauregui", "roturas-vs-sin-roturas3.csv", "datasets/roturas-vs-sin.csv")
 
 

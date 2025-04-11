@@ -98,12 +98,12 @@ image_paths = [
     "images-testing/skinny-rotura.png",
 ]
 descriptions = [
-    "jean sin rotura.",
+    "jean sin cortes ni roturas",
     "jean con roturas."
 ]
-find_similarities_matrix("melijauregui/fashionSigLIP-roturas",
+find_similarities_matrix("melijauregui/fashionSigLIP-roturas3",
                         "Marqo/marqo-fashionSigLIP",
-                        image_paths, descriptions)
+                        image_paths, descriptions)  
 # find_most_similar_description(
 #     model_name, pretrained_model_name, image_path, descriptions)
 

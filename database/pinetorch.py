@@ -44,11 +44,9 @@ def extract_text_features(text):
 
 csv_filename = "fashion_data.csv"
 df = pd.read_csv(csv_filename)
-
-model = AutoModel.from_pretrained("melijauregui/fashionSigLIP-roturas2", trust_remote_code=True).to(device)
+model = AutoModel.from_pretrained("melijauregui/fashionSigLIP-roturas", trust_remote_code=True).to(device)
 processor = AutoProcessor.from_pretrained("Marqo/marqo-fashionSigLIP", trust_remote_code=True)
 model.eval()
-torch.manual_seed(42) 
 df['image_embedding'] = df['image'].apply(extract_image_features)
 df['text_embedding'] = df['description'].apply(extract_text_features)
 df.dropna(subset=['image_embedding', 'text_embedding', 'image'], inplace=True)
