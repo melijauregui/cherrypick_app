@@ -4,7 +4,7 @@ import { MasonryFlashList } from "@shopify/flash-list";
 import { ClothingItemComponent } from "@/components/ClothingItemComponent";
 
 const Home = () => {
-  const [clothingItems, setClothingItems] = useState<string[]>([]);
+  const [clothingItems, setClothingItems] = useState<Metadata[]>([]);
 
   useEffect(() => {
     const fetchClothingItems = async () => {
@@ -24,11 +24,11 @@ const Home = () => {
         numColumns={2}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingVertical: 10}}
-        renderItem={({item, index}: {item: string, index: number}) => <ClothingItemComponent
+        renderItem={({item, index}: {item: Metadata, index: number}) => <ClothingItemComponent
           i={index}
           key={index}
           id={(index).toString()}
-          url={item}
+          url={item.image_url}
         />}
         onEndReachedThreshold={0.1}
       />
@@ -38,25 +38,32 @@ const Home = () => {
 };
 export default Home;
 
-
-async function getClothingItems(): Promise<string[]>  {
+interface Metadata {
+  id: string;
+  description: string;
+  image_url: string;
+  url: string;
+  type : string;
+}
+export type { Metadata };
+async function getClothingItems(): Promise<Metadata[]>  {
   const page = "2";
   const limit = "10";
 
   try {
     const response: Response = await fetch(
-      `http://localhost:3000/database?page=${page}&limit=${limit}`,
+      `http://localhost:3000/all?page=${page}&limit=${limit}`,
       {
         method: "GET",
       }
     );
+    // // console.log("Status:", response.status);
+    // console.log("Response text:", await response.text());
 
     if (!response.ok) {
       throw new Error("Error al obtener los datos");
     }
-
-    const jsonResponse: any = await response.json();
-    const clothingItems: string[] = jsonResponse.data;
+    const clothingItems: Metadata[] = await response.json();
     console.log("Clothing items:", clothingItems);
     return clothingItems;
 

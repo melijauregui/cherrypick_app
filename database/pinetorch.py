@@ -19,9 +19,9 @@ def extract_image_features(url):
     if url is None :
         return None
     try:
-        # response = requests.get(url)
-        # image = Image.open(BytesIO(response.content))
-        image = Image.open(url).convert("RGB")
+        response = requests.get(url)
+        image = Image.open(BytesIO(response.content))
+        # image = Image.open(url).convert("RGB")
         image_inputs = processor(images=image, return_tensors="pt", padding=True).to(device)
     
         with torch.no_grad():
@@ -47,9 +47,9 @@ df = pd.read_csv(csv_filename)
 model = AutoModel.from_pretrained("melijauregui/fashionSigLIP-roturas", trust_remote_code=True).to(device)
 processor = AutoProcessor.from_pretrained("Marqo/marqo-fashionSigLIP", trust_remote_code=True)
 model.eval()
-df['image_embedding'] = df['image'].apply(extract_image_features)
+df['image_embedding'] = df['image_url'].apply(extract_image_features)
 df['text_embedding'] = df['description'].apply(extract_text_features)
-df.dropna(subset=['image_embedding', 'text_embedding', 'image'], inplace=True)
+df.dropna(subset=['image_embedding', 'text_embedding', 'image_url'], inplace=True)
 
 # ---- pinecone ----
 
@@ -85,7 +85,7 @@ for i, row in df.iterrows():
         {
         "id": f'{i}_image',
         "values": row['image_embedding'].tolist(), 
-        "metadata": {"image": row['image'],"description": row['description'], "type": "image"}
+        "metadata": {"url":row["url"],"image_url": row['image_url'],"description": row['description'], "type": "image"}
         }
     )  
     
@@ -93,7 +93,7 @@ for i, row in df.iterrows():
         {
         "id": f'{i}_text', 
         "values": row['text_embedding'], 
-        "metadata": {"image": row['image'],"description": row['description'], "type": "text"}
+        "metadata": {"url":row["url"],"image_url": row['image_url'],"description": row['description'], "type": "text"}
         }
     )  
      

@@ -2,13 +2,13 @@ import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import React, { useEffect, useState } from "react";
 import { MasonryFlashList } from "@shopify/flash-list";
 import { ClothingItemComponent } from "@/components/ClothingItemComponent";
-import { TextInput, View } from 'react-native';
+import { TextInput, View, Image } from 'react-native';
 import icons from "../../constants/icons";
-import { Image } from "react-native";
+import { Metadata } from "./home";
 
 
 const Explore = () => {
-  const [clothingItems, setClothingItems] = useState<string[]>([]);
+  const [clothingItems, setClothingItems] = useState<Metadata[]>([]);
   const [searchText, onChangeTextSearch] = React.useState('');
 
   useEffect(() => {
@@ -44,11 +44,11 @@ const Explore = () => {
         numColumns={2}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingVertical: 10}}
-        renderItem={({item, index}: {item: string, index: number}) => <ClothingItemComponent
+        renderItem={({item, index}: {item: Metadata, index: number}) => <ClothingItemComponent
           i={index}
           key={index}
           id={(index).toString()}
-          url={item}
+          url={item.image_url}
         />}
         onEndReachedThreshold={0.1}
       />
@@ -59,24 +59,24 @@ const Explore = () => {
 export default Explore;
 
 
-async function getClothingItems(): Promise<string[]>  {
+async function getClothingItems(): Promise<Metadata[]>  {
   const page = "2";
   const limit = "10";
 
   try {
     const response: Response = await fetch(
-      `http://localhost:3000/database?page=${page}&limit=${limit}`,
+      `http://localhost:3000/all?page=${page}&limit=${limit}`,
       {
         method: "GET",
       }
     );
+    // // console.log("Status:", response.status);
+    // console.log("Response text:", await response.text());
 
     if (!response.ok) {
       throw new Error("Error al obtener los datos");
     }
-
-    const jsonResponse: any = await response.json();
-    const clothingItems: string[] = jsonResponse.data;
+    const clothingItems: Metadata[] = await response.json();
     console.log("Clothing items:", clothingItems);
     return clothingItems;
 

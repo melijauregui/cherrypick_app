@@ -1,6 +1,8 @@
 import { z } from '@hono/zod-openapi'
-import { Pinecone, RecordMetadata } from "@pinecone-database/pinecone";
+import { Pinecone } from "@pinecone-database/pinecone";
 import fs from "fs";
+import { config } from '../config'
+
 
 //funcion para llamar a la red neuronal
 async function callVGGNet(imagePath: string) : Promise<number[]> {
@@ -22,24 +24,22 @@ export { callVGGNet };
 
 interface Metadata {
   id: string;
-  score: number;
-  values: number[];
-  brand : string;
+  description: string;
+  image_url: string;
+  url: string;
   type : string;
 }
 
 //funcion para hacer query a pinecone
-async function queryPinecone(queryVector: number[]) : Promise<Metadata[]>  {
+async function queryPinecone(queryVector: number[], topK: number) : Promise<Metadata[]>  {
   try {
-    const pc = new Pinecone({
-      apiKey: process.env.PINECONE_API_KEY?.toString() || "",
-     });
-
-    const index = pc.Index(process.env.PINECONE_INDEX_NAME?.toString() || "");
-    const queryResponse  = await index.namespace('example-namespace').query({
-      topK: 3, 
+    const pc = new Pinecone({ apiKey: config.PINECONE_API_KEY});
+    const namespace = pc.index(config.PINECONE_INDEX_NAME, config.PINECONE_HOST_NAME).namespace(config.PINECONE_NAMESPACE);
+    const queryResponse  = await namespace.query({
+      topK: topK, 
       vector: queryVector,
       includeMetadata: true,
+      filter: {type: "image"}
     });
 
     if (!queryResponse || !queryResponse.matches || queryResponse.matches.length === 0) {
@@ -55,10 +55,10 @@ async function queryPinecone(queryVector: number[]) : Promise<Metadata[]>  {
     
       return {
         id: match.id,
-        score: match.score,
-        values: match.values,
-        brand: match.metadata?.brand || "Unknown",
-        type: match.metadata?.type || "Unknown",
+        description: match.metadata?.description || "",
+        image_url: match.metadata?.image_url || "",
+        url: match.metadata?.url || "",
+        type: match.metadata?.type || "",
       };
     }).filter((item): item is Metadata => item !== null);
     
@@ -85,17 +85,17 @@ const TopMatchSchema = z
     id: z.string().openapi({
       example: '13.jpg',
     }),
-    score: z.number().openapi({
-      example: 0.98,
+    description: z.string().openapi({
+      example: 'A nice pair of jeans',
     }),
-    values: z.array(z.number()).openapi({
-      example: [0.1, 0.2, 0.3],
+    image_url: z.string().openapi({
+      example: 'https://example.com/jeans.jpg',
     }),
-    brand: z.string().openapi({
-      example: 'Levis',
+    url: z.string().openapi({
+      example: 'https://example.com/jeans',
     }),
     type: z.string().openapi({
-      example: 'Jeans',
+      example: 'image',
     }),
   })
   .openapi('User')
@@ -104,10 +104,10 @@ const TopMatchesSchema = z.array(TopMatchSchema).openapi({
   example: [
     {
       id: '13.jpg',
-      score: 0.98,
-      values: [0.1, 0.2, 0.3],
-      brand: 'Levis',
-      type: 'Jeans',
+      description: 'A nice pair of jeans',
+      image_url: 'https://example.com/jeans.jpg',
+      url: 'https://example.com/jeans',
+      type: 'image',
     },
   ],
 })

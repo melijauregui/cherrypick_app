@@ -5,19 +5,19 @@ import fs from "fs";
 
 // Esquema para validar los parámetros de paginación (query string)
 const PaginationSchema = z.object({
-    page: z.preprocess((val) => parseInt(val as string) || 1, z.number().min(1)),
-    limit: z.preprocess((val) => parseInt(val as string) || 10, z.number().min(1)),
-  })
-  export { PaginationSchema }
+  page: z.preprocess((val) => parseInt(val as string) || 1, z.number().min(1)),
+  limit: z.preprocess((val) => parseInt(val as string) || 10, z.number().min(1)),
+})
+export { PaginationSchema }
   
-  // Esquema para la respuesta paginada
-  const PaginatedResponseSchema = z.object({
-    data: z.array(z.string()),
-    page: z.number(),
-    limit: z.number(),
-    total: z.number(),
-  })
-    export { PaginatedResponseSchema }
+// Esquema para la respuesta paginada
+const PaginatedResponseSchema = z.object({
+  data: z.array(z.string()),
+  page: z.number(),
+  limit: z.number(),
+  total: z.number(),
+})
+export { PaginatedResponseSchema }
   
   
 // await function getPaginatedData(page: number, limit: number): Promise<{ data: string[], page: number, limit: number, total: number }> {
