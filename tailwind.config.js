@@ -18,8 +18,8 @@ module.exports = {
         black: "#000000",
         white : "#ffffff",
         grey: {
-          light : "#909497",
-          strong : "#909497",
+          light : "#999999",
+          strong : "#242424",
         },
         brown : {
           light : "#af785a",

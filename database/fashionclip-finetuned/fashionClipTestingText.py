@@ -105,7 +105,7 @@ image_paths = [
     "images-testing/skinny-rotura.png",
 ]
 descriptions = [
-    "jean sin rotura.",
+    "jean sin cortes ni roturas",
     "jean con roturas."
 ]
 find_similarities_matrix("Sofia-gb/fashionSigLIP-roturas4",

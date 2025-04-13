@@ -1,12 +1,13 @@
 import fs from "fs";
-import { OpenAPIHono } from '@hono/zod-openapi'
+import { OpenAPIHono, createRoute } from '@hono/zod-openapi'
 import { callVGGNet, ImageParamSchema, queryPinecone, TopMatchesSchema } from './app/routeVector';
-import { createRoute } from '@hono/zod-openapi'
-import { PaginatedResponseSchema, PaginationSchema } from "./app/allDatabase";
+import { PaginationSchema } from "./app/allDatabase";
+
 
 const app = new OpenAPIHono()
 export default app
 
+// api que recibe una imagen y devuelve los 10 resultados más similares paginados
 const routeVector = createRoute({
   method: 'get',
   path: '/images/{image_path}',
@@ -26,20 +27,22 @@ const routeVector = createRoute({
 })
 
 app.openapi(routeVector, async (c) => {
+  const topK = 10;
   const { image_path } = c.req.valid('param')
   const image_path_complete = `./server/images/${image_path}`;
   const queryVector = await callVGGNet(image_path_complete);
   fs.writeFileSync('result.json', JSON.stringify(queryVector));
-  const res = await queryPinecone(queryVector);
+  const res = await queryPinecone(queryVector, topK);
   return c.json(
     res,
     200 
   )
 })
 
+// api que devuelve los resultados paginados de la base de datos
 const paginatedRoute = createRoute({
   method: 'get',
-  path: '/database',
+  path: '/all',
   request: {
     query: PaginationSchema,
   },
@@ -47,7 +50,7 @@ const paginatedRoute = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: PaginatedResponseSchema,
+          schema: TopMatchesSchema,
         },
       },
       description: 'Devuelve los datos de la base de datos de forma paginada',
@@ -58,25 +61,15 @@ const paginatedRoute = createRoute({
 // Registrar el endpoint en la aplicación
 app.openapi(paginatedRoute, async (c) => {
   const { page, limit } = c.req.valid('query')
+  const topK = 10;
+  
+  const embedding = Array.from({ length: 768 }, () => Math.random());
 
-  // const data = await getPaginatedData(page, limit) // Función que retorna un array con los datos de la página solicitada
-
+  const res = await queryPinecone(embedding, topK);
   return c.json(
-    {
-      page,
-      limit,
-      total: 4, 
-      data: ["https://i.pinimg.com/474x/72/ec/8e/72ec8eb21c671a640a92c0a24c76bad8.jpg",
-              "https://i.pinimg.com/474x/e3/87/4b/e3874b60b2bd8c354b80f74b768ff45a.jpg",
-              "https://i.pinimg.com/736x/32/be/3e/32be3e7fa9aa0f103599845cf1778d46.jpg",
-              "https://i.pinimg.com/474x/1f/21/16/1f2116d0a2d253fea8853cbcc7c6820b.jpg",
-              "https://i.pinimg.com/736x/32/be/3e/32be3e7fa9aa0f103599845cf1778d46.jpg",
-              "https://i.pinimg.com/474x/72/ec/8e/72ec8eb21c671a640a92c0a24c76bad8.jpg",
-              "https://i.pinimg.com/474x/e3/87/4b/e3874b60b2bd8c354b80f74b768ff45a.jpg",
-              "https://i.pinimg.com/736x/32/be/3e/32be3e7fa9aa0f103599845cf1778d46.jpg",
-              "https://i.pinimg.com/474x/1f/21/16/1f2116d0a2d253fea8853cbcc7c6820b.jpg",
-              "https://i.pinimg.com/736x/32/be/3e/32be3e7fa9aa0f103599845cf1778d46.jpg"], 
-    },
-    200
+    res,
+    200 
   )
 })
+
+
