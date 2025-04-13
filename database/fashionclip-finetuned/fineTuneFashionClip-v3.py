@@ -10,8 +10,16 @@ from torch.utils.data import Dataset, DataLoader
 from transformers import AutoProcessor, AutoModel
 import torch
 import torch.nn as nn
+from torchvision import transforms
+import nlpaug.augmenter.word as naw
 import torch.optim as optim
 from huggingface_hub import create_repo, upload_file
+import nltk
+
+try:
+    nltk.data.find('taggers/averaged_perceptron_tagger_eng')
+except LookupError:
+    nltk.download('averaged_perceptron_tagger_eng')
 
 
 # --- CONFIGURACIÓN ---
@@ -24,12 +32,26 @@ EPOCHS = 30
 LR = 1e-5
 DEVICE = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 
+# Definir las transformaciones
+data_transforms = transforms.Compose([
+    transforms.RandomHorizontalFlip(),  # Volteo horizontal aleatorio
+    transforms.RandomRotation(30),  # Rotación aleatoria entre -30 y 30 grados
+    # Recorte aleatorio y redimensionado de la imagen
+    transforms.RandomResizedCrop(224),
+    transforms.ColorJitter(brightness=0.2, contrast=0.2,
+                           saturation=0.2, hue=0.2),  # Cambios de iluminación
+])
+aug_text = naw.SynonymAug(aug_p=0.3)
 
 # --- DATASET PERSONALIZADO ---
+
+
 class FashionDataset(Dataset):
-    def __init__(self, dataframe, processor):
+    def __init__(self, dataframe, processor, aug_img=False, aug_text=False):
         self.dataframe = dataframe
         self.processor = processor
+        self.aug_img = aug_img
+        self.aug_text = aug_text
 
     def __len__(self):
         return len(self.dataframe)
@@ -38,7 +60,15 @@ class FashionDataset(Dataset):
         row = self.dataframe.iloc[idx]
         response = requests.get(row["image"])
         image = Image.open(BytesIO(response.content))
+        if self.aug_img:
+            image = data_transforms(image)
         text = row["description"]
+        if self.aug_text:
+            text = aug_text.augment(text)
+            if isinstance(text, list):
+                text = text[0]
+            else:
+                text = text
         return image, text
 
 
@@ -87,16 +117,19 @@ def store_csv(username, dataset_name, csv_path):
 
 
 # --- CARGA DE DATOS Y MODELO ---
-def fine_tune(csv_path, original_model_name, model_name, model_name_to_push, batch_size=BATCH_SIZE, epochs=EPOCHS):
+def fine_tune(csv_path, original_model_name, model_name, model_name_to_push, batch_size=BATCH_SIZE, epochs=EPOCHS, data_aug=False):
     df = pd.read_csv(csv_path)
     processor = AutoProcessor.from_pretrained(
         original_model_name, trust_remote_code=True)
     model = AutoModel.from_pretrained(
         model_name, trust_remote_code=True).to(DEVICE)
-    # print(f"Parametros: {model.model}")
     freeze_layers(model)
 
-    dataset = FashionDataset(df, processor)
+    if data_aug:
+        dataset = FashionDataset(
+            df, processor, aug_img=True, aug_text=True)
+    else:
+        dataset = FashionDataset(df, processor)
     dataloader = DataLoader(dataset, batch_size=batch_size,
                             shuffle=True, collate_fn=collate_fn)
 
@@ -156,5 +189,4 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push, bat
 
 
 fine_tune(csv_path="datasets/roturas-vs-sin.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
-          model_name_to_push="Sofia-gb/fashionSigLIP-roturas4")
-# store_csv("melijauregui", "roturas-vs-sin-roturas.csv", "datasets/roturas-vs-sin.csv")
+          model_name_to_push="Sofia-gb/fashionSigLIP-roturas5", data_aug=True)
