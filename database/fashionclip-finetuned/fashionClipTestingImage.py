@@ -47,7 +47,8 @@ def find_most_similar_image(query_image_path, pretrained_model_name, gallery_pat
 
 
 pretrained_model_name_or_path = "Marqo/marqo-fashionSigLIP"
-model_name = "melijauregui/fashionSigLIP-roturas2"
+# model_name = "melijauregui/fashionSigLIP-roturas2"
+model_name = "Sofia-gb/fashionSigLIP-roturas4"
 query_image_path = "roturas-negro2.jpg"
 gallery_paths = [
     "rotura1.png",
@@ -155,4 +156,23 @@ Similitud con 'roturas-negro2.jpg': 0.8663132190704346
 Similitud con 'roturas-negro1.jpg': 0.8636921644210815
 📸 Imagen más similar para :rotura1.png: rotura3.png
 
+---------------------------------------------
+
+Sofia-gb/fashionSigLIP-roturas4: congelar capas y optimizar solo la última.
+
+Similitud con 'roturas-negro1.jpg': 0.9166030883789062
+Similitud con 'rotura2.png': 0.8889819979667664
+Similitud con 'rotura3.png': 0.8875263929367065
+Similitud con 'skinny-rotura.png': 0.8473618030548096
+Similitud con 'rotura1.png': 0.8370959758758545
+Similitud con 'sin-rotura.png': 0.6315427422523499
+📸 Imagen más similar para :roturas-negro2.jpg: roturas-negro1.jpg
+
+Similitud con 'rotura3.png': 0.916398286819458
+Similitud con 'rotura2.png': 0.8704217076301575
+Similitud con 'roturas-negro1.jpg': 0.8607035875320435
+Similitud con 'skinny-rotura.png': 0.8460321426391602
+Similitud con 'roturas-negro2.jpg': 0.8370959162712097
+Similitud con 'sin-rotura.png': 0.5840163230895996
+📸 Imagen más similar para :rotura1.png: rotura3.png
 """
