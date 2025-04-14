@@ -41,7 +41,7 @@ data_transforms = transforms.Compose([
     transforms.ColorJitter(brightness=0.2, contrast=0.2,
                            saturation=0.2, hue=0.2),  # Cambios de iluminación
 ])
-aug_text = naw.SynonymAug(aug_p=0.3)
+aug_text = naw.SynonymAug(aug_p=0.4)
 
 # --- DATASET PERSONALIZADO ---
 
@@ -78,6 +78,36 @@ def collate_fn(batch):
     return list(images), list(texts)
 
 
+def freeze_layers2(model):
+    # Descongelar todas las capas
+    for param in model.parameters():
+        param.requires_grad = False
+
+    # --- VISIÓN ---
+    # Descongelar las últimas capas de visión
+    visual_blocks = model.model.visual.trunk.blocks
+    for block in visual_blocks[-4:]:
+        for param in block.parameters():
+            param.requires_grad = True
+
+    # Descongelar la attn_pool
+    for param in model.model.visual.trunk.attn_pool.parameters():
+        param.requires_grad = True
+
+    # --- TEXTO ---
+    # Descongelar las últimas capas de texto
+    text_layers = model.model.text.transformer.resblocks
+    for layer in text_layers[-4:]:
+        for param in layer.parameters():
+            param.requires_grad = True
+
+    # Descongelar la proyección de texto
+    for param in model.model.text.text_projection.parameters():
+        param.requires_grad = True
+
+    print("🔓 Descongelamos las últimas capas de visión y texto + proyecciones finales.")
+
+
 def freeze_layers(model):
     # Congelar visión
     for param in model.model._modules["visual"].parameters():
@@ -87,7 +117,6 @@ def freeze_layers(model):
     for param in model.model._modules["text"].parameters():
         param.requires_grad = False
 
-    # Dejamos libres las capas finales de proyección (para fine-tuning)
     for param in model.model._modules["visual"].trunk.attn_pool.parameters():
         param.requires_grad = True
 
@@ -117,13 +146,14 @@ def store_csv(username, dataset_name, csv_path):
 
 
 # --- CARGA DE DATOS Y MODELO ---
-def fine_tune(csv_path, original_model_name, model_name, model_name_to_push, batch_size=BATCH_SIZE, epochs=EPOCHS, data_aug=False):
+def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
+              batch_size=BATCH_SIZE, epochs=EPOCHS, data_aug=False, freeze_func=freeze_layers):
     df = pd.read_csv(csv_path)
     processor = AutoProcessor.from_pretrained(
         original_model_name, trust_remote_code=True)
     model = AutoModel.from_pretrained(
         model_name, trust_remote_code=True).to(DEVICE)
-    freeze_layers(model)
+    freeze_func(model)
 
     if data_aug:
         dataset = FashionDataset(
@@ -137,6 +167,9 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push, bat
 
     # --- ENTRENAMIENTO ---
     model.train()
+    patience = 3
+    best_loss = float('inf')
+    counter = 0
     for epoch in range(epochs):
         running_loss = 0.0
         for images, texts in tqdm(dataloader, desc=f"Epoch {epoch+1}/{epochs}"):
@@ -182,11 +215,23 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push, bat
         avg_loss = running_loss / len(dataloader)
         print(f"✅ Epoch {epoch+1} - Loss: {avg_loss:.4f}")
 
+        if avg_loss < best_loss:
+            best_loss = avg_loss
+            counter = 0
+            print(f"✨ Nueva mejor pérdida: {best_loss:.4f}")
+        else:
+            counter += 1
+            print(
+                f"⚠️ No hay mejora en la pérdida. Patience: {counter}/{patience}")
+            if counter >= patience:
+                print("🛑 Early stopping activado.")
+                break
+
     print(f'Pushing model to {model_name_to_push}')
     # --- GUARDAR MODELO ---
     model.push_to_hub(model_name_to_push)
     processor.push_to_hub(model_name_to_push)
 
 
-fine_tune(csv_path="datasets/roturas-vs-sin.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
-          model_name_to_push="Sofia-gb/fashionSigLIP-roturas5", data_aug=True)
+fine_tune(csv_path="datasets/con-sin-roturas.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
+          model_name_to_push="Sofia-gb/fashionSigLIP-roturas6", data_aug=True, freeze_func=freeze_layers2)

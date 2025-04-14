@@ -106,9 +106,9 @@ image_paths = [
 ]
 descriptions = [
     "jean sin cortes ni roturas",
-    "jean con roturas."
+    "jean con roturas"
 ]
-find_similarities_matrix("Sofia-gb/fashionSigLIP-roturas5",
+find_similarities_matrix("Sofia-gb/fashionSigLIP-roturas6",
                          "Marqo/marqo-fashionSigLIP",
                          image_paths, descriptions)
 
@@ -228,4 +228,79 @@ Sofia-gb/fashionSigLIP-roturas5: congelar capas y optimizar solo la última + da
    5. images-testing/sin-rotura.png → Similitud: 0.450
    6. images-testing/skinny-rotura.png → Similitud: 0.439
    7. images-testing/rotura1.png → Similitud: 0.429
+   
+---------------------------
+
+Sofia-gb/fashionSigLIP-roturas6: congelar capas y optimizar últimas 2 + data augmentation.
+ds = datasets/roturas-vs-sin.csv
+
+📝 SIMILITUD CON DESCRIPCIÓN: 'jean sin cortes ni roturas'
+
+   1. images-testing/sin-rotura.png → Similitud: 0.623
+   2. images-testing/roturas-negro2.jpg → Similitud: 0.603
+   3. images-testing/rotura2.png → Similitud: 0.599
+   4. images-testing/rotura1.png → Similitud: 0.595
+   5. images-testing/roturas-negro1.jpg → Similitud: 0.594
+   6. images-testing/skinny-rotura.png → Similitud: 0.593
+   7. images-testing/rotura3.png → Similitud: 0.592
+
+📝 SIMILITUD CON DESCRIPCIÓN: 'jean con roturas'
+
+   1. images-testing/sin-rotura.png → Similitud: 0.735
+   2. images-testing/roturas-negro2.jpg → Similitud: 0.731
+   3. images-testing/roturas-negro1.jpg → Similitud: 0.729
+   4. images-testing/rotura2.png → Similitud: 0.728
+   5. images-testing/rotura1.png → Similitud: 0.722
+   6. images-testing/rotura3.png → Similitud: 0.722
+   7. images-testing/skinny-rotura.png → Similitud: 0.721
+   
+---------------------------
+
+# Sofia-gb/fashionSigLIP-roturas6: congelar capas y optimizar últimas 2 + data augmentation.
+ds = datasets/con-sin-roturas.csv
+
+ SIMILITUD CON DESCRIPCIÓN: 'jean sin cortes ni roturas'
+
+   1. images-testing/roturas-negro2.jpg → Similitud: 0.287
+   2. images-testing/rotura1.png → Similitud: 0.285
+   3. images-testing/rotura2.png → Similitud: 0.284
+   4. images-testing/roturas-negro1.jpg → Similitud: 0.282
+   5. images-testing/rotura3.png → Similitud: 0.279
+   6. images-testing/skinny-rotura.png → Similitud: 0.275
+   7. images-testing/sin-rotura.png → Similitud: 0.272
+
+📝 SIMILITUD CON DESCRIPCIÓN: 'jean con roturas'
+
+   1. images-testing/roturas-negro2.jpg → Similitud: 0.350
+   2. images-testing/rotura2.png → Similitud: 0.349
+   3. images-testing/roturas-negro1.jpg → Similitud: 0.344
+   4. images-testing/rotura3.png → Similitud: 0.343
+   5. images-testing/rotura1.png → Similitud: 0.339
+   6. images-testing/sin-rotura.png → Similitud: 0.338
+   7. images-testing/skinny-rotura.png → Similitud: 0.338
+   
+--------------------------
+
+Sofia-gb/fashionSigLIP-roturas6: congelar capas y optimizar últimas 4 + data augmentation + early stopping.
+ds = datasets/con-sin-roturas.csv
+
+📝 SIMILITUD CON DESCRIPCIÓN: 'jean sin cortes ni roturas'
+
+   1. images-testing/rotura3.png → Similitud: 0.259
+   2. images-testing/sin-rotura.png → Similitud: 0.258
+   3. images-testing/rotura2.png → Similitud: 0.256
+   4. images-testing/roturas-negro2.jpg → Similitud: 0.255
+   5. images-testing/rotura1.png → Similitud: 0.254
+   6. images-testing/roturas-negro1.jpg → Similitud: 0.245
+   7. images-testing/skinny-rotura.png → Similitud: 0.244
+
+📝 SIMILITUD CON DESCRIPCIÓN: 'jean con roturas'
+
+   1. images-testing/rotura3.png → Similitud: 0.322
+   2. images-testing/roturas-negro2.jpg → Similitud: 0.320
+   3. images-testing/rotura2.png → Similitud: 0.318
+   4. images-testing/sin-rotura.png → Similitud: 0.317
+   5. images-testing/roturas-negro1.jpg → Similitud: 0.309
+   6. images-testing/rotura1.png → Similitud: 0.309
+   7. images-testing/skinny-rotura.png → Similitud: 0.308
 """
