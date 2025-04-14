@@ -15,6 +15,9 @@ import nlpaug.augmenter.word as naw
 import torch.optim as optim
 from huggingface_hub import create_repo, upload_file
 import nltk
+import nlpaug.augmenter.word as naw
+# pip install nlpaug transformers sentencepiece
+import random
 
 try:
     nltk.data.find('taggers/averaged_perceptron_tagger_eng')
@@ -27,7 +30,7 @@ ORIGINAL_MODEL_NAME = "Marqo/marqo-fashionCLIP"
 MODEL_NAME = "Marqo/marqo-fashionCLIP"
 MODEL_NAME_TO_PUSH = "melijauregui/fashionclip-roturas4"
 CSV_PATH = "datasets/roturas-vs-sin.csv"
-BATCH_SIZE = 20
+BATCH_SIZE = 30
 EPOCHS = 30
 LR = 1e-5
 DEVICE = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
@@ -41,7 +44,13 @@ data_transforms = transforms.Compose([
     transforms.ColorJitter(brightness=0.2, contrast=0.2,
                            saturation=0.2, hue=0.2),  # Cambios de iluminación
 ])
-aug_text = naw.SynonymAug(aug_p=0.4)
+
+synonym_aug = naw.SynonymAug(aug_p=0.4)
+random_swap_aug = naw.RandomWordAug(action="swap")
+contextual_aug = naw.ContextualWordEmbsAug(
+    model_path='bert-base-uncased',
+    action="substitute"
+)
 
 # --- DATASET PERSONALIZADO ---
 
@@ -58,13 +67,22 @@ class FashionDataset(Dataset):
 
     def __getitem__(self, idx):
         row = self.dataframe.iloc[idx]
-        response = requests.get(row["image"])
-        image = Image.open(BytesIO(response.content))
-        if self.aug_img:
-            image = data_transforms(image)
+        try:
+            response = requests.get(row["image"])
+            image = Image.open(BytesIO(response.content))
+            if self.aug_img:
+                image = data_transforms(image)
+        except Exception as e:
+            print(f"Error al cargar la imagen: {e}")
+            return None
         text = row["description"]
         if self.aug_text:
-            text = aug_text.augment(text)
+            augs = [contextual_aug, synonym_aug, random_swap_aug]
+            chosen_aug = random.choice(augs)
+            text = chosen_aug.augment(text)
+
+            # text = synonym_aug.augment(text)
+            # text = random_swap_aug.augment(text)
             if isinstance(text, list):
                 text = text[0]
             else:
@@ -74,6 +92,9 @@ class FashionDataset(Dataset):
 
 # --- FUNCIONES AUXILIARES ---
 def collate_fn(batch):
+    batch = [item for item in batch if item is not None]
+    if not batch:
+        return [], []
     images, texts = zip(*batch)
     return list(images), list(texts)
 
@@ -147,7 +168,7 @@ def store_csv(username, dataset_name, csv_path):
 
 # --- CARGA DE DATOS Y MODELO ---
 def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
-              batch_size=BATCH_SIZE, epochs=EPOCHS, data_aug=False, freeze_func=freeze_layers):
+              batch_size=BATCH_SIZE, epochs=EPOCHS, img_aug=False, text_aug=False, freeze_func=freeze_layers):
     df = pd.read_csv(csv_path)
     processor = AutoProcessor.from_pretrained(
         original_model_name, trust_remote_code=True)
@@ -155,15 +176,12 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
         model_name, trust_remote_code=True).to(DEVICE)
     freeze_func(model)
 
-    if data_aug:
-        dataset = FashionDataset(
-            df, processor, aug_img=True, aug_text=True)
-    else:
-        dataset = FashionDataset(df, processor)
+    dataset = FashionDataset(
+        df, processor, aug_img=img_aug, aug_text=text_aug)
     dataloader = DataLoader(dataset, batch_size=batch_size,
                             shuffle=True, collate_fn=collate_fn)
 
-    optimizer = optim.AdamW(model.parameters(), lr=LR)
+    optimizer = optim.AdamW(model.parameters(), lr=LR, weight_decay=1e-4)
 
     # --- ENTRENAMIENTO ---
     model.train()
@@ -218,7 +236,10 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
         if avg_loss < best_loss:
             best_loss = avg_loss
             counter = 0
-            print(f"✨ Nueva mejor pérdida: {best_loss:.4f}")
+            # Guardar el mejor modelo
+            model.save_pretrained(model_name_to_push)
+            processor.save_pretrained(model_name_to_push)
+            print(f"✨ Nuevo mejor modelo guardado en epoch {epoch+1}")
         else:
             counter += 1
             print(
@@ -226,6 +247,9 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
             if counter >= patience:
                 print("🛑 Early stopping activado.")
                 break
+        if avg_loss < 0.01:
+            print("🛑 Early stopping activado por pérdida baja.")
+            break
 
     print(f'Pushing model to {model_name_to_push}')
     # --- GUARDAR MODELO ---
@@ -234,4 +258,4 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
 
 
 fine_tune(csv_path="datasets/con-sin-roturas.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
-          model_name_to_push="Sofia-gb/fashionSigLIP-roturas6", data_aug=True, freeze_func=freeze_layers2)
+          model_name_to_push="Sofia-gb/fashionSigLIP-roturas7", img_aug=False, text_aug=True, freeze_func=freeze_layers2)
