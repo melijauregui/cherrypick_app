@@ -2,17 +2,17 @@ import torch
 from PIL import Image
 from transformers import AutoModel, AutoProcessor
 import numpy as np
+DEVICE = torch.device(
+    "mps" if torch.backends.mps.is_available() else "cpu")
 
 
 def find_most_similar_image(query_image_path, pretrained_model_name, gallery_paths, model_name):
     folder_path = "images-testing"
     # Configurar dispositivo
-    device = torch.device(
-        "mps" if torch.backends.mps.is_available() else "cpu")
 
     # Cargar modelo y processor
     model = AutoModel.from_pretrained(
-        model_name, trust_remote_code=True).to(device)
+        model_name, trust_remote_code=True, low_cpu_mem_usage=False).to(DEVICE)
     processor = AutoProcessor.from_pretrained(
         pretrained_model_name, trust_remote_code=True)
 
@@ -25,12 +25,12 @@ def find_most_similar_image(query_image_path, pretrained_model_name, gallery_pat
     with torch.no_grad():
         # Procesar query
         query_inputs = processor(
-            images=query_image, return_tensors="pt").to(device)
+            images=query_image, return_tensors="pt").to(DEVICE)
         query_emb = model.model.encode_image(query_inputs["pixel_values"])
         query_emb = query_emb / query_emb.norm(p=2, dim=-1, keepdim=True)
 
         gallery_inputs = processor(
-            images=gallery_images, return_tensors="pt").to(device)
+            images=gallery_images, return_tensors="pt").to(DEVICE)
         gallery_embs = model.model.encode_image(gallery_inputs["pixel_values"])
         gallery_embs = gallery_embs / \
             gallery_embs.norm(p=2, dim=-1, keepdim=True)
@@ -47,8 +47,7 @@ def find_most_similar_image(query_image_path, pretrained_model_name, gallery_pat
 
 
 pretrained_model_name_or_path = "Marqo/marqo-fashionSigLIP"
-# model_name = "melijauregui/fashionSigLIP-roturas2"
-model_name = "Sofia-gb/fashionSigLIP-roturas7"
+model_name = "Sofia-gb/fashionSigLIP-roturas8"
 query_image_path = "roturas-negro2.jpg"
 gallery_paths = [
     "rotura1.png",

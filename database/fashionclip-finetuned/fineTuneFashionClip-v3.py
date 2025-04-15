@@ -18,6 +18,7 @@ import nltk
 import nlpaug.augmenter.word as naw
 # pip install nlpaug transformers sentencepiece
 import random
+from sklearn.model_selection import train_test_split
 
 try:
     nltk.data.find('taggers/averaged_perceptron_tagger_eng')
@@ -26,14 +27,10 @@ except LookupError:
 
 
 # --- CONFIGURACIÓN ---
-ORIGINAL_MODEL_NAME = "Marqo/marqo-fashionCLIP"
-MODEL_NAME = "Marqo/marqo-fashionCLIP"
-MODEL_NAME_TO_PUSH = "melijauregui/fashionclip-roturas4"
-CSV_PATH = "datasets/roturas-vs-sin.csv"
 BATCH_SIZE = 30
 EPOCHS = 30
 LR = 1e-5
-DEVICE = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Definir las transformaciones
 data_transforms = transforms.Compose([
@@ -77,9 +74,10 @@ class FashionDataset(Dataset):
             return None
         text = row["description"]
         if self.aug_text:
-            # augs = [contextual_aug, synonym_aug, random_swap_aug]
-            # chosen_aug = random.choice(augs)
-            text = contextual_aug.augment(text)
+            augs = [contextual_aug, synonym_aug, random_swap_aug]
+            chosen_aug = random.choice(augs)
+            # text = contextual_aug.augment(text)
+            text = chosen_aug.augment(text)
             if isinstance(text, list):
                 text = text[0]
             else:
@@ -133,32 +131,66 @@ def contrastive_loss(image_embeds, text_embeds, margin=0.5):
     return loss
 
 
-def store_csv(username, dataset_name, csv_path):
-    repo_id = f"{username}/roturas"  # nombre del repo
-    create_repo(repo_id, repo_type="dataset", exist_ok=True)
-    upload_file(
-        path_or_fileobj=csv_path,
-        path_in_repo=dataset_name,  # cómo se llamará el archivo en el repo
-        repo_id=repo_id,
-        repo_type="dataset"
-    )
-    print(f"Dataset subido: https://huggingface.co/datasets/{repo_id}")
+def validate(model, val_loader, processor, epoch, epochs):
+    model.eval()
+    val_loss = 0.0
+    with torch.no_grad():
+        for images, texts in tqdm(val_loader, desc=f"Epoch {epoch+1}/{epochs} [Validation]"):
+            if not images:
+                continue
+
+            inputs = processor(
+                images=images, text=texts, return_tensors="pt",
+                padding=True,
+                truncation=True,
+            ).to(DEVICE)
+
+            pixel_values = inputs["pixel_values"]
+            input_ids = inputs["input_ids"]
+            attention_mask = inputs["attention_mask"]
+
+            image_embeds = model.model.encode_image(pixel_values)
+            text_embeds = model.get_text_features(
+                input_ids=input_ids,
+                attention_mask=attention_mask,
+                normalize=True
+            )
+
+            image_embeds = image_embeds / \
+                image_embeds.norm(p=2, dim=-1, keepdim=True)
+            text_embeds = text_embeds / \
+                text_embeds.norm(p=2, dim=-1, keepdim=True)
+
+            loss = contrastive_loss(image_embeds, text_embeds)
+            val_loss += loss.item()
+
+    avg_val_loss = val_loss / len(val_loader)
+    print(f"🧪 Epoch {epoch+1} - Validation Loss: {avg_val_loss:.4f}")
+    return avg_val_loss
 
 
 # --- CARGA DE DATOS Y MODELO ---
 def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
               batch_size=BATCH_SIZE, epochs=EPOCHS, img_aug=False, text_aug=False, freeze_func=freeze_layers):
     df = pd.read_csv(csv_path)
+    train_df, val_df = train_test_split(df, test_size=0.2, random_state=42)
+
     processor = AutoProcessor.from_pretrained(
         original_model_name, trust_remote_code=True)
     model = AutoModel.from_pretrained(
         model_name, trust_remote_code=True).to(DEVICE)
+
     freeze_func(model)
 
-    dataset = FashionDataset(
-        df, processor, aug_img=img_aug, aug_text=text_aug)
-    dataloader = DataLoader(dataset, batch_size=batch_size,
-                            shuffle=True, collate_fn=collate_fn)
+    train_dataset = FashionDataset(
+        train_df, processor, aug_img=img_aug, aug_text=text_aug)
+    val_dataset = FashionDataset(
+        val_df, processor, aug_img=False, aug_text=False)
+
+    train_loader = DataLoader(
+        train_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn)
+    val_loader = DataLoader(
+        val_dataset, batch_size=batch_size, shuffle=False, collate_fn=collate_fn)
 
     optimizer = optim.AdamW(model.parameters(), lr=LR, weight_decay=1e-4)
 
@@ -170,7 +202,7 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
     best_model_state_dict = None
     for epoch in range(epochs):
         running_loss = 0.0
-        for images, texts in tqdm(dataloader, desc=f"Epoch {epoch+1}/{epochs}"):
+        for images, texts in tqdm(train_loader, desc=f"Epoch {epoch+1}/{epochs}"):
             if original_model_name.endswith("SigLIP"):
                 inputs = processor(
                     images=images, text=texts, return_tensors="pt",
@@ -210,11 +242,13 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
 
             running_loss += loss.item()
 
-        avg_loss = running_loss / len(dataloader)
+        avg_loss = running_loss / len(train_loader)
         print(f"✅ Epoch {epoch+1} - Loss: {avg_loss:.4f}")
 
-        if avg_loss < best_loss:
-            best_loss = avg_loss
+        avg_val_loss = validate(model, val_loader, processor, epoch, epochs)
+
+        if avg_val_loss < best_loss:
+            best_loss = avg_val_loss
             counter = 0
             # Guardar el mejor modelo
             best_model_state_dict = model.state_dict()
@@ -226,7 +260,7 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
             if counter >= patience:
                 print("🛑 Early stopping activado.")
                 break
-        if avg_loss < 0.01:
+        if avg_val_loss < 0.01:
             print("🛑 Early stopping activado por pérdida baja.")
             break
 
@@ -240,6 +274,5 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
         processor.push_to_hub(model_name_to_push)
 
 
-# TODO: hacer data augmentation de texto usando solo contextual_aug y probar model.load_state_dict
 fine_tune(csv_path="datasets/con-sin-roturas.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
           model_name_to_push="Sofia-gb/fashionSigLIP-roturas8", img_aug=False, text_aug=True, freeze_func=freeze_layers)
