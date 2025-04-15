@@ -77,12 +77,9 @@ class FashionDataset(Dataset):
             return None
         text = row["description"]
         if self.aug_text:
-            augs = [contextual_aug, synonym_aug, random_swap_aug]
-            chosen_aug = random.choice(augs)
-            text = chosen_aug.augment(text)
-
-            # text = synonym_aug.augment(text)
-            # text = random_swap_aug.augment(text)
+            # augs = [contextual_aug, synonym_aug, random_swap_aug]
+            # chosen_aug = random.choice(augs)
+            text = contextual_aug.augment(text)
             if isinstance(text, list):
                 text = text[0]
             else:
@@ -99,7 +96,7 @@ def collate_fn(batch):
     return list(images), list(texts)
 
 
-def freeze_layers2(model):
+def freeze_layers(model):
     # Descongelar todas las capas
     for param in model.parameters():
         param.requires_grad = False
@@ -127,24 +124,6 @@ def freeze_layers2(model):
         param.requires_grad = True
 
     print("🔓 Descongelamos las últimas capas de visión y texto + proyecciones finales.")
-
-
-def freeze_layers(model):
-    # Congelar visión
-    for param in model.model._modules["visual"].parameters():
-        param.requires_grad = False
-
-    # Congelar texto
-    for param in model.model._modules["text"].parameters():
-        param.requires_grad = False
-
-    for param in model.model._modules["visual"].trunk.attn_pool.parameters():
-        param.requires_grad = True
-
-    for param in model.model._modules["text"].text_projection.parameters():
-        param.requires_grad = True
-
-    print("🔒 Capas congeladas. Solo entrenamos las proyecciones finales.")
 
 
 def contrastive_loss(image_embeds, text_embeds, margin=0.5):
@@ -188,6 +167,7 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
     patience = 3
     best_loss = float('inf')
     counter = 0
+    best_model_state_dict = None
     for epoch in range(epochs):
         running_loss = 0.0
         for images, texts in tqdm(dataloader, desc=f"Epoch {epoch+1}/{epochs}"):
@@ -237,8 +217,7 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
             best_loss = avg_loss
             counter = 0
             # Guardar el mejor modelo
-            model.save_pretrained(model_name_to_push)
-            processor.save_pretrained(model_name_to_push)
+            best_model_state_dict = model.state_dict()
             print(f"✨ Nuevo mejor modelo guardado en epoch {epoch+1}")
         else:
             counter += 1
@@ -251,11 +230,16 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
             print("🛑 Early stopping activado por pérdida baja.")
             break
 
-    print(f'Pushing model to {model_name_to_push}')
     # --- GUARDAR MODELO ---
-    model.push_to_hub(model_name_to_push)
-    processor.push_to_hub(model_name_to_push)
+    if best_model_state_dict:
+        print(f'Pushing model to {model_name_to_push}')
+        model.load_state_dict(best_model_state_dict)
+        model.save_pretrained(model_name_to_push)
+        processor.save_pretrained(model_name_to_push)
+        model.push_to_hub(model_name_to_push)
+        processor.push_to_hub(model_name_to_push)
 
 
+# TODO: hacer data augmentation de texto usando solo contextual_aug y probar model.load_state_dict
 fine_tune(csv_path="datasets/con-sin-roturas.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
-          model_name_to_push="Sofia-gb/fashionSigLIP-roturas7", img_aug=False, text_aug=True, freeze_func=freeze_layers2)
+          model_name_to_push="Sofia-gb/fashionSigLIP-roturas8", img_aug=False, text_aug=True, freeze_func=freeze_layers)
