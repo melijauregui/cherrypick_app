@@ -83,7 +83,29 @@ def find_similarities_matrix(model, processor, descriptions, image_paths, image_
 
     return similarity_matrix
 
-def test_text_clasification(similarity_matrix, image_paths, has, clasification_img):
+def find_similarities_matrix2(model, processor, description, image_paths, images):
+    processed = processor(text=[description], images=images, padding='max_length', return_tensors="pt")
+
+    with torch.no_grad():
+        image_features = model.get_image_features(processed['pixel_values'], normalize=True)
+        text_features = model.get_text_features(processed['input_ids'], normalize=True)
+
+    # Matriz de similitud: (n imágenes x 1 texto)
+    similarity_scores = (100.0 * image_features @ text_features.T).squeeze(-1)  # (n imágenes,)
+    # Opcional: pasarlo a "probabilidad" tipo sigmoidea
+    probabilities = similarity_scores.sigmoid()  # 🔵 Si querés algo entre 0 y 1
+
+    print(f"\n📝 SIMILITUD CON DESCRIPCIÓN: '{description}'\n")
+    sorted_indices = np.argsort(probabilities.cpu().numpy())[::-1]
+    for rank, img_idx in enumerate(sorted_indices):
+        similarity = probabilities[img_idx]
+        print(
+            f"   {rank+1}. {image_paths[img_idx]} → Similitud: {similarity:.3f}")
+
+    return probabilities
+
+
+def test_text_clasification(probabilities, image_paths, has, clasification_img):
     # Extraer nombres de archivo
     image_names = [os.path.basename(path) for path in image_paths]
 
@@ -104,9 +126,15 @@ def test_text_clasification(similarity_matrix, image_paths, has, clasification_i
                 rotura_imgs.append(i)
 
     # Evaluar condición 1: rotura con descripción 1
-    max_no_rotura = max(similarity_matrix[0][j] for j in no_rotura_imgs)
+    best_idx = None
+    max_no_rotura = float('-inf')
+    for j in no_rotura_imgs:
+        if probabilities[j] > max_no_rotura:
+            max_no_rotura = probabilities[j]
+            best_idx = j
+    print(f"mayor no rotura es {image_names[best_idx]} con {max_no_rotura} de probabilidad")
     for i in rotura_imgs:
-        value = similarity_matrix[0][i]
+        value = probabilities[i]
         print(f"[{clasification_img}] {image_names[i]}: {value:.3f} > {max_no_rotura:.3f}? {'✅' if value > max_no_rotura else '❌'}")
 
 
