@@ -83,17 +83,22 @@ def find_similarities_matrix(model, processor, descriptions, image_paths, image_
 
     return similarity_matrix
 
+
 def find_similarities_matrix2(model, processor, description, image_paths, images):
-    processed = processor(text=[description], images=images, padding='max_length', return_tensors="pt")
+    processed = processor(
+        text=[description], images=images, padding='max_length', return_tensors="pt")
 
     with torch.no_grad():
-        image_features = model.get_image_features(processed['pixel_values'], normalize=True)
-        text_features = model.get_text_features(processed['input_ids'], normalize=True)
+        image_features = model.get_image_features(
+            processed['pixel_values'], normalize=True)
+        text_features = model.get_text_features(
+            processed['input_ids'], normalize=True)
 
     # Matriz de similitud: (n imágenes x 1 texto)
-    similarity_scores = (100.0 * image_features @ text_features.T).squeeze(-1)  # (n imágenes,)
+    similarity_scores = (image_features @
+                         text_features.T).squeeze(-1)  # (n imágenes,)
     # Opcional: pasarlo a "probabilidad" tipo sigmoidea
-    probabilities = similarity_scores.sigmoid()  # 🔵 Si querés algo entre 0 y 1
+    probabilities = similarity_scores.sigmoid()  # entre 0 y 1
 
     print(f"\n📝 SIMILITUD CON DESCRIPCIÓN: '{description}'\n")
     sorted_indices = np.argsort(probabilities.cpu().numpy())[::-1]
@@ -132,7 +137,8 @@ def test_text_clasification(probabilities, image_paths, has, clasification_img):
         if probabilities[j] > max_no_rotura:
             max_no_rotura = probabilities[j]
             best_idx = j
-    print(f"mayor no rotura es {image_names[best_idx]} con {max_no_rotura} de probabilidad")
+    print(
+        f"mayor no rotura es {image_names[best_idx]} con {max_no_rotura} de probabilidad")
     for i in rotura_imgs:
         value = probabilities[i]
         print(f"[{clasification_img}] {image_names[i]}: {value:.3f} > {max_no_rotura:.3f}? {'✅' if value > max_no_rotura else '❌'}")
