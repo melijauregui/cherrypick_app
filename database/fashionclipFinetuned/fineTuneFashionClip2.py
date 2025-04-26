@@ -13,18 +13,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
-# --- CONFIGURACIÓN ---
-ORIGINAL_MODEL_NAME = "Marqo/marqo-fashionCLIP"
-MODEL_NAME = "Marqo/marqo-fashionCLIP"
-MODEL_NAME_TO_PUSH = "melijauregui/fashionclip-roturas4"
-CSV_PATH = "datasets/roturas-vs-sin.csv"
-BATCH_SIZE = 32
-EPOCHS = 30
-LR = 1e-5
-PATIENCE = 3
 DEVICE = torch.device("mps" if torch.backends.mps.is_available(
 ) else "cuda" if torch.cuda.is_available() else "cpu")
-
 
 # --- DATASET PERSONALIZADO ---
 class FashionDataset(Dataset):
@@ -85,7 +75,7 @@ def evaluate(model, val_loader, processor):
 
 
 # --- ENTRENAMIENTO ---
-def fine_tune(csv_path, original_model_name, model_name, model_name_to_push, batch_size=BATCH_SIZE, epochs=EPOCHS):
+def fine_tune(csv_path, original_model_name, model_name, model_name_to_push, batch_size, epochs, lr, patience):
     df = pd.read_csv(csv_path)
 
     # División entrenamiento / validación
@@ -105,7 +95,7 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push, bat
     val_loader = DataLoader(
         val_dataset, batch_size=batch_size, shuffle=False, collate_fn=collate_fn)
 
-    optimizer = optim.AdamW(model.parameters(), lr=LR)
+    optimizer = optim.AdamW(model.parameters(), lr=lr)
 
     best_val_loss = float("inf")
     counter = 0
@@ -155,7 +145,7 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push, bat
             torch.save(model.state_dict(), "best_model.pt")
         else:
             counter += 1
-            if counter >= PATIENCE:
+            if counter >= patience:
                 print("🛑 Early stopping activado.")
                 break
 
@@ -166,7 +156,5 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push, bat
     model.push_to_hub(model_name_to_push)
     processor.push_to_hub(model_name_to_push)
 
-
-model = "Marqo/marqo-fashionSigLIP"
-fine_tune(csv_path="datasets/con-sin-roturas.csv", original_model_name=model, model_name=model,
-          model_name_to_push="Sofia-gb/fashionSigLIP-roturas3", batch_size=32, epochs=15)
+# fine_tune(csv_path="datasets/con-sin-roturas.csv", original_model_name=model, model_name=model,
+#           model_name_to_push="Sofia-gb/fashionSigLIP-roturas3", batch_size=32, epochs=15)

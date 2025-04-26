@@ -1,3 +1,4 @@
+import os
 import torch
 from PIL import Image
 from transformers import AutoModel, AutoProcessor
@@ -45,21 +46,11 @@ def find_most_similar_description(model_name, pretrained_model_name, image_path,
         delta = abs(similarities[0] - similarities[1])
         print(f"Diferencia: {delta}")
 
-    print(f"Descripción más similar: {descriptions[np.argmax(similarities)]}")
-    
+    print(f"Descripción más similar: {descriptions[np.argmax(sorted_indices)]}")
     
 
-def find_similarities_matrix(model_name, pretrained_model_name, image_paths, descriptions):
+def find_similarities_matrix(model, processor, descriptions, image_paths, image_inputs):
     # Cargar modelo y processor
-    model = AutoModel.from_pretrained(model_name, trust_remote_code=True).to(device)
-    processor = AutoProcessor.from_pretrained(pretrained_model_name, trust_remote_code=True)
-    model.eval()
-    torch.manual_seed(42)  
-
-    # Cargar y procesar imágenes
-    images = [Image.open(p).convert("RGB") for p in image_paths]
-    image_inputs = processor(images=images, return_tensors="pt", padding=True).to(device)
-
     with torch.no_grad():
         image_features = model.get_image_features(**image_inputs)
         image_features = image_features / image_features.norm(p=2, dim=-1, keepdim=True) 
@@ -87,25 +78,31 @@ def find_similarities_matrix(model_name, pretrained_model_name, image_paths, des
 
     return similarity_matrix
 
+def test_text_clasification(similarity_matrix, image_paths, has, clasification_img):
+    # Extraer nombres de archivo
+    image_names = [os.path.basename(path) for path in image_paths]
 
-image_paths = [
-    "images-testing/rotura1.png",
-    "images-testing/rotura2.png",
-    "images-testing/rotura3.png",
-    "images-testing/roturas-negro1.jpg",
-    "images-testing/roturas-negro2.jpg",
-    "images-testing/sin-rotura.png",
-    "images-testing/skinny-rotura.png",
-]
-descriptions = [
-    "jean sin cortes ni roturas",
-    "jean con roturas."
-]
-find_similarities_matrix("melijauregui/fashionSigLIP-roturas3",
-                        "Marqo/marqo-fashionSigLIP",
-                        image_paths, descriptions)  
-# find_most_similar_description(
-#     model_name, pretrained_model_name, image_path, descriptions)
+    # Clasificar imágenes
+    rotura_imgs = []
+    no_rotura_imgs = []
+
+    for i, name in enumerate(image_names):
+        if has:
+            if has and clasification_img in name:
+                rotura_imgs.append(i)
+            else:
+                no_rotura_imgs.append(i)
+        else:
+            if clasification_img in name:
+                no_rotura_imgs.append(i)
+            else:
+                rotura_imgs.append(i)
+
+    # Evaluar condición 1: rotura con descripción 1
+    max_no_rotura = max(similarity_matrix[0][j] for j in no_rotura_imgs)
+    for i in rotura_imgs:
+        value = similarity_matrix[0][i]
+        print(f"[{clasification_img}] {image_names[i]}: {value:.3f} > {max_no_rotura:.3f}? {'✅' if value > max_no_rotura else '❌'}")
 
 
 """ 
