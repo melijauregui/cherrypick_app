@@ -2,17 +2,17 @@ import torch
 from PIL import Image
 from transformers import AutoModel, AutoProcessor
 import numpy as np
+DEVICE = torch.device(
+    "mps" if torch.backends.mps.is_available() else "cpu")
 
 
 def find_most_similar_image(query_image_path, pretrained_model_name, gallery_paths, model_name):
     folder_path = "images-testing"
     # Configurar dispositivo
-    device = torch.device(
-        "mps" if torch.backends.mps.is_available() else "cpu")
 
     # Cargar modelo y processor
     model = AutoModel.from_pretrained(
-        model_name, trust_remote_code=True).to(device)
+        model_name, trust_remote_code=True, low_cpu_mem_usage=False).to(DEVICE)
     processor = AutoProcessor.from_pretrained(
         pretrained_model_name, trust_remote_code=True)
 
@@ -25,12 +25,12 @@ def find_most_similar_image(query_image_path, pretrained_model_name, gallery_pat
     with torch.no_grad():
         # Procesar query
         query_inputs = processor(
-            images=query_image, return_tensors="pt").to(device)
+            images=query_image, return_tensors="pt").to(DEVICE)
         query_emb = model.model.encode_image(query_inputs["pixel_values"])
         query_emb = query_emb / query_emb.norm(p=2, dim=-1, keepdim=True)
 
         gallery_inputs = processor(
-            images=gallery_images, return_tensors="pt").to(device)
+            images=gallery_images, return_tensors="pt").to(DEVICE)
         gallery_embs = model.model.encode_image(gallery_inputs["pixel_values"])
         gallery_embs = gallery_embs / \
             gallery_embs.norm(p=2, dim=-1, keepdim=True)
@@ -43,11 +43,11 @@ def find_most_similar_image(query_image_path, pretrained_model_name, gallery_pat
         print(f"Similitud con '{gallery_paths[i]}': {similarities[i]}")
 
     print(
-        f"📸 Imagen más similar para :{query_image_path}: {gallery_paths[np.argmax(similarities)]}\n")
+        f"📸 Imagen más similar para {query_image_path}: {gallery_paths[np.argmax(similarities)]}\n")
 
 
 pretrained_model_name_or_path = "Marqo/marqo-fashionSigLIP"
-model_name = "melijauregui/fashionSigLIP-roturas2"
+model_name = "Sofia-gb/fashionSigLIP-roturas8"
 query_image_path = "roturas-negro2.jpg"
 gallery_paths = [
     "rotura1.png",
@@ -155,4 +155,127 @@ Similitud con 'roturas-negro2.jpg': 0.8663132190704346
 Similitud con 'roturas-negro1.jpg': 0.8636921644210815
 📸 Imagen más similar para :rotura1.png: rotura3.png
 
+---------------------------------------------
+
+Sofia-gb/fashionSigLIP-roturas4: congelar capas y optimizar solo la última.
+
+Similitud con 'roturas-negro1.jpg': 0.9166030883789062
+Similitud con 'rotura2.png': 0.8889819979667664
+Similitud con 'rotura3.png': 0.8875263929367065
+Similitud con 'skinny-rotura.png': 0.8473618030548096
+Similitud con 'rotura1.png': 0.8370959758758545
+Similitud con 'sin-rotura.png': 0.6315427422523499
+📸 Imagen más similar para :roturas-negro2.jpg: roturas-negro1.jpg
+
+Similitud con 'rotura3.png': 0.916398286819458
+Similitud con 'rotura2.png': 0.8704217076301575
+Similitud con 'roturas-negro1.jpg': 0.8607035875320435
+Similitud con 'skinny-rotura.png': 0.8460321426391602
+Similitud con 'roturas-negro2.jpg': 0.8370959162712097
+Similitud con 'sin-rotura.png': 0.5840163230895996
+📸 Imagen más similar para :rotura1.png: rotura3.png
+
+------------------------------------
+
+Sofia-gb/fashionSigLIP-roturas5: congelar capas y optimizar solo la última + data augmentation.
+
+Similitud con 'roturas-negro1.jpg': 0.9434396624565125
+Similitud con 'rotura3.png': 0.9123458862304688
+Similitud con 'rotura2.png': 0.9048678874969482
+Similitud con 'skinny-rotura.png': 0.8640248775482178
+Similitud con 'rotura1.png': 0.8525998592376709
+Similitud con 'sin-rotura.png': 0.7889119386672974
+📸 Imagen más similar para :roturas-negro2.jpg: roturas-negro1.jpg
+
+Similitud con 'rotura3.png': 0.9164090156555176
+Similitud con 'rotura2.png': 0.8823390603065491
+Similitud con 'roturas-negro1.jpg': 0.8589333295822144
+Similitud con 'roturas-negro2.jpg': 0.8525997400283813
+Similitud con 'skinny-rotura.png': 0.831209659576416
+Similitud con 'sin-rotura.png': 0.7981151938438416
+📸 Imagen más similar para :rotura1.png: rotura3.png
+
+-----------------------------------------------
+
+Sofia-gb/fashionSigLIP-roturas6: congelar capas y optimizar últimas 2 + data augmentation.
+ds = datasets/roturas-vs-sin.csv
+
+Similitud con 'rotura2.png': 0.9801482558250427
+Similitud con 'roturas-negro1.jpg': 0.9769968390464783
+Similitud con 'rotura3.png': 0.9749467372894287
+Similitud con 'skinny-rotura.png': 0.9723838567733765
+Similitud con 'rotura1.png': 0.9637279510498047
+Similitud con 'sin-rotura.png': 0.9520493149757385
+📸 Imagen más similar para :roturas-negro2.jpg: rotura2.png
+
+Similitud con 'rotura3.png': 0.9840423464775085
+Similitud con 'rotura2.png': 0.9737619757652283
+Similitud con 'roturas-negro1.jpg': 0.9722333550453186
+Similitud con 'skinny-rotura.png': 0.9638115167617798
+Similitud con 'roturas-negro2.jpg': 0.963728129863739
+Similitud con 'sin-rotura.png': 0.9292023181915283
+📸 Imagen más similar para :rotura1.png: rotura3.png
+
+--------------------------------
+
+Sofia-gb/fashionSigLIP-roturas6: congelar capas y optimizar últimas 2 + data augmentation.
+ds = datasets/con-sin-roturas.csv
+
+Similitud con 'roturas-negro1.jpg': 0.9898427724838257
+Similitud con 'rotura3.png': 0.9743671417236328
+Similitud con 'rotura2.png': 0.9739425778388977
+Similitud con 'rotura1.png': 0.9625593423843384
+Similitud con 'sin-rotura.png': 0.9488450884819031
+Similitud con 'skinny-rotura.png': 0.9397170543670654
+📸 Imagen más similar para roturas-negro2.jpg: roturas-negro1.jpg
+
+Similitud con 'rotura3.png': 0.9862618446350098
+Similitud con 'rotura2.png': 0.9846208691596985
+Similitud con 'roturas-negro1.jpg': 0.9657573103904724
+Similitud con 'roturas-negro2.jpg': 0.9625592231750488
+Similitud con 'sin-rotura.png': 0.9616489410400391
+Similitud con 'skinny-rotura.png': 0.9606481790542603
+📸 Imagen más similar para rotura1.png: rotura3.png
+
+--------------------------
+
+Sofia-gb/fashionSigLIP-roturas6: congelar capas y optimizar últimas 4 + data augmentation + early stopping.
+ds = datasets/con-sin-roturas.csv
+
+Similitud con 'roturas-negro1.jpg': 0.9864325523376465
+Similitud con 'rotura3.png': 0.9645108580589294
+Similitud con 'rotura2.png': 0.9638651609420776
+Similitud con 'sin-rotura.png': 0.9518420696258545
+Similitud con 'rotura1.png': 0.951041579246521
+Similitud con 'skinny-rotura.png': 0.9225273132324219
+📸 Imagen más similar para roturas-negro2.jpg: roturas-negro1.jpg
+
+Similitud con 'rotura3.png': 0.9843188524246216
+Similitud con 'rotura2.png': 0.9816229343414307
+Similitud con 'sin-rotura.png': 0.9627786874771118
+Similitud con 'skinny-rotura.png': 0.9560232162475586
+Similitud con 'roturas-negro2.jpg': 0.9510417580604553
+Similitud con 'roturas-negro1.jpg': 0.9506567716598511
+📸 Imagen más similar para rotura1.png: rotura3.png
+
+-------------------------
+
+Sofia-gb/fashionSigLIP-roturas7: congelar capas y optimizar últimas 4 + data augmentation (RANDOM-text) + early stopping.
+ds = datasets/con-sin-roturas.csv
+
+Similitud con 'roturas-negro1.jpg': 0.9766131639480591
+Similitud con 'rotura2.png': 0.9472299814224243
+Similitud con 'rotura3.png': 0.941148579120636
+Similitud con 'sin-rotura.png': 0.9390088319778442
+Similitud con 'rotura1.png': 0.9366506934165955
+Similitud con 'skinny-rotura.png': 0.9147423505783081
+📸 Imagen más similar para roturas-negro2.jpg: roturas-negro1.jpg
+
+Similitud con 'rotura3.png': 0.9851783514022827
+Similitud con 'rotura2.png': 0.9769280552864075
+Similitud con 'skinny-rotura.png': 0.9572533369064331
+Similitud con 'sin-rotura.png': 0.9569511413574219
+Similitud con 'roturas-negro1.jpg': 0.9450658559799194
+Similitud con 'roturas-negro2.jpg': 0.9366506338119507
+📸 Imagen más similar para rotura1.png: rotura3.png
 """
