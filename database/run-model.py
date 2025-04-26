@@ -7,6 +7,7 @@ import torch
 import torch.optim as optim
 from fashionclipFinetuned.fashionClipTestingText import find_similarities_matrix, test_text_clasification
 
+#cd database && python3 run-model.py > test.txt 
 
 # --- CONFIGURACIÓN ---
 ORIGINAL_MODEL_NAME = "Marqo/marqo-fashionSigLIP"
