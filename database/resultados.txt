@@ -629,6 +629,8 @@ mayor no rotura es skinny-rotura-simetrica2.jpg con 0.6164584755897522 de probab
 [rotura] wide-ondas1.jpg: 0.614 > 0.616? ❌
 [rotura] wide1.png: 0.614 > 0.616? ❌
 
+🎯 Porcentaje de acierto: 3.12% (1/32)
+
 
 
 Descripcion: jean con roturas
@@ -691,6 +693,8 @@ mayor no rotura es mom3.jpg con 0.6288678050041199 de probabilidad
 [rotura] wide-rotura-simetrica-negro2.jpg: 0.631 > 0.629? ✅
 [rotura] wide-rotura-simetrica1.png: 0.633 > 0.629? ✅
 
+🎯 Porcentaje de acierto: 100.00% (11/11)
+
 
 
 Descripcion: jean wide leg
@@ -747,6 +751,8 @@ mayor no rotura es palazzo2.jpg con 0.6237757205963135 de probabilidad
 [wide] wide-rotura-simetrica-negro2.jpg: 0.622 > 0.624? ❌
 [wide] wide-rotura-simetrica1.png: 0.622 > 0.624? ❌
 [wide] wide1.png: 0.624 > 0.624? ✅
+
+🎯 Porcentaje de acierto: 16.67% (1/6)
 
 
 
@@ -806,6 +812,8 @@ mayor no rotura es flared1.jpg con 0.6089181900024414 de probabilidad
 [skinny] skinny-rotura-simetrica3.jpg: 0.610 > 0.609? ✅
 [skinny] skinny1.jpg: 0.614 > 0.609? ✅
 
+🎯 Porcentaje de acierto: 100.00% (7/7)
+
 
 
 Descripcion: jean recto
@@ -862,6 +870,8 @@ mayor no rotura es mom3.jpg con 0.6184887886047363 de probabilidad
 [recto] recto1.jpg: 0.616 > 0.618? ❌
 [recto] recto2.jpg: 0.618 > 0.618? ❌
 
+🎯 Porcentaje de acierto: 0.00% (0/5)
+
 
 
 Descripcion: jean palazzo
@@ -917,6 +927,8 @@ mayor no rotura es wide-ondas1.jpg con 0.6265280842781067 de probabilidad
 [palazzo] palazzo3.jpg: 0.627 > 0.627? ✅
 [palazzo] palazzo4.jpg: 0.626 > 0.627? ❌
 [palazzo] palazzo5.jpg: 0.626 > 0.627? ❌
+
+🎯 Porcentaje de acierto: 40.00% (2/5)
 
 
 
@@ -975,6 +987,8 @@ mayor no rotura es mom5.jpg con 0.6061614751815796 de probabilidad
 [cargo] cargo-vintage2.jpg: 0.615 > 0.606? ✅
 [cargo] cargo1.jpg: 0.615 > 0.606? ✅
 
+🎯 Porcentaje de acierto: 100.00% (6/6)
+
 
 
 Descripcion: jean mom
@@ -1031,6 +1045,8 @@ mayor no rotura es skinny-rotura-simetrica2.jpg con 0.6071261763572693 de probab
 [mom] mom4.jpg: 0.601 > 0.607? ❌
 [mom] mom5.jpg: 0.602 > 0.607? ❌
 [mom] mom6.jpg: 0.603 > 0.607? ❌
+
+🎯 Porcentaje de acierto: 0.00% (0/6)
 
 
 
@@ -1090,7 +1106,4 @@ mayor no rotura es wide1.png con 0.6220905184745789 de probabilidad
 [flared] flared5.jpg: 0.622 > 0.622? ❌
 [flared] flared6.jpg: 0.623 > 0.622? ✅
 
----------------------------------------------------------------------------
-
-MODEL_NAME_TO_PUSH = "melijauregui/fashionSigLIP-roturas"
-CSV_PATH = "datasets/roturas-vs-sin.csv"
+🎯 Porcentaje de acierto: 57.14% (4/7)

@@ -139,9 +139,18 @@ def test_text_clasification(probabilities, image_paths, has, clasification_img):
             best_idx = j
     print(
         f"mayor no rotura es {image_names[best_idx]} con {max_no_rotura} de probabilidad")
+    correct = 0
+    total = len(rotura_imgs)
+
     for i in rotura_imgs:
         value = probabilities[i]
-        print(f"[{clasification_img}] {image_names[i]}: {value:.3f} > {max_no_rotura:.3f}? {'✅' if value > max_no_rotura else '❌'}")
+        success = value > max_no_rotura
+        if success:
+            correct += 1
+        print(f"[{clasification_img}] {image_names[i]}: {value:.3f} > {max_no_rotura:.3f}? {'✅' if success else '❌'}")
+
+    accuracy = (correct / total) * 100 if total > 0 else 0
+    print(f"\n🎯 Porcentaje de acierto: {accuracy:.2f}% ({correct}/{total})")
 
 
 """ 
