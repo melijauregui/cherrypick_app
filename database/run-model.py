@@ -12,7 +12,7 @@ from fashionclipFinetuned.fashionClipTestingText import test_text_clasification,
 # --- CONFIGURACIÓN ---
 ORIGINAL_MODEL_NAME = "Marqo/marqo-fashionSigLIP"
 MODEL_NAME_TO_FINETUNE = "Marqo/marqo-fashionSigLIP"
-MODEL_NAME_TO_PUSH = "Sofia-gb/fashionSigLIP-roturas9"
+MODEL_NAME_TO_PUSH = "Sofia-gb/fashionSigLIP-roturas12"
 # CSV_PATH = "datasets/con-sin-roturas.csv"
 FOLDER_IMAGES_TESTING = "images-testing"
 
@@ -117,7 +117,7 @@ test_text_clasification(probabilities=probabilities,
 print("\n")
 
 # --- test texto con descripcion de flared
-description = "jean flared"
+description = "jean acampanado"
 print("\nDescripcion:", description)
 probabilities = find_similarities_matrix2(
     model, processor, description, image_paths, images)

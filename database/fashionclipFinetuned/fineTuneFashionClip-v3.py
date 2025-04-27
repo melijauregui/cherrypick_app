@@ -15,7 +15,6 @@ import nlpaug.augmenter.word as naw
 import torch.optim as optim
 from huggingface_hub import create_repo, upload_file
 import nltk
-import nlpaug.augmenter.word as naw
 # pip install nlpaug transformers sentencepiece
 import random
 from sklearn.model_selection import train_test_split
@@ -131,7 +130,7 @@ def freeze_layers(model):
     print("🔓 Descongelamos las últimas capas de visión y texto + proyecciones finales.")
 
 
-def contrastive_loss(image_embeds, text_embeds, margin=0.7):
+def contrastive_loss(image_embeds, text_embeds, margin=0.5):
     positive = cosine_similarity(image_embeds, text_embeds)
 
     negative = 1 - positive
@@ -211,12 +210,12 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
             params_frozen.append(param)
 
     # Optimizador con differential learning rate
-    optimizer = optim.AdamW([
-        {"params": params_frozen, "lr": LR},
-        {"params": params_to_optimize, "lr": LR * 10}  # ToDo: ajustar
-    ], weight_decay=1e-4)
+    # optimizer = optim.AdamW([
+    #    {"params": params_frozen, "lr": LR},
+    #    {"params": params_to_optimize, "lr": LR * 10}  # ToDo: ajustar
+    # ], weight_decay=1e-4)
 
-    # optimizer = optim.AdamW(model.parameters(), lr=LR, weight_decay=1e-4)
+    optimizer = optim.AdamW(model.parameters(), lr=LR, weight_decay=1e-4)
 
     # --- ENTRENAMIENTO ---
     model.train()
@@ -301,5 +300,5 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
 # fine_tune(csv_path="datasets/con-sin-roturas.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
 #          model_name_to_push="Sofia-gb/fashionSigLIP-roturas8", img_aug=False, text_aug=True, freeze_func=freeze_layers)
 
-fine_tune(csv_path="datasets/con-sin-roturas-v2.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
-          model_name_to_push="Sofia-gb/fashionSigLIP-roturas9", img_aug=True, text_aug=True, freeze_func=freeze_layers)
+fine_tune(csv_path="datasets/con-sin-roturas-v3.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
+          model_name_to_push="Sofia-gb/fashionSigLIP-roturas12", img_aug=False, text_aug=False, freeze_func=freeze_layers)

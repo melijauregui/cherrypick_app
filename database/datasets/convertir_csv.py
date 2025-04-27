@@ -3,17 +3,28 @@ import re
 import pandas as pd
 
 input_file = 'con-sin-roturas.csv'
-output_file = 'con-sin-roturas-v2.csv'
+output_file = 'con-sin-roturas-v3.csv'
 
 
 def limpiar_descripcion(texto):
-    texto = re.sub(r'\.?\s*podria ser[^.]*\.', '', texto, flags=re.IGNORECASE)
+    texto = re.sub(r'\.?\s*podria ser[^.]*\.', '.', texto, flags=re.IGNORECASE)
 
     texto = re.sub(r'\bde mujer\b', '', texto, flags=re.IGNORECASE)
 
     texto = re.sub(r'\bsin rotura\b', '', texto, flags=re.IGNORECASE)
 
-    texto = re.sub(r'\s+', ' ', texto).strip()
+    texto = re.sub(r'recto', 'RECTO', texto, flags=re.IGNORECASE)
+    texto = re.sub(r'wide leg', 'WIDE LEG', texto, flags=re.IGNORECASE)
+    texto = re.sub(r'skinny', 'SKINNY', texto, flags=re.IGNORECASE)
+    texto = re.sub(r'palazzo', 'PALAZZO', texto, flags=re.IGNORECASE)
+    texto = re.sub(r'cargo', 'CARGO', texto, flags=re.IGNORECASE)
+    texto = re.sub(r'acampanado', 'ACAMPANADO', texto, flags=re.IGNORECASE)
+    texto = re.sub(r'roturas', 'ROTURAS', texto, flags=re.IGNORECASE)
+    texto = re.sub(r'rotura', 'ROTURA', texto)
+
+    texto = re.sub(r'flatered', 'FLATERED', texto, flags=re.IGNORECASE)
+    texto = re.sub(r'campana', 'CAMPANA', texto, flags=re.IGNORECASE)
+    # texto = re.sub(r'\s+', ' ', texto).strip()
 
     return texto
 
