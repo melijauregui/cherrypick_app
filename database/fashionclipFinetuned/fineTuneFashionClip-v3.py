@@ -32,15 +32,22 @@ EPOCHS = 30
 LR = 1e-5
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# Definir las transformaciones
+# data_transforms = transforms.Compose([
+#    transforms.RandomHorizontalFlip(),  # Volteo horizontal aleatorio
+#    transforms.RandomRotation(30),  # Rotación aleatoria entre -30 y 30 grados
+#    # Recorte aleatorio y redimensionado de la imagen
+#    transforms.RandomResizedCrop(224),
+#    transforms.ColorJitter(brightness=0.2, contrast=0.2,
+#                           saturation=0.2, hue=0.2),  # Cambios de iluminación
+# ])
+
 data_transforms = transforms.Compose([
-    transforms.RandomHorizontalFlip(),  # Volteo horizontal aleatorio
-    transforms.RandomRotation(30),  # Rotación aleatoria entre -30 y 30 grados
-    # Recorte aleatorio y redimensionado de la imagen
-    transforms.RandomResizedCrop(224),
-    transforms.ColorJitter(brightness=0.2, contrast=0.2,
-                           saturation=0.2, hue=0.2),  # Cambios de iluminación
+    transforms.RandomHorizontalFlip(),
+    transforms.RandomRotation(10),
+    transforms.RandomResizedCrop(224, scale=(0.9, 1.0)),
+    transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1),
 ])
+
 
 synonym_aug = naw.SynonymAug(aug_p=0.4)
 random_swap_aug = naw.RandomWordAug(action="swap")
@@ -124,8 +131,9 @@ def freeze_layers(model):
     print("🔓 Descongelamos las últimas capas de visión y texto + proyecciones finales.")
 
 
-def contrastive_loss(image_embeds, text_embeds, margin=0.5):
+def contrastive_loss(image_embeds, text_embeds, margin=0.7):
     positive = cosine_similarity(image_embeds, text_embeds)
+
     negative = 1 - positive
     loss = torch.mean(torch.relu(margin - positive + negative))
     return loss
@@ -192,7 +200,23 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
     val_loader = DataLoader(
         val_dataset, batch_size=batch_size, shuffle=False, collate_fn=collate_fn)
 
-    optimizer = optim.AdamW(model.parameters(), lr=LR, weight_decay=1e-4)
+    # Definimos dos grupos de parámetros: descongelados y el resto
+    params_to_optimize = []
+    params_frozen = []
+
+    for name, param in model.named_parameters():
+        if param.requires_grad:
+            params_to_optimize.append(param)
+        else:
+            params_frozen.append(param)
+
+    # Optimizador con differential learning rate
+    optimizer = optim.AdamW([
+        {"params": params_frozen, "lr": LR},
+        {"params": params_to_optimize, "lr": LR * 10}  # ToDo: ajustar
+    ], weight_decay=1e-4)
+
+    # optimizer = optim.AdamW(model.parameters(), lr=LR, weight_decay=1e-4)
 
     # --- ENTRENAMIENTO ---
     model.train()
@@ -274,5 +298,8 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
         processor.push_to_hub(model_name_to_push)
 
 
-fine_tune(csv_path="datasets/con-sin-roturas.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
-          model_name_to_push="Sofia-gb/fashionSigLIP-roturas8", img_aug=False, text_aug=True, freeze_func=freeze_layers)
+# fine_tune(csv_path="datasets/con-sin-roturas.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
+#          model_name_to_push="Sofia-gb/fashionSigLIP-roturas8", img_aug=False, text_aug=True, freeze_func=freeze_layers)
+
+fine_tune(csv_path="datasets/con-sin-roturas-v2.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
+          model_name_to_push="Sofia-gb/fashionSigLIP-roturas9", img_aug=True, text_aug=True, freeze_func=freeze_layers)
