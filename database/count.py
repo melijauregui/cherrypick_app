@@ -4,7 +4,7 @@ from collections import defaultdict
 # Definí las palabras clave que vas a buscar
 cortes = {
     # "liso",
-    "jean wide leg": [0, 0],
+    # "jean wide leg": [0, 0],
     # "jean skinny": [0, 0],
     # "jean recto": [0, 0],
     "jean palazzo": [0, 0],
