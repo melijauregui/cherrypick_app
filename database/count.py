@@ -26,6 +26,6 @@ for desc in df['description']:
 
 for corte, _ in cortes.items():
     con_rotura, sin_rotura = cortes[corte]
-    if con_rotura == 25 and sin_rotura == 25:
-        continue
+    # if con_rotura == 25 and sin_rotura == 25:
+    #    continue
     print(f"{corte}: {con_rotura} con rotura, {sin_rotura} sin rotura")
