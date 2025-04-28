@@ -1,4 +1,5 @@
 from torch.nn.functional import cosine_similarity
+import random
 from huggingface_hub import HfApi, HfFolder, Repository
 from io import BytesIO
 import os
@@ -64,6 +65,7 @@ class FashionDataset(Dataset):
         self.processor = processor
         self.aug_img = aug_img
         self.aug_text = aug_text
+        self.aug_prob = 0.5
 
     def __len__(self):
         return len(self.dataframe)
@@ -73,21 +75,19 @@ class FashionDataset(Dataset):
         try:
             response = requests.get(row["image"])
             image = Image.open(BytesIO(response.content))
-            if self.aug_img:
+            if self.aug_img and random.random() < self.aug_prob:
                 image = data_transforms(image)
         except Exception as e:
             print(f"Error al cargar la imagen: {e}")
             return None
         text = row["description"]
-        if self.aug_text:
+        if self.aug_text and random.random() < self.aug_prob:
             augs = [contextual_aug, synonym_aug, random_swap_aug]
             chosen_aug = random.choice(augs)
             # text = contextual_aug.augment(text)
             text = chosen_aug.augment(text)
             if isinstance(text, list):
                 text = text[0]
-            else:
-                text = text
         return image, text
 
 
@@ -300,5 +300,5 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
 # fine_tune(csv_path="datasets/con-sin-roturas.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
 #          model_name_to_push="Sofia-gb/fashionSigLIP-roturas8", img_aug=False, text_aug=True, freeze_func=freeze_layers)
 
-fine_tune(csv_path="datasets/con-sin-roturas-v3.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
-          model_name_to_push="Sofia-gb/fashionSigLIP-roturas12", img_aug=False, text_aug=False, freeze_func=freeze_layers)
+fine_tune(csv_path="datasets/cs-roturas-synthetic-v2.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
+          model_name_to_push="Sofia-gb/fashionSigLIP-roturas15", img_aug=True, text_aug=False, freeze_func=freeze_layers)
