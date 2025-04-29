@@ -144,13 +144,14 @@ def test_text_clasification(probabilities, image_paths, has, clasification_img, 
                 continue
             max_no_rotura = probabilities[j]
             best_idx = j
-            
+
     print(
         f"mayor no rotura es {image_names[best_idx]} con {max_no_rotura} de probabilidad")
     if best_idx_yellow_flag is not None:
         print(
             f"mayor no rotura es {image_names[best_idx_yellow_flag]} con {max_yellow_flag} de probabilidad")
     correct = 0
+    correct_aprox = 0
     total = len(rotura_imgs)
 
     for i in rotura_imgs:
@@ -162,16 +163,23 @@ def test_text_clasification(probabilities, image_paths, has, clasification_img, 
 
         if value > max_no_rotura:
             status = '🟨'  # Amarillo si supera max_no_rotura pero no max_yellow_flag
+            correct_aprox += 1
         else:
             status = '❌'  # Rojo si no supera ni max_no_rotura
 
         if success:
             status = '✅'  # Verde si supera ambos
 
-        print(f"[{clasification_img}] {image_names[i]}: {value:.3f} > {max_no_rotura:.3f}? {status}")
+        print(
+            f"[{clasification_img}] {image_names[i]}: {value:.3f} > {max_no_rotura:.3f}? {status}")
 
     accuracy = (correct / total) * 100 if total > 0 else 0
     print(f"\n🎯 Porcentaje de acierto: {accuracy:.2f}% ({correct}/{total})")
+    if correct_aprox > correct:
+        accuracy = (correct_aprox / total) * 100 if total > 0 else 0
+
+        print(
+            f"\n🎯 Porcentaje de acierto incluyendo 🟨: {accuracy:.2f}% ({correct_aprox}/{total})")
 
 
 """ 
