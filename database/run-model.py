@@ -30,6 +30,8 @@ DEVICE = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 
 
 # --- TESTS ---
+#print the info of the model
+print("Model name:", MODEL_NAME_TO_PUSH)
 model = AutoModel.from_pretrained(
     pretrained_model_name_or_path=MODEL_NAME_TO_PUSH, trust_remote_code=True)
 processor = AutoProcessor.from_pretrained(
@@ -68,7 +70,7 @@ print("\nDescripcion:", description)
 probabilities = find_similarities_matrix2(
     model, processor, description, image_paths, images)
 test_text_clasification(probabilities=probabilities,
-                        image_paths=image_paths, has=True, clasification_img="wide")
+                        image_paths=image_paths, has=True, clasification_img="wide", yellow_flags=["palazzo"])
 print("\n")
 
 # --- test texto con descripcion de skinny
@@ -95,7 +97,7 @@ print("\nDescripcion:", description)
 probabilities = find_similarities_matrix2(
     model, processor, description, image_paths, images)
 test_text_clasification(probabilities=probabilities,
-                        image_paths=image_paths, has=True, clasification_img="palazzo")
+                        image_paths=image_paths, has=True, clasification_img="palazzo", yellow_flags=["wide"])
 print("\n")
 
 # --- test texto con descripcion de cargo

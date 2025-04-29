@@ -110,7 +110,7 @@ def find_similarities_matrix2(model, processor, description, image_paths, images
     return probabilities
 
 
-def test_text_clasification(probabilities, image_paths, has, clasification_img):
+def test_text_clasification(probabilities, image_paths, has, clasification_img, yellow_flags=[]):
     # Extraer nombres de archivo
     image_names = [os.path.basename(path) for path in image_paths]
 
@@ -131,23 +131,44 @@ def test_text_clasification(probabilities, image_paths, has, clasification_img):
                 rotura_imgs.append(i)
 
     # Evaluar condición 1: rotura con descripción 1
-    best_idx = None
     max_no_rotura = float('-inf')
+    best_idx = None
+    max_yellow_flag = float('-inf')
+    best_idx_yellow_flag = None
     for j in no_rotura_imgs:
         if probabilities[j] > max_no_rotura:
+            if any(flag in image_names[j] for flag in yellow_flags):
+                if probabilities[j] > max_yellow_flag:
+                    max_yellow_flag = probabilities[j]
+                    best_idx_yellow_flag = j
+                continue
             max_no_rotura = probabilities[j]
             best_idx = j
+            
     print(
         f"mayor no rotura es {image_names[best_idx]} con {max_no_rotura} de probabilidad")
+    if best_idx_yellow_flag is not None:
+        print(
+            f"mayor no rotura es {image_names[best_idx_yellow_flag]} con {max_yellow_flag} de probabilidad")
     correct = 0
     total = len(rotura_imgs)
 
     for i in rotura_imgs:
         value = probabilities[i]
-        success = value > max_no_rotura
+        success = value > max_no_rotura and value > max_yellow_flag
+
         if success:
             correct += 1
-        print(f"[{clasification_img}] {image_names[i]}: {value:.3f} > {max_no_rotura:.3f}? {'✅' if success else '❌'}")
+
+        if value > max_no_rotura:
+            status = '🟨'  # Amarillo si supera max_no_rotura pero no max_yellow_flag
+        else:
+            status = '❌'  # Rojo si no supera ni max_no_rotura
+
+        if success:
+            status = '✅'  # Verde si supera ambos
+
+        print(f"[{clasification_img}] {image_names[i]}: {value:.3f} > {max_no_rotura:.3f}? {status}")
 
     accuracy = (correct / total) * 100 if total > 0 else 0
     print(f"\n🎯 Porcentaje de acierto: {accuracy:.2f}% ({correct}/{total})")
