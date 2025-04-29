@@ -43,10 +43,53 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 data_transforms = transforms.Compose([
     transforms.RandomHorizontalFlip(),
-    transforms.RandomRotation(10),
+    transforms.RandomRotation(7),
     transforms.RandomResizedCrop(224, scale=(0.9, 1.0)),
     transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1),
+    transforms.RandomAffine(degrees=5, translate=(0.02, 0.02))
 ])
+
+
+def load_image_from_url(url):
+    response = requests.get(url)
+    return Image.open(BytesIO(response.content)).convert('RGB')
+
+def augment_train_df(train_df, num_augmented_per_image=5):
+    """
+    Aumenta el train_df generando nuevas filas con imágenes augmentadas.
+    """
+    augmented_rows = []
+
+    for idx, row in train_df.iterrows():
+        url = row['image']  # o como se llame tu columna de URL
+
+        try:
+            original_image = load_image_from_url(url)
+
+            for i in range(num_augmented_per_image):
+                # augmented_image = data_transforms(original_image)
+
+                # Guardamos imagen augmentada en memoria (opcional: podrías subirla a un server, o usarla directamente en el DataLoader)
+                # Para ahora, generamos una fila que "simula" tener una imagen augmentada
+                augmented_rows.append({
+                    'image': url,  # Podés marcarlo como el mismo URL si no querés guardar las nuevas imágenes
+                    'augmentation_applied': True,  # Agregamos una columna nueva para indicar que es augmentada
+                    'description': row['description']  # Copiamos la descripción original
+                })
+
+        except Exception as e:
+            print(f"Error en URL {url}: {e}")
+
+    # Crear un DataFrame de las nuevas filas augmentadas
+    augmented_df = pd.DataFrame(augmented_rows)
+
+    # Opcionalmente, marcamos las imágenes originales
+    train_df['augmentation_applied'] = False
+
+    # Concatenamos originales + augmentadas
+    train_df_augmented = pd.concat([train_df, augmented_df], ignore_index=True)
+
+    return train_df_augmented
 
 
 synonym_aug = naw.SynonymAug(aug_p=0.4)
@@ -75,19 +118,20 @@ class FashionDataset(Dataset):
         try:
             response = requests.get(row["image"])
             image = Image.open(BytesIO(response.content))
-            if self.aug_img and random.random() < self.aug_prob:
+            # Aplico augmentation SOLO si la fila lo indica
+            if row.get("augmentation_applied", False):  # Usa get() para no romper si no existe la columna
                 image = data_transforms(image)
         except Exception as e:
             print(f"Error al cargar la imagen: {e}")
             return None
         text = row["description"]
-        if self.aug_text and random.random() < self.aug_prob:
-            augs = [contextual_aug, synonym_aug, random_swap_aug]
-            chosen_aug = random.choice(augs)
-            # text = contextual_aug.augment(text)
-            text = chosen_aug.augment(text)
-            if isinstance(text, list):
-                text = text[0]
+        # if self.aug_text and random.random() < self.aug_prob:
+        #     augs = [contextual_aug, synonym_aug, random_swap_aug]
+        #     chosen_aug = random.choice(augs)
+        #     # text = contextual_aug.augment(text)
+        #     text = chosen_aug.augment(text)
+        #     if isinstance(text, list):
+        #         text = text[0]
         return image, text
 
 
@@ -181,6 +225,7 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
               batch_size=BATCH_SIZE, epochs=EPOCHS, img_aug=False, text_aug=False, freeze_func=freeze_layers):
     df = pd.read_csv(csv_path)
     train_df, val_df = train_test_split(df, test_size=0.2, random_state=42)
+    train_df_augmented = augment_train_df(train_df, num_augmented_per_image=10)
 
     processor = AutoProcessor.from_pretrained(
         original_model_name, trust_remote_code=True)
@@ -190,7 +235,9 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
     freeze_func(model)
 
     train_dataset = FashionDataset(
-        train_df, processor, aug_img=img_aug, aug_text=text_aug)
+        train_df_augmented, processor, aug_img=img_aug, aug_text=text_aug)
+    
+    
     val_dataset = FashionDataset(
         val_df, processor, aug_img=False, aug_text=False)
 
@@ -208,12 +255,6 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
             params_to_optimize.append(param)
         else:
             params_frozen.append(param)
-
-    # Optimizador con differential learning rate
-    # optimizer = optim.AdamW([
-    #    {"params": params_frozen, "lr": LR},
-    #    {"params": params_to_optimize, "lr": LR * 10}  # ToDo: ajustar
-    # ], weight_decay=1e-4)
 
     optimizer = optim.AdamW(model.parameters(), lr=LR, weight_decay=1e-4)
 
@@ -298,4 +339,4 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
 
 
 fine_tune(csv_path="datasets/con-sin-roturas-v3.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
-          model_name_to_push="Sofia-gb/fashionSigLIP-roturas15", img_aug=False, text_aug=False, freeze_func=freeze_layers)
+          model_name_to_push="melijauregui/fashionSigLIP-roturas15v2", img_aug=False, text_aug=False, freeze_func=freeze_layers)

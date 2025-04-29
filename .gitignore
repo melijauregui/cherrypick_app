@@ -45,4 +45,5 @@ ios/
 # database
 
 database/Sofia-gb/**
+database/melijauregui/**
 database/fashionclipFinetuned/__pycache__/**
