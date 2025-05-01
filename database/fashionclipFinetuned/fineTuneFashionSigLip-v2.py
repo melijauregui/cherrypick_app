@@ -221,15 +221,15 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
         else:
             params_frozen.append(param)
 
-    optimizer = optim.AdamW(params_to_optimize, lr=LR, weight_decay=1e-4)
+    optimizer = optim.AdamW(model.parameters(), lr=LR, weight_decay=1e-4)
 
     # --- ENTRENAMIENTO ---
     patience = 3
     best_loss = float('inf')
     counter = 0
+    model.train()
     best_model_state_dict = None
     for epoch in range(epochs):
-        model.train()
         running_loss = 0.0
         for images, texts in tqdm(train_loader, desc=f"Epoch {epoch+1}/{epochs}"):
             if original_model_name.endswith("SigLIP"):
@@ -304,4 +304,4 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
 
 
 fine_tune(csv_path="datasets/con-sin-roturas-v3.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
-          model_name_to_push="Sofia-gb/fashionSigLIP-roturas16", img_aug=False, text_aug=False, freeze_func=freeze_layers)
+          model_name_to_push="Sofia-gb/fashionSigLIP-roturas17", img_aug=False, text_aug=False, freeze_func=freeze_layers)

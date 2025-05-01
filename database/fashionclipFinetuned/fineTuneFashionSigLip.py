@@ -102,7 +102,7 @@ def freeze_layers(model):
     # --- VISIÓN ---
     # Descongelar las últimas capas de visión
     visual_blocks = model.model.visual.trunk.blocks
-    for block in visual_blocks[-4:]:
+    for block in visual_blocks[-3:]:
         for param in block.parameters():
             param.requires_grad = True
 
@@ -113,7 +113,7 @@ def freeze_layers(model):
     # --- TEXTO ---
     # Descongelar las últimas capas de texto
     text_layers = model.model.text.transformer.resblocks
-    for layer in text_layers[-4:]:
+    for layer in text_layers[-3:]:
         for param in layer.parameters():
             param.requires_grad = True
 
@@ -285,5 +285,5 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
 
 
 fine_tune(csv_path="datasets/con-sin-roturas-v3.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
-          model_name_to_push="Sofia-gb/fashionSigLIP-roturas16", img_aug=False, text_aug=False, freeze_func=freeze_layers)
+          model_name_to_push="Sofia-gb/fashionSigLIP-roturas17", img_aug=False, text_aug=False, freeze_func=freeze_layers)
 # 16: 4
