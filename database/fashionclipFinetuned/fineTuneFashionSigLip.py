@@ -284,6 +284,5 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
         processor.push_to_hub(model_name_to_push)
 
 
-fine_tune(csv_path="datasets/con-sin-roturas-v3.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
-          model_name_to_push="Sofia-gb/fashionSigLIP-roturas17", img_aug=False, text_aug=False, freeze_func=freeze_layers)
-# 16: 4
+fine_tune(csv_path="datasets/con-sin-roturas-v4.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
+          model_name_to_push="Sofia-gb/fashionSigLIP-roturas16", img_aug=False, text_aug=False, freeze_func=freeze_layers)
