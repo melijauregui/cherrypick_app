@@ -31,7 +31,7 @@ BATCH_SIZE = 30
 EPOCHS = 30
 LR = 1e-5
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
+print("Usando dispositivo:", DEVICE)
 data_transforms = transforms.Compose([
     transforms.RandomHorizontalFlip(),
     transforms.RandomRotation(7),

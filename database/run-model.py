@@ -12,7 +12,7 @@ from fashionclipFinetuned.fashionClipTestingText import test_text_clasification,
 # --- CONFIGURACIÓN ---
 ORIGINAL_MODEL_NAME = "Marqo/marqo-fashionSigLIP"
 MODEL_NAME_TO_FINETUNE = "Marqo/marqo-fashionSigLIP"
-MODEL_NAME_TO_PUSH = "Sofia-gb/fashionSigLIP-roturas17"
+MODEL_NAME_TO_PUSH = "Sofia-gb/fashionSigLIP-roturas16"
 # CSV_PATH = "datasets/con-sin-roturas.csv"
 FOLDER_IMAGES_TESTING = "images-testing"
 

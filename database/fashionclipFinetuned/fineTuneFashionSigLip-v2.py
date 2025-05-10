@@ -12,35 +12,22 @@ from transformers import AutoProcessor, AutoModel
 import torch
 import torch.nn as nn
 from torchvision import transforms
-import nlpaug.augmenter.word as naw
 import torch.optim as optim
 from huggingface_hub import create_repo, upload_file
-import nltk
 # pip install nlpaug transformers sentencepiece
 import random
 from sklearn.model_selection import train_test_split
-
-try:
-    nltk.data.find('taggers/averaged_perceptron_tagger_eng')
-except LookupError:
-    nltk.download('averaged_perceptron_tagger_eng')
-
+import torch.nn.functional as F
+import multiprocessing
 
 # --- CONFIGURACIÓN ---
 BATCH_SIZE = 30
 EPOCHS = 30
 LR = 1e-5
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-# data_transforms = transforms.Compose([
-#    transforms.RandomHorizontalFlip(),  # Volteo horizontal aleatorio
-#    transforms.RandomRotation(30),  # Rotación aleatoria entre -30 y 30 grados
-#    # Recorte aleatorio y redimensionado de la imagen
-#    transforms.RandomResizedCrop(224),
-#    transforms.ColorJitter(brightness=0.2, contrast=0.2,
-#                           saturation=0.2, hue=0.2),  # Cambios de iluminación
-# ])
-
+NUM_WORKERS = min(4, os.cpu_count() or 1)
+TEMPERATURE = 0.1
+# print(f"Using {NUM_WORKERS} workers for data loading.")
 data_transforms = transforms.Compose([
     transforms.RandomHorizontalFlip(),
     transforms.RandomRotation(7),
@@ -49,25 +36,15 @@ data_transforms = transforms.Compose([
     transforms.RandomAffine(degrees=5, translate=(0.02, 0.02))
 ])
 
-
-synonym_aug = naw.SynonymAug(aug_p=0.4)
-random_swap_aug = naw.RandomWordAug(action="swap")
-contextual_aug = naw.ContextualWordEmbsAug(
-    model_path='bert-base-uncased',
-    action="substitute"
-)
-
 # --- DATASET PERSONALIZADO ---
 
 
 class FashionDataset(Dataset):
-    def __init__(self, dataframe, processor, aug_img=False, aug_text=False, n_augmented=3):
+    def __init__(self, dataframe, processor, data_aug=False, n_augmented=5):
         self.dataframe = dataframe
         self.processor = processor
-        self.aug_img = aug_img
-        self.aug_text = aug_text
-        self.aug_prob = 0.5
         self.n_augmented = n_augmented
+        self.data_aug = data_aug
         self.augment = transforms.Compose([
             transforms.RandomHorizontalFlip(p=0.5),
             transforms.RandomRotation(5),
@@ -78,16 +55,20 @@ class FashionDataset(Dataset):
         ])
 
     def __len__(self):
-        # return len(self.dataframe)
-        return len(self.dataframe) * (self.n_augmented + 1)
+        if not self.data_aug:
+            return len(self.dataframe)
+        else:
+            return len(self.dataframe) * (self.n_augmented + 1)
 
     def __getitem__(self, idx):
-        base_idx = idx // (self.n_augmented + 1)
-        is_augmented = idx % (self.n_augmented + 1) != 0
+        if not self.data_aug:
+            row = self.dataframe.iloc[idx]
+            is_augmented = False
+        else:
+            base_idx = idx // (self.n_augmented + 1)
+            is_augmented = idx % (self.n_augmented + 1) != 0
 
-        row = self.dataframe.iloc[base_idx]
-        # image, text = self.dataset[base_idx]
-
+            row = self.dataframe.iloc[base_idx]
         try:
             response = requests.get(row["image"])
             image = Image.open(BytesIO(response.content))
@@ -110,17 +91,18 @@ def collate_fn(batch):
     return list(images), list(texts)
 
 
-def freeze_layers(model):
+def freeze_layers(model, n_layers=4):
     # Descongelar todas las capas
     for param in model.parameters():
         param.requires_grad = False
 
     # --- VISIÓN ---
     # Descongelar las últimas capas de visión
-    visual_blocks = model.model.visual.trunk.blocks
-    for block in visual_blocks[-4:]:
-        for param in block.parameters():
-            param.requires_grad = True
+    if n_layers != 0:
+        visual_blocks = model.model.visual.trunk.blocks
+        for block in visual_blocks[-n_layers:]:
+            for param in block.parameters():
+                param.requires_grad = True
 
     # Descongelar la attn_pool
     for param in model.model.visual.trunk.attn_pool.parameters():
@@ -128,16 +110,15 @@ def freeze_layers(model):
 
     # --- TEXTO ---
     # Descongelar las últimas capas de texto
-    text_layers = model.model.text.transformer.resblocks
-    for layer in text_layers[-4:]:
-        for param in layer.parameters():
-            param.requires_grad = True
+    if n_layers != 0:
+        text_layers = model.model.text.transformer.resblocks
+        for layer in text_layers[-n_layers:]:
+            for param in layer.parameters():
+                param.requires_grad = True
 
     # Descongelar la proyección de texto
     for param in model.model.text.text_projection.parameters():
         param.requires_grad = True
-
-    print("🔓 Descongelamos las últimas capas de visión y texto + proyecciones finales.")
 
 
 def contrastive_loss(image_embeds, text_embeds, margin=0.5):
@@ -146,6 +127,20 @@ def contrastive_loss(image_embeds, text_embeds, margin=0.5):
     negative = 1 - positive
     loss = torch.mean(torch.relu(margin - positive + negative))
     return loss
+
+
+# 07):
+def contrastive_loss_InfoNCE(text_embeds, image_embeds, temperature=TEMPERATURE):
+    text_embeds = F.normalize(text_embeds, dim=-1)
+    image_embeds = F.normalize(image_embeds, dim=-1)
+
+    logits = torch.matmul(text_embeds, image_embeds.T) / temperature
+    labels = torch.arange(len(text_embeds)).to(logits.device)
+
+    loss_i2t = F.cross_entropy(logits, labels)
+    loss_t2i = F.cross_entropy(logits.T, labels)
+
+    return (loss_i2t + loss_t2i) / 2
 
 
 def validate(model, val_loader, processor, epoch, epochs):
@@ -188,7 +183,8 @@ def validate(model, val_loader, processor, epoch, epochs):
 
 # --- CARGA DE DATOS Y MODELO ---
 def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
-              batch_size=BATCH_SIZE, epochs=EPOCHS, img_aug=False, text_aug=False, freeze_func=freeze_layers):
+              batch_size=BATCH_SIZE, epochs=EPOCHS, lr=LR, data_aug=False,
+              freeze_func=freeze_layers, n_layers=4, loss_func=contrastive_loss):
     df = pd.read_csv(csv_path)
     train_df, val_df = train_test_split(df, test_size=0.2, random_state=42)
     # train_df_augmented = augment_train_df(train_df, num_augmented_per_image=10)
@@ -198,20 +194,19 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
     model = AutoModel.from_pretrained(
         model_name, trust_remote_code=True).to(DEVICE)
 
-    freeze_func(model)
+    freeze_func(model, n_layers=n_layers)
 
     train_dataset = FashionDataset(
-        train_df, processor, aug_img=img_aug, aug_text=text_aug)
+        train_df, processor, data_aug=data_aug)
 
     val_dataset = FashionDataset(
-        val_df, processor, aug_img=False, aug_text=False)
+        val_df, processor, data_aug=False)
 
     train_loader = DataLoader(
-        train_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn)
+        train_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn, num_workers=NUM_WORKERS)
     val_loader = DataLoader(
-        val_dataset, batch_size=batch_size, shuffle=False, collate_fn=collate_fn)
+        val_dataset, batch_size=batch_size, shuffle=False, collate_fn=collate_fn, num_workers=NUM_WORKERS)
 
-    # Definimos dos grupos de parámetros: descongelados y el resto
     params_to_optimize = []
     params_frozen = []
 
@@ -221,7 +216,7 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
         else:
             params_frozen.append(param)
 
-    optimizer = optim.AdamW(model.parameters(), lr=LR, weight_decay=1e-4)
+    optimizer = optim.AdamW(params_to_optimize, lr=lr, weight_decay=1e-4)
 
     # --- ENTRENAMIENTO ---
     patience = 3
@@ -263,7 +258,7 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
                 text_embeds.norm(p=2, dim=-1, keepdim=True)
 
             # Calcular loss
-            loss = contrastive_loss(image_embeds, text_embeds)
+            loss = loss_func(image_embeds, text_embeds)
 
             optimizer.zero_grad()
             loss.backward()
@@ -303,5 +298,9 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
         processor.push_to_hub(model_name_to_push)
 
 
-fine_tune(csv_path="datasets/con-sin-roturas-v3.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
-          model_name_to_push="Sofia-gb/fashionSigLIP-roturas17", img_aug=False, text_aug=False, freeze_func=freeze_layers)
+if __name__ == "__main__":
+    multiprocessing.freeze_support()
+    fine_tune(csv_path="datasets/con-sin-roturas-v4.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
+              model_name_to_push="Sofia-gb/fashionSigLIP-roturas18", data_aug=True,
+              loss_func=contrastive_loss, batch_size=8, epochs=12, lr=2e-5,
+              n_layers=4)  # 2e-4)
