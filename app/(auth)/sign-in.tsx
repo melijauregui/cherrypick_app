@@ -11,22 +11,23 @@ import React, { useState } from "react";
 import { LogoSmallPink } from "@/components/LogoSmallPink";
 import * as Google from "expo-auth-session/providers/google";
 import { Link, router } from "expo-router";
+import { Alert } from "react-native";
 
 const SignIn = () => {
   return (
-    <SafeAreaView className="bg-brown-strong flex-1 h-full w-full justify-center items-center ">
-      <ScrollView className="my-1 ">
-        <View className="flex flex-col justify-center items-center w-[360px]">
+    <SafeAreaView className="bg-brown-strong flex-1 h-full w-full">
+      <ScrollView className="flex-1 w-full h-full" contentContainerStyle={{ flexGrow: 1 }}  >
+       <View className="flex flex-col justify-center mx-auto items-center w-[360px]">
           <LogoSmallPink classname="w-[60] h-[60] mb-2 top-5" />
           <View className="w-[340px]">
             <Text className="text-white text-[25px] font-pbold relative top-[140px] text-justify">
               Instantly match any outfit to real shopping options.
             </Text>
-            {googleSignInButton()}
-            {orLine()}
-            {signUpButton()}
+            <GoogleSignInButton />
+            <OrLine />
+            <SignUpButton /> 
             <Link
-              className="text-brown-light left-24 top-[400px]"
+              className="text-brown-light left-24 absolute top-[400px]"
               href="/sign-up"
             >
               Go to sign-up
@@ -40,12 +41,11 @@ const SignIn = () => {
 
 export default SignIn;
 
-const googleSignInButton = () => {
+// ✅ Este sí puede usar hooks y JSX como corresponde
+const GoogleSignInButton = () => {
   const [request, response, promptAsync] = Google.useAuthRequest({
-    androidClientId:
-      process.env.ANDROID_CLIENT_ID,
-    iosClientId:
-      process.env.IOS_CLIENT_ID,
+    androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
+    iosClientId: process.env.EXPO_PUBLIC_IOS_CLIENT_ID,
   });
 
   useEffect(() => {
@@ -57,24 +57,22 @@ const googleSignInButton = () => {
         console.log("No response");
       }
     }
-  });
+  }, [response]);
 
   return (
     <TouchableOpacity
-      className="flex flex-row bg-white top-[300px]  h-[50px] justify-center items-center rounded-full"
+      className="flex flex-row bg-white top-[300px] h-[50px] justify-center items-center rounded-full"
       onPress={() =>
         promptAsync().catch((e) => {
           console.error("Error al iniciar sesión:", e);
         })
       }
     >
-      {/* Google Logo */}
       <Image
-        source={require("../../assets/icons/logo-google.png")} // Path to your logo
+        source={require("../../assets/icons/logo-google.png")}
         className="w-[25px] h-[25px] mr-3"
         resizeMode="contain"
       />
-
       <Text className="text-black font-psemibold text-[15px]">
         Continue with Google
       </Text>
@@ -82,27 +80,19 @@ const googleSignInButton = () => {
   );
 };
 
-const signUpButton = () => {
-  return (
-    <TouchableOpacity
-      className="flex flex-row bg-white top-[330px] h-[50px] justify-center items-center rounded-full"
-      onPress={() => console.log("Sign Up NOT DONE")}
-    >
-      <Text className="text-black font-psemibold text-[15px]">
-        Create account
-      </Text>
-    </TouchableOpacity>
-  );
-};
+const SignUpButton = () => (
+  <TouchableOpacity
+    className="flex flex-row bg-white top-[330px] h-[50px] justify-center items-center rounded-full"
+    onPress={() => Alert.alert("Sign Up", "NOT DONE")}
+  >
+    <Text className="text-black font-psemibold text-[15px]">Create account</Text>
+  </TouchableOpacity>
+);
 
-const orLine = () => {
-  return (
-    <View className="flex flex-row items-center justify-center top-[315px]">
-      <View className="w-40 h-px bg-gray-600  opacity-70 "></View>
-      <Text className="text-gray-600 text-[13px] font-plight mx-2 opacity-70">
-        or
-      </Text>
-      <View className="w-40 h-px bg-gray-600 opacity-70"></View>
-    </View>
-  );
-};
+const OrLine = () => (
+  <View className="flex flex-row items-center justify-center top-[315px]">
+    <View className="w-40 h-px bg-gray-500 opacity-70" />
+    <Text className="text-gray-500 text-[13px] font-plight mx-2 opacity-70">or</Text>
+    <View className="w-40 h-px bg-gray-500 opacity-70" />
+  </View>
+);
