@@ -4,6 +4,8 @@ import { MasonryFlashList } from "@shopify/flash-list";
 import { ClothingItemComponent } from "@/components/ClothingItemComponent";
 
 const Home = () => {
+
+  
   const [clothingItems, setClothingItems] = useState<Metadata[]>([]);
 
   useEffect(() => {

@@ -8,9 +8,9 @@ import {
 } from "react-native";
 import { useEffect } from "react";
 import React, { useState } from "react";
-import { LogoSmallPink } from "@/components/LogoSmallPink";
+import { LogoCircle } from "@/components/LogoCircle";
 import * as Google from "expo-auth-session/providers/google";
-import { Link, router } from "expo-router";
+import { router } from "expo-router";
 import { Alert } from "react-native";
 
 const SignIn = () => {
@@ -18,7 +18,7 @@ const SignIn = () => {
     <SafeAreaView className="bg-brown-strong flex-1 h-full w-full">
       <ScrollView className="flex-1 w-full h-full" contentContainerStyle={{ flexGrow: 1 }}  >
        <View className="flex flex-col justify-center mx-auto items-center w-[360px]">
-          <LogoSmallPink classname="w-[60] h-[60] mb-2 top-5" />
+          <LogoCircle classname="w-[60] h-[60] mb-2 top-5" />
           <View className="w-[340px]">
             <Text className="text-white text-[25px] font-pbold relative top-[140px] text-justify">
               Instantly match any outfit to real shopping options.
@@ -26,12 +26,6 @@ const SignIn = () => {
             <GoogleSignInButton />
             <OrLine />
             <SignUpButton /> 
-            <Link
-              className="text-brown-light left-24 absolute top-[400px]"
-              href="/sign-up"
-            >
-              Go to sign-up
-            </Link>
           </View>
         </View>
       </ScrollView>
@@ -52,7 +46,7 @@ const GoogleSignInButton = () => {
     if (response) {
       if (response.type === "success") {
         console.log(response.authentication?.accessToken || "No access token");
-        router.push("/");
+        router.push("/home");
       } else {
         console.log("No response");
       }
