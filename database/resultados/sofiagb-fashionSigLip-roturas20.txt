@@ -205,7 +205,7 @@ mayor no rotura es palazzo3.jpg con 0.5407648086547852 de probabilidad
 🎯 Porcentaje de acierto: 0.00% (0/8)
 
 🎯 Porcentaje de acierto incluyendo 🟨: 37.50% (3/8)
-
+[roturas-15 tiene 5/8]
 
 
 Descripcion: jean skinny
@@ -263,7 +263,7 @@ mayor no rotura es jean-rojo.jpg con 0.5402898788452148 de probabilidad
 [skinny] skinny1.jpg: 0.544 > 0.540? ✅
 
 🎯 Porcentaje de acierto: 42.86% (3/7)
-
+[roturas-20 tiene 4/7]
 
 
 Descripcion: jean recto
