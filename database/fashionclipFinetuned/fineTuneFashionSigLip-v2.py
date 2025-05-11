@@ -27,6 +27,8 @@ LR = 1e-5
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 NUM_WORKERS = min(4, os.cpu_count() or 1)
 TEMPERATURE = 0.1
+CACHE_DIR = "cached_images"
+
 # print(f"Using {NUM_WORKERS} workers for data loading.")
 data_transforms = transforms.Compose([
     transforms.RandomHorizontalFlip(),
@@ -69,9 +71,19 @@ class FashionDataset(Dataset):
             is_augmented = idx % (self.n_augmented + 1) != 0
 
             row = self.dataframe.iloc[base_idx]
+
+        url = row["image"]
+        filename = os.path.join(CACHE_DIR, os.path.basename(url).split("?")[0])
+
         try:
-            response = requests.get(row["image"])
-            image = Image.open(BytesIO(response.content))
+            if not os.path.exists(filename):
+                response = requests.get(url, timeout=10)
+                response.raise_for_status()
+                image = Image.open(BytesIO(response.content)).convert("RGB")
+                image.save(filename)
+            else:
+                image = Image.open(filename).convert("RGB")
+
             if is_augmented:
                 image = self.augment(image)
         except Exception as e:
@@ -143,7 +155,7 @@ def contrastive_loss_InfoNCE(text_embeds, image_embeds, temperature=TEMPERATURE)
     return (loss_i2t + loss_t2i) / 2
 
 
-def validate(model, val_loader, processor, epoch, epochs):
+def validate(model, val_loader, processor, epoch, epochs, loss_func):
     model.eval()
     val_loss = 0.0
     with torch.no_grad():
@@ -173,7 +185,7 @@ def validate(model, val_loader, processor, epoch, epochs):
             text_embeds = text_embeds / \
                 text_embeds.norm(p=2, dim=-1, keepdim=True)
 
-            loss = contrastive_loss(image_embeds, text_embeds)
+            loss = loss_func(image_embeds, text_embeds)
             val_loss += loss.item()
 
     avg_val_loss = val_loss / len(val_loader)
@@ -187,7 +199,6 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
               freeze_func=freeze_layers, n_layers=4, loss_func=contrastive_loss):
     df = pd.read_csv(csv_path)
     train_df, val_df = train_test_split(df, test_size=0.2, random_state=42)
-    # train_df_augmented = augment_train_df(train_df, num_augmented_per_image=10)
 
     processor = AutoProcessor.from_pretrained(
         original_model_name, trust_remote_code=True)
@@ -269,7 +280,8 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
         avg_loss = running_loss / len(train_loader)
         print(f"✅ Epoch {epoch+1} - Loss: {avg_loss:.4f}")
 
-        avg_val_loss = validate(model, val_loader, processor, epoch, epochs)
+        avg_val_loss = validate(
+            model, val_loader, processor, epoch, epochs, loss_func=loss_func)
 
         if avg_val_loss < best_loss:
             best_loss = avg_val_loss
@@ -301,6 +313,11 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
 if __name__ == "__main__":
     multiprocessing.freeze_support()
     fine_tune(csv_path="datasets/con-sin-roturas-v4.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
-              model_name_to_push="Sofia-gb/fashionSigLIP-roturas19", data_aug=True,
-              loss_func=contrastive_loss, batch_size=8, epochs=32, lr=2e-5,
+              model_name_to_push="Sofia-gb/fashionSigLIP-roturas22", data_aug=False,
+              loss_func=contrastive_loss_InfoNCE, batch_size=8, epochs=32, lr=2e-5,
               n_layers=0)
+
+    # fine_tune(csv_path="datasets/con-sin-roturas-v4.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
+    #          model_name_to_push="Sofia-gb/fashionSigLIP-roturas21", data_aug=True,
+    #          loss_func=contrastive_loss_InfoNCE, batch_size=32, epochs=32, lr=5e-5,
+    #          n_layers=0)
