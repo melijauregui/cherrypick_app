@@ -301,6 +301,6 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
 if __name__ == "__main__":
     multiprocessing.freeze_support()
     fine_tune(csv_path="datasets/con-sin-roturas-v4.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
-              model_name_to_push="Sofia-gb/fashionSigLIP-roturas18", data_aug=True,
-              loss_func=contrastive_loss, batch_size=8, epochs=12, lr=2e-5,
-              n_layers=4)  # 2e-4)
+              model_name_to_push="Sofia-gb/fashionSigLIP-roturas19", data_aug=True,
+              loss_func=contrastive_loss, batch_size=8, epochs=32, lr=2e-5,
+              n_layers=0)
