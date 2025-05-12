@@ -141,7 +141,6 @@ def contrastive_loss(image_embeds, text_embeds, margin=0.5):
     return loss
 
 
-# 07):
 def contrastive_loss_InfoNCE(text_embeds, image_embeds, temperature=TEMPERATURE):
     text_embeds = F.normalize(text_embeds, dim=-1)
     image_embeds = F.normalize(image_embeds, dim=-1)
@@ -155,9 +154,28 @@ def contrastive_loss_InfoNCE(text_embeds, image_embeds, temperature=TEMPERATURE)
     return (loss_i2t + loss_t2i) / 2
 
 
+def compute_recall_at_k(image_embeds, text_embeds, k=5):
+    sims = image_embeds @ text_embeds.T
+    targets = torch.arange(len(image_embeds), device=sims.device)
+    _, topk = sims.topk(k, dim=1)
+    correct = topk.eq(targets.unsqueeze(1)).any(dim=1).float()
+    return correct.mean().item()
+
+
+def compute_mrr(image_embeds, text_embeds):
+    sims = image_embeds @ text_embeds.T
+    targets = torch.arange(len(image_embeds), device=sims.device)
+    sorted_indices = sims.argsort(dim=1, descending=True)
+    ranks = (sorted_indices == targets.unsqueeze(1)).nonzero()[:, 1] + 1
+    reciprocal_ranks = 1.0 / ranks.float()
+    return reciprocal_ranks.mean().item()
+
+
 def validate(model, val_loader, processor, epoch, epochs, loss_func):
     model.eval()
     val_loss = 0.0
+    all_image_embeds = []
+    all_text_embeds = []
     with torch.no_grad():
         for images, texts in tqdm(val_loader, desc=f"Epoch {epoch+1}/{epochs} [Validation]"):
             if not images:
@@ -185,11 +203,21 @@ def validate(model, val_loader, processor, epoch, epochs, loss_func):
             text_embeds = text_embeds / \
                 text_embeds.norm(p=2, dim=-1, keepdim=True)
 
+            all_image_embeds.append(image_embeds)
+            all_text_embeds.append(text_embeds)
+
             loss = loss_func(image_embeds, text_embeds)
             val_loss += loss.item()
 
     avg_val_loss = val_loss / len(val_loader)
+    image_embeds = torch.cat(all_image_embeds)
+    text_embeds = torch.cat(all_text_embeds)
+
+    recall_at_5 = compute_recall_at_k(image_embeds, text_embeds, k=5)
+    mrr = compute_mrr(image_embeds, text_embeds)
     print(f"🧪 Epoch {epoch+1} - Validation Loss: {avg_val_loss:.4f}")
+    print(f"🔍 Recall@5: {recall_at_5:.4f}")
+    print(f"🔍 MRR: {mrr:.4f}")
     return avg_val_loss
 
 
@@ -228,6 +256,8 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
             params_frozen.append(param)
 
     optimizer = optim.AdamW(params_to_optimize, lr=lr, weight_decay=1e-4)
+    # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+    #    optimizer, mode='min', patience=2, factor=0.5, verbose=True)
 
     # --- ENTRENAMIENTO ---
     patience = 3
@@ -300,6 +330,8 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
             print("🛑 Early stopping activado por pérdida baja.")
             break
 
+        # scheduler.step(avg_val_loss)
+
     # --- GUARDAR MODELO ---
     if best_model_state_dict:
         print(f'Pushing model to {model_name_to_push}')
@@ -313,6 +345,6 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
 if __name__ == "__main__":
     multiprocessing.freeze_support()
     fine_tune(csv_path="datasets/con-sin-roturas-v4.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
-              model_name_to_push="Sofia-gb/fashionSigLIP-roturas25", data_aug=False,
+              model_name_to_push="Sofia-gb/fashionSigLIP-roturas26", data_aug=False,
               loss_func=contrastive_loss_InfoNCE, batch_size=8, epochs=32, lr=2e-5,
-              n_layers=4)
+              n_layers=2)
