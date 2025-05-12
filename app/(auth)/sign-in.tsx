@@ -11,7 +11,6 @@ import React, { useState } from "react";
 import { LogoCircle } from "@/components/LogoCircle";
 import * as Google from "expo-auth-session/providers/google";
 import { router } from "expo-router";
-import { Alert } from "react-native";
 
 const SignIn = () => {
   return (
@@ -20,15 +19,17 @@ const SignIn = () => {
         className="flex-1 w-full h-full"
         contentContainerStyle={{ flexGrow: 1 }}
       >
-        <View className="flex flex-col justify-center mx-auto items-center w-[360px]">
-          <LogoCircle classname="w-[60] h-[60] mb-2 top-5" />
-          <View className="w-[340px]">
-            <Text className="text-white text-[25px] font-pbold relative top-[140px] text-justify">
+        <View className="flex flex-grow flex-col w-full px-14 py-3">
+          <LogoCircle classname="w-[60] h-[60] mb-2 self-center" />
+          <View className="w-full mt-40">
+            <Text className="text-white text-[25px] font-pbold relative text-justify">
               Instantly match any outfit to real shopping options.
             </Text>
-            <GoogleSignInButton />
-            <OrLine />
-            <SignUpButton />
+            <View className="w-full mt-40 flex flex-col gap-4">
+              <GoogleSignInButton />
+              <OrLine />
+              <SignUpButton />
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -57,7 +58,7 @@ const GoogleSignInButton = () => {
 
   return (
     <TouchableOpacity
-      className="flex flex-row bg-white top-[300px] h-[50px] justify-center items-center rounded-full"
+      className="flex flex-row bg-white h-[50px] justify-center items-center rounded-full"
       onPress={() =>
         promptAsync().catch((e) => {
           console.error("Error al iniciar sesión:", e);
@@ -78,8 +79,8 @@ const GoogleSignInButton = () => {
 
 const SignUpButton = () => (
   <TouchableOpacity
-    className="flex flex-row bg-white top-[330px] h-[50px] justify-center items-center rounded-full"
-    onPress={() => Alert.alert("Sign Up", "NOT DONE")}
+    className="flex flex-row bg-white h-[50px] justify-center items-center rounded-full"
+    onPress={() => router.push("/sign-up")}
   >
     <Text className="text-black font-psemibold text-[15px]">
       Create account
@@ -88,7 +89,7 @@ const SignUpButton = () => (
 );
 
 const OrLine = () => (
-  <View className="flex flex-row items-center justify-center top-[315px]">
+  <View className="flex flex-row items-center justify-center">
     <View className="w-40 h-px bg-gray-500 opacity-70" />
     <Text className="text-gray-500 text-[13px] font-plight mx-2 opacity-70">
       or
