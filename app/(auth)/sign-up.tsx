@@ -139,7 +139,12 @@ const SignIn = () => {
               />
             </View>
           </View>
-          <NextButton onPress={handleSubmit} />
+          <NextButton
+            onPress={handleSubmit}
+            name={name}
+            email={email}
+            date={dateString}
+          />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -150,18 +155,39 @@ export default SignIn;
 
 const NextButton = ({
   onPress,
+  name,
+  email,
+  date,
 }: {
   onPress?: () => Promise<void> | undefined;
-}) => (
-  <View className="flex flex-row justify-end ">
-    <TouchableOpacity
-      className="flex flex-row bg-white py-2 items-center px-5 rounded-3xl"
-      onPress={onPress}
-    >
-      <Text className="text-black font-psemibold text-[15px]">Next</Text>
-    </TouchableOpacity>
-  </View>
-);
+  name?: string;
+  email?: string;
+  date?: string;
+}) => {
+  const isDisabled = !name || !email || !date;
+
+  return (
+    <View className="flex flex-row justify-end">
+      <TouchableOpacity
+        disabled={isDisabled}
+        onPress={isDisabled ? undefined : onPress}
+        className={`
+          flex flex-row items-center px-5 py-2 rounded-3xl
+          ${isDisabled ? "bg-gray-400 opacity-50" : "bg-white"}
+        `}
+      >
+        <Text
+          className={`
+            text-[15px] font-psemibold
+            ${isDisabled ? "text-gray-700" : "text-black"}
+          `}
+        >
+          Next
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
 
 const Input = ({
   placeholder,
