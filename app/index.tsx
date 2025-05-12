@@ -3,7 +3,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { AppName } from "../components/AppName";
-import {  LogoSquareBeige } from "@/components/LogoSquareBeige"
+import { LogoSquareBeige } from "@/components/LogoSquareBeige";
 import "../global.css";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
@@ -13,7 +13,7 @@ export default function App() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      router.push("/sign-in"); // Redirect to /sign-in after 1 second
+      router.push("/sign-up"); // Redirect to /sign-in after 1 second
     }, 1000);
 
     return () => clearTimeout(timer); // Cleanup in case component unmounts
@@ -46,7 +46,7 @@ export default function App() {
 //       try {
 //         const response = await fetch(API_URL)
 //         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`)
-        
+
 //         const data = await response.json()
 //         setUser(data)
 //       } catch (err) {

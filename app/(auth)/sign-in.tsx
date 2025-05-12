@@ -16,8 +16,11 @@ import { Alert } from "react-native";
 const SignIn = () => {
   return (
     <SafeAreaView className="bg-brown-strong flex-1 h-full w-full">
-      <ScrollView className="flex-1 w-full h-full" contentContainerStyle={{ flexGrow: 1 }}  >
-       <View className="flex flex-col justify-center mx-auto items-center w-[360px]">
+      <ScrollView
+        className="flex-1 w-full h-full"
+        contentContainerStyle={{ flexGrow: 1 }}
+      >
+        <View className="flex flex-col justify-center mx-auto items-center w-[360px]">
           <LogoCircle classname="w-[60] h-[60] mb-2 top-5" />
           <View className="w-[340px]">
             <Text className="text-white text-[25px] font-pbold relative top-[140px] text-justify">
@@ -25,7 +28,7 @@ const SignIn = () => {
             </Text>
             <GoogleSignInButton />
             <OrLine />
-            <SignUpButton /> 
+            <SignUpButton />
           </View>
         </View>
       </ScrollView>
@@ -35,7 +38,6 @@ const SignIn = () => {
 
 export default SignIn;
 
-// ✅ Este sí puede usar hooks y JSX como corresponde
 const GoogleSignInButton = () => {
   const [request, response, promptAsync] = Google.useAuthRequest({
     androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
@@ -79,14 +81,18 @@ const SignUpButton = () => (
     className="flex flex-row bg-white top-[330px] h-[50px] justify-center items-center rounded-full"
     onPress={() => Alert.alert("Sign Up", "NOT DONE")}
   >
-    <Text className="text-black font-psemibold text-[15px]">Create account</Text>
+    <Text className="text-black font-psemibold text-[15px]">
+      Create account
+    </Text>
   </TouchableOpacity>
 );
 
 const OrLine = () => (
   <View className="flex flex-row items-center justify-center top-[315px]">
     <View className="w-40 h-px bg-gray-500 opacity-70" />
-    <Text className="text-gray-500 text-[13px] font-plight mx-2 opacity-70">or</Text>
+    <Text className="text-gray-500 text-[13px] font-plight mx-2 opacity-70">
+      or
+    </Text>
     <View className="w-40 h-px bg-gray-500 opacity-70" />
   </View>
 );
