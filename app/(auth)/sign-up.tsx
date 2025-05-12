@@ -14,15 +14,24 @@ import {
   formSchema,
   verifyAvailabilitySchema,
 } from "@/schemas/auth/sign-up-schema";
+import DatePicker from "react-native-date-picker";
 
 const SignIn = () => {
   const [name, setName] = useState<string>();
   const [email, setEmail] = useState<string>();
+  const [dateString, setDateString] = useState<string | undefined>(undefined);
+  const [date, setDate] = useState<Date>(new Date());
+  const [open, setOpen] = useState(false);
   const [nameError, setNameError] = useState<string | undefined>(undefined);
   const [emailError, setEmailError] = useState<string | undefined>(undefined);
+  const [dateError, setDateError] = useState<string | undefined>(undefined);
 
   async function handleSubmit() {
-    const result = formSchema.safeParse({ name, email: email?.toLowerCase() });
+    const result = formSchema.safeParse({
+      name,
+      email: email?.toLowerCase(),
+      dateString,
+    });
     if (!result.success) {
       const nameError = result.error.issues.find(
         (issue) => issue.path[0] === "name"
@@ -30,11 +39,14 @@ const SignIn = () => {
       const emailError = result.error.issues.find(
         (issue) => issue.path[0] === "email"
       );
+      const dateError = result.error.issues.find(
+        (issue) => issue.path[0] === "date"
+      );
       setNameError(nameError?.message);
       setEmailError(emailError?.message);
+      setDateError(dateError?.message);
       return;
     }
-    console.log("Form is valid");
 
     const { name: nameValue, email: emailValue } = result.data;
 
@@ -48,7 +60,14 @@ const SignIn = () => {
         return;
       }
       // Proceed with the next steps, e.g., navigate to the next screen
-      console.log("Proceeding with name:", nameValue, "and email:", emailValue);
+      console.log(
+        "Proceeding with name:",
+        nameValue,
+        "and email:",
+        emailValue,
+        "and date:",
+        dateString
+      );
     } catch (error) {
       if (error instanceof Error) {
         setEmailError(error.message);
@@ -67,34 +86,58 @@ const SignIn = () => {
         <View className="flex flex-grow flex-col w-full justify-between px-14 py-3">
           <View className="flex flex-col w-full">
             <LogoCircle classname="w-[60] h-[60] mb-2 self-center" />
-            <Text className="text-white text-[27px] font-pbold text-justify pt-3">
+            <Text className="text-white text-[27px] font-pbold text-justify pt-14">
               Create your account
             </Text>
-            <Input
-              placeholder="Name"
-              value={name}
-              onChange={(text) => {
-                setNameError(undefined);
-                setName(text);
-              }}
-              type="default"
-            />
-            {nameError && (
-              <Text className="text-red-500 pt-0.5">{nameError}</Text>
-            )}
-            <Input
-              type="email-address"
-              placeholder="Email"
-              value={email}
-              onChange={(text) => {
-                setEmailError(undefined);
-                setEmail(text.toLowerCase());
-              }}
-            />
-            {emailError && (
-              <Text className="text-red-500 pt-0.5">{emailError}</Text>
-            )}
-            {/* <DateOfBirthInput placeholder="Date of birth" /> */}
+            <View className="flex flex-col w-full gap-10 mt-4">
+              <Input
+                placeholder="Name"
+                value={name}
+                onChange={(text) => {
+                  setNameError(undefined);
+                  setName(text);
+                }}
+                type="default"
+                error={nameError}
+              />
+              <Input
+                type="email-address"
+                placeholder="Email"
+                value={email}
+                onChange={(text) => {
+                  setEmailError(undefined);
+                  setEmail(text.toLowerCase());
+                }}
+                error={emailError}
+              />
+              <DateOfBirthInput
+                placeholder="Date of birth"
+                value={dateString}
+                onPress={() => setOpen(true)}
+                error={dateError}
+              />
+              <DatePicker
+                modal
+                open={open}
+                date={date}
+                onConfirm={(date) => {
+                  setDateError(undefined);
+                  setOpen(false);
+                  setDate(date);
+                  setDateString(
+                    date.toLocaleDateString("es-AR", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })
+                  );
+                }}
+                onCancel={() => {
+                  setOpen(false);
+                  setDateString(undefined);
+                }}
+              />
+            </View>
           </View>
           <NextButton onPress={handleSubmit} />
         </View>
@@ -125,20 +168,25 @@ const Input = ({
   value,
   onChange,
   type,
+  error,
 }: {
   placeholder: string;
   value?: string;
   onChange?: (text: string) => void;
   type?: KeyboardTypeOptions;
+  error?: string;
 }) => (
-  <TextInput
-    className=" h-[50px] text-[16px] mt-8 border-b border-gray-500 text-white"
-    placeholder={placeholder}
-    placeholderTextColor="#6b7280"
-    value={value}
-    onChangeText={onChange}
-    keyboardType={type}
-  />
+  <View className="flex flex-col">
+    <TextInput
+      className="text-[16px] h-[50px] border-b border-gray-500 text-white"
+      placeholder={placeholder}
+      placeholderTextColor="#6b7280"
+      value={value}
+      onChangeText={onChange}
+      keyboardType={type}
+    />
+    {error && <Text className="text-red-500 pt-0.5">{error}</Text>}
+  </View>
 );
 
 async function verifyMailAvailability(
@@ -168,3 +216,28 @@ async function verifyMailAvailability(
     }
   }
 }
+
+const DateOfBirthInput = ({
+  placeholder,
+  onPress,
+  value,
+  error,
+}: {
+  placeholder: string;
+  onPress: () => void;
+  value: string | undefined;
+  error?: string;
+}) => (
+  <View className="flex flex-col">
+    <TouchableOpacity
+      className="h-[50px] border-b border-gray-500 justify-center"
+      onPress={onPress}
+    >
+      {value && <Text className="text-[16px] text-white">{value}</Text>}
+      {!value && (
+        <Text className="text-[16px] text-[#6b7280] ">{placeholder}</Text>
+      )}
+    </TouchableOpacity>
+    {error && <Text className="text-red-500 pt-0.5">{error}</Text>}
+  </View>
+);

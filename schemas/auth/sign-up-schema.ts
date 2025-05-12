@@ -10,6 +10,7 @@ const formSchema = z.object({
       required_error: "Email is required",
     })
     .email({ message: "Invalid email address" }),
+  dateString: z.string({ required_error: "Valid date is required" }),
 });
 export { formSchema };
 
