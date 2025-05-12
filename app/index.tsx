@@ -13,7 +13,7 @@ export default function App() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      router.push("/sign-up"); // Redirect to /sign-in after 1 second
+      router.push("/code-verification"); // Redirect to /sign-in after 1 second
     }, 1000);
 
     return () => clearTimeout(timer); // Cleanup in case component unmounts
@@ -23,7 +23,7 @@ export default function App() {
       <ScrollView className="my-1 ">
         <View className="w-full justify-center items-center min-h-[85vh]">
           <LogoSquareBeige classname="w-[90] h-[90] mb-2" />
-          <AppName classname="text-2xl text-[#b39c7d] tracking-[7] font-giregular " />
+          <AppName classname="text-2xl text-[#d6bfa0] tracking-[7] font-giregular " />
         </View>
       </ScrollView>
       <StatusBar backgroundColor="#000000" style="light" />

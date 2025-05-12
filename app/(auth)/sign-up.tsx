@@ -15,8 +15,10 @@ import {
   verifyAvailabilitySchema,
 } from "@/schemas/auth/sign-up-schema";
 import DatePicker from "react-native-date-picker";
+import { useRouter } from "expo-router";
 
 const SignIn = () => {
+  const router = useRouter();
   const [name, setName] = useState<string>();
   const [email, setEmail] = useState<string>();
   const [dateString, setDateString] = useState<string | undefined>(undefined);
@@ -68,6 +70,14 @@ const SignIn = () => {
         "and date:",
         dateString
       );
+      router.push({
+        pathname: "/code-verification",
+        params: {
+          name,
+          email,
+          dateBirth: date.toISOString(),
+        },
+      });
     } catch (error) {
       if (error instanceof Error) {
         setEmailError(error.message);
