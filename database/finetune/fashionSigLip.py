@@ -8,7 +8,7 @@ from PIL import Image
 import requests
 from tqdm import tqdm
 from torch.utils.data import Dataset, DataLoader
-from transformers import AutoProcessor, AutoModel
+from transformers import AutoProcessor, AutoModel, AutoImageProcessor, AutoModelForImageClassification
 import torch
 import torch.nn as nn
 from torchvision import transforms
@@ -42,7 +42,7 @@ data_transforms = transforms.Compose([
 
 
 class FashionDataset(Dataset):
-    def __init__(self, dataframe, processor, data_aug=False, n_augmented=5):
+    def __init__(self, dataframe, processor, data_aug=False, n_augmented=3):
         self.dataframe = dataframe
         self.processor = processor
         self.n_augmented = n_augmented
@@ -221,7 +221,27 @@ def validate(model, val_loader, processor, epoch, epochs, loss_func):
     return avg_val_loss
 
 
+class AverageMeter(object):
+    """Computes and stores the average and current value"""
+
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        self.val = 0
+        self.avg = 0
+        self.sum = 0
+        self.count = 0
+
+    def update(self, val, n=1):
+        self.val = val
+        self.sum += val * n
+        self.count += n
+        self.avg = self.sum / self.count
+
 # --- CARGA DE DATOS Y MODELO ---
+
+
 def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
               batch_size=BATCH_SIZE, epochs=EPOCHS, lr=LR, data_aug=False,
               freeze_func=freeze_layers, n_layers=4, loss_func=contrastive_loss):
@@ -265,6 +285,8 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
     counter = 0
     model.train()
     best_model_state_dict = None
+    # train_loss_meter = AverageMeter()
+
     for epoch in range(epochs):
         running_loss = 0.0
         for images, texts in tqdm(train_loader, desc=f"Epoch {epoch+1}/{epochs}"):
@@ -304,6 +326,8 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+
+            # train_loss_meter.update(loss.item(), n=len(images))
 
             running_loss += loss.item()
 
@@ -345,6 +369,6 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
 if __name__ == "__main__":
     multiprocessing.freeze_support()
     fine_tune(csv_path="datasets/con-sin-roturas-v4.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
-              model_name_to_push="Sofia-gb/fashionSigLIP-roturas26", data_aug=False,
+              model_name_to_push="Sofia-gb/fashionSigLIP-roturas26", data_aug=True,
               loss_func=contrastive_loss_InfoNCE, batch_size=8, epochs=32, lr=2e-5,
               n_layers=2)

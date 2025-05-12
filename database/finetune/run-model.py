@@ -5,7 +5,7 @@ import numpy as np
 from transformers import AutoProcessor, AutoModel
 import torch
 import torch.optim as optim
-from fashionclipFinetuned.fashionClipTestingText import test_text_clasification, find_similarities_matrix2
+from fashionClipTestingText import test_text_clasification, find_similarities_matrix2
 
 # cd database && python3 run-model.py > test.txt
 
