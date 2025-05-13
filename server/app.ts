@@ -8,10 +8,15 @@ import {
 } from "./app/routeVector";
 import { PaginationSchema } from "./app/allDatabase";
 import {
-  verifyAvailabilitySchema,
-  queryVerifyAvalabilitySchema,
+  VerifyAvailabilitySchema,
+  QueryVerifyAvalabilitySchema,
   VerifyAvailabilitySchemaType,
 } from "../schemas/auth/sign-up-schema";
+import {
+  QueryVerifyCodeSchema,
+  VerifyCodeSchema,
+  VerifyCodeSchemaType,
+} from "../schemas/auth/code-verification-schema";
 
 const app = new OpenAPIHono();
 export default app;
@@ -77,13 +82,13 @@ const verifiedEmailRoute = createRoute({
   method: "get",
   path: "/verify-email",
   request: {
-    query: queryVerifyAvalabilitySchema,
+    query: QueryVerifyAvalabilitySchema,
   },
   responses: {
     200: {
       content: {
         "application/json": {
-          schema: verifyAvailabilitySchema,
+          schema: VerifyAvailabilitySchema,
         },
       },
       description:
@@ -127,4 +132,50 @@ function verifyGoogleMail(email: string): boolean {
   // Simulación de verificación de un email registrado en Google
   const googleEmails = ["m@gmail.com", "s@gmail.com", "p@gmail.com"];
   return googleEmails.includes(email);
+}
+
+// endpoint que verifica si el code de verificación es correcto
+const verifiedCodeRoute = createRoute({
+  method: "get",
+  path: "/verify-code",
+  request: {
+    query: QueryVerifyCodeSchema,
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: VerifyCodeSchema,
+        },
+      },
+      description:
+        "Devuelve un booleano que indica si el codigo de verificación es correcto",
+    },
+  },
+});
+app.openapi(verifiedCodeRoute, async (c) => {
+  const { code } = c.req.valid("query");
+  let res: VerifyCodeSchemaType;
+
+  // Simulación de verificación de un código
+  if (!verifyCode(code)) {
+    console.log("Code is incorrect");
+    res = {
+      error: true,
+      details: "Code is incorrect",
+    };
+  } else {
+    console.log("Code is correct");
+    res = {
+      error: false,
+      isCorrect: true,
+    };
+  }
+  return c.json(res, 200);
+});
+
+function verifyCode(code: string): boolean {
+  // Simulación de verificación de un email registrado en Google
+  const googleCodes = ["123456", "000000", "111111"];
+  return googleCodes.includes(code);
 }

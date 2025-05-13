@@ -11,8 +11,8 @@ import { LogoCircle } from "@/components/LogoCircle";
 import { TextInput } from "react-native";
 import { safeFetch } from "@/utils/safe-fetch";
 import {
-  formSchema,
-  verifyAvailabilitySchema,
+  FormSchemaSignUp,
+  VerifyAvailabilitySchema,
 } from "@/schemas/auth/sign-up-schema";
 import DatePicker from "react-native-date-picker";
 import { useRouter } from "expo-router";
@@ -29,7 +29,7 @@ const SignIn = () => {
   const [dateError, setDateError] = useState<string | undefined>(undefined);
 
   async function handleSubmit() {
-    const result = formSchema.safeParse({
+    const result = FormSchemaSignUp.safeParse({
       name,
       email: email?.toLowerCase(),
       dateString,
@@ -177,7 +177,7 @@ const NextButton = ({
   const isDisabled = !name || !email || !date;
 
   return (
-    <View className="flex flex-row justify-end">
+    <View className="flex flex-row justify-end mb-2">
       <TouchableOpacity
         disabled={isDisabled}
         onPress={isDisabled ? undefined : onPress}
@@ -231,7 +231,7 @@ async function verifyMailAvailability(
   try {
     const { data } = await safeFetch({
       url: `http://localhost:3000/verify-email?email=${email}`,
-      schema: verifyAvailabilitySchema,
+      schema: VerifyAvailabilitySchema,
       method: "GET",
     });
 

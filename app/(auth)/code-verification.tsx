@@ -6,33 +6,85 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import React, { useState } from "react";
 import { LogoCircle } from "@/components/LogoCircle";
-
+import {
+  FormSchemaCodeVerification,
+  VerifyCodeSchema,
+} from "@/schemas/auth/code-verification-schema";
 import {
   TextInput,
-  StyleSheet,
   NativeSyntheticEvent,
   TextInputKeyPressEventData,
 } from "react-native";
-import { set } from "zod";
+import { useRouter } from "expo-router";
+import { safeFetch } from "@/utils/safe-fetch";
+import { useLocalSearchParams } from "expo-router";
 
 const CodeVerification = () => {
-  // const { name, email, dateBirth } = useLocalSearchParams();
-  // console.log(
-  //   "Proceeding with name in code-verification:",
-  //   name,
-  //   "and email:",
-  //   email,
-  //   "and date:",
-  //   dateBirth
-  // );
-  const name = "John Doe";
-  const email = "j@gmail.com";
-  const dateBirth = "2023-10-01";
+  const router = useRouter();
+  const { name, email, dateBirth } = useLocalSearchParams();
+  console.log(
+    "Proceeding with name in code-verification:",
+    name,
+    "and email:",
+    email,
+    "and date:",
+    dateBirth
+  );
+  // const name = "John Doe";
+  // const email = "j@gmail.com";
+  // const dateBirth = "2023-10-01";
 
   const [code, setCode] = useState("");
+  const [codeReady, setCodeReady] = useState(false);
+  const [codeError, setCodeError] = useState<string | undefined>(undefined);
+  async function handleSubmit() {
+    const result = FormSchemaCodeVerification.safeParse({
+      code,
+    });
+    if (!result.success) {
+      const codeError = result.error.issues.find(
+        (issue) => issue.path[0] === "code"
+      );
+      setCodeError(codeError?.message);
+      return;
+    }
+    try {
+      const { isCorrect } = await verifyCode(code);
+      if (isCorrect) {
+        console.log("Code is correct");
+      } else {
+        console.log("Code is incorrect");
+        setCodeError("Code is incorrect");
+        return;
+      }
+      // Proceed with the next steps, e.g., navigate to the next screen
+      console.log(
+        "Proceeding with name:",
+        name,
+        "and email:",
+        email,
+        "and date:",
+        dateBirth
+      );
+      router.push({
+        pathname: "/preferences",
+        params: {
+          name,
+          email,
+          dateBirth: dateBirth,
+        },
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        setCodeError(error.message);
+      } else {
+        setCodeError("Unexpected error occurred");
+      }
+    }
+  }
   return (
     <SafeAreaView className="bg-brown-strong flex-1 h-full w-full">
       <ScrollView
@@ -48,17 +100,20 @@ const CodeVerification = () => {
             <Text className="text-gray-500 text-[15px] font-pregular pt-5">
               Enter it below to verify your email: {email}.
             </Text>
-            <View className="flex flex-col w-full gap-10 mt-4">
+            <View className="flex flex-col w-full mt-6 gap-3">
               <CodeInput
                 length={6}
                 onComplete={(c) => {
                   setCode(c);
-                  console.log("código completo:", c);
                 }}
+                setCodeReady={setCodeReady}
               />
+              {codeError && (
+                <Text className="text-red-500 pt-0.5">{codeError}</Text>
+              )}
             </View>
           </View>
-          {/* <NextButton onPress={handleSubmit} /> */}
+          <NextButton onPress={handleSubmit} codeReady={codeReady} />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -69,13 +124,15 @@ export default CodeVerification;
 
 const NextButton = ({
   onPress,
+  codeReady,
 }: {
   onPress?: () => Promise<void> | undefined;
+  codeReady?: boolean;
 }) => {
-  const isDisabled = false;
+  const isDisabled = !codeReady;
 
   return (
-    <View className="flex flex-row justify-end">
+    <View className="flex flex-row justify-end mb-2">
       <TouchableOpacity
         disabled={isDisabled}
         onPress={isDisabled ? undefined : onPress}
@@ -100,11 +157,13 @@ const NextButton = ({
 type CodeInputProps = {
   length?: number; // cuántos dígitos
   onComplete?: (code: string) => void; // callback cuando se completa
+  setCodeReady: (ready: boolean) => void; // callback para avisar que el código está listo
 };
 
 export const CodeInput: React.FC<CodeInputProps> = ({
   length = 6,
   onComplete,
+  setCodeReady,
 }) => {
   // estado como array de strings de longitud “length”
   const [code, setCode] = useState<string[]>(Array(length).fill(""));
@@ -128,6 +187,7 @@ export const CodeInput: React.FC<CodeInputProps> = ({
     } else {
       // si acabamos, juntamos y avisamos
       onComplete?.(newCode.join(""));
+      setCodeReady(true);
     }
   };
 
@@ -141,6 +201,9 @@ export const CodeInput: React.FC<CodeInputProps> = ({
       const newCode = [...code];
       newCode[idx] = "";
       setCode(newCode);
+      if (idx === length - 1) {
+        setCodeReady(false);
+      }
     }
     if (e.nativeEvent.key === "Backspace" && code[idx] === "") {
       if (idx > 0) {
@@ -151,31 +214,20 @@ export const CodeInput: React.FC<CodeInputProps> = ({
       newCode[idx - 1] = "";
       setCode(newCode);
     }
-    if (!/^\d$/.test(e.nativeEvent.key)) {
-      return;
-    } else {
-      const newCode = [...code];
-      newCode[idx] = e.nativeEvent.key;
-      setCode(newCode);
-      if (idx < length - 1) {
-        inputs.current[idx + 1]?.focus();
-        setFocusedIdx(idx + 1);
-      }
-    }
   };
-  console.log("code NEW:", code);
+  // console.log("code NEW:", code);
   return (
     <View className="flex flex-row justify-between w-full self-center">
       {code.map((digit, idx) => {
         const isFocused = focusedIdx === idx;
-        console.log(
-          "isFocused:",
-          isFocused,
-          " idx:",
-          idx,
-          "focusedIdx:",
-          focusedIdx
-        );
+        // console.log(
+        //   "isFocused:",
+        //   isFocused,
+        //   " idx:",
+        //   idx,
+        //   "focusedIdx:",
+        //   focusedIdx
+        // );
         return (
           <TextInput
             selectTextOnFocus={false}
@@ -199,3 +251,29 @@ export const CodeInput: React.FC<CodeInputProps> = ({
     </View>
   );
 };
+
+async function verifyCode(code: string): Promise<{ isCorrect: boolean }> {
+  try {
+    const { data } = await safeFetch({
+      url: `http://localhost:3000/verify-code?code=${code}`,
+      schema: VerifyCodeSchema,
+      method: "GET",
+    });
+
+    if (data.error) {
+      console.log("Error:", data.details);
+      throw new Error(data.details);
+    }
+    return {
+      isCorrect: data.isCorrect,
+    };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Error:", error.message);
+      throw error;
+    } else {
+      console.error("Unexpected error:", error);
+      throw new Error("Unexpected error");
+    }
+  }
+}

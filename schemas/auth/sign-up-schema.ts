@@ -1,5 +1,5 @@
 import { z } from "zod";
-const formSchema = z.object({
+const FormSchemaSignUp = z.object({
   name: z
     .string({
       required_error: "Name must ve valid",
@@ -12,9 +12,9 @@ const formSchema = z.object({
     .email({ message: "Invalid email address" }),
   dateString: z.string({ required_error: "Valid date is required" }),
 });
-export { formSchema };
+export { FormSchemaSignUp };
 
-const verifyAvailabilitySchema = z.union([
+const VerifyAvailabilitySchema = z.union([
   z.object({
     error: z.literal(false),
     isAvailable: z.boolean(),
@@ -24,12 +24,12 @@ const verifyAvailabilitySchema = z.union([
     details: z.string(),
   }),
 ]);
-export { verifyAvailabilitySchema };
+export { VerifyAvailabilitySchema };
 export type VerifyAvailabilitySchemaType = z.infer<
-  typeof verifyAvailabilitySchema
+  typeof VerifyAvailabilitySchema
 >;
 
-const queryVerifyAvalabilitySchema = z.object({
+const QueryVerifyAvalabilitySchema = z.object({
   email: z.preprocess((val) => val?.toString(), z.string()),
 });
-export { queryVerifyAvalabilitySchema };
+export { QueryVerifyAvalabilitySchema };
