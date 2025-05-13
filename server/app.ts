@@ -199,9 +199,6 @@ const codeVerificationRoute = createRoute({
 app.openapi(codeVerificationRoute, async (c) => {
   const { email } = await c.req.valid("json");
   const code = generateVerificationCode();
-
-  console.log("Email received:", email);
-
   const emailSent = await sendEmail(email, code);
 
   if (!emailSent) {
@@ -241,14 +238,18 @@ export async function sendEmail(email: string, code: string): Promise<boolean> {
       },
     });
 
-    console.log("Enviando correo:", process.env.SMTP_USER, process.env.SMTP_PASS);
     console.log("Enviando correo a:", email);
     const info = await transporter.sendMail({
       from: `"Cherrypick" <${process.env.SMTP_USER}>`,
       to: email,
-      subject: "Tu código de verificación",
-      text: `Tu código es: ${code}`,
-      html: `<p>Tu código de verificación es: <strong>${code}</strong></p>`,
+      subject: "Verify your email address",
+      text: `Thank you for signing up for CherryPick!\n\nTo complete your account setup, please enter the following verification code on our app:\n\n${code}\n\nThanks,\nthe CherryPick Team.`,
+      html: `
+        <p>Thank you for signing up for <strong>CherryPick</strong>!</p>
+        <p>To complete your account setup, please enter the following verification code on our app:</p>
+        <p><strong>${code}</strong></p>
+        <p>Thanks,<br>The <strong>CherryPick</strong> Team</p>
+      `,
     });
 
     console.log("Correo enviado:", info.messageId);
