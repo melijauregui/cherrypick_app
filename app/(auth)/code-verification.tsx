@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import React, { useState } from "react";
 import { LogoCircle } from "@/components/LogoCircle";
 import {
@@ -40,6 +40,21 @@ const CodeVerification = () => {
   const [code, setCode] = useState("");
   const [codeReady, setCodeReady] = useState(false);
   const [codeError, setCodeError] = useState<string | undefined>(undefined);
+  const [secondsLeft, setSecondsLeft] = useState(300); // 5 minutos = 300 segundos
+
+  useEffect(() => {
+    if (secondsLeft <= 0) {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setSecondsLeft((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [secondsLeft]);
+
+
   async function handleSubmit() {
     const result = FormSchemaCodeVerification.safeParse({
       code,
@@ -52,7 +67,8 @@ const CodeVerification = () => {
       return;
     }
     try {
-      const { isCorrect } = await verifyCode(code);
+      const emailStr = email?.toString();
+      const { isCorrect } = await verifyCode(code, emailStr);
       if (isCorrect) {
         console.log("Code is correct");
       } else {
@@ -112,6 +128,14 @@ const CodeVerification = () => {
                 <Text className="text-red-500 pt-0.5">{codeError}</Text>
               )}
             </View>
+            <Text className="text-gray-400 text-[14px] font-pregular pt-2">
+              Code expires in {Math.floor(secondsLeft / 60)}:
+              {(secondsLeft % 60).toString().padStart(2, "0")}
+            </Text>
+            {secondsLeft <= 0 && (
+              <Text className="text-red-500 pt-1 text-[14px]">The code has expired. Please request a new one.</Text>
+            )}
+
           </View>
           <NextButton onPress={handleSubmit} codeReady={codeReady} />
         </View>
@@ -125,6 +149,7 @@ export default CodeVerification;
 const NextButton = ({
   onPress,
   codeReady,
+
 }: {
   onPress?: () => Promise<void> | undefined;
   codeReady?: boolean;
@@ -250,11 +275,11 @@ export const CodeInput: React.FC<CodeInputProps> = ({
   );
 };
 
-async function verifyCode(code: string): Promise<{ isCorrect: boolean }> {
+async function verifyCode(code: string, email: string): Promise<{ isCorrect: boolean }> {
   try {
     const IP = process.env.EXPO_PUBLIC_IP || "localhost";
     const { data } = await safeFetch({
-      url: `http://${IP}:3000/verify-code?code=${code}`,
+      url: `http://${IP}:3000/verify-code?code=${code}&email=${email}`,
       schema: VerifyCodeSchema,
       method: "GET",
     });

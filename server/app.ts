@@ -207,13 +207,15 @@ app.openapi(codeVerificationRoute, async (c) => {
 
   // Guardar (o reemplazar) en DB
   try {
+    const expiryTime = new Date();
+    expiryTime.setMinutes(expiryTime.getMinutes() + 5); // Expira en 5 minutos
     await db.query(
       `
-      INSERT INTO registerInProgress (email, verification_code)
-      VALUES (?, ?)
-      ON DUPLICATE KEY UPDATE verification_code = VALUES(verification_code)
+      INSERT INTO registerInProgress (email, verification_code, verification_code_expiry)
+      VALUES (?, ?, ?)
+      ON DUPLICATE KEY UPDATE verification_code = VALUES(verification_code), verification_code_expiry = VALUES(verification_code_expiry)
       `,
-      [email, code]
+      [email, code, expiryTime]
     );
 
     return c.json({ error: false as false }, 200);
@@ -297,21 +299,27 @@ const verifiedCodeRoute = createRoute({
   },
 });
 app.openapi(verifiedCodeRoute, async (c) => {
-  const { code } = c.req.valid("query");
+  const { code, email } = c.req.valid("query");
 
   try {
     const [rows]: any[] = await db.query(
-      "SELECT * FROM registerInProgress WHERE verification_code = ?",
-      [code]
+      `SELECT verification_code, verification_code_expiry FROM registerInProgress WHERE email = ?`,
+      [email]
     );
 
-    if (rows.length === 0) {
-      return c.json({ error: true as true, details: "Code is incorrect" }, 404);
+    const { verification_code, verification_code_expiry } = rows[0];
+
+    if (!verification_code || verification_code !== code) {
+      return c.json({ error: true as true, details: "Invalid verification code" }, 404);
+    }
+
+    if (new Date() > new Date(verification_code_expiry)) {
+      return c.json({ error: true as true, details: "Verification code expired" }, 404);
     }
 
     await db.query(
-      "DELETE FROM registerInProgress WHERE verification_code = ?",
-      [code]
+      "DELETE FROM registerInProgress WHERE email = ?",
+      [email]
     );
 
     return c.json({ error: false as false, isCorrect: true }, 200);
