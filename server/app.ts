@@ -11,6 +11,9 @@ import {
   VerifyAvailabilitySchema,
   QueryVerifyAvalabilitySchema,
   VerifyAvailabilitySchemaType,
+  ResCodeVerificationPostSchema,
+  BodyCodeVerificationPostSchema,
+  ResCodeVerificationPostSchemaType,
 } from "../schemas/auth/sign-up-schema";
 import {
   QueryVerifyCodeSchema,
@@ -132,6 +135,53 @@ function verifyGoogleMail(email: string): boolean {
   // Simulación de verificación de un email registrado en Google
   const googleEmails = ["m@gmail.com", "s@gmail.com", "p@gmail.com"];
   return googleEmails.includes(email);
+}
+
+// endpoint que publica un nuevo code-verification
+const codeVerificationRoute = createRoute({
+  method: "post",
+  path: "/code-verification",
+  request: {
+    body: {
+      content: {
+        "application/json": { schema: BodyCodeVerificationPostSchema },
+      },
+    },
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: ResCodeVerificationPostSchema,
+        },
+      },
+      description:
+        "Devuelve un booleano que indica si el codigo de verificación es correcto",
+    },
+  },
+});
+app.openapi(codeVerificationRoute, async (c) => {
+  const { email } = c.req.valid("json");
+  let res: ResCodeVerificationPostSchemaType;
+
+  // Simulación de verificación de un código
+  if (!creteCode(email)) {
+    console.log("Code failed");
+    res = {
+      error: true,
+      details: "Code failed",
+    };
+  } else {
+    console.log("Code success");
+    res = {
+      error: false,
+    };
+  }
+  return c.json(res, 200);
+});
+
+function creteCode(email: string): boolean {
+  return true;
 }
 
 // endpoint que verifica si el code de verificación es correcto

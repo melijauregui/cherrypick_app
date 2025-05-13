@@ -13,6 +13,7 @@ import { safeFetch } from "@/utils/safe-fetch";
 import {
   FormSchemaSignUp,
   VerifyAvailabilitySchema,
+  ResCodeVerificationPostSchema,
 } from "@/schemas/auth/sign-up-schema";
 import DatePicker from "react-native-date-picker";
 import { useRouter } from "expo-router";
@@ -70,6 +71,17 @@ const SignIn = () => {
         "and date:",
         dateString
       );
+
+      try {
+        await postCodeVerification({ email: emailValue });
+      } catch (error) {
+        if (error instanceof Error) {
+          setEmailError(error.message);
+        } else {
+          setEmailError("Unexpected error occurred");
+        }
+      }
+
       router.push({
         pathname: "/code-verification",
         params: {
@@ -248,6 +260,29 @@ async function verifyMailAvailability(
       throw error;
     } else {
       console.error("Unexpected error:", error);
+      throw new Error("Unexpected error");
+    }
+  }
+}
+
+async function postCodeVerification({ email }: { email: string }) {
+  try {
+    const { data } = await safeFetch({
+      url: `http://localhost:3000/code-verification`,
+      method: "POST",
+      body: JSON.stringify({ email }),
+      schema: ResCodeVerificationPostSchema,
+    });
+    if (data.error) {
+      console.log("Error:", data.details);
+      throw new Error(data.details);
+    }
+    console.log("Code success");
+  } catch (error) {
+    console.error("Error:", error);
+    if (error instanceof Error) {
+      throw error;
+    } else {
       throw new Error("Unexpected error");
     }
   }
