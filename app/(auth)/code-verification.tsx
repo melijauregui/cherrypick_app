@@ -16,6 +16,7 @@ import {
   NativeSyntheticEvent,
   TextInputKeyPressEventData,
 } from "react-native";
+import { set } from "zod";
 
 const CodeVerification = () => {
   // const { name, email, dateBirth } = useLocalSearchParams();
@@ -107,6 +108,7 @@ export const CodeInput: React.FC<CodeInputProps> = ({
 }) => {
   // estado como array de strings de longitud “length”
   const [code, setCode] = useState<string[]>(Array(length).fill(""));
+  const [focusedIdx, setFocusedIdx] = useState<number>(0);
 
   // refs para cada TextInput, poder .focus() en ellos
   const inputs = useRef<Array<TextInput | null>>(Array(length).fill(null));
@@ -122,6 +124,7 @@ export const CodeInput: React.FC<CodeInputProps> = ({
     // pasamos al siguiente campo
     if (idx < length - 1) {
       inputs.current[idx + 1]?.focus();
+      setFocusedIdx(idx + 1);
     } else {
       // si acabamos, juntamos y avisamos
       onComplete?.(newCode.join(""));
@@ -135,13 +138,15 @@ export const CodeInput: React.FC<CodeInputProps> = ({
   ) => {
     console.log("key pressed", e.nativeEvent.key, " idx:", idx);
     if (e.nativeEvent.key === "Backspace" && code[idx] !== "") {
-      // inputs.current[idx - 1]?.focus();
       const newCode = [...code];
       newCode[idx] = "";
       setCode(newCode);
     }
     if (e.nativeEvent.key === "Backspace" && code[idx] === "") {
-      inputs.current[idx - 1]?.focus();
+      if (idx > 0) {
+        inputs.current[idx - 1]?.focus();
+        setFocusedIdx(idx - 1);
+      }
       const newCode = [...code];
       newCode[idx - 1] = "";
       setCode(newCode);
@@ -154,42 +159,43 @@ export const CodeInput: React.FC<CodeInputProps> = ({
       setCode(newCode);
       if (idx < length - 1) {
         inputs.current[idx + 1]?.focus();
+        setFocusedIdx(idx + 1);
       }
     }
   };
-
+  console.log("code NEW:", code);
   return (
-    <View style={styles.container}>
-      {code.map((digit, idx) => (
-        <TextInput
-          key={idx}
-          ref={(ref) => (inputs.current[idx] = ref)}
-          value={digit}
-          onChangeText={(text) => handleChange(text, idx)}
-          onKeyPress={(e) => handleKeyPress(e, idx)}
-          keyboardType="number-pad"
-          maxLength={1}
-          style={styles.input}
-        />
-      ))}
+    <View className="flex flex-row justify-between w-full self-center">
+      {code.map((digit, idx) => {
+        const isFocused = focusedIdx === idx;
+        console.log(
+          "isFocused:",
+          isFocused,
+          " idx:",
+          idx,
+          "focusedIdx:",
+          focusedIdx
+        );
+        return (
+          <TextInput
+            selectTextOnFocus={false}
+            key={idx}
+            pointerEvents={isFocused ? "auto" : "none"}
+            ref={(ref) => (inputs.current[idx] = ref)}
+            value={digit}
+            onChangeText={(text) => handleChange(text, idx)}
+            onKeyPress={(e) => handleKeyPress(e, idx)}
+            keyboardType="number-pad"
+            maxLength={1}
+            caretHidden={true}
+            selectionColor="transparent"
+            className={`
+              w-[40px] h-[50px] border-b-2 text-center text-white text-[24px]
+              ${isFocused ? "border-white" : "border-gray-500"}
+            `}
+          />
+        );
+      })}
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "80%", // ajusta al ancho que quieras
-    alignSelf: "center",
-  },
-  input: {
-    width: 40,
-    height: 50,
-    borderBottomWidth: 2,
-    borderColor: "#888",
-    textAlign: "center",
-    fontSize: 24,
-    color: "#fff",
-  },
-});
