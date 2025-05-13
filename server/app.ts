@@ -1,4 +1,6 @@
 import fs from "fs";
+import nodemailer from "nodemailer";
+import { randomInt } from "crypto";
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import {
   callVGGNet,
@@ -13,7 +15,7 @@ import {
   VerifyAvailabilitySchemaType,
   ResCodeVerificationPostSchema,
   BodyCodeVerificationPostSchema,
-  ResCodeVerificationPostSchemaType,
+  ErrorResponseSchema,
 } from "../schemas/auth/sign-up-schema";
 import {
   QueryVerifyCodeSchema,
@@ -155,12 +157,6 @@ app.openapi(verifiedEmailRoute, async (c) => {
   return c.json(res, 200);
 });
 
-function verifyGoogleMail(email: string): boolean {
-  // Simulación de verificación de un email registrado en Google
-  const googleEmails = ["m@gmail.com", "s@gmail.com", "p@gmail.com"];
-  return googleEmails.includes(email);
-}
-
 // endpoint que publica un nuevo code-verification
 const codeVerificationRoute = createRoute({
   method: "post",
@@ -180,33 +176,89 @@ const codeVerificationRoute = createRoute({
         },
       },
       description:
-        "Devuelve un booleano que indica si el codigo de verificación es correcto",
+        "Devuelve un booleano que indica si se pudo enviar el código de verificación",
+    },
+    404: {
+      description: "Mail incorrecto",
+      content: {
+        "application/json": {
+          schema: ErrorResponseSchema,
+        },
+      },
+    },
+    500: {
+      description: "Error del servidor",
+      content: {
+        "application/json": {
+          schema: ErrorResponseSchema,
+        },
+      },
     },
   },
 });
 app.openapi(codeVerificationRoute, async (c) => {
-  const { email } = c.req.valid("json");
-  let res: ResCodeVerificationPostSchemaType;
+  const { email } = await c.req.valid("json");
+  const code = generateVerificationCode();
 
-  // Simulación de verificación de un código
-  if (!creteCode(email)) {
-    console.log("Code failed");
-    res = {
-      error: true,
-      details: "Code failed",
-    };
-  } else {
-    console.log("Code success");
-    res = {
-      error: false,
-    };
+  console.log("Email received:", email);
+
+  const emailSent = await sendEmail(email, code);
+
+  if (!emailSent) {
+    return c.json({ error: true as true, details: "Invalid email" }, 404);
   }
-  return c.json(res, 200);
+
+  // Guardar (o reemplazar) en DB
+  try {
+    await db.query(
+      `
+      INSERT INTO registerInProgress (email, verification_code)
+      VALUES (?, ?)
+      ON DUPLICATE KEY UPDATE verification_code = VALUES(verification_code)
+      `,
+      [email, code]
+    );
+
+    return c.json({ error: false as false }, 200);
+  } catch (err) {
+    console.error("Error al guardar código:", err);
+    return c.json({ error: true as true, details: "Error al guardar en la base" }, 500);
+  }
 });
 
-function creteCode(email: string): boolean {
-  return true;
+
+function generateVerificationCode(): string {
+  return String(randomInt(100000, 999999));
 }
+
+export async function sendEmail(email: string, code: string): Promise<boolean> {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+
+    console.log("Enviando correo:", process.env.SMTP_USER, process.env.SMTP_PASS);
+    console.log("Enviando correo a:", email);
+    const info = await transporter.sendMail({
+      from: `"Cherrypick" <${process.env.SMTP_USER}>`,
+      to: email,
+      subject: "Tu código de verificación",
+      text: `Tu código es: ${code}`,
+      html: `<p>Tu código de verificación es: <strong>${code}</strong></p>`,
+    });
+
+    console.log("Correo enviado:", info.messageId);
+    return true;
+  } catch (error) {
+    console.error("Error enviando correo:", error);
+    return false;
+  }
+}
+
 
 // endpoint que verifica si el code de verificación es correcto
 const verifiedCodeRoute = createRoute({
@@ -225,31 +277,46 @@ const verifiedCodeRoute = createRoute({
       description:
         "Devuelve un booleano que indica si el codigo de verificación es correcto",
     },
+    404: {
+      description: "Código incorrecto",
+      content: {
+        "application/json": {
+          schema: ErrorResponseSchema,
+        },
+      },
+    },
+    500: {
+      description: "Error del servidor",
+      content: {
+        "application/json": {
+          schema: ErrorResponseSchema,
+        },
+      },
+    },
   },
 });
 app.openapi(verifiedCodeRoute, async (c) => {
   const { code } = c.req.valid("query");
-  let res: VerifyCodeSchemaType;
 
-  // Simulación de verificación de un código
-  if (!verifyCode(code)) {
-    console.log("Code is incorrect");
-    res = {
-      error: true,
-      details: "Code is incorrect",
-    };
-  } else {
-    console.log("Code is correct");
-    res = {
-      error: false,
-      isCorrect: true,
-    };
+  try {
+    const [rows]: any[] = await db.query(
+      "SELECT * FROM registerInProgress WHERE verification_code = ?",
+      [code]
+    );
+
+    if (rows.length === 0) {
+      return c.json({ error: true as true, details: "Code is incorrect" }, 404);
+    }
+
+    await db.query(
+      "DELETE FROM registerInProgress WHERE verification_code = ?",
+      [code]
+    );
+
+    return c.json({ error: false as false, isCorrect: true }, 200);
+  } catch (err) {
+    console.error("Error al verificar código:", err);
+    return c.json({ error: true as true, details: "DB error" }, 500);
   }
-  return c.json(res, 200);
 });
 
-function verifyCode(code: string): boolean {
-  // Simulación de verificación de un email registrado en Google
-  const googleCodes = ["123456", "000000", "111111"];
-  return googleCodes.includes(code);
-}

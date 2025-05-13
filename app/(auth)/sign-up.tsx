@@ -52,7 +52,6 @@ const SignIn = () => {
     }
 
     const { name: nameValue, email: emailValue } = result.data;
-
     try {
       const { isAvailable } = await verifyMailAvailability(emailValue);
       if (isAvailable) {
@@ -273,6 +272,9 @@ async function postCodeVerification({ email }: { email: string }) {
     const { data } = await safeFetch({
       url: `http://${IP}:3000/code-verification`,
       method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({ email }),
       schema: ResCodeVerificationPostSchema,
     });

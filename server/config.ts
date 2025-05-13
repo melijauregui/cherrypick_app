@@ -9,6 +9,8 @@ const {
   EXPO_PUBLIC_ANDROID_CLIENT_ID,
   EXPO_PUBLIC_IOS_CLIENT_ID,
   EXPO_PUBLIC_IP,
+  SMTP_USER,
+  SMTP_PASS,
 } = process.env;
 const REQUIRED_VARS = {
   PINECONE_API_KEY,
@@ -17,6 +19,8 @@ const REQUIRED_VARS = {
   PINECONE_NAMESPACE,
   EXPO_PUBLIC_ANDROID_CLIENT_ID,
   EXPO_PUBLIC_IOS_CLIENT_ID,
+  SMTP_USER,
+  SMTP_PASS,
 };
 
 // Check if any required variable is missing
@@ -41,4 +45,6 @@ export const config = {
     .EXPO_PUBLIC_ANDROID_CLIENT_ID as string,
   EXPO_PUBLIC_IOS_CLIENT_ID: process.env.EXPO_PUBLIC_IOS_CLIENT_ID as string,
   EXPO_PUBLIC_IP: process.env.EXPO_PUBLIC_IP as string,
+  SMTP_USER: process.env.SMTP_USER as string,
+  SMTP_PASS: process.env.SMTP_PASS as string,
 };
