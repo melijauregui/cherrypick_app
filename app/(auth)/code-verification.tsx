@@ -255,7 +255,7 @@ export const CodeInput: React.FC<CodeInputProps> = ({
 async function verifyCode(code: string): Promise<{ isCorrect: boolean }> {
   try {
     const { data } = await safeFetch({
-      url: `http://localhost:3000/verify-code?code=${code}`,
+      url: `http://${process.env.IP}:3000/verify-code?code=${code}`,
       schema: VerifyCodeSchema,
       method: "GET",
     });

@@ -22,50 +22,50 @@ const Explore = () => {
 
   return (
     <SafeAreaProvider>
-    <SafeAreaView className="bg-brown-strong w-full flex-1 "  >
-      <View className="">
-      <TextInput
-        className="bg-[#212121] rounded-full p-2 mx-4 pl-10 py-5 text-white font-pregular my-2"
-        onChangeText={onChangeTextSearch}
-        value={searchText}
-        placeholder="Search"
-        placeholderTextColor="#999999"
-      />
-      <Image
-          className="absolute  mx-7 my-7 w-5 h-5"
-          tintColor='#999999'
-          source={icons.search}
-          resizeMode="contain"
-      />
-      </View>
+      <SafeAreaView className="bg-brown-strong w-full flex-1 "  >
+        <View className="">
+          <TextInput
+            className="bg-[#212121] rounded-full p-2 mx-4 pl-10 py-5 text-white font-pregular my-2"
+            onChangeText={onChangeTextSearch}
+            value={searchText}
+            placeholder="Search"
+            placeholderTextColor="#999999"
+          />
+          <Image
+            className="absolute  mx-7 my-7 w-5 h-5"
+            tintColor='#999999'
+            source={icons.search}
+            resizeMode="contain"
+          />
+        </View>
 
-      <MasonryFlashList
-        data={clothingItems}
-        numColumns={2}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingVertical: 10}}
-        renderItem={({item, index}: {item: Metadata, index: number}) => <ClothingItemComponent
-          i={index}
-          key={index}
-          id={(index).toString()}
-          url={item.image_url}
-        />}
-        onEndReachedThreshold={0.1}
-      />
-    </SafeAreaView>
-  </SafeAreaProvider>
+        <MasonryFlashList
+          data={clothingItems}
+          numColumns={2}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingVertical: 10 }}
+          renderItem={({ item, index }: { item: Metadata, index: number }) => <ClothingItemComponent
+            i={index}
+            key={index}
+            id={(index).toString()}
+            url={item.image_url}
+          />}
+          onEndReachedThreshold={0.1}
+        />
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 };
 export default Explore;
 
 
-async function getClothingItems(): Promise<Metadata[]>  {
+async function getClothingItems(): Promise<Metadata[]> {
   const page = "2";
   const limit = "10";
 
   try {
     const response: Response = await fetch(
-      `http://localhost:3000/all?page=${page}&limit=${limit}`,
+      `http://${process.env.IP}:3000/all?page=${page}&limit=${limit}`,
       {
         method: "GET",
       }

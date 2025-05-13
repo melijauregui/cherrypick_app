@@ -230,7 +230,7 @@ async function verifyMailAvailability(
 ): Promise<{ isAvailable: boolean }> {
   try {
     const { data } = await safeFetch({
-      url: `http://localhost:3000/verify-email?email=${email}`,
+      url: `http://${process.env.IP}:3000/verify-email?email=${email}`,
       schema: VerifyAvailabilitySchema,
       method: "GET",
     });
