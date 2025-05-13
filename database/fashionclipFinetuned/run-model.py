@@ -12,7 +12,7 @@ from fashionclipFinetuned.fashionClipTestingText import test_text_clasification,
 # --- CONFIGURACIÓN ---
 ORIGINAL_MODEL_NAME = "Marqo/marqo-fashionSigLIP"
 MODEL_NAME_TO_FINETUNE = "Marqo/marqo-fashionSigLIP"
-MODEL_NAME_TO_PUSH = "melijauregui/fashionSigLIP-roturas15v2"
+MODEL_NAME_TO_PUSH = "Sofia-gb/fashionSigLIP-roturas23"
 # CSV_PATH = "datasets/con-sin-roturas.csv"
 FOLDER_IMAGES_TESTING = "images-testing"
 
@@ -30,7 +30,7 @@ DEVICE = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 
 
 # --- TESTS ---
-#print the info of the model
+# print the info of the model
 print("Model name:", MODEL_NAME_TO_PUSH)
 model = AutoModel.from_pretrained(
     pretrained_model_name_or_path=MODEL_NAME_TO_PUSH, trust_remote_code=True)
@@ -88,7 +88,8 @@ print("\nDescripcion:", description)
 probabilities = find_similarities_matrix2(
     model, processor, description, image_paths, images)
 test_text_clasification(probabilities=probabilities,
-                        image_paths=image_paths, has=True, clasification_img="recto")
+                        image_paths=image_paths, has=True, clasification_img="recto",
+                        yellow_flags=["mom"])
 print("\n")
 
 # --- test texto con descripcion de palazzo
@@ -115,7 +116,8 @@ print("\nDescripcion:", description)
 probabilities = find_similarities_matrix2(
     model, processor, description, image_paths, images)
 test_text_clasification(probabilities=probabilities,
-                        image_paths=image_paths, has=True, clasification_img="mom")
+                        image_paths=image_paths, has=True, clasification_img="mom",
+                        yellow_flags=["recto"])
 print("\n")
 
 # --- test texto con descripcion de flared
