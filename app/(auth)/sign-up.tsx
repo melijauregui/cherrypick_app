@@ -241,8 +241,10 @@ async function verifyMailAvailability(
   email: string
 ): Promise<{ isAvailable: boolean }> {
   try {
+
+    const IP = process.env.EXPO_PUBLIC_IP || "localhost";
     const { data } = await safeFetch({
-      url: `http://${process.env.IP}:3000/verify-email?email=${email}`,
+      url: `http://${IP}:3000/verify-email?email=${email}`,
       schema: VerifyAvailabilitySchema,
       method: "GET",
     });
@@ -267,8 +269,9 @@ async function verifyMailAvailability(
 
 async function postCodeVerification({ email }: { email: string }) {
   try {
+    const IP = process.env.EXPO_PUBLIC_IP || "localhost";
     const { data } = await safeFetch({
-      url: `http://localhost:3000/code-verification`,
+      url: `http://${IP}:3000/code-verification`,
       method: "POST",
       body: JSON.stringify({ email }),
       schema: ResCodeVerificationPostSchema,

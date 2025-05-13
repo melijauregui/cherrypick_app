@@ -7,5 +7,4 @@ RUN set -a && . /docker-entrypoint-initdb.d/.env && set +a
 
 # Copy the database schema to the container
 COPY init/* /docker-entrypoint-initdb.d/
-COPY csvs/* /var/lib/mysql-files/
 RUN chown -R mysql:mysql /docker-entrypoint-initdb.d/

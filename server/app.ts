@@ -20,7 +20,7 @@ import {
   VerifyCodeSchema,
   VerifyCodeSchemaType,
 } from "../schemas/auth/code-verification-schema";
-
+import { db } from "./db";
 const app = new OpenAPIHono();
 export default app;
 
@@ -103,31 +103,55 @@ app.openapi(verifiedEmailRoute, async (c) => {
   const { email } = c.req.valid("query");
   let res: VerifyAvailabilitySchemaType;
 
-  if (!verifyGoogleMail(email)) {
-    // Simulación de un email no registrado en google
-    console.log("Email not registered in Google");
-    res = {
-      error: true,
-      details: "Email not registered in Google",
-    };
-  } else {
-    console.log("Email registered in Google");
-    if (email === "p@gmail.com") {
-      console.log("Email registered in the database");
-      // Simulación de un email no registrado en la base de datos
+  try {
+    const [rows]: any[] = await db.query('SELECT id FROM users WHERE email = ?', [email]);
+
+    if (rows.length > 0) {
+      // Email ya registrado
       res = {
         error: false,
         isAvailable: false,
       };
     } else {
-      console.log("Email not registered in the database");
-      // Simulación de un email registrado en la base de datos
+      // Email disponible para registrar
       res = {
         error: false,
         isAvailable: true,
       };
     }
+  } catch (err) {
+    console.error('Error checking email:', err);
+    res = {
+      error: true,
+      details: 'Error querying the database',
+    };
   }
+  /* 
+    if (!verifyGoogleMail(email)) {
+      // Simulación de un email no registrado en google
+      console.log("Email not registered in Google");
+      res = {
+        error: true,
+        details: "Email not registered in Google",
+      };
+    } else {
+      console.log("Email registered in Google");
+      if (email === "p@gmail.com") {
+        console.log("Email registered in the database");
+        // Simulación de un email no registrado en la base de datos
+        res = {
+          error: false,
+          isAvailable: false,
+        };
+      } else {
+        console.log("Email not registered in the database");
+        // Simulación de un email registrado en la base de datos
+        res = {
+          error: false,
+          isAvailable: true,
+        };
+      }
+    } */
   return c.json(res, 200);
 });
 

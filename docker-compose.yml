@@ -1,7 +1,7 @@
 services:
 
   cherrypick:
-    container_name: cherrypick # Service name of the database
+    container_name: cherrypick_db # Service name of the database
     build:
       context: ./database
     ports:

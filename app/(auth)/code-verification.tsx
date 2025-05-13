@@ -252,8 +252,9 @@ export const CodeInput: React.FC<CodeInputProps> = ({
 
 async function verifyCode(code: string): Promise<{ isCorrect: boolean }> {
   try {
+    const IP = process.env.EXPO_PUBLIC_IP || "localhost";
     const { data } = await safeFetch({
-      url: `http://${process.env.IP}:3000/verify-code?code=${code}`,
+      url: `http://${IP}:3000/verify-code?code=${code}`,
       schema: VerifyCodeSchema,
       method: "GET",
     });

@@ -1,8 +1,16 @@
+CREATE DATABASE IF NOT EXISTS cherrypick_db;
+USE cherrypick_db;
+
+DROP USER IF EXISTS 'cherrypick'@'%';
+CREATE USER 'cherrypick'@'%' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON cherrypick_db.* TO 'cherrypick'@'%';
+FLUSH PRIVILEGES;
+
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
     email VARCHAR(50) NOT NULL UNIQUE,
-    date_of_birth DATE,
+    date_of_birth DATE
 );
 
 CREATE TABLE IF NOT EXISTS registerInProgress (
@@ -10,7 +18,7 @@ CREATE TABLE IF NOT EXISTS registerInProgress (
     name VARCHAR(50) NOT NULL,
     email VARCHAR(50) NOT NULL UNIQUE,
     date_of_birth DATE,
-    verification_code VARCHAR(50) NOT NULL, -- ToDo: change type
+    verification_code VARCHAR(50) NOT NULL -- ToDo: change type
 );
 
 /* CREATE TABLE IF NOT EXISTS clothingItem (

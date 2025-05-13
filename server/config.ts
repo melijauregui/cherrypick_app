@@ -8,7 +8,7 @@ const {
   PINECONE_NAMESPACE,
   EXPO_PUBLIC_ANDROID_CLIENT_ID,
   EXPO_PUBLIC_IOS_CLIENT_ID,
-  IP,
+  EXPO_PUBLIC_IP,
 } = process.env;
 const REQUIRED_VARS = {
   PINECONE_API_KEY,
@@ -40,5 +40,5 @@ export const config = {
   EXPO_PUBLIC_ANDROID_CLIENT_ID: process.env
     .EXPO_PUBLIC_ANDROID_CLIENT_ID as string,
   EXPO_PUBLIC_IOS_CLIENT_ID: process.env.EXPO_PUBLIC_IOS_CLIENT_ID as string,
-  IP: process.env.IP as string || "localhost",
+  EXPO_PUBLIC_IP: process.env.EXPO_PUBLIC_IP as string,
 };

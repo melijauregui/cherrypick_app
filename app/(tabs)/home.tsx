@@ -53,8 +53,9 @@ async function getClothingItems(): Promise<Metadata[]> {
   const limit = "10";
 
   try {
+    const IP = process.env.EXPO_PUBLIC_IP || "localhost";
     const response: Response = await fetch(
-      `http://${process.env.IP}:3000/all?page=${page}&limit=${limit}`,
+      `http://${IP}:3000/all?page=${page}&limit=${limit}`,
       {
         method: "GET",
       }
