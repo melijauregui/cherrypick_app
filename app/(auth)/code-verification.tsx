@@ -175,7 +175,6 @@ export const CodeInput: React.FC<CodeInputProps> = ({
   // al cambiar un dígito
   const handleChange = (char: string, idx: number) => {
     if (!/^\d$/.test(char)) return; // sólo dígitos 0–9
-    console.log("char:", char, " idx:", idx);
     const newCode = [...code];
     newCode[idx] = char;
     setCode(newCode);
@@ -196,7 +195,6 @@ export const CodeInput: React.FC<CodeInputProps> = ({
     e: NativeSyntheticEvent<TextInputKeyPressEventData>,
     idx: number
   ) => {
-    console.log("key pressed", e.nativeEvent.key, " idx:", idx);
     if (e.nativeEvent.key === "Backspace" && code[idx] !== "") {
       const newCode = [...code];
       newCode[idx] = "";

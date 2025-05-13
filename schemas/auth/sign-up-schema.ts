@@ -33,3 +33,31 @@ const QueryVerifyAvalabilitySchema = z.object({
   email: z.preprocess((val) => val?.toString(), z.string()),
 });
 export { QueryVerifyAvalabilitySchema };
+
+const CodeVerificationPostSchema = z.object({
+  email: z
+    .string({ required_error: "Email is required" })
+    .email({ message: "Invalid email address" }),
+});
+export { CodeVerificationPostSchema };
+
+const ResCodeVerificationPostSchema = z.union([
+  z.object({
+    error: z.literal(false),
+  }),
+  z.object({
+    error: z.literal(true),
+    details: z.string(),
+  }),
+]);
+export { ResCodeVerificationPostSchema };
+export type ResCodeVerificationPostSchemaType = z.infer<
+  typeof ResCodeVerificationPostSchema
+>;
+
+const BodyCodeVerificationPostSchema = z.object({
+  email: z
+    .string({ required_error: "Email is required" })
+    .email({ message: "Invalid email address" }),
+});
+export { BodyCodeVerificationPostSchema };
