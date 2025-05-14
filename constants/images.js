@@ -7,6 +7,10 @@ import logoSquareBeige from "../assets/images/logo_new_square_beige.png";
 import oldMoneyImage from "../assets/images/old_money.jpg";
 import streetWearImage from "../assets/images/streetwear.jpg";
 import bohoChicImage from "../assets/images/boho_chic.jpg";
+import coquetteImage from "../assets/images/coquette.jpg";
+import minimalistImage from "../assets/images/minimalist.jpg";
+import nightOutImage from "../assets/images/night_out.jpg";
+import sportyImage from "../assets/images/sporty.jpg";
 
 export default {
   logoSmall,
@@ -18,4 +22,8 @@ export default {
   oldMoneyImage,
   streetWearImage,
   bohoChicImage,
+  coquetteImage,
+  minimalistImage,
+  nightOutImage,
+  sportyImage,
 };

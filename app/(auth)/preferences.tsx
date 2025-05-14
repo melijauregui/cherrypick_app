@@ -25,25 +25,25 @@ const Preferences = () => {
   //   "and date:",
   //   dateBirth
   // );
-
+  const [selectedOne, setSelectedOne] = useState<boolean>(false);
   return (
     <SafeAreaView className="bg-brown-strong flex-1 h-full w-full">
       <View className="flex flex-grow flex-col w-full justify-between px-14 py-3">
         <View className="flex flex-col w-full">
-          <LogoCircle classname="w-[60] h-[60] mb-2 self-center" />
-          <Text className="text-white text-[27px] font-pbold  pt-14">
+          <LogoCircle classname="w-[60] h-[60] mb-1 self-center" />
+          <Text className="text-white text-[27px] font-pbold pt-6">
             How would you describe your fashion style?
           </Text>
-          <Text className="text-gray-400 text-[15px] font-pregular pt-5">
+          <Text className="text-gray-400 text-[15px] font-pregular pt-3">
             Pick at least 1 to customize your home feed.
           </Text>
-          <SelectionList />
+          <SelectionList setSelectedOne={setSelectedOne} />
         </View>
         <NextButton
           onPress={() => {
-            // Your function logic here
-            console.log("Button pressed");
+            console.log("Creating an account");
           }}
+          codeReady={selectedOne}
         />
       </View>
     </SafeAreaView>
@@ -67,20 +67,20 @@ const DATA: ItemData[] = [
     image: images.streetWearImage,
   },
   {
+    title: "Sporty",
+    image: images.sportyImage,
+  },
+  {
     title: "Old money",
     image: images.oldMoneyImage,
   },
   {
-    title: "Boho-chic2",
-    image: images.bohoChicImage,
+    title: "Minimalist",
+    image: images.minimalistImage,
   },
   {
-    title: "Streetwear2",
-    image: images.streetWearImage,
-  },
-  {
-    title: "Old money2",
-    image: images.oldMoneyImage,
+    title: "Coquette",
+    image: images.coquetteImage,
   },
 ];
 
@@ -95,12 +95,6 @@ const Item = ({
   textColor: string;
   selectedIdxs: string[];
 }) => {
-  // const [imageDimensions, setImageDimensions] = useState({
-  //   width: 0,
-  //   height: 0,
-  // });
-  // const { width, height } = Dimensions.get("window");
-  // const widthDetermined = width / 2 - 10; //width hard coded
   const isSelected = selectedIdxs.includes(item.title);
   return (
     <TouchableOpacity
@@ -124,7 +118,11 @@ const Item = ({
   );
 };
 
-const SelectionList = () => {
+const SelectionList = ({
+  setSelectedOne,
+}: {
+  setSelectedOne: (value: boolean) => void;
+}) => {
   const [selectedIdxs, setSelectedIdxs] = useState<string[]>([]);
 
   function handleOnpress(title: string) {
@@ -133,6 +131,7 @@ const SelectionList = () => {
       : [...selectedIdxs, title];
 
     setSelectedIdxs(updated);
+    setSelectedOne(updated.length > 0);
     console.log("Selected items:", updated);
   }
 

@@ -24,18 +24,18 @@ import { useLocalSearchParams } from "expo-router";
 
 const CodeVerification = () => {
   const router = useRouter();
-  const { name, email, dateBirth } = useLocalSearchParams();
-  console.log(
-    "Proceeding with name in code-verification:",
-    name,
-    "and email:",
-    email,
-    "and date:",
-    dateBirth
-  );
-  // const name = "John Doe";
-  // const email = "j@gmail.com";
-  // const dateBirth = "2023-10-01";
+  // const { name, email, dateBirth } = useLocalSearchParams();
+  // console.log(
+  //   "Proceeding with name in code-verification:",
+  //   name,
+  //   "and email:",
+  //   email,
+  //   "and date:",
+  //   dateBirth
+  // );
+  const name = "John Doe";
+  const email = "j@gmail.com";
+  const dateBirth = "2023-10-01";
 
   const [code, setCode] = useState("");
   const [codeReady, setCodeReady] = useState(false);
@@ -93,11 +93,11 @@ const CodeVerification = () => {
       >
         <View className="flex flex-grow flex-col w-full justify-between px-14 py-3">
           <View className="flex flex-col w-full">
-            <LogoCircle classname="w-[60] h-[60] mb-2 self-center" />
-            <Text className="text-white text-[27px] font-pbold text-justify pt-14">
+            <LogoCircle classname="w-[60] h-[60] mb-1 self-center" />
+            <Text className="text-white text-[27px] font-pbold text-justify pt-6">
               We sent you a code
             </Text>
-            <Text className="text-gray-500 text-[15px] font-pregular pt-5">
+            <Text className="text-gray-400 text-[15px] font-pregular pt-3">
               Enter it below to verify your email: {email}.
             </Text>
             <View className="flex flex-col w-full mt-6 gap-3">
