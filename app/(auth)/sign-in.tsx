@@ -4,6 +4,7 @@ import {
   View,
   TouchableOpacity,
   Image,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useEffect } from "react";
@@ -11,6 +12,13 @@ import React, { useState } from "react";
 import { LogoCircle } from "@/components/LogoCircle";
 import * as Google from "expo-auth-session/providers/google";
 import { router } from "expo-router";
+import { makeRedirectUri } from "expo-auth-session";
+import Constants from 'expo-constants';
+import * as WebBrowser from 'expo-web-browser';
+import { safeFetch } from "@/utils/safe-fetch";
+import { VerifyUserResponseSchema } from "@/schemas/auth/sign-up-schema";
+
+WebBrowser.maybeCompleteAuthSession();
 
 const SignIn = () => {
   return (
@@ -40,21 +48,58 @@ const SignIn = () => {
 export default SignIn;
 
 const GoogleSignInButton = () => {
+  const isExpoGo = Constants.executionEnvironment === 'storeClient';
+  const googleRedirectUri = isExpoGo
+    ? "https://auth.expo.io/@cherrypickapp/cherrypick"
+    : undefined;
   const [request, response, promptAsync] = Google.useAuthRequest({
-    androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
+    androidClientId: isExpoGo ? undefined : process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
     iosClientId: process.env.EXPO_PUBLIC_IOS_CLIENT_ID,
-  });
+    clientId: process.env.EXPO_PUBLIC_EXPO_CLIENT_ID,
+    redirectUri: googleRedirectUri,
+
+  },
+  );
+  //console.log("response", response);
 
   useEffect(() => {
-    if (response) {
-      if (response.type === "success") {
-        console.log(response.authentication?.accessToken || "No access token");
-        router.push("/home");
-      } else {
-        console.log("No response");
+    const fetchUserInfo = async () => {
+      if (response?.type === "success" && response.authentication?.accessToken) {
+        try {
+          const userInfoResponse = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+            headers: {
+              Authorization: `Bearer ${response.authentication.accessToken}`,
+            },
+          });
+
+          const userInfo = await userInfoResponse.json();
+          console.log("User Info:", userInfo);
+          const IP = process.env.EXPO_PUBLIC_IP || "localhost";
+          const { data } = await safeFetch({
+            url: `http://${IP}:3000/verify-user`,
+            method: "POST",
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email: userInfo.email }),
+            schema: VerifyUserResponseSchema,
+          });
+
+
+          if (data.exists) {
+            console.log("User verification result:", data.user);
+            router.push("/home");
+          }
+
+        } catch (error) {
+          console.error("Error fetching user info or verifying:", error);
+        }
       }
-    }
+    };
+
+    fetchUserInfo();
   }, [response]);
+
 
   return (
     <TouchableOpacity

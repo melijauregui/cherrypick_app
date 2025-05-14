@@ -12,7 +12,7 @@ const Home = () => {
     const fetchClothingItems = async () => {
       const items = await getClothingItems();
       setClothingItems(items);
-      console.log("Datos paginados:", items);
+      //console.log("Datos paginados:", items);
     };
 
     fetchClothingItems();

@@ -69,3 +69,22 @@ const BodyCodeVerificationPostSchema = z.object({
     .email({ message: "Invalid email address" }),
 });
 export { BodyCodeVerificationPostSchema };
+
+const BodyUserVerificationPostSchema = z.object({
+  email: z
+    .string({ required_error: "Email is required" })
+    .email({ message: "Invalid email address" }),
+});
+export { BodyUserVerificationPostSchema };
+
+export const VerifyUserResponseSchema = z.object({
+  exists: z.boolean(),
+  user: z
+    .object({
+      id: z.number(),
+      name: z.string(),
+      email: z.string(),
+      date_of_birth: z.string().nullable(),
+    })
+    .optional(),
+});

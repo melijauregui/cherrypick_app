@@ -16,6 +16,9 @@ import {
   ResCodeVerificationPostSchema,
   BodyCodeVerificationPostSchema,
   ErrorResponseSchema,
+  VerifyUserResponseSchema,
+  BodyUserVerificationPostSchema,
+
 } from "../schemas/auth/sign-up-schema";
 import {
   QueryVerifyCodeSchema,
@@ -128,32 +131,6 @@ app.openapi(verifiedEmailRoute, async (c) => {
       details: 'Error querying the database',
     };
   }
-  /* 
-    if (!verifyGoogleMail(email)) {
-      // Simulación de un email no registrado en google
-      console.log("Email not registered in Google");
-      res = {
-        error: true,
-        details: "Email not registered in Google",
-      };
-    } else {
-      console.log("Email registered in Google");
-      if (email === "p@gmail.com") {
-        console.log("Email registered in the database");
-        // Simulación de un email no registrado en la base de datos
-        res = {
-          error: false,
-          isAvailable: false,
-        };
-      } else {
-        console.log("Email not registered in the database");
-        // Simulación de un email registrado en la base de datos
-        res = {
-          error: false,
-          isAvailable: true,
-        };
-      }
-    } */
   return c.json(res, 200);
 });
 
@@ -332,3 +309,60 @@ app.openapi(verifiedCodeRoute, async (c) => {
   }
 });
 
+const verifyUserRoute = createRoute({
+  method: "post",
+  path: "/verify-user",
+  request: {
+    body: {
+      content: {
+        "application/json": { schema: BodyUserVerificationPostSchema },
+      },
+    },
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: VerifyUserResponseSchema,
+        },
+      },
+      description: "Devuelve si el usuario existe o no",
+    },
+    404: {
+      description: "Faltan datos",
+      content: {
+        "application/json": {
+          schema: ErrorResponseSchema,
+        },
+      },
+    },
+    500: {
+      description: "Error del servidor",
+      content: {
+        "application/json": {
+          schema: ErrorResponseSchema,
+        },
+      },
+    },
+  },
+});
+app.openapi(verifyUserRoute, async (c) => {
+  const { email } = c.req.valid("json");
+
+  if (!email) {
+    return c.json({ error: true as true, details: "Missing email" }, 404);
+  }
+
+  const [userExistente]: any[] = await db.query("SELECT * FROM users");
+  return c.json({ exists: true as true, user: userExistente[0] }, 200);
+
+  // ToDo:
+
+  const [rows]: any[] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
+
+  if (rows.length > 0) {
+    return c.json({ exists: true as true, user: rows[0] }, 200);
+  } else {
+    return c.json({ exists: false as false }, 200);
+  }
+});

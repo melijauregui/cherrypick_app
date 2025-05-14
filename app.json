@@ -2,18 +2,26 @@
   "expo": {
     "name": "cherrypick",
     "slug": "cherrypick",
+    "owner": "cherrypickapp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/small_logo.png",
     "scheme": "cherrypick",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "ios": {
       "bundleIdentifier": "com.cherrypickapp.googleauthern",
       "supportsTablet": true,
       "infoPlist": {
-        "CFBundleURLTypes" :{
-          "CFBundleURLSchemes": ["com.googleusercontent.apps.321366117154-gq34d2c6r30i8tl8r45dpte4i0ba8nk9"]
+        "CFBundleURLTypes": {
+          "CFBundleURLSchemes": [
+            "com.googleusercontent.apps.321366117154-gq34d2c6r30i8tl8r45dpte4i0ba8nk9"
+          ]
         }
       }
     },
@@ -49,7 +57,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "ced3d184-554f-4257-9206-3ea6a9b6eb27"
+        "projectId": "e0d221a6-6b38-4601-8549-ca222a510406"
       }
     }
   }
