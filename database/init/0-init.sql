@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS registerInProgress (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(50) NOT NULL UNIQUE,
     verification_code VARCHAR(6) NOT NULL,
-    verification_code_expiry DATETIME NOT NULL
+    verification_code_expiration VARCHAR(30) NOT NULL
 );
 
 /* CREATE TABLE IF NOT EXISTS clothingItem (

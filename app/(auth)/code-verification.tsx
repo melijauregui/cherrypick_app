@@ -21,6 +21,7 @@ import {
 import { useRouter } from "expo-router";
 import { safeFetch } from "@/utils/safe-fetch";
 import { useLocalSearchParams } from "expo-router";
+import { ResCodeVerificationPostSchema } from "@/schemas/auth/sign-up-schema";
 
 const CodeVerification = () => {
   const router = useRouter();
@@ -40,7 +41,12 @@ const CodeVerification = () => {
   const [code, setCode] = useState("");
   const [codeReady, setCodeReady] = useState(false);
   const [codeError, setCodeError] = useState<string | undefined>(undefined);
-  const [secondsLeft, setSecondsLeft] = useState(300); // 5 minutos = 300 segundos
+  const expiration = new Date();
+  expiration.setMinutes(expiration.getMinutes() + 3); // Expira en 3 minutos
+  const [expirationTime, setExpirationTime] = useState<Date>(expiration);
+  const [secondsLeft, setSecondsLeft] = useState<number>(
+    Math.max(0, Math.floor((expiration.getTime() - Date.now()) / 1000))
+  );
 
   useEffect(() => {
     if (secondsLeft <= 0) {
@@ -48,11 +54,51 @@ const CodeVerification = () => {
     }
 
     const interval = setInterval(() => {
-      setSecondsLeft((prev) => prev - 1);
+      const now = new Date();
+      const diff = Math.max(0, Math.floor((expirationTime.getTime() - now.getTime()) / 1000));
+      setSecondsLeft(diff);
+
+      if (diff <= 0) {
+        clearInterval(interval);
+      }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [secondsLeft]);
+  }, [secondsLeft, expirationTime]);
+
+  async function handleResendCode() {
+    try {
+      // Reiniciar el tiempo
+      const newExpiration = new Date();
+      newExpiration.setMinutes(newExpiration.getMinutes() + 3);
+      setExpirationTime(newExpiration);
+      setSecondsLeft(180);
+      setCodeError(undefined);
+      setCode("");
+
+      const IP = process.env.EXPO_PUBLIC_IP || "localhost";
+      const { data } = await safeFetch({
+        url: `http://${IP}:3000/code-verification`,
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+        schema: ResCodeVerificationPostSchema,
+      });
+
+      if (data.error) {
+        console.log("Error:", data.details);
+        throw new Error(data.details);
+      }
+
+      console.log("Código reenviado");
+    } catch (error) {
+      console.error("Error al reenviar código:", error);
+      setCodeError("Failed to resend code.");
+    }
+  }
+
 
 
   async function handleSubmit() {
@@ -123,6 +169,7 @@ const CodeVerification = () => {
                   setCode(c);
                 }}
                 setCodeReady={setCodeReady}
+                disabled={secondsLeft <= 0}
               />
               {codeError && (
                 <Text className="text-red-500 pt-0.5">{codeError}</Text>
@@ -135,9 +182,12 @@ const CodeVerification = () => {
             {secondsLeft <= 0 && (
               <Text className="text-red-500 pt-1 text-[14px]">The code has expired. Please request a new one.</Text>
             )}
+            <TouchableOpacity onPress={handleResendCode} className="mt-2">
+              <Text className="text-white underline text-[14px]">Resend Code</Text>
+            </TouchableOpacity>
 
           </View>
-          <NextButton onPress={handleSubmit} codeReady={codeReady} />
+          <NextButton onPress={handleSubmit} codeReady={codeReady} secondsLeft={secondsLeft} />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -149,12 +199,13 @@ export default CodeVerification;
 const NextButton = ({
   onPress,
   codeReady,
-
+  secondsLeft,
 }: {
   onPress?: () => Promise<void> | undefined;
   codeReady?: boolean;
+  secondsLeft: number;
 }) => {
-  const isDisabled = !codeReady;
+  const isDisabled = !codeReady || secondsLeft <= 0;
 
   return (
     <View className="flex flex-row justify-end mb-2">
@@ -183,12 +234,14 @@ type CodeInputProps = {
   length?: number; // cuántos dígitos
   onComplete?: (code: string) => void; // callback cuando se completa
   setCodeReady: (ready: boolean) => void; // callback para avisar que el código está listo
+  disabled?: boolean;
 };
 
 export const CodeInput: React.FC<CodeInputProps> = ({
   length = 6,
   onComplete,
   setCodeReady,
+  disabled,
 }) => {
   // estado como array de strings de longitud “length”
   const [code, setCode] = useState<string[]>(Array(length).fill(""));
@@ -264,6 +317,7 @@ export const CodeInput: React.FC<CodeInputProps> = ({
             maxLength={1}
             caretHidden={true}
             selectionColor="transparent"
+            editable={!disabled}
             className={`
               w-[40px] h-[50px] border-b-2 text-center text-white text-[24px]
               ${isFocused ? "border-white" : "border-gray-500"}

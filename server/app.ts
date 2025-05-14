@@ -207,15 +207,16 @@ app.openapi(codeVerificationRoute, async (c) => {
 
   // Guardar (o reemplazar) en DB
   try {
-    const expiryTime = new Date();
-    expiryTime.setMinutes(expiryTime.getMinutes() + 5); // Expira en 5 minutos
+    const expirationTime = new Date();
+    expirationTime.setMinutes(expirationTime.getMinutes() + 3); // Expira en 3 minutos
+    const expirationString = expirationTime.toISOString(); // "2025-05-14T18:30:00.000Z"
     await db.query(
       `
-      INSERT INTO registerInProgress (email, verification_code, verification_code_expiry)
+      INSERT INTO registerInProgress (email, verification_code, verification_code_expiration)
       VALUES (?, ?, ?)
-      ON DUPLICATE KEY UPDATE verification_code = VALUES(verification_code), verification_code_expiry = VALUES(verification_code_expiry)
+      ON DUPLICATE KEY UPDATE verification_code = VALUES(verification_code), verification_code_expiration = VALUES(verification_code_expiration)
       `,
-      [email, code, expiryTime]
+      [email, code, expirationString]
     );
 
     return c.json({ error: false as false }, 200);
@@ -303,17 +304,17 @@ app.openapi(verifiedCodeRoute, async (c) => {
 
   try {
     const [rows]: any[] = await db.query(
-      `SELECT verification_code, verification_code_expiry FROM registerInProgress WHERE email = ?`,
+      `SELECT verification_code, verification_code_expiration FROM registerInProgress WHERE email = ?`,
       [email]
     );
 
-    const { verification_code, verification_code_expiry } = rows[0];
+    const { verification_code, verification_code_expiration } = rows[0];
 
     if (!verification_code || verification_code !== code) {
       return c.json({ error: true as true, details: "Invalid verification code" }, 404);
     }
 
-    if (new Date() > new Date(verification_code_expiry)) {
+    if (new Date() > new Date(verification_code_expiration)) {
       return c.json({ error: true as true, details: "Verification code expired" }, 404);
     }
 
@@ -321,6 +322,8 @@ app.openapi(verifiedCodeRoute, async (c) => {
       "DELETE FROM registerInProgress WHERE email = ?",
       [email]
     );
+
+    console.log("Código de verificación correcto");
 
     return c.json({ error: false as false, isCorrect: true }, 200);
   } catch (err) {
