@@ -1,11 +1,14 @@
 import {
-  SafeAreaView,
   ScrollView,
   Text,
   View,
   TouchableOpacity,
-  Image,
+  TextInput,
+  NativeSyntheticEvent,
+  TextInputKeyPressEventData,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 import { useEffect, useRef } from "react";
 import React, { useState } from "react";
 import { LogoCircle } from "@/components/LogoCircle";
@@ -13,11 +16,7 @@ import {
   FormSchemaCodeVerification,
   VerifyCodeSchema,
 } from "@/schemas/auth/code-verification-schema";
-import {
-  TextInput,
-  NativeSyntheticEvent,
-  TextInputKeyPressEventData,
-} from "react-native";
+
 import { useRouter } from "expo-router";
 import { safeFetch } from "@/utils/safe-fetch";
 import { useLocalSearchParams } from "expo-router";

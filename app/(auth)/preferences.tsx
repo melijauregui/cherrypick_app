@@ -1,5 +1,4 @@
 import {
-  SafeAreaView,
   ScrollView,
   Text,
   View,
@@ -8,6 +7,7 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { LogoCircle } from "@/components/LogoCircle";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useRouter } from "expo-router";
 import { useLocalSearchParams } from "expo-router";

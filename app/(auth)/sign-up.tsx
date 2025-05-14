@@ -1,22 +1,23 @@
 import {
-  SafeAreaView,
   ScrollView,
   Text,
   View,
   TouchableOpacity,
   KeyboardTypeOptions,
+  TextInput,
+  Platform
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from "react";
 import { LogoCircle } from "@/components/LogoCircle";
-import { TextInput } from "react-native";
 import { safeFetch } from "@/utils/safe-fetch";
 import {
   FormSchemaSignUp,
   VerifyAvailabilitySchema,
   ResCodeVerificationPostSchema,
 } from "@/schemas/auth/sign-up-schema";
-import DatePicker from "react-native-date-picker";
 import { useRouter } from "expo-router";
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const SignIn = () => {
   const router = useRouter();
@@ -36,6 +37,7 @@ const SignIn = () => {
       dateString,
     });
     if (!result.success) {
+      //console.log("Validation failed:", result.error);
       const nameError = result.error.issues.find(
         (issue) => issue.path[0] === "name"
       );
@@ -71,6 +73,7 @@ const SignIn = () => {
         dateString
       );
 
+      console.log("Sending code verification to email:", emailValue);
       try {
         await postCodeVerification({ email: emailValue });
       } catch (error) {
@@ -104,7 +107,7 @@ const SignIn = () => {
         className="flex-1 w-full h-full"
         contentContainerStyle={{ flexGrow: 1 }}
       >
-        <View className="flex flex-grow flex-col w-full justify-between px-14 py-3">
+        <View className="flex flex-grow flex-col w-full justify-between px-14 py-3" >
           <View className="flex flex-col w-full">
             <LogoCircle classname="w-[60] h-[60] mb-2 self-center" />
             <Text className="text-white text-[27px] font-pbold text-justify pt-14">
@@ -137,27 +140,28 @@ const SignIn = () => {
                 onPress={() => setOpen(true)}
                 error={dateError}
               />
-              <DatePicker
-                modal
-                open={open}
-                date={date}
-                onConfirm={(date) => {
-                  setDateError(undefined);
-                  setOpen(false);
-                  setDate(date);
-                  setDateString(
-                    date.toLocaleDateString("es-AR", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    })
-                  );
-                }}
-                onCancel={() => {
-                  setOpen(false);
-                  setDateString(undefined);
-                }}
-              />
+              {open && (
+                <DateTimePicker
+                  value={date}
+                  mode="date"
+                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                  onChange={(event, selectedDate) => {
+                    setOpen(false);
+                    if (selectedDate) {
+                      setDateError(undefined);
+                      setDate(selectedDate);
+                      setDateString(
+                        selectedDate.toLocaleDateString("es-AR", {
+                          day: "numeric",
+                          month: "long",
+                          year: "numeric",
+                        })
+                      );
+                    }
+                  }}
+                />
+              )}
+
             </View>
           </View>
           <NextButton
@@ -168,7 +172,7 @@ const SignIn = () => {
           />
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </SafeAreaView >
   );
 };
 
