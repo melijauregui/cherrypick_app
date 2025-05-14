@@ -6,6 +6,7 @@ import {
   Image,
   Platform,
 } from "react-native";
+import * as SecureStore from "expo-secure-store";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useEffect } from "react";
 import React, { useState } from "react";
@@ -88,6 +89,7 @@ const GoogleSignInButton = () => {
 
           if (data.exists) {
             console.log("User verification result:", data.user);
+            await SecureStore.setItemAsync("accessToken", response.authentication.accessToken);
             router.push("/home");
           }
 

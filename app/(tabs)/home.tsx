@@ -67,7 +67,7 @@ async function getClothingItems(): Promise<Metadata[]> {
       throw new Error("Error al obtener los datos");
     }
     const clothingItems: Metadata[] = await response.json();
-    console.log("Clothing items:", clothingItems);
+    //console.log("Clothing items:", clothingItems);
     return clothingItems;
 
   } catch (error: unknown) {

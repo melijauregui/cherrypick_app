@@ -7,11 +7,39 @@ import { LogoSquareBeige } from "@/components/LogoSquareBeige";
 import "../global.css";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
+import * as SecureStore from "expo-secure-store";
+
 
 export default function App() {
   const router = useRouter();
 
   useEffect(() => {
+    const checkSession = async () => {
+      const token = await SecureStore.getItemAsync("accessToken");
+
+      if (token) {
+        try {
+          const userInfoResponse = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          const userInfo = await userInfoResponse.json();
+
+          if (userInfo.email) {
+            console.log("User already logged in",);
+            router.replace("/home");
+          }
+        } catch (err) {
+          console.log("Token inválido o expirado, pedir login nuevamente.");
+          await SecureStore.deleteItemAsync("accessToken");
+        }
+      }
+    };
+
+    checkSession();
+
     const timer = setTimeout(() => {
       router.push("/sign-in"); // Redirect to /sign-in after 1 second
     }, 1000);
