@@ -313,13 +313,9 @@ app.openapi(verifyUserRoute, async (c) => {
   if (!email) {
     return c.json({ error: true as true, details: "Missing email" }, 200);
   }
-  // ToDo: borrar esto
-  //const [userExistente]: any[] = await db.query("SELECT * FROM users");
-  //return c.json({ exists: true as true, user: userExistente[0] }, 200);
 
-  // ToDo: usar esto
   const [rows]: any[] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
-
+  //console.log("Verifying user:", rows);
   if (rows.length > 0) {
     return c.json({ exists: true as true, user: rows[0] }, 200);
   } else {

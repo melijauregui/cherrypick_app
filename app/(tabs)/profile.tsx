@@ -18,7 +18,7 @@ const Profile = () => {
             <SafeAreaView className="bg-brown-strong w-full flex-1">
                 <View className="flex-1 justify-end p-4">
                     <View className="mb-4">
-                        <LogOutButton logout={logout} setUser={setUser} />
+                        <LogOutButton logout={logout} />
                     </View>
                     <DeleteAccountButton user={user} loading={loading} logout={logout} />
                 </View>
@@ -28,12 +28,11 @@ const Profile = () => {
 };
 export default Profile;
 
-const LogOutButton: React.FC<{ logout: () => Promise<void>; setUser: React.Dispatch<React.SetStateAction<any>> }> = ({ logout, setUser }) => {
+const LogOutButton: React.FC<{ logout: () => Promise<void> }> = ({ logout }) => {
     const router = useRouter();
 
     const handleLogout = async () => {
         await logout();
-        setUser(null);
         router.replace("/sign-in");
     };
 
@@ -47,7 +46,11 @@ const LogOutButton: React.FC<{ logout: () => Promise<void>; setUser: React.Dispa
     );
 };
 
-const DeleteAccountButton: React.FC<{ user: { email: string } | null; loading: boolean; logout: () => Promise<void> }> = ({ user, loading, logout }) => {
+const DeleteAccountButton: React.FC<{
+    user: { email: string } | null;
+    loading: boolean;
+    logout: () => Promise<void>;
+}> = ({ user, loading, logout }) => {
     const router = useRouter();
 
     const handleDeleteAccount = async () => {
@@ -70,6 +73,7 @@ const DeleteAccountButton: React.FC<{ user: { email: string } | null; loading: b
         if ("success" in data && data.success) {
             console.log("Account deleted successfully");
             await logout();
+
             router.replace("/sign-in");
         } else if ("details" in data && data.details) {
             console.log("Error:", data.details);
