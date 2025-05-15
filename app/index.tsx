@@ -8,33 +8,22 @@ import "../global.css";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
+import { useAuth } from "@/context/AuthContext";
 
 
 export default function App() {
   const router = useRouter();
+  const authContext = useAuth();
+  const user = authContext?.user;
 
   useEffect(() => {
     const checkSession = async () => {
-      const token = await SecureStore.getItemAsync("accessToken");
-
-      if (token) {
-        try {
-          const userInfoResponse = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-
-          const userInfo = await userInfoResponse.json();
-
-          if (userInfo.email) {
-            console.log("User already logged in",);
-            router.replace("/home");
-          }
-        } catch (err) {
-          console.log("Token inválido o expirado, pedir login nuevamente.");
-          await SecureStore.deleteItemAsync("accessToken");
-        }
+      console.log("Checking session...");
+      if (user) {
+        console.log("User already logged in", user);
+        router.replace("/home");
+      } else {
+        console.log("No user found, checking token");
       }
     };
 
@@ -45,7 +34,7 @@ export default function App() {
     }, 1000);
 
     return () => clearTimeout(timer); // Cleanup in case component unmounts
-  }, []);
+  }, [user]);
   return (
     <SafeAreaView className="flex-1 h-full bg-brown-strong">
       <ScrollView className="my-1 ">
