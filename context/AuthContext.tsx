@@ -71,7 +71,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const checkSession = async () => {
-        //await SecureStore.deleteItemAsync("accessToken");
         let token = await SecureStore.getItemAsync("accessToken");
 
         if (!token) {

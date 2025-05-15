@@ -20,6 +20,12 @@ const TabsLayout = () => {
           icon: icons.search,
           iconName: "Explore",
         })}
+        {Page({
+          name: "profile",
+          title: "Profile",
+          icon: icons.profile,
+          iconName: "Profile",
+        })}
       </Tabs>
     </>
   );
