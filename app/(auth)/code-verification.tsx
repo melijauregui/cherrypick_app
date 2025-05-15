@@ -52,6 +52,7 @@ const CodeVerification = () => {
   const [code, setCode] = useState("");
   const [codeReady, setCodeReady] = useState(false);
   const [codeError, setCodeError] = useState<string | undefined>(undefined);
+  const [resetCodeInput, setResetCodeInput] = useState(false);
   const expiration = new Date();
   expiration.setMinutes(expiration.getMinutes() + 3); // Expira en 3 minutos
   const [expirationTime, setExpirationTime] = useState<Date>(expiration);
@@ -82,6 +83,8 @@ const CodeVerification = () => {
 
   async function handleResendCode() {
     try {
+      setResetCodeInput(true); // trigger reset
+      setTimeout(() => setResetCodeInput(false), 0); // immediately turn off
       // Reiniciar el tiempo
       const newExpiration = new Date();
       newExpiration.setMinutes(newExpiration.getMinutes() + 3);
@@ -193,6 +196,7 @@ const CodeVerification = () => {
                     setCodeReady={setCodeReady}
                     disabled={secondsLeft <= 0}
                     setCodeError={setCodeError}
+                    reset={resetCodeInput}
                   />
                   {codeError && (
                     <Text className="text-red-500 pt-0.5">{codeError}</Text>
@@ -269,6 +273,7 @@ type CodeInputProps = {
   setCodeReady: (ready: boolean) => void; // callback para avisar que el código está listo
   disabled?: boolean;
   setCodeError: (error: string | undefined) => void; // callback para manejar errores
+  reset?: boolean; // para resetear el input
 };
 
 export const CodeInput: React.FC<CodeInputProps> = ({
@@ -277,6 +282,7 @@ export const CodeInput: React.FC<CodeInputProps> = ({
   setCodeReady,
   disabled,
   setCodeError,
+  reset,
 }) => {
   // estado como array de strings de longitud “length”
   const [code, setCode] = useState<string[]>(Array(length).fill(""));
@@ -284,6 +290,16 @@ export const CodeInput: React.FC<CodeInputProps> = ({
 
   // refs para cada TextInput, poder .focus() en ellos
   const inputs = useRef<Array<TextInput | null>>(Array(length).fill(null));
+
+  useEffect(() => {
+    if (reset) {
+      setCode(Array(length).fill(""));
+      setFocusedIdx(0);
+      inputs.current[0]?.focus();
+      setCodeReady(false);
+    }
+  }, [reset]);
+
 
   // al cambiar un dígito
   const handleChange = (
