@@ -24,20 +24,23 @@ import { ResCodeVerificationPostSchema } from "@/schemas/auth/sign-up-schema";
 
 const CodeVerification = () => {
   const router = useRouter();
-  const params = useLocalSearchParams<{
-    name?: string;
-    email?: string;
-    dateBirth?: string;
-  }>();
+  // const params = useLocalSearchParams<{
+  //   name?: string;
+  //   email?: string;
+  //   dateBirth?: string;
+  // }>();
 
-  const { name, email, dateBirth } = params;
+  // const { name, email, dateBirth } = params;
 
+  const name = "meli";
+  const email = "m@fi.uba.ar";
+  const dateBirth = "2023-10-10";
   if (
     typeof name !== "string" ||
     typeof email !== "string" ||
     typeof dateBirth !== "string"
   ) {
-    console.error("Missing or invalid parameters in CodeVerification:", params);
+    // console.error("Missing or invalid parameters in CodeVerification:", params);
     router.replace("/sign-up");
     return null;
   }
@@ -180,6 +183,7 @@ const CodeVerification = () => {
                 }}
                 setCodeReady={setCodeReady}
                 disabled={secondsLeft <= 0}
+                setCodeError={setCodeError}
               />
               {codeError && (
                 <Text className="text-red-500 pt-0.5">{codeError}</Text>
@@ -252,6 +256,7 @@ type CodeInputProps = {
   onComplete?: (code: string) => void; // callback cuando se completa
   setCodeReady: (ready: boolean) => void; // callback para avisar que el código está listo
   disabled?: boolean;
+  setCodeError: (error: string | undefined) => void; // callback para manejar errores
 };
 
 export const CodeInput: React.FC<CodeInputProps> = ({
@@ -259,6 +264,7 @@ export const CodeInput: React.FC<CodeInputProps> = ({
   onComplete,
   setCodeReady,
   disabled,
+  setCodeError,
 }) => {
   // estado como array de strings de longitud “length”
   const [code, setCode] = useState<string[]>(Array(length).fill(""));
@@ -268,10 +274,37 @@ export const CodeInput: React.FC<CodeInputProps> = ({
   const inputs = useRef<Array<TextInput | null>>(Array(length).fill(null));
 
   // al cambiar un dígito
-  const handleChange = (char: string, idx: number) => {
-    if (!/^\d$/.test(char)) return; // sólo dígitos 0–9
+  const handleChange = (
+    text: string,
+    idx: number,
+    setCodeError: (error: string | undefined) => void
+  ) => {
+    if (text.length == 6) {
+      // nos quedamos con los primeros `length` caracteres
+      const chars = text.slice(0, length).split("");
+      for (let i = 0; i < chars.length; i++) {
+        const char = chars[i];
+        if (char === undefined || !/^\d$/.test(char)) {
+          setCodeError("Invalid paste code");
+          return;
+        }
+      }
+      setCode(chars);
+      onComplete?.(chars.join(""));
+      setCodeReady(true);
+      inputs.current[length - 1]?.focus();
+      setFocusedIdx(length - 1);
+      return;
+    }
+    if (text.length > 1) {
+      setCodeError(
+        "Paste allow only with one character or six at the same time"
+      );
+      return;
+    }
+    if (!/^\d$/.test(text)) return; // sólo dígitos 0–9
     const newCode = [...code];
-    newCode[idx] = char;
+    newCode[idx] = text;
     setCode(newCode);
 
     // pasamos al siguiente campo
@@ -308,19 +341,10 @@ export const CodeInput: React.FC<CodeInputProps> = ({
       setCode(newCode);
     }
   };
-  // console.log("code NEW:", code);
   return (
     <View className="flex flex-row justify-between w-full self-center">
       {code.map((digit, idx) => {
         const isFocused = focusedIdx === idx;
-        // console.log(
-        //   "isFocused:",
-        //   isFocused,
-        //   " idx:",
-        //   idx,
-        //   "focusedIdx:",
-        //   focusedIdx
-        // );
         return (
           <TextInput
             selectTextOnFocus={false}
@@ -328,10 +352,10 @@ export const CodeInput: React.FC<CodeInputProps> = ({
             pointerEvents={isFocused ? "auto" : "none"}
             ref={(ref) => (inputs.current[idx] = ref)}
             value={digit}
-            onChangeText={(text) => handleChange(text, idx)}
+            onChangeText={(text) => handleChange(text, idx, setCodeError)}
             onKeyPress={(e) => handleKeyPress(e, idx)}
             keyboardType="number-pad"
-            maxLength={1}
+            maxLength={idx === 0 ? length : 1}
             caretHidden={true}
             selectionColor="transparent"
             editable={!disabled}
