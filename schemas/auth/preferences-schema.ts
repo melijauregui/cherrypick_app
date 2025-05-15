@@ -32,3 +32,4 @@ const CreateAccountSchemaRes = z.union([
   }),
 ]);
 export { CreateAccountSchemaRes };
+export type CreateAccountSchemaResType = z.infer<typeof CreateAccountSchemaRes>;

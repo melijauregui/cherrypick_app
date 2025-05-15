@@ -71,7 +71,7 @@ const SignIn = () => {
         "and email:",
         emailValue,
         "and date:",
-        dateString
+        date.toISOString()
       );
 
       router.push({
@@ -141,16 +141,24 @@ const SignIn = () => {
                 onPress={() => setOpen(true)}
                 error={dateError}
               />
+
               <DatePicker
                 modal
                 open={open}
                 date={date}
                 mode="date"
+                // @ts-ignore
                 androidVariant="nativeAndroid"
                 onConfirm={(date: Date) => {
                   setDateError(undefined);
                   setOpen(false);
-                  setDate(date);
+                  const justDate = new Date(
+                    date.getFullYear(),
+                    date.getMonth(),
+                    date.getDate()
+                  );
+                  setDate(justDate);
+                  console.log("Selected date:", justDate);
                   setDateString(
                     date.toLocaleDateString("es-AR", {
                       day: "numeric",
@@ -257,7 +265,7 @@ async function verifyMailAvailability(
       throw new Error(data.details);
     }
     return {
-      isAvailable: data.isAvailable,
+      isAvailable: true,
     };
   } catch (error: unknown) {
     if (error instanceof Error) {

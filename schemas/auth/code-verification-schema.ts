@@ -19,13 +19,13 @@ const VerifyCodeSchema = z.union([
   }),
 ]);
 export { VerifyCodeSchema };
+export type VerifyCodeSchemaType = z.infer<typeof VerifyCodeSchema>;
 
 const QueryVerifyCodeSchema = z.object({
   code: z.preprocess((val) => val?.toString(), z.string()),
   email: z.preprocess((val) => val?.toString(), z.string()),
 });
 export { QueryVerifyCodeSchema };
-export type VerifyCodeSchemaType = z.infer<typeof VerifyCodeSchema>;
 
 const queryDbSchemaRegisterInProgress = z.tuple([
   z.object({

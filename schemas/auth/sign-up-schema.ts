@@ -1,3 +1,4 @@
+import { error } from "console";
 import { z } from "zod";
 const FormSchemaSignUp = z.object({
   name: z
@@ -17,7 +18,6 @@ export { FormSchemaSignUp };
 const VerifyAvailabilitySchema = z.union([
   z.object({
     error: z.literal(false),
-    isAvailable: z.boolean(),
   }),
   z.object({
     error: z.literal(true),
@@ -79,33 +79,35 @@ export { BodyUserVerificationPostSchema };
 
 export const VerifyUserResponseSchema = z.union([
   z.object({
-    exists: z.boolean(),
-    user: z
-      .object({
-        id: z.number(),
-        name: z.string(),
-        email: z.string(),
-        date_of_birth: z.string().nullable(),
-      })
-      .optional(),
+    error: z.literal(false),
+    user: z.object({
+      id: z.string(),
+      name: z.string(),
+      email: z.string(),
+      date_of_birth: z.string(),
+    }),
   }),
   z.object({
     error: z.literal(true),
     details: z.string(),
   }),
 ]);
-const queryDbSchemaUsers = z.array(
+export type VerifyUserResponseSchemaType = z.infer<
+  typeof VerifyUserResponseSchema
+>;
+const queryDbSchemaUser = z.tuple([
   z.object({
     id: z.string(),
     name: z.string(),
     email: z.string(),
     date_of_birth: z.string(),
-  })
-);
-export { queryDbSchemaUsers };
+  }),
+]);
+
+export { queryDbSchemaUser };
 
 export const BodyUserCreationPostSchema = z.object({
   name: z.string().min(1),
   email: z.string().email(),
-  date_of_birth: z.string().optional(), // formato: 'YYYY-MM-DD'
+  date_of_birth: z.string(), // formato: 'YYYY-MM-DD'
 });

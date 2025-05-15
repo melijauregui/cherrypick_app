@@ -12,6 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import images from "../../constants/images";
 import { CreateAccountSchemaRes } from "@/schemas/auth/preferences-schema";
+import { BodyUserCreationPostSchema } from "@/schemas/auth/sign-up-schema";
 import { safeFetch } from "@/utils/safe-fetch";
 import { LOCAL_IP } from "@/config/api";
 
@@ -31,18 +32,26 @@ const Preferences = () => {
     if (
       typeof name !== "string" ||
       typeof email !== "string" ||
-      dateBirth !== "string"
+      typeof dateBirth !== "string"
     ) {
-      //ToDo: manejar error
+      console.log("typeof name", typeof name);
+      console.log("typeof email", typeof email);
+      console.log("typeof dateBirth", typeof dateBirth);
+      console.log("Invalid parameters");
       return;
     }
-    const { success } = await createAccount(name, email, dateBirth);
-    if (success) {
-      console.log("Account created successfully");
-      router.push("/home");
-    } else {
-      console.log("Error creating account"); //TODO HANDLEAR MEJOR
-      router.push("/sign-in");
+    try {
+      const { success } = await createAccount(name, email, dateBirth);
+      if (success) {
+        console.log("Account created successfully");
+        router.push("/home");
+      } else {
+        console.log("Error creating account"); //TODO HANDLEAR MEJOR
+        router.push("/sign-in");
+      }
+    } catch (error) {
+      console.error("Error creating account:", error);
+      // router.push("/sign-in");
     }
   }
   const [selectedOne, setSelectedOne] = useState<boolean>(false);
@@ -221,13 +230,28 @@ async function createAccount(
   email: string,
   dateString: string
 ): Promise<{ success: boolean }> {
+  console.log(
+    "Creating account with name:",
+    name,
+    "email:",
+    email,
+    "date:",
+    dateString
+  );
   try {
+    const date_of_birth = dateString;
+    const parsedReq = BodyUserCreationPostSchema.parse({
+      name,
+      email,
+      date_of_birth,
+    });
+    console.log("Parsed request:", parsedReq);
     const { data } = await safeFetch({
       url: `http://${LOCAL_IP}:3000/create-account`,
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ name, email, dateString }),
+      body: JSON.stringify({ name, email, date_of_birth }),
       schema: CreateAccountSchemaRes,
       method: "POST",
     });
@@ -236,6 +260,7 @@ async function createAccount(
       console.log("Error:", data.details);
       throw new Error(data.details);
     }
+    console.log("Account created successfully:", data);
     return {
       success: true,
     };

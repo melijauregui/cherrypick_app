@@ -14,8 +14,8 @@ import { LogoCircle } from "@/components/LogoCircle";
 import * as Google from "expo-auth-session/providers/google";
 import { router } from "expo-router";
 import { makeRedirectUri } from "expo-auth-session";
-import Constants from 'expo-constants';
-import * as WebBrowser from 'expo-web-browser';
+import Constants from "expo-constants";
+import * as WebBrowser from "expo-web-browser";
 import { safeFetch } from "@/utils/safe-fetch";
 import { VerifyUserResponseSchema } from "@/schemas/auth/sign-up-schema";
 import { LOCAL_IP } from "@/config/api";
@@ -50,34 +50,41 @@ const SignIn = () => {
 export default SignIn;
 
 const GoogleSignInButton = () => {
-  const isExpoGo = Constants.executionEnvironment === 'storeClient';
+  const isExpoGo = Constants.executionEnvironment === "storeClient";
   const googleRedirectUri = isExpoGo
     ? "https://auth.expo.io/@cherrypickapp/cherrypick"
     : undefined;
   const [request, response, promptAsync] = Google.useAuthRequest({
-    androidClientId: isExpoGo ? undefined : process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
+    androidClientId: isExpoGo
+      ? undefined
+      : process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
     iosClientId: process.env.EXPO_PUBLIC_IOS_CLIENT_ID,
     clientId: process.env.EXPO_PUBLIC_EXPO_CLIENT_ID,
     redirectUri: googleRedirectUri,
-    responseType: 'code',
+    responseType: "code",
     extraParams: {
-      access_type: 'offline',
-      prompt: 'consent',
+      access_type: "offline",
+      prompt: "consent",
     },
-  },
-  );
+  });
   //console.log("response", response);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
-      if (response?.type === "success" && response.authentication?.accessToken) {
+      if (
+        response?.type === "success" &&
+        response.authentication?.accessToken
+      ) {
         console.log("Token expires at ", response?.authentication?.expiresIn);
         try {
-          const userInfoResponse = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
-            headers: {
-              Authorization: `Bearer ${response.authentication?.accessToken}`,
-            },
-          });
+          const userInfoResponse = await fetch(
+            "https://www.googleapis.com/oauth2/v3/userinfo",
+            {
+              headers: {
+                Authorization: `Bearer ${response.authentication?.accessToken}`,
+              },
+            }
+          );
 
           const userInfo = await userInfoResponse.json();
           console.log("User Info:", userInfo);
@@ -85,20 +92,25 @@ const GoogleSignInButton = () => {
             url: `http://${LOCAL_IP}:3000/verify-user`,
             method: "POST",
             headers: {
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
             body: JSON.stringify({ email: userInfo.email }),
             schema: VerifyUserResponseSchema,
           });
-
-
-          if ('exists' in data && data.exists) {
-            console.log("User verification result:", data.user);
-            await SecureStore.setItemAsync("accessToken", response.authentication?.accessToken);
-            await SecureStore.setItemAsync("refreshToken", response.authentication?.refreshToken ?? "");
-            router.push("/home");
+          if (data.error) {
+            console.log("Error:", data.details);
+            throw new Error(data.details);
           }
-
+          console.log("User verification result:", data.user);
+          await SecureStore.setItemAsync(
+            "accessToken",
+            response.authentication?.accessToken
+          );
+          await SecureStore.setItemAsync(
+            "refreshToken",
+            response.authentication?.refreshToken ?? ""
+          );
+          router.push("/home");
         } catch (error) {
           console.error("Error fetching user info or verifying:", error);
         }
@@ -107,7 +119,6 @@ const GoogleSignInButton = () => {
 
     fetchUserInfo();
   }, [response]);
-
 
   return (
     <TouchableOpacity

@@ -18,8 +18,10 @@ import {
   ErrorResponseSchema,
   VerifyUserResponseSchema,
   BodyUserVerificationPostSchema,
-  queryDbSchemaUsers,
+  queryDbSchemaUser,
   BodyUserCreationPostSchema,
+  VerifyUserResponseSchemaType,
+  ResCodeVerificationPostSchemaType,
 } from "../schemas/auth/sign-up-schema";
 import {
   QueryVerifyCodeSchema,
@@ -31,7 +33,10 @@ import { db } from "./db";
 const app = new OpenAPIHono();
 export default app;
 import { RowDataPacket } from "mysql2/promise";
-import { CreateAccountSchemaRes } from "../schemas/auth/preferences-schema";
+import {
+  CreateAccountSchemaRes,
+  CreateAccountSchemaResType,
+} from "../schemas/auth/preferences-schema";
 
 // endpoint que recibe una imagen y devuelve los 10 resultados más similares paginados WIP
 const routeVector = createRoute({
@@ -117,19 +122,18 @@ app.openapi(verifiedEmailRoute, async (c) => {
       "SELECT id FROM users WHERE email = ?",
       [email]
     );
-    const parsedRows = queryDbSchemaUsers.parse(rows);
-
-    if (parsedRows.length > 0) {
-      // Email ya registrado
+    if (rows.length === 0) {
+      // Email no registrado
       res = {
         error: false,
-        isAvailable: false,
       };
     } else {
-      // Email disponible para registrar
+      //chequeo que sea un user valido
+      const parsedRows = queryDbSchemaUser.parse(rows);
+      // Email ya registrado
       res = {
-        error: false,
-        isAvailable: true,
+        error: true,
+        details: "Email already registered",
       };
     }
   } catch (err) {
@@ -169,9 +173,15 @@ app.openapi(codeVerificationRoute, async (c) => {
   const { email } = await c.req.valid("json");
   const code = generateVerificationCode();
   const emailSent = await sendEmail(email, code);
+  let res: ResCodeVerificationPostSchemaType;
 
   if (!emailSent) {
-    return c.json({ error: true as true, details: "Invalid email" }, 200);
+    // return c.json({ error: true as true, details: "Invalid email" }, 200);
+    res = {
+      error: true,
+      details: "Invalid email",
+    };
+    return c.json(res, 200);
   }
 
   // Guardar (o reemplazar) en DB
@@ -187,12 +197,17 @@ app.openapi(codeVerificationRoute, async (c) => {
       `,
       [email, code, expirationString]
     );
-
-    return c.json({ error: false as false }, 200);
+    res = {
+      error: false,
+    };
   } catch (err) {
     console.error("Error al guardar código:", err);
-    return c.json({ error: true as true, details: "Error al guardar en la base" }, 200);
+    res = {
+      error: true,
+      details: "Error al guardar en la base",
+    };
   }
+  return c.json(res, 200);
 });
 
 function generateVerificationCode(): string {
@@ -252,6 +267,7 @@ const verifiedCodeRoute = createRoute({
 });
 app.openapi(verifiedCodeRoute, async (c) => {
   const { code, email } = c.req.valid("query");
+  let res: VerifyCodeSchemaType;
 
   try {
     const [rows]: any[] = await db.query(
@@ -260,7 +276,11 @@ app.openapi(verifiedCodeRoute, async (c) => {
     );
 
     if (rows.length === 0) {
-      return c.json({ error: true as true, details: "Email not found" }, 200);
+      res = {
+        error: true,
+        details: "Email not found",
+      };
+      return c.json(res, 200);
     }
 
     const parsedRows = queryDbSchemaRegisterInProgress.parse(rows);
@@ -271,20 +291,28 @@ app.openapi(verifiedCodeRoute, async (c) => {
     }
 
     if (new Date() > new Date(verification_code_expiration)) {
-      return c.json({ error: true as true, details: "Verification code expired" }, 200);
+      res = {
+        error: true,
+        details: "Verification code expired",
+      };
+      return c.json(res, 200);
     }
 
     await db.query("DELETE FROM registerInProgress WHERE email = ?", [email]);
 
     console.log("Código de verificación correcto");
-
-    return c.json({ error: false as false, isCorrect: true }, 200);
+    res = {
+      error: false,
+      isCorrect: true,
+    };
+    return c.json(res, 200);
   } catch (err) {
     console.error("Error al verificar código:", err);
     return c.json({ error: true as true, details: "DB error" }, 200);
   }
 });
 
+// endpoint que verifica si el usuario existe en la base de datos
 const verifyUserRoute = createRoute({
   method: "post",
   path: "/verify-user",
@@ -308,24 +336,38 @@ const verifyUserRoute = createRoute({
 });
 app.openapi(verifyUserRoute, async (c) => {
   const { email } = c.req.valid("json");
+  let res: VerifyUserResponseSchemaType;
 
-  if (!email) {
-    return c.json({ error: true as true, details: "Missing email" }, 200);
-  }
-  // ToDo: borrar esto
-  const [userExistente]: any[] = await db.query("SELECT * FROM users");
-  return c.json({ exists: true as true, user: userExistente[0] }, 200);
+  // // ToDo: borrar esto
+  // const [userExistente]: any[] = await db.query("SELECT * FROM users"); //todo safeparse()
+  // return c.json({ exists: true as true, user: userExistente[0] }, 200);
 
   // ToDo: usar esto
-  const [rows]: any[] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
-
-  if (rows.length > 0) {
-    return c.json({ exists: true as true, user: rows[0] }, 200);
+  const [rows]: any[] = await db.query("SELECT * FROM users WHERE email = ?", [
+    email,
+  ]);
+  if (rows.length === 0) {
+    res = {
+      error: true,
+      details: "User not found",
+    };
   } else {
-    return c.json({ exists: false as false }, 200);
+    const parsedRows = queryDbSchemaUser.parse(rows);
+    const { id, name, email, date_of_birth } = parsedRows[0];
+    res = {
+      error: false,
+      user: {
+        id: id,
+        name: name,
+        email: email,
+        date_of_birth: date_of_birth,
+      },
+    };
   }
+  return c.json(res, 200);
 });
 
+// endpoint que crea un nuevo usuario en la base de datos
 const createUserRoute = createRoute({
   method: "post",
   path: "/create-account",
@@ -352,26 +394,38 @@ const createUserRoute = createRoute({
 
 app.openapi(createUserRoute, async (c) => {
   const { name, email, date_of_birth } = c.req.valid("json");
-
-  if (!name || !email) {
-    return c.json({ error: true as true, details: "Missing name or email" }, 200);
-  }
+  let res: CreateAccountSchemaResType;
+  console.log("Creating user:", name, email, date_of_birth);
 
   try {
-    const [existing]: any[] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
+    const [existing]: any[] = await db.query(
+      "SELECT * FROM users WHERE email = ?",
+      [email]
+    );
 
     if (existing.length > 0) {
-      return c.json({ error: true as true, details: "Email already registered" }, 200);
+      res = {
+        error: true,
+        details: "Email already registered",
+      };
     }
+
+    const dateBirth = new Date(date_of_birth);
 
     const [result]: any = await db.query(
       "INSERT INTO users (name, email, date_of_birth) VALUES (?, ?, ?)",
-      [name, email, date_of_birth ?? null]
+      [name, email, dateBirth]
     );
-
-    return c.json({ error: false as false }, 200);
+    console.log("User created:", result);
+    res = {
+      error: false,
+    };
   } catch (err) {
     console.error(err);
-    return c.json({ error: true as true, details: "Server error" }, 200);
+    res = {
+      error: true,
+      details: "Server error",
+    };
   }
+  return c.json(res, 200);
 });
