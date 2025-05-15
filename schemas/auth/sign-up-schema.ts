@@ -98,7 +98,7 @@ const queryDbSchemaUser = z.tuple([
   z.object({
     name: z.string(),
     email: z.string(),
-    date_of_birth: z.string(),
+    date_of_birth: z.date(),
   }),
 ]);
 

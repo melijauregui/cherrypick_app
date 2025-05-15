@@ -349,12 +349,13 @@ app.openapi(verifyUserRoute, async (c) => {
   } else {
     const parsedRows = queryDbSchemaUser.parse(rows);
     const { name, email, date_of_birth } = parsedRows[0];
+    const date_of_birth_str = date_of_birth.toISOString();
     res = {
       error: false,
       user: {
         name: name,
         email: email,
-        date_of_birth: date_of_birth,
+        date_of_birth: date_of_birth_str,
       },
     };
   }
