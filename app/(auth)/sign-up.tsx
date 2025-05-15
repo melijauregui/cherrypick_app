@@ -145,7 +145,9 @@ const SignIn = () => {
                 modal
                 open={open}
                 date={date}
-                onConfirm={(date) => {
+                mode="date"
+                androidVariant="nativeAndroid"
+                onConfirm={(date: Date) => {
                   setDateError(undefined);
                   setOpen(false);
                   setDate(date);

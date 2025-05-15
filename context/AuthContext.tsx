@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const refreshAccessToken = async (): Promise<string | null> => {
         const refreshToken = await SecureStore.getItemAsync("refreshToken");
-        if (!refreshToken) return null;
+        if (!refreshToken || refreshToken == "") return null;
 
         try {
             console.log("Refreshing access token...");
