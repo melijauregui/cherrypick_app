@@ -20,7 +20,6 @@ import {
   BodyUserVerificationPostSchema,
   queryDbSchemaUsers,
   BodyUserCreationPostSchema,
-  CreateUserResponseSchema,
 } from "../schemas/auth/sign-up-schema";
 import {
   QueryVerifyCodeSchema,
@@ -32,6 +31,7 @@ import { db } from "./db";
 const app = new OpenAPIHono();
 export default app;
 import { RowDataPacket } from "mysql2/promise";
+import { CreateAccountSchemaRes } from "../schemas/auth/preferences-schema";
 
 // endpoint que recibe una imagen y devuelve los 10 resultados más similares paginados WIP
 const routeVector = createRoute({
@@ -328,7 +328,7 @@ app.openapi(verifyUserRoute, async (c) => {
 
 const createUserRoute = createRoute({
   method: "post",
-  path: "/create-user",
+  path: "/create-account",
   request: {
     body: {
       content: {
@@ -343,7 +343,7 @@ const createUserRoute = createRoute({
       description: "Crea un nuevo usuario",
       content: {
         "application/json": {
-          schema: CreateUserResponseSchema,
+          schema: CreateAccountSchemaRes,
         },
       },
     },
@@ -354,14 +354,14 @@ app.openapi(createUserRoute, async (c) => {
   const { name, email, date_of_birth } = c.req.valid("json");
 
   if (!name || !email) {
-    return c.json({ success: false, error: "Missing name or email" }, 200);
+    return c.json({ error: true as true, details: "Missing name or email" }, 200);
   }
 
   try {
     const [existing]: any[] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
 
     if (existing.length > 0) {
-      return c.json({ success: false, error: "Email already registered" }, 200);
+      return c.json({ error: true as true, details: "Email already registered" }, 200);
     }
 
     const [result]: any = await db.query(
@@ -369,11 +369,9 @@ app.openapi(createUserRoute, async (c) => {
       [name, email, date_of_birth ?? null]
     );
 
-    const [user]: any[] = await db.query("SELECT * FROM users WHERE id = ?", [result.insertId]);
-
-    return c.json({ success: true, user: user[0] }, 200);
+    return c.json({ error: false as false }, 200);
   } catch (err) {
     console.error(err);
-    return c.json({ success: false, error: "Server error" }, 200);
+    return c.json({ error: true as true, details: "Server error" }, 200);
   }
 });

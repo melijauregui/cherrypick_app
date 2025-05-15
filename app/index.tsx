@@ -9,6 +9,9 @@ import { useRouter } from "expo-router";
 import { useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
 import { useAuth } from "@/context/AuthContext";
+import { safeFetch } from "@/utils/safe-fetch";
+import { LOCAL_IP } from "@/config/api";
+import { VerifyUserResponseSchema } from "@/schemas/auth/sign-up-schema";
 
 
 export default function App() {
@@ -20,10 +23,21 @@ export default function App() {
     const checkSession = async () => {
       console.log("Checking session...");
       if (user) {
-        console.log("User already logged in", user);
-        router.replace("/home");
-      } else {
-        console.log("No user found, checking token");
+        console.log("Checking if the user is logged in");
+        const { data } = await safeFetch({
+          url: `http://${LOCAL_IP}:3000/verify-user`,
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email: user.email }),
+          schema: VerifyUserResponseSchema,
+        });
+
+        if ('exists' in data && data.exists) {
+          console.log("User already logged in")
+          router.replace("/home");
+        }
       }
     };
 

@@ -13,6 +13,7 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import images from "../../constants/images";
 import { CreateAccountSchemaRes } from "@/schemas/auth/preferences-schema";
 import { safeFetch } from "@/utils/safe-fetch";
+import { LOCAL_IP } from "@/config/api";
 
 const Preferences = () => {
   const router = useRouter();
@@ -27,6 +28,14 @@ const Preferences = () => {
   );
   async function handleSubmit() {
     console.log("Creating an account");
+    if (
+      typeof name !== "string" ||
+      typeof email !== "string" ||
+      dateBirth !== "string"
+    ) {
+      //ToDo: manejar error
+      return;
+    }
     const { success } = await createAccount(name, email, dateBirth);
     if (success) {
       console.log("Account created successfully");
@@ -208,14 +217,13 @@ const NextButton = ({
 };
 
 async function createAccount(
-  code: string,
+  name: string,
   email: string,
   dateString: string
 ): Promise<{ success: boolean }> {
   try {
-    const IP = process.env.EXPO_PUBLIC_IP || "localhost";
     const { data } = await safeFetch({
-      url: `http://${IP}:3000/create-account`,
+      url: `http://${LOCAL_IP}:3000/create-account`,
       headers: {
         "Content-Type": "application/json",
       },

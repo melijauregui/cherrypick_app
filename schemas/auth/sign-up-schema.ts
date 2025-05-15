@@ -109,16 +109,3 @@ export const BodyUserCreationPostSchema = z.object({
   email: z.string().email(),
   date_of_birth: z.string().optional(), // formato: 'YYYY-MM-DD'
 });
-
-export const CreateUserResponseSchema = z.object({
-  success: z.boolean(),
-  user: z
-    .object({
-      id: z.number(),
-      name: z.string(),
-      email: z.string(),
-      date_of_birth: z.string().nullable(),
-    })
-    .optional(),
-  error: z.string().optional(),
-});
