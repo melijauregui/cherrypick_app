@@ -94,3 +94,12 @@ export const VerifyUserResponseSchema = z.union([
     details: z.string(),
   }),
 ]);
+const queryDbSchemaUsers = z.array(
+  z.object({
+    id: z.string(),
+    name: z.string(),
+    email: z.string(),
+    date_of_birth: z.string(),
+  })
+);
+export { queryDbSchemaUsers };

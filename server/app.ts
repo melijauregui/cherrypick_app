@@ -19,15 +19,18 @@ import {
   VerifyUserResponseSchema,
   BodyUserVerificationPostSchema,
 
+  queryDbSchemaUsers,
 } from "../schemas/auth/sign-up-schema";
 import {
   QueryVerifyCodeSchema,
   VerifyCodeSchema,
   VerifyCodeSchemaType,
+  queryDbSchemaRegisterInProgress,
 } from "../schemas/auth/code-verification-schema";
 import { db } from "./db";
 const app = new OpenAPIHono();
 export default app;
+import { RowDataPacket } from "mysql2/promise";
 
 // endpoint que recibe una imagen y devuelve los 10 resultados más similares paginados WIP
 const routeVector = createRoute({
@@ -107,11 +110,15 @@ const verifiedEmailRoute = createRoute({
 app.openapi(verifiedEmailRoute, async (c) => {
   const { email } = c.req.valid("query");
   let res: VerifyAvailabilitySchemaType;
-
+  console.log("Verifying email availability:", email);
   try {
-    const [rows]: any[] = await db.query('SELECT id FROM users WHERE email = ?', [email]);
+    const [rows]: any[] = await db.query(
+      "SELECT id FROM users WHERE email = ?",
+      [email]
+    );
+    const parsedRows = queryDbSchemaUsers.parse(rows);
 
-    if (rows.length > 0) {
+    if (parsedRows.length > 0) {
       // Email ya registrado
       res = {
         error: false,
@@ -125,10 +132,10 @@ app.openapi(verifiedEmailRoute, async (c) => {
       };
     }
   } catch (err) {
-    console.error('Error checking email:', err);
+    console.error("Error checking email:", err);
     res = {
       error: true,
-      details: 'Error querying the database',
+      details: "Error querying the database",
     };
   }
   return c.json(res, 200);
@@ -187,7 +194,6 @@ app.openapi(codeVerificationRoute, async (c) => {
   }
 });
 
-
 function generateVerificationCode(): string {
   return String(randomInt(100000, 999999));
 }
@@ -224,7 +230,6 @@ export async function sendEmail(email: string, code: string): Promise<boolean> {
   }
 }
 
-
 // endpoint que verifica si el code de verificación es correcto
 const verifiedCodeRoute = createRoute({
   method: "get",
@@ -257,7 +262,8 @@ app.openapi(verifiedCodeRoute, async (c) => {
       return c.json({ error: true as true, details: "Email not found" }, 200);
     }
 
-    const { verification_code, verification_code_expiration } = rows[0];
+    const parsedRows = queryDbSchemaRegisterInProgress.parse(rows);
+    const { verification_code, verification_code_expiration } = parsedRows[0];
 
     if (!verification_code || verification_code !== code) {
       return c.json({ error: false as false, isCorrect: false }, 200);
@@ -267,10 +273,7 @@ app.openapi(verifiedCodeRoute, async (c) => {
       return c.json({ error: true as true, details: "Verification code expired" }, 200);
     }
 
-    await db.query(
-      "DELETE FROM registerInProgress WHERE email = ?",
-      [email]
-    );
+    await db.query("DELETE FROM registerInProgress WHERE email = ?", [email]);
 
     console.log("Código de verificación correcto");
 

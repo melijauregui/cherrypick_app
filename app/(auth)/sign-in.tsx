@@ -30,7 +30,7 @@ const SignIn = () => {
         contentContainerStyle={{ flexGrow: 1 }}
       >
         <View className="flex flex-grow flex-col w-full px-14 py-3">
-          <LogoCircle classname="w-[60] h-[60] mb-2 self-center" />
+          <LogoCircle classname="w-[60] h-[60] mb-1 self-center" />
           <View className="w-full mt-40">
             <Text className="text-white text-[25px] font-pbold relative text-justify">
               Instantly match any outfit to real shopping options.

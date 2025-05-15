@@ -26,3 +26,11 @@ const QueryVerifyCodeSchema = z.object({
 });
 export { QueryVerifyCodeSchema };
 export type VerifyCodeSchemaType = z.infer<typeof VerifyCodeSchema>;
+
+const queryDbSchemaRegisterInProgress = z.tuple([
+  z.object({
+    verification_code: z.string(),
+    verification_code_expiration: z.string(),
+  }),
+]);
+export { queryDbSchemaRegisterInProgress };

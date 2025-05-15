@@ -1,16 +1,18 @@
 import {
-  ScrollView,
   Text,
   View,
   TouchableOpacity,
   Image,
+  ImageSourcePropType,
+  FlatList,
 } from "react-native";
 import React, { useState } from "react";
 import { LogoCircle } from "@/components/LogoCircle";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-import { useRouter } from "expo-router";
-import { useLocalSearchParams } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
+import images from "../../constants/images";
+import { CreateAccountSchemaRes } from "@/schemas/auth/preferences-schema";
+import { safeFetch } from "@/utils/safe-fetch";
 
 const Preferences = () => {
   const router = useRouter();
@@ -23,45 +25,167 @@ const Preferences = () => {
     "and date:",
     dateBirth
   );
-  //   const name = "John Doe";
-  //   const email = "j@gmail.com";
-  //   const dateBirth = "2023-10-01";
-
+  async function handleSubmit() {
+    console.log("Creating an account");
+    const { success } = await createAccount(name, email, dateBirth);
+    if (success) {
+      console.log("Account created successfully");
+      router.push("/home");
+    } else {
+      console.log("Error creating account"); //TODO HANDLEAR MEJOR
+      router.push("/sign-in");
+    }
+  }
+  const [selectedOne, setSelectedOne] = useState<boolean>(false);
   return (
     <SafeAreaView className="bg-brown-strong flex-1 h-full w-full">
-      <ScrollView
-        className="flex-1 w-full h-full"
-        contentContainerStyle={{ flexGrow: 1 }}
-      >
-        <View className="flex flex-grow flex-col w-full justify-between px-14 py-3">
-          <View className="flex flex-col w-full">
-            <LogoCircle classname="w-[60] h-[60] mb-2 self-center" />
-            <Text className="text-white text-[27px] font-pbold text-justify pt-14">
-              We sent you a code
-            </Text>
-            <Text className="text-white text-[27px] font-pbold text-justify pt-14">
-              {`name: ${name}, email: ${email}, date: ${dateBirth}`}
-            </Text>
-          </View>
+      <View className="flex flex-grow flex-col w-full justify-between px-14 pt-3">
+        <View className="flex flex-col w-full">
+          <LogoCircle classname="w-[60] h-[60] mb-1 self-center" />
+          <Text className="text-white text-[27px] font-pbold pt-6">
+            How would you describe your fashion style?
+          </Text>
+          <Text className="text-gray-400 text-[15px] font-pregular pt-3">
+            Pick at least 1 to customize your home feed.
+          </Text>
+          <SelectionList setSelectedOne={setSelectedOne} />
         </View>
-      </ScrollView>
+        <NextButton
+          onPress={() => {
+            handleSubmit();
+          }}
+          codeReady={selectedOne}
+        />
+      </View>
     </SafeAreaView>
   );
 };
 
 export default Preferences;
 
+type ItemData = {
+  title: string;
+  image: ImageSourcePropType;
+};
+
+const DATA: ItemData[] = [
+  {
+    title: "Boho-chic",
+    image: images.bohoChicImage,
+  },
+  {
+    title: "Streetwear",
+    image: images.streetWearImage,
+  },
+  {
+    title: "Sporty",
+    image: images.sportyImage,
+  },
+  {
+    title: "Old money",
+    image: images.oldMoneyImage,
+  },
+  {
+    title: "Minimalist",
+    image: images.minimalistImage,
+  },
+  {
+    title: "Coquette",
+    image: images.coquetteImage,
+  },
+];
+
+const Item = ({
+  item,
+  onPress,
+  textColor,
+  selectedIdxs,
+}: {
+  item: ItemData;
+  onPress: () => void;
+  textColor: string;
+  selectedIdxs: string[];
+}) => {
+  const isSelected = selectedIdxs.includes(item.title);
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      className="w-[50%] flex flex-col items-center justify-center mb-4 "
+    >
+      <Image
+        source={item.image}
+        className={`
+          w-full  
+          h-[160px]        
+          aspect-[1]   
+          rounded-2xl
+          mb-1
+          ${isSelected ? "border-2 border-white" : ""}
+        `}
+        resizeMode="cover"
+      />
+      <Text className="text-gray-400">{item.title}</Text>
+    </TouchableOpacity>
+  );
+};
+
+const SelectionList = ({
+  setSelectedOne,
+}: {
+  setSelectedOne: (value: boolean) => void;
+}) => {
+  const [selectedIdxs, setSelectedIdxs] = useState<string[]>([]);
+
+  function handleOnpress(title: string) {
+    const updated = selectedIdxs.includes(title)
+      ? selectedIdxs.filter((item) => item !== title)
+      : [...selectedIdxs, title];
+
+    setSelectedIdxs(updated);
+    setSelectedOne(updated.length > 0);
+    console.log("Selected items:", updated);
+  }
+
+  const renderItem = ({ item }: { item: ItemData }) => {
+    const color = "black";
+
+    return (
+      <Item
+        item={item}
+        onPress={() => handleOnpress(item.title)}
+        textColor={color}
+        selectedIdxs={selectedIdxs}
+      />
+    );
+  };
+
+  return (
+    <View className="w-full mt-6">
+      <FlatList
+        data={DATA}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.title}
+        extraData={selectedIdxs}
+        numColumns={2}
+        columnWrapperStyle={{
+          justifyContent: "space-between",
+        }}
+      />
+    </View>
+  );
+};
+
 const NextButton = ({
   onPress,
   codeReady,
 }: {
-  onPress?: () => Promise<void> | undefined;
+  onPress?: () => void;
   codeReady?: boolean;
 }) => {
   const isDisabled = !codeReady;
 
   return (
-    <View className="flex flex-row justify-end mb-2">
+    <View className="flex flex-row justify-end mb-4">
       <TouchableOpacity
         disabled={isDisabled}
         onPress={isDisabled ? undefined : onPress}
@@ -82,3 +206,38 @@ const NextButton = ({
     </View>
   );
 };
+
+async function createAccount(
+  code: string,
+  email: string,
+  dateString: string
+): Promise<{ success: boolean }> {
+  try {
+    const IP = process.env.EXPO_PUBLIC_IP || "localhost";
+    const { data } = await safeFetch({
+      url: `http://${IP}:3000/create-account`,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name, email, dateString }),
+      schema: CreateAccountSchemaRes,
+      method: "POST",
+    });
+
+    if (data.error) {
+      console.log("Error:", data.details);
+      throw new Error(data.details);
+    }
+    return {
+      success: true,
+    };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Error:", error.message);
+      throw error;
+    } else {
+      console.error("Unexpected error:", error);
+      throw new Error("Unexpected error");
+    }
+  }
+}

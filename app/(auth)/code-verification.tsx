@@ -6,6 +6,10 @@ import {
   TextInput,
   NativeSyntheticEvent,
   TextInputKeyPressEventData,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -16,7 +20,6 @@ import {
   FormSchemaCodeVerification,
   VerifyCodeSchema,
 } from "@/schemas/auth/code-verification-schema";
-
 import { useRouter } from "expo-router";
 import { safeFetch } from "@/utils/safe-fetch";
 import { useLocalSearchParams } from "expo-router";
@@ -25,18 +28,26 @@ import { LOCAL_IP } from "@/config/api";
 
 const CodeVerification = () => {
   const router = useRouter();
-  const { name, email, dateBirth } = useLocalSearchParams();
-  console.log(
-    "Proceeding with name in code-verification:",
-    name,
-    "and email:",
-    email,
-    "and date:",
-    dateBirth
-  );
-  // const name = "John Doe";
-  // const email = "j@gmail.com";
-  // const dateBirth = "2023-10-01";
+  const params = useLocalSearchParams<{
+    name?: string;
+    email?: string;
+    dateBirth?: string;
+  }>();
+
+  const { name, email, dateBirth } = params;
+
+  // const name = "meli";
+  // const email = "m@fi.uba.ar";
+  // const dateBirth = "2023-10-10";
+  if (
+    typeof name !== "string" ||
+    typeof email !== "string" ||
+    typeof dateBirth !== "string"
+  ) {
+    // console.error("Missing or invalid parameters in CodeVerification:", params);
+    router.replace("/sign-up");
+    return null;
+  }
 
   const [code, setCode] = useState("");
   const [codeReady, setCodeReady] = useState(false);
@@ -55,7 +66,10 @@ const CodeVerification = () => {
 
     const interval = setInterval(() => {
       const now = new Date();
-      const diff = Math.max(0, Math.floor((expirationTime.getTime() - now.getTime()) / 1000));
+      const diff = Math.max(
+        0,
+        Math.floor((expirationTime.getTime() - now.getTime()) / 1000)
+      );
       setSecondsLeft(diff);
 
       if (diff <= 0) {
@@ -80,7 +94,7 @@ const CodeVerification = () => {
         url: `http://${LOCAL_IP}:3000/code-verification`,
         method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ email }),
         schema: ResCodeVerificationPostSchema,
@@ -98,8 +112,6 @@ const CodeVerification = () => {
     }
   }
 
-
-
   async function handleSubmit() {
     const result = FormSchemaCodeVerification.safeParse({
       code,
@@ -113,6 +125,11 @@ const CodeVerification = () => {
     }
     try {
       const emailStr = email?.toString();
+      if (!emailStr) {
+        console.error("Email is not a string");
+        setCodeError("Invalid email");
+        return;
+      }
       const { isCorrect } = await verifyCode(code, emailStr);
       if (isCorrect) {
         console.log("Code is correct");
@@ -147,49 +164,66 @@ const CodeVerification = () => {
     }
   }
   return (
-    <SafeAreaView className="bg-brown-strong flex-1 h-full w-full">
-      <ScrollView
-        className="flex-1 w-full h-full"
-        contentContainerStyle={{ flexGrow: 1 }}
-      >
-        <View className="flex flex-grow flex-col w-full justify-between px-14 py-3">
-          <View className="flex flex-col w-full">
-            <LogoCircle classname="w-[60] h-[60] mb-2 self-center" />
-            <Text className="text-white text-[27px] font-pbold text-justify pt-14">
-              We sent you a code
-            </Text>
-            <Text className="text-gray-500 text-[15px] font-pregular pt-5">
-              Enter it below to verify your email: {email}.
-            </Text>
-            <View className="flex flex-col w-full mt-6 gap-3">
-              <CodeInput
-                length={6}
-                onComplete={(c) => {
-                  setCode(c);
-                }}
-                setCodeReady={setCodeReady}
-                disabled={secondsLeft <= 0}
-              />
-              {codeError && (
-                <Text className="text-red-500 pt-0.5">{codeError}</Text>
-              )}
-            </View>
-            <Text className="text-gray-400 text-[14px] font-pregular pt-2">
-              Code expires in {Math.floor(secondsLeft / 60)}:
-              {(secondsLeft % 60).toString().padStart(2, "0")}
-            </Text>
-            {secondsLeft <= 0 && (
-              <Text className="text-red-500 pt-1 text-[14px]">The code has expired. Please request a new one.</Text>
-            )}
-            <TouchableOpacity onPress={handleResendCode} className="mt-2">
-              <Text className="text-white underline text-[14px]">Resend Code</Text>
-            </TouchableOpacity>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      className="flex-1 "
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <SafeAreaView className="bg-brown-strong flex-1 h-full w-full">
+          <ScrollView
+            className="flex-1 w-full h-full"
+            contentContainerStyle={{ flexGrow: 1 }}
+            keyboardShouldPersistTaps="handled"
+          >
+            <View className="flex flex-grow flex-col w-full justify-between px-14 pt-3">
+              <View className="flex flex-col w-full">
+                <LogoCircle classname="w-[60] h-[60] mb-1 self-center" />
+                <Text className="text-white text-[27px] font-pbold text-justify pt-6">
+                  We sent you a code
+                </Text>
+                <Text className="text-gray-400 text-[15px] font-pregular pt-3">
+                  Enter it below to verify your email: {email}.
+                </Text>
+                <View className="flex flex-col w-full mt-6 gap-3">
+                  <CodeInput
+                    length={6}
+                    onComplete={(c) => {
+                      setCode(c);
+                    }}
+                    setCodeReady={setCodeReady}
+                    disabled={secondsLeft <= 0}
+                    setCodeError={setCodeError}
+                  />
+                  {codeError && (
+                    <Text className="text-red-500 pt-0.5">{codeError}</Text>
+                  )}
+                </View>
+                <Text className="text-gray-400 text-[14px] font-pregular pt-2">
+                  Code expires in {Math.floor(secondsLeft / 60)}:
+                  {(secondsLeft % 60).toString().padStart(2, "0")}
+                </Text>
+                {secondsLeft <= 0 && (
+                  <Text className="text-red-500 pt-1 text-[14px]">
+                    The code has expired. Please request a new one.
+                  </Text>
+                )}
+                <TouchableOpacity onPress={handleResendCode} className="mt-2">
+                  <Text className="text-white underline text-[14px]">
+                    Resend Code
+                  </Text>
+                </TouchableOpacity>
+              </View>
 
-          </View>
-          <NextButton onPress={handleSubmit} codeReady={codeReady} secondsLeft={secondsLeft} />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+              <NextButton
+                onPress={handleSubmit}
+                codeReady={codeReady}
+                secondsLeft={secondsLeft}
+              />
+            </View>
+          </ScrollView>
+        </SafeAreaView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -207,12 +241,12 @@ const NextButton = ({
   const isDisabled = !codeReady || secondsLeft <= 0;
 
   return (
-    <View className="flex flex-row justify-end mb-2">
+    <View className="flex flex-row justify-end mb-0 ">
       <TouchableOpacity
         disabled={isDisabled}
         onPress={isDisabled ? undefined : onPress}
         className={`
-          flex flex-row items-center px-5 py-2 rounded-3xl
+          flex flex-row items-center px-5 py-2 rounded-3xl mb-4
           ${isDisabled ? "bg-gray-400 opacity-50" : "bg-white"}
         `}
       >
@@ -234,6 +268,7 @@ type CodeInputProps = {
   onComplete?: (code: string) => void; // callback cuando se completa
   setCodeReady: (ready: boolean) => void; // callback para avisar que el código está listo
   disabled?: boolean;
+  setCodeError: (error: string | undefined) => void; // callback para manejar errores
 };
 
 export const CodeInput: React.FC<CodeInputProps> = ({
@@ -241,6 +276,7 @@ export const CodeInput: React.FC<CodeInputProps> = ({
   onComplete,
   setCodeReady,
   disabled,
+  setCodeError,
 }) => {
   // estado como array de strings de longitud “length”
   const [code, setCode] = useState<string[]>(Array(length).fill(""));
@@ -250,10 +286,37 @@ export const CodeInput: React.FC<CodeInputProps> = ({
   const inputs = useRef<Array<TextInput | null>>(Array(length).fill(null));
 
   // al cambiar un dígito
-  const handleChange = (char: string, idx: number) => {
-    if (!/^\d$/.test(char)) return; // sólo dígitos 0–9
+  const handleChange = (
+    text: string,
+    idx: number,
+    setCodeError: (error: string | undefined) => void
+  ) => {
+    if (text.length == 6) {
+      // nos quedamos con los primeros `length` caracteres
+      const chars = text.slice(0, length).split("");
+      for (let i = 0; i < chars.length; i++) {
+        const char = chars[i];
+        if (char === undefined || !/^\d$/.test(char)) {
+          setCodeError("Invalid paste code");
+          return;
+        }
+      }
+      setCode(chars);
+      onComplete?.(chars.join(""));
+      setCodeReady(true);
+      inputs.current[length - 1]?.focus();
+      setFocusedIdx(length - 1);
+      return;
+    }
+    if (text.length > 1) {
+      setCodeError(
+        "Paste allow only with one character or six at the same time"
+      );
+      return;
+    }
+    if (!/^\d$/.test(text)) return; // sólo dígitos 0–9
     const newCode = [...code];
-    newCode[idx] = char;
+    newCode[idx] = text;
     setCode(newCode);
 
     // pasamos al siguiente campo
@@ -290,19 +353,10 @@ export const CodeInput: React.FC<CodeInputProps> = ({
       setCode(newCode);
     }
   };
-  // console.log("code NEW:", code);
   return (
     <View className="flex flex-row justify-between w-full self-center">
       {code.map((digit, idx) => {
         const isFocused = focusedIdx === idx;
-        // console.log(
-        //   "isFocused:",
-        //   isFocused,
-        //   " idx:",
-        //   idx,
-        //   "focusedIdx:",
-        //   focusedIdx
-        // );
         return (
           <TextInput
             selectTextOnFocus={false}
@@ -310,10 +364,10 @@ export const CodeInput: React.FC<CodeInputProps> = ({
             pointerEvents={isFocused ? "auto" : "none"}
             ref={(ref) => (inputs.current[idx] = ref)}
             value={digit}
-            onChangeText={(text) => handleChange(text, idx)}
+            onChangeText={(text) => handleChange(text, idx, setCodeError)}
             onKeyPress={(e) => handleKeyPress(e, idx)}
             keyboardType="number-pad"
-            maxLength={1}
+            maxLength={idx === 0 ? length : 1}
             caretHidden={true}
             selectionColor="transparent"
             editable={!disabled}
@@ -328,7 +382,10 @@ export const CodeInput: React.FC<CodeInputProps> = ({
   );
 };
 
-async function verifyCode(code: string, email: string): Promise<{ isCorrect: boolean }> {
+async function verifyCode(
+  code: string,
+  email: string
+): Promise<{ isCorrect: boolean }> {
   try {
     console.log("Local IP:", LOCAL_IP);
     const { data } = await safeFetch({

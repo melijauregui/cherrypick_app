@@ -5,9 +5,8 @@ import {
   TouchableOpacity,
   KeyboardTypeOptions,
   TextInput,
-  Platform
+  Platform,
 } from "react-native";
-import DatePicker from "react-native-date-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from "react";
 import { LogoCircle } from "@/components/LogoCircle";
@@ -17,6 +16,7 @@ import {
   VerifyAvailabilitySchema,
   ResCodeVerificationPostSchema,
 } from "@/schemas/auth/sign-up-schema";
+import DatePicker from "react-native-date-picker";
 import { useRouter } from "expo-router";
 import { LOCAL_IP } from "../../config/api";
 
@@ -74,6 +74,15 @@ const SignIn = () => {
         dateString
       );
 
+      router.push({
+        pathname: "/code-verification",
+        params: {
+          name,
+          email,
+          dateBirth: date.toISOString(),
+        },
+      });
+
       console.log("Sending code verification to email:", emailValue);
       try {
         await postCodeVerification({ email: emailValue });
@@ -84,15 +93,6 @@ const SignIn = () => {
           setEmailError("Unexpected error occurred");
         }
       }
-
-      router.push({
-        pathname: "/code-verification",
-        params: {
-          name,
-          email,
-          dateBirth: date.toISOString(),
-        },
-      });
     } catch (error) {
       if (error instanceof Error) {
         setEmailError(error.message);
@@ -108,10 +108,10 @@ const SignIn = () => {
         className="flex-1 w-full h-full"
         contentContainerStyle={{ flexGrow: 1 }}
       >
-        <View className="flex flex-grow flex-col w-full justify-between px-14 py-3" >
+        <View className="flex flex-grow flex-col w-full justify-between px-14 pt-3">
           <View className="flex flex-col w-full">
-            <LogoCircle classname="w-[60] h-[60] mb-2 self-center" />
-            <Text className="text-white text-[27px] font-pbold text-justify pt-14">
+            <LogoCircle classname="w-[60] h-[60] mb-1 self-center" />
+            <Text className="text-white text-[27px] font-pbold text-justify pt-6">
               Create your account
             </Text>
             <View className="flex flex-col w-full gap-10 mt-4">
@@ -162,7 +162,6 @@ const SignIn = () => {
                   setDateString(undefined);
                 }}
               />
-
             </View>
           </View>
           <NextButton
@@ -173,7 +172,7 @@ const SignIn = () => {
           />
         </View>
       </ScrollView>
-    </SafeAreaView >
+    </SafeAreaView>
   );
 };
 
@@ -193,7 +192,7 @@ const NextButton = ({
   const isDisabled = !name || !email || !date;
 
   return (
-    <View className="flex flex-row justify-end mb-2">
+    <View className="flex flex-row justify-end mb-4">
       <TouchableOpacity
         disabled={isDisabled}
         onPress={isDisabled ? undefined : onPress}
@@ -245,7 +244,6 @@ async function verifyMailAvailability(
   email: string
 ): Promise<{ isAvailable: boolean }> {
   try {
-
     const { data } = await safeFetch({
       url: `http://${LOCAL_IP}:3000/verify-email?email=${email}`,
       schema: VerifyAvailabilitySchema,
@@ -276,7 +274,7 @@ async function postCodeVerification({ email }: { email: string }) {
       url: `http://${LOCAL_IP}:3000/code-verification`,
       method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ email }),
       schema: ResCodeVerificationPostSchema,
