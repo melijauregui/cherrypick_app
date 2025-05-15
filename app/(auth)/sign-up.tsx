@@ -7,6 +7,7 @@ import {
   TextInput,
   Platform
 } from "react-native";
+import DatePicker from "react-native-date-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from "react";
 import { LogoCircle } from "@/components/LogoCircle";
@@ -17,7 +18,6 @@ import {
   ResCodeVerificationPostSchema,
 } from "@/schemas/auth/sign-up-schema";
 import { useRouter } from "expo-router";
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { LOCAL_IP } from "../../config/api";
 
 const SignIn = () => {
@@ -141,27 +141,27 @@ const SignIn = () => {
                 onPress={() => setOpen(true)}
                 error={dateError}
               />
-              {open && (
-                <DateTimePicker
-                  value={date}
-                  mode="date"
-                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                  onChange={(event, selectedDate) => {
-                    setOpen(false);
-                    if (selectedDate) {
-                      setDateError(undefined);
-                      setDate(selectedDate);
-                      setDateString(
-                        selectedDate.toLocaleDateString("es-AR", {
-                          day: "numeric",
-                          month: "long",
-                          year: "numeric",
-                        })
-                      );
-                    }
-                  }}
-                />
-              )}
+              <DatePicker
+                modal
+                open={open}
+                date={date}
+                onConfirm={(date) => {
+                  setDateError(undefined);
+                  setOpen(false);
+                  setDate(date);
+                  setDateString(
+                    date.toLocaleDateString("es-AR", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })
+                  );
+                }}
+                onCancel={() => {
+                  setOpen(false);
+                  setDateString(undefined);
+                }}
+              />
 
             </View>
           </View>
