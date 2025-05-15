@@ -23,7 +23,7 @@ export default Profile;
 
 const LogOutButton = () => {
     const router = useRouter();
-    const { logout } = useAuth(); // ✅ Hook dentro de componente
+    const { logout } = useAuth();
 
     const handleLogout = async () => {
         await logout();
