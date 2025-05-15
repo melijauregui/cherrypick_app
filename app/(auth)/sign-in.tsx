@@ -59,7 +59,11 @@ const GoogleSignInButton = () => {
     iosClientId: process.env.EXPO_PUBLIC_IOS_CLIENT_ID,
     clientId: process.env.EXPO_PUBLIC_EXPO_CLIENT_ID,
     redirectUri: googleRedirectUri,
-
+    responseType: 'code',
+    extraParams: {
+      access_type: 'offline',
+      prompt: 'consent',
+    },
   },
   );
   //console.log("response", response);
@@ -67,10 +71,11 @@ const GoogleSignInButton = () => {
   useEffect(() => {
     const fetchUserInfo = async () => {
       if (response?.type === "success" && response.authentication?.accessToken) {
+        console.log("Token expires at ", response?.authentication?.expiresIn);
         try {
           const userInfoResponse = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
             headers: {
-              Authorization: `Bearer ${response.authentication.accessToken}`,
+              Authorization: `Bearer ${response.authentication?.accessToken}`,
             },
           });
 
@@ -89,7 +94,8 @@ const GoogleSignInButton = () => {
 
           if ('exists' in data && data.exists) {
             console.log("User verification result:", data.user);
-            await SecureStore.setItemAsync("accessToken", response.authentication.accessToken);
+            await SecureStore.setItemAsync("accessToken", response.authentication?.accessToken);
+            await SecureStore.setItemAsync("refreshToken", response.authentication?.refreshToken ?? "");
             router.push("/home");
           }
 
