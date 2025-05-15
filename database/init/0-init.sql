@@ -11,15 +11,13 @@ GRANT ALL PRIVILEGES ON cherrypick_db.* TO 'cherrypick' @'%';
 FLUSH PRIVILEGES;
 
 CREATE TABLE IF NOT EXISTS users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(50) PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
-    email VARCHAR(50) NOT NULL UNIQUE,
-    date_of_birth DATE NOT NULL,
+    date_of_birth DATE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS registerInProgress (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    email VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(50) PRIMARY KEY,
     verification_code VARCHAR(6) NOT NULL,
     verification_code_expiration VARCHAR(30) NOT NULL
 );

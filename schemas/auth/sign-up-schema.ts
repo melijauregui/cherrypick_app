@@ -81,7 +81,6 @@ export const VerifyUserResponseSchema = z.union([
   z.object({
     error: z.literal(false),
     user: z.object({
-      id: z.string(),
       name: z.string(),
       email: z.string(),
       date_of_birth: z.string(),
@@ -97,7 +96,6 @@ export type VerifyUserResponseSchemaType = z.infer<
 >;
 const queryDbSchemaUser = z.tuple([
   z.object({
-    id: z.string(),
     name: z.string(),
     email: z.string(),
     date_of_birth: z.string(),

@@ -119,7 +119,7 @@ app.openapi(verifiedEmailRoute, async (c) => {
   console.log("Verifying email availability:", email);
   try {
     const [rows]: any[] = await db.query(
-      "SELECT id FROM users WHERE email = ?",
+      "SELECT * FROM users WHERE email = ?",
       [email]
     );
     if (rows.length === 0) {
@@ -129,7 +129,7 @@ app.openapi(verifiedEmailRoute, async (c) => {
       };
     } else {
       //chequeo que sea un user valido
-      const parsedRows = queryDbSchemaUser.parse(rows);
+      // const parsedRows = queryDbSchemaUser.parse(rows);
       // Email ya registrado
       res = {
         error: true,
@@ -338,11 +338,6 @@ app.openapi(verifyUserRoute, async (c) => {
   const { email } = c.req.valid("json");
   let res: VerifyUserResponseSchemaType;
 
-  // // ToDo: borrar esto
-  // const [userExistente]: any[] = await db.query("SELECT * FROM users"); //todo safeparse()
-  // return c.json({ exists: true as true, user: userExistente[0] }, 200);
-
-  // ToDo: usar esto
   const [rows]: any[] = await db.query("SELECT * FROM users WHERE email = ?", [
     email,
   ]);
@@ -353,11 +348,10 @@ app.openapi(verifyUserRoute, async (c) => {
     };
   } else {
     const parsedRows = queryDbSchemaUser.parse(rows);
-    const { id, name, email, date_of_birth } = parsedRows[0];
+    const { name, email, date_of_birth } = parsedRows[0];
     res = {
       error: false,
       user: {
-        id: id,
         name: name,
         email: email,
         date_of_birth: date_of_birth,
