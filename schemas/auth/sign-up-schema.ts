@@ -113,6 +113,7 @@ export const BodyUserCreationPostSchema = z.object({
   name: z.string().min(1),
   email: z.string().email(),
   date_of_birth: z.string(), // formato: 'YYYY-MM-DD'
+  preferences: z.array(z.string()),
 });
 
 const VerifyAccountDeletedSchema = z.union([

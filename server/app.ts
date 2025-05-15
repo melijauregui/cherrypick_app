@@ -348,7 +348,7 @@ const createUserRoute = createRoute({
 });
 
 app.openapi(createUserRoute, async (c) => {
-  const { name, email, date_of_birth } = c.req.valid("json");
+  const { name, email, date_of_birth, preferences } = c.req.valid("json");
 
   if (!name || !email) {
     console.error("Missing name or email");
@@ -365,8 +365,8 @@ app.openapi(createUserRoute, async (c) => {
 
     const onlyDate = new Date(date_of_birth).toISOString().slice(0, 10);
     const [result]: any = await db.query(
-      "INSERT INTO users (name, email, date_of_birth) VALUES (?, ?, ?)",
-      [name, email, onlyDate]
+      "INSERT INTO users (name, email, date_of_birth, preferences) VALUES (?, ?, ?, ?)",
+      [name, email, onlyDate, JSON.stringify(preferences)]
     );
     console.log("User created");
 

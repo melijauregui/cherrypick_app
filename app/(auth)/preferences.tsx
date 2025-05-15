@@ -18,6 +18,7 @@ import { useGoogleSignIn } from "@/hooks/useGoogleSignIn";
 
 const Preferences = () => {
   const router = useRouter();
+  const [preferences, setPreferences] = useState<string[]>([]);
   const { name, email, dateBirth } = useLocalSearchParams();
   const { promptGoogleLogin, isReady } = useGoogleSignIn(() => {
     //router.push("/home");
@@ -45,7 +46,7 @@ const Preferences = () => {
       //ToDo: manejar error
       return;
     }
-    const { success } = await createAccount(name, email, dateBirth);
+    const { success } = await createAccount(name, email, dateBirth, preferences);
     if (success) {
       console.log("Account created, now signing in with Google");
       if (isReady) {
@@ -72,7 +73,7 @@ const Preferences = () => {
           <Text className="text-gray-400 text-[15px] font-pregular pt-3">
             Pick at least 1 to customize your home feed.
           </Text>
-          <SelectionList setSelectedOne={setSelectedOne} />
+          <SelectionList setSelectedOne={setSelectedOne} setPreferences={setPreferences} />
         </View>
         <NextButton
           onPress={() => {
@@ -155,8 +156,10 @@ const Item = ({
 
 const SelectionList = ({
   setSelectedOne,
+  setPreferences,
 }: {
   setSelectedOne: (value: boolean) => void;
+  setPreferences: (value: string[]) => void;
 }) => {
   const [selectedIdxs, setSelectedIdxs] = useState<string[]>([]);
 
@@ -167,6 +170,7 @@ const SelectionList = ({
 
     setSelectedIdxs(updated);
     setSelectedOne(updated.length > 0);
+    setPreferences(updated);
     console.log("Selected items:", updated);
   }
 
@@ -234,7 +238,8 @@ const NextButton = ({
 async function createAccount(
   name: string,
   email: string,
-  dateString: string
+  dateString: string,
+  preferences: string[]
 ): Promise<{ success: boolean }> {
   try {
     const { data } = await safeFetch({
@@ -242,7 +247,7 @@ async function createAccount(
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ name, email, date_of_birth: dateString }),
+      body: JSON.stringify({ name, email, date_of_birth: dateString, preferences }),
       schema: CreateAccountSchemaRes,
       method: "POST",
     });
