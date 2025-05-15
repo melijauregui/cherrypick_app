@@ -146,10 +146,10 @@ def test_text_clasification(probabilities, image_paths, has, clasification_img, 
             best_idx = j
 
     print(
-        f"mayor no rotura es {image_names[best_idx]} con {max_no_rotura} de probabilidad")
+        f"mayor red flag es {image_names[best_idx]} con {max_no_rotura} de probabilidad")
     if best_idx_yellow_flag is not None:
         print(
-            f"mayor no rotura es {image_names[best_idx_yellow_flag]} con {max_yellow_flag} de probabilidad")
+            f"mayor yellow flag es {image_names[best_idx_yellow_flag]} con {max_yellow_flag} de probabilidad")
     correct = 0
     correct_aprox = 0
     total = len(rotura_imgs)

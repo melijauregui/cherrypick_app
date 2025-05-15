@@ -1,4 +1,6 @@
 import fs from "fs";
+import nodemailer from "nodemailer";
+import { randomInt } from "crypto";
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import {
   callVGGNet,
@@ -13,16 +15,18 @@ import {
   VerifyAvailabilitySchemaType,
   ResCodeVerificationPostSchema,
   BodyCodeVerificationPostSchema,
-  ResCodeVerificationPostSchemaType,
+  ErrorResponseSchema,
 } from "../schemas/auth/sign-up-schema";
 import {
   QueryVerifyCodeSchema,
   VerifyCodeSchema,
   VerifyCodeSchemaType,
+  queryDbSchema,
 } from "../schemas/auth/code-verification-schema";
-
+import { db } from "./db";
 const app = new OpenAPIHono();
 export default app;
+import { RowDataPacket } from "mysql2/promise";
 
 // endpoint que recibe una imagen y devuelve los 10 resultados más similares paginados WIP
 const routeVector = createRoute({
@@ -102,40 +106,61 @@ const verifiedEmailRoute = createRoute({
 app.openapi(verifiedEmailRoute, async (c) => {
   const { email } = c.req.valid("query");
   let res: VerifyAvailabilitySchemaType;
+  console.log("Verifying email availability:", email);
+  try {
+    const [rows]: any[] = await db.query(
+      "SELECT id FROM users WHERE email = ?",
+      [email]
+    );
 
-  if (!verifyGoogleMail(email)) {
-    // Simulación de un email no registrado en google
-    console.log("Email not registered in Google");
-    res = {
-      error: true,
-      details: "Email not registered in Google",
-    };
-  } else {
-    console.log("Email registered in Google");
-    if (email === "p@gmail.com") {
-      console.log("Email registered in the database");
-      // Simulación de un email no registrado en la base de datos
+    if (rows.length > 0) {
+      // Email ya registrado
       res = {
         error: false,
         isAvailable: false,
       };
     } else {
-      console.log("Email not registered in the database");
-      // Simulación de un email registrado en la base de datos
+      // Email disponible para registrar
       res = {
         error: false,
         isAvailable: true,
       };
     }
+  } catch (err) {
+    console.error("Error checking email:", err);
+    res = {
+      error: true,
+      details: "Error querying the database",
+    };
   }
+  /* 
+    if (!verifyGoogleMail(email)) {
+      // Simulación de un email no registrado en google
+      console.log("Email not registered in Google");
+      res = {
+        error: true,
+        details: "Email not registered in Google",
+      };
+    } else {
+      console.log("Email registered in Google");
+      if (email === "p@gmail.com") {
+        console.log("Email registered in the database");
+        // Simulación de un email no registrado en la base de datos
+        res = {
+          error: false,
+          isAvailable: false,
+        };
+      } else {
+        console.log("Email not registered in the database");
+        // Simulación de un email registrado en la base de datos
+        res = {
+          error: false,
+          isAvailable: true,
+        };
+      }
+    } */
   return c.json(res, 200);
 });
-
-function verifyGoogleMail(email: string): boolean {
-  // Simulación de verificación de un email registrado en Google
-  const googleEmails = ["m@gmail.com", "s@gmail.com", "p@gmail.com"];
-  return googleEmails.includes(email);
-}
 
 // endpoint que publica un nuevo code-verification
 const codeVerificationRoute = createRoute({
@@ -156,32 +181,93 @@ const codeVerificationRoute = createRoute({
         },
       },
       description:
-        "Devuelve un booleano que indica si el codigo de verificación es correcto",
+        "Devuelve un booleano que indica si se pudo enviar el código de verificación",
+    },
+    404: {
+      description: "Mail incorrecto",
+      content: {
+        "application/json": {
+          schema: ErrorResponseSchema,
+        },
+      },
+    },
+    500: {
+      description: "Error del servidor",
+      content: {
+        "application/json": {
+          schema: ErrorResponseSchema,
+        },
+      },
     },
   },
 });
 app.openapi(codeVerificationRoute, async (c) => {
-  const { email } = c.req.valid("json");
-  let res: ResCodeVerificationPostSchemaType;
+  const { email } = await c.req.valid("json");
+  const code = generateVerificationCode();
+  const emailSent = await sendEmail(email, code);
 
-  // Simulación de verificación de un código
-  if (!creteCode(email)) {
-    console.log("Code failed");
-    res = {
-      error: true,
-      details: "Code failed",
-    };
-  } else {
-    console.log("Code success");
-    res = {
-      error: false,
-    };
+  if (!emailSent) {
+    return c.json({ error: true as true, details: "Invalid email" }, 404);
   }
-  return c.json(res, 200);
+
+  // Guardar (o reemplazar) en DB
+  try {
+    const expirationTime = new Date();
+    expirationTime.setMinutes(expirationTime.getMinutes() + 3); // Expira en 3 minutos
+    const expirationString = expirationTime.toISOString(); // "2025-05-14T18:30:00.000Z"
+    await db.query(
+      `
+      INSERT INTO registerInProgress (email, verification_code, verification_code_expiration)
+      VALUES (?, ?, ?)
+      ON DUPLICATE KEY UPDATE verification_code = VALUES(verification_code), verification_code_expiration = VALUES(verification_code_expiration)
+      `,
+      [email, code, expirationString]
+    );
+
+    return c.json({ error: false as false }, 200);
+  } catch (err) {
+    console.error("Error al guardar código:", err);
+    return c.json(
+      { error: true as true, details: "Error al guardar en la base" },
+      500
+    );
+  }
 });
 
-function creteCode(email: string): boolean {
-  return true;
+function generateVerificationCode(): string {
+  return String(randomInt(100000, 999999));
+}
+
+export async function sendEmail(email: string, code: string): Promise<boolean> {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+
+    console.log("Enviando correo a:", email);
+    const info = await transporter.sendMail({
+      from: `"Cherrypick" <${process.env.SMTP_USER}>`,
+      to: email,
+      subject: "Verify your email address",
+      text: `Thank you for signing up for CherryPick!\n\nTo complete your account setup, please enter the following verification code on our app:\n\n${code}\n\nThanks,\nthe CherryPick Team.`,
+      html: `
+        <p>Thank you for signing up for <strong>CherryPick</strong>!</p>
+        <p>To complete your account setup, please enter the following verification code on our app:</p>
+        <p><strong>${code}</strong></p>
+        <p>Thanks,<br>The <strong>CherryPick</strong> Team</p>
+      `,
+    });
+
+    console.log("Correo enviado:", info.messageId);
+    return true;
+  } catch (error) {
+    console.error("Error enviando correo:", error);
+    return false;
+  }
 }
 
 // endpoint que verifica si el code de verificación es correcto
@@ -201,31 +287,57 @@ const verifiedCodeRoute = createRoute({
       description:
         "Devuelve un booleano que indica si el codigo de verificación es correcto",
     },
+    404: {
+      description: "Código incorrecto",
+      content: {
+        "application/json": {
+          schema: ErrorResponseSchema,
+        },
+      },
+    },
+    500: {
+      description: "Error del servidor",
+      content: {
+        "application/json": {
+          schema: ErrorResponseSchema,
+        },
+      },
+    },
   },
 });
 app.openapi(verifiedCodeRoute, async (c) => {
-  const { code } = c.req.valid("query");
-  let res: VerifyCodeSchemaType;
+  const { code, email } = c.req.valid("query");
 
-  // Simulación de verificación de un código
-  if (!verifyCode(code)) {
-    console.log("Code is incorrect");
-    res = {
-      error: true,
-      details: "Code is incorrect",
-    };
-  } else {
-    console.log("Code is correct");
-    res = {
-      error: false,
-      isCorrect: true,
-    };
+  try {
+    const [rows] = await db.query(
+      `SELECT verification_code, verification_code_expiration FROM registerInProgress WHERE email = ?`,
+      [email]
+    );
+    const parsedRows = queryDbSchema.parse(rows);
+
+    const { verification_code, verification_code_expiration } = parsedRows[0];
+
+    if (verification_code !== code) {
+      return c.json(
+        { error: true as true, details: "Invalid verification code" },
+        404
+      );
+    }
+
+    if (new Date() > new Date(verification_code_expiration)) {
+      return c.json(
+        { error: true as true, details: "Verification code expired" },
+        404
+      );
+    }
+
+    await db.query("DELETE FROM registerInProgress WHERE email = ?", [email]);
+
+    console.log("Código de verificación correcto");
+
+    return c.json({ error: false as false, isCorrect: true }, 200);
+  } catch (err) {
+    console.error("Error al verificar código:", err);
+    return c.json({ error: true as true, details: "DB error" }, 500);
   }
-  return c.json(res, 200);
 });
-
-function verifyCode(code: string): boolean {
-  // Simulación de verificación de un email registrado en Google
-  const googleCodes = ["123456", "000000", "111111"];
-  return googleCodes.includes(code);
-}

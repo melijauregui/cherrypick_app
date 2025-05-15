@@ -1,0 +1,11 @@
+services:
+
+  cherrypick:
+    container_name: cherrypick_db # Service name of the database
+    build:
+      context: ./database
+    ports:
+      - ${DATABASE_PORT}:3306
+    env_file:
+      - ./database/.env
+    restart: unless-stopped

@@ -50,10 +50,18 @@ const ResCodeVerificationPostSchema = z.union([
     details: z.string(),
   }),
 ]);
+
+const ErrorResponseSchema = z.object({
+  error: z.literal(true),
+  details: z.string(),
+});
+
 export { ResCodeVerificationPostSchema };
 export type ResCodeVerificationPostSchemaType = z.infer<
   typeof ResCodeVerificationPostSchema
 >;
+export { ErrorResponseSchema };
+export type ErrorResponseSchemaType = z.infer<typeof ErrorResponseSchema>;
 
 const BodyCodeVerificationPostSchema = z.object({
   email: z

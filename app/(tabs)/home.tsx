@@ -5,7 +5,7 @@ import { ClothingItemComponent } from "@/components/ClothingItemComponent";
 
 const Home = () => {
 
-  
+
   const [clothingItems, setClothingItems] = useState<Metadata[]>([]);
 
   useEffect(() => {
@@ -20,22 +20,22 @@ const Home = () => {
 
   return (
     <SafeAreaProvider>
-    <SafeAreaView className="bg-brown-strong w-full flex-1 "  >
-      <MasonryFlashList
-        data={clothingItems}
-        numColumns={2}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingVertical: 10}}
-        renderItem={({item, index}: {item: Metadata, index: number}) => <ClothingItemComponent
-          i={index}
-          key={index}
-          id={(index).toString()}
-          url={item.image_url}
-        />}
-        onEndReachedThreshold={0.1}
-      />
-    </SafeAreaView>
-  </SafeAreaProvider>
+      <SafeAreaView className="bg-brown-strong w-full flex-1 "  >
+        <MasonryFlashList
+          data={clothingItems}
+          numColumns={2}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingVertical: 10 }}
+          renderItem={({ item, index }: { item: Metadata, index: number }) => <ClothingItemComponent
+            i={index}
+            key={index}
+            id={(index).toString()}
+            url={item.image_url}
+          />}
+          onEndReachedThreshold={0.1}
+        />
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 };
 export default Home;
@@ -45,16 +45,17 @@ interface Metadata {
   description: string;
   image_url: string;
   url: string;
-  type : string;
+  type: string;
 }
 export type { Metadata };
-async function getClothingItems(): Promise<Metadata[]>  {
+async function getClothingItems(): Promise<Metadata[]> {
   const page = "2";
   const limit = "10";
 
   try {
+    const IP = process.env.EXPO_PUBLIC_IP || "localhost";
     const response: Response = await fetch(
-      `http://localhost:3000/all?page=${page}&limit=${limit}`,
+      `http://${IP}:3000/all?page=${page}&limit=${limit}`,
       {
         method: "GET",
       }

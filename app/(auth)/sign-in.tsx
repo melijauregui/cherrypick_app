@@ -1,11 +1,11 @@
 import {
-  SafeAreaView,
   ScrollView,
   Text,
   View,
   TouchableOpacity,
   Image,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useEffect } from "react";
 import React, { useState } from "react";
 import { LogoCircle } from "@/components/LogoCircle";

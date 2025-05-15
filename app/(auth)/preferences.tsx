@@ -1,5 +1,4 @@
 import {
-  SafeAreaView,
   Text,
   View,
   TouchableOpacity,
@@ -11,6 +10,7 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { LogoCircle } from "@/components/LogoCircle";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import images from "../../constants/images";
 

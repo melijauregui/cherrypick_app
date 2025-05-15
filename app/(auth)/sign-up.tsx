@@ -1,14 +1,15 @@
 import {
-  SafeAreaView,
   ScrollView,
   Text,
   View,
   TouchableOpacity,
   KeyboardTypeOptions,
+  TextInput,
+  Platform,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from "react";
 import { LogoCircle } from "@/components/LogoCircle";
-import { TextInput } from "react-native";
 import { safeFetch } from "@/utils/safe-fetch";
 import {
   FormSchemaSignUp,
@@ -17,7 +18,6 @@ import {
 } from "@/schemas/auth/sign-up-schema";
 import DatePicker from "react-native-date-picker";
 import { useRouter } from "expo-router";
-
 const SignIn = () => {
   const router = useRouter();
   const [name, setName] = useState<string>();
@@ -36,6 +36,7 @@ const SignIn = () => {
       dateString,
     });
     if (!result.success) {
+      //console.log("Validation failed:", result.error);
       const nameError = result.error.issues.find(
         (issue) => issue.path[0] === "name"
       );
@@ -52,7 +53,6 @@ const SignIn = () => {
     }
 
     const { name: nameValue, email: emailValue } = result.data;
-
     try {
       const { isAvailable } = await verifyMailAvailability(emailValue);
       if (isAvailable) {
@@ -72,6 +72,16 @@ const SignIn = () => {
         dateString
       );
 
+      router.push({
+        pathname: "/code-verification",
+        params: {
+          name,
+          email,
+          dateBirth: date.toISOString(),
+        },
+      });
+
+      console.log("Sending code verification to email:", emailValue);
       try {
         await postCodeVerification({ email: emailValue });
       } catch (error) {
@@ -81,15 +91,6 @@ const SignIn = () => {
           setEmailError("Unexpected error occurred");
         }
       }
-
-      router.push({
-        pathname: "/code-verification",
-        params: {
-          name,
-          email,
-          dateBirth: date.toISOString(),
-        },
-      });
     } catch (error) {
       if (error instanceof Error) {
         setEmailError(error.message);
@@ -241,8 +242,9 @@ async function verifyMailAvailability(
   email: string
 ): Promise<{ isAvailable: boolean }> {
   try {
+    const IP = process.env.EXPO_PUBLIC_IP || "localhost";
     const { data } = await safeFetch({
-      url: `http://localhost:3000/verify-email?email=${email}`,
+      url: `http://${IP}:3000/verify-email?email=${email}`,
       schema: VerifyAvailabilitySchema,
       method: "GET",
     });
@@ -267,9 +269,13 @@ async function verifyMailAvailability(
 
 async function postCodeVerification({ email }: { email: string }) {
   try {
+    const IP = process.env.EXPO_PUBLIC_IP || "localhost";
     const { data } = await safeFetch({
-      url: `http://localhost:3000/code-verification`,
+      url: `http://${IP}:3000/code-verification`,
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({ email }),
       schema: ResCodeVerificationPostSchema,
     });

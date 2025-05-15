@@ -1,45 +1,121 @@
 import {
-  SafeAreaView,
   ScrollView,
   Text,
   View,
   TouchableOpacity,
-  Image,
+  TextInput,
+  NativeSyntheticEvent,
+  TextInputKeyPressEventData,
 } from "react-native";
-import { useRef } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+import { useEffect, useRef } from "react";
 import React, { useState } from "react";
 import { LogoCircle } from "@/components/LogoCircle";
 import {
   FormSchemaCodeVerification,
   VerifyCodeSchema,
 } from "@/schemas/auth/code-verification-schema";
-import {
-  TextInput,
-  NativeSyntheticEvent,
-  TextInputKeyPressEventData,
-} from "react-native";
+
 import { useRouter } from "expo-router";
 import { safeFetch } from "@/utils/safe-fetch";
 import { useLocalSearchParams } from "expo-router";
+import { ResCodeVerificationPostSchema } from "@/schemas/auth/sign-up-schema";
 
 const CodeVerification = () => {
   const router = useRouter();
-  // const { name, email, dateBirth } = useLocalSearchParams();
-  // console.log(
-  //   "Proceeding with name in code-verification:",
-  //   name,
-  //   "and email:",
-  //   email,
-  //   "and date:",
-  //   dateBirth
-  // );
-  const name = "John Doe";
-  const email = "j@gmail.com";
-  const dateBirth = "2023-10-01";
+  const params = useLocalSearchParams<{
+    name?: string;
+    email?: string;
+    dateBirth?: string;
+  }>();
+
+  const { name, email, dateBirth } = params;
+  console.log(
+    "Proceeding with name in code-verification:",
+    name,
+    "and email:",
+    email,
+    "and date:",
+    dateBirth
+  );
+
+  // Guard para que sean strings (y no null, undefined o array)
+  if (
+    typeof name !== "string" ||
+    typeof email !== "string" ||
+    typeof dateBirth !== "string"
+  ) {
+    console.error("Missing or invalid parameters in CodeVerification:", params);
+    // opcional: rediriges al usuario a la pantalla anterior
+    router.replace("/sign-up");
+    return null;
+  }
 
   const [code, setCode] = useState("");
   const [codeReady, setCodeReady] = useState(false);
   const [codeError, setCodeError] = useState<string | undefined>(undefined);
+  const expiration = new Date();
+  expiration.setMinutes(expiration.getMinutes() + 3); // Expira en 3 minutos
+  const [expirationTime, setExpirationTime] = useState<Date>(expiration);
+  const [secondsLeft, setSecondsLeft] = useState<number>(
+    Math.max(0, Math.floor((expiration.getTime() - Date.now()) / 1000))
+  );
+
+  useEffect(() => {
+    if (secondsLeft <= 0) {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      const now = new Date();
+      const diff = Math.max(
+        0,
+        Math.floor((expirationTime.getTime() - now.getTime()) / 1000)
+      );
+      setSecondsLeft(diff);
+
+      if (diff <= 0) {
+        clearInterval(interval);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [secondsLeft, expirationTime]);
+
+  async function handleResendCode() {
+    try {
+      // Reiniciar el tiempo
+      const newExpiration = new Date();
+      newExpiration.setMinutes(newExpiration.getMinutes() + 3);
+      setExpirationTime(newExpiration);
+      setSecondsLeft(180);
+      setCodeError(undefined);
+      setCode("");
+
+      const IP = process.env.EXPO_PUBLIC_IP || "localhost";
+      const { data } = await safeFetch({
+        url: `http://${IP}:3000/code-verification`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+        schema: ResCodeVerificationPostSchema,
+      });
+
+      if (data.error) {
+        console.log("Error:", data.details);
+        throw new Error(data.details);
+      }
+
+      console.log("Código reenviado");
+    } catch (error) {
+      console.error("Error al reenviar código:", error);
+      setCodeError("Failed to resend code.");
+    }
+  }
+
   async function handleSubmit() {
     const result = FormSchemaCodeVerification.safeParse({
       code,
@@ -52,7 +128,13 @@ const CodeVerification = () => {
       return;
     }
     try {
-      const { isCorrect } = await verifyCode(code);
+      const emailStr = email?.toString();
+      if (!emailStr) {
+        console.error("Email is not a string");
+        setCodeError("Invalid email");
+        return;
+      }
+      const { isCorrect } = await verifyCode(code, emailStr);
       if (isCorrect) {
         console.log("Code is correct");
       } else {
@@ -107,13 +189,32 @@ const CodeVerification = () => {
                   setCode(c);
                 }}
                 setCodeReady={setCodeReady}
+                disabled={secondsLeft <= 0}
               />
               {codeError && (
                 <Text className="text-red-500 pt-0.5">{codeError}</Text>
               )}
             </View>
+            <Text className="text-gray-400 text-[14px] font-pregular pt-2">
+              Code expires in {Math.floor(secondsLeft / 60)}:
+              {(secondsLeft % 60).toString().padStart(2, "0")}
+            </Text>
+            {secondsLeft <= 0 && (
+              <Text className="text-red-500 pt-1 text-[14px]">
+                The code has expired. Please request a new one.
+              </Text>
+            )}
+            <TouchableOpacity onPress={handleResendCode} className="mt-2">
+              <Text className="text-white underline text-[14px]">
+                Resend Code
+              </Text>
+            </TouchableOpacity>
           </View>
-          <NextButton onPress={handleSubmit} codeReady={codeReady} />
+          <NextButton
+            onPress={handleSubmit}
+            codeReady={codeReady}
+            secondsLeft={secondsLeft}
+          />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -125,11 +226,13 @@ export default CodeVerification;
 const NextButton = ({
   onPress,
   codeReady,
+  secondsLeft,
 }: {
   onPress?: () => Promise<void> | undefined;
   codeReady?: boolean;
+  secondsLeft: number;
 }) => {
-  const isDisabled = !codeReady;
+  const isDisabled = !codeReady || secondsLeft <= 0;
 
   return (
     <View className="flex flex-row justify-end mb-2">
@@ -158,12 +261,14 @@ type CodeInputProps = {
   length?: number; // cuántos dígitos
   onComplete?: (code: string) => void; // callback cuando se completa
   setCodeReady: (ready: boolean) => void; // callback para avisar que el código está listo
+  disabled?: boolean;
 };
 
 export const CodeInput: React.FC<CodeInputProps> = ({
   length = 6,
   onComplete,
   setCodeReady,
+  disabled,
 }) => {
   // estado como array de strings de longitud “length”
   const [code, setCode] = useState<string[]>(Array(length).fill(""));
@@ -239,6 +344,7 @@ export const CodeInput: React.FC<CodeInputProps> = ({
             maxLength={1}
             caretHidden={true}
             selectionColor="transparent"
+            editable={!disabled}
             className={`
               w-[40px] h-[50px] border-b-2 text-center text-white text-[24px]
               ${isFocused ? "border-white" : "border-gray-500"}
@@ -250,10 +356,14 @@ export const CodeInput: React.FC<CodeInputProps> = ({
   );
 };
 
-async function verifyCode(code: string): Promise<{ isCorrect: boolean }> {
+async function verifyCode(
+  code: string,
+  email: string
+): Promise<{ isCorrect: boolean }> {
   try {
+    const IP = process.env.EXPO_PUBLIC_IP || "localhost";
     const { data } = await safeFetch({
-      url: `http://localhost:3000/verify-code?code=${code}`,
+      url: `http://${IP}:3000/verify-code?code=${code}&email=${email}`,
       schema: VerifyCodeSchema,
       method: "GET",
     });

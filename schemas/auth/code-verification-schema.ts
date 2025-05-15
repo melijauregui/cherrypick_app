@@ -22,6 +22,15 @@ export { VerifyCodeSchema };
 
 const QueryVerifyCodeSchema = z.object({
   code: z.preprocess((val) => val?.toString(), z.string()),
+  email: z.preprocess((val) => val?.toString(), z.string()),
 });
 export { QueryVerifyCodeSchema };
 export type VerifyCodeSchemaType = z.infer<typeof VerifyCodeSchema>;
+
+const queryDbSchema = z.tuple([
+  z.object({
+    verification_code: z.string(),
+    verification_code_expiration: z.string(),
+  }),
+]);
+export { queryDbSchema };
