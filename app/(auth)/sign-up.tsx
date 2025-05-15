@@ -106,7 +106,7 @@ const SignIn = () => {
         className="flex-1 w-full h-full"
         contentContainerStyle={{ flexGrow: 1 }}
       >
-        <View className="flex flex-grow flex-col w-full justify-between px-14 py-3">
+        <View className="flex flex-grow flex-col w-full justify-between px-14 pt-3">
           <View className="flex flex-col w-full">
             <LogoCircle classname="w-[60] h-[60] mb-1 self-center" />
             <Text className="text-white text-[27px] font-pbold text-justify pt-6">
@@ -190,7 +190,7 @@ const NextButton = ({
   const isDisabled = !name || !email || !date;
 
   return (
-    <View className="flex flex-row justify-end mb-2">
+    <View className="flex flex-row justify-end mb-4">
       <TouchableOpacity
         disabled={isDisabled}
         onPress={isDisabled ? undefined : onPress}

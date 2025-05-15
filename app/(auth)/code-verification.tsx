@@ -6,6 +6,10 @@ import {
   TextInput,
   NativeSyntheticEvent,
   TextInputKeyPressEventData,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -16,7 +20,6 @@ import {
   FormSchemaCodeVerification,
   VerifyCodeSchema,
 } from "@/schemas/auth/code-verification-schema";
-
 import { useRouter } from "expo-router";
 import { safeFetch } from "@/utils/safe-fetch";
 import { useLocalSearchParams } from "expo-router";
@@ -161,57 +164,66 @@ const CodeVerification = () => {
     }
   }
   return (
-    <SafeAreaView className="bg-brown-strong flex-1 h-full w-full">
-      <ScrollView
-        className="flex-1 w-full h-full"
-        contentContainerStyle={{ flexGrow: 1 }}
-      >
-        <View className="flex flex-grow flex-col w-full justify-between px-14 py-3">
-          <View className="flex flex-col w-full">
-            <LogoCircle classname="w-[60] h-[60] mb-1 self-center" />
-            <Text className="text-white text-[27px] font-pbold text-justify pt-6">
-              We sent you a code
-            </Text>
-            <Text className="text-gray-400 text-[15px] font-pregular pt-3">
-              Enter it below to verify your email: {email}.
-            </Text>
-            <View className="flex flex-col w-full mt-6 gap-3">
-              <CodeInput
-                length={6}
-                onComplete={(c) => {
-                  setCode(c);
-                }}
-                setCodeReady={setCodeReady}
-                disabled={secondsLeft <= 0}
-                setCodeError={setCodeError}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      className="flex-1 "
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <SafeAreaView className="bg-brown-strong flex-1 h-full w-full">
+          <ScrollView
+            className="flex-1 w-full h-full"
+            contentContainerStyle={{ flexGrow: 1 }}
+            keyboardShouldPersistTaps="handled"
+          >
+            <View className="flex flex-grow flex-col w-full justify-between px-14 pt-3">
+              <View className="flex flex-col w-full">
+                <LogoCircle classname="w-[60] h-[60] mb-1 self-center" />
+                <Text className="text-white text-[27px] font-pbold text-justify pt-6">
+                  We sent you a code
+                </Text>
+                <Text className="text-gray-400 text-[15px] font-pregular pt-3">
+                  Enter it below to verify your email: {email}.
+                </Text>
+                <View className="flex flex-col w-full mt-6 gap-3">
+                  <CodeInput
+                    length={6}
+                    onComplete={(c) => {
+                      setCode(c);
+                    }}
+                    setCodeReady={setCodeReady}
+                    disabled={secondsLeft <= 0}
+                    setCodeError={setCodeError}
+                  />
+                  {codeError && (
+                    <Text className="text-red-500 pt-0.5">{codeError}</Text>
+                  )}
+                </View>
+                <Text className="text-gray-400 text-[14px] font-pregular pt-2">
+                  Code expires in {Math.floor(secondsLeft / 60)}:
+                  {(secondsLeft % 60).toString().padStart(2, "0")}
+                </Text>
+                {secondsLeft <= 0 && (
+                  <Text className="text-red-500 pt-1 text-[14px]">
+                    The code has expired. Please request a new one.
+                  </Text>
+                )}
+                <TouchableOpacity onPress={handleResendCode} className="mt-2">
+                  <Text className="text-white underline text-[14px]">
+                    Resend Code
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              <NextButton
+                onPress={handleSubmit}
+                codeReady={codeReady}
+                secondsLeft={secondsLeft}
               />
-              {codeError && (
-                <Text className="text-red-500 pt-0.5">{codeError}</Text>
-              )}
             </View>
-            <Text className="text-gray-400 text-[14px] font-pregular pt-2">
-              Code expires in {Math.floor(secondsLeft / 60)}:
-              {(secondsLeft % 60).toString().padStart(2, "0")}
-            </Text>
-            {secondsLeft <= 0 && (
-              <Text className="text-red-500 pt-1 text-[14px]">
-                The code has expired. Please request a new one.
-              </Text>
-            )}
-            <TouchableOpacity onPress={handleResendCode} className="mt-2">
-              <Text className="text-white underline text-[14px]">
-                Resend Code
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <NextButton
-            onPress={handleSubmit}
-            codeReady={codeReady}
-            secondsLeft={secondsLeft}
-          />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+          </ScrollView>
+        </SafeAreaView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -229,12 +241,12 @@ const NextButton = ({
   const isDisabled = !codeReady || secondsLeft <= 0;
 
   return (
-    <View className="flex flex-row justify-end mb-2">
+    <View className="flex flex-row justify-end mb-0 ">
       <TouchableOpacity
         disabled={isDisabled}
         onPress={isDisabled ? undefined : onPress}
         className={`
-          flex flex-row items-center px-5 py-2 rounded-3xl
+          flex flex-row items-center px-5 py-2 rounded-3xl mb-4
           ${isDisabled ? "bg-gray-400 opacity-50" : "bg-white"}
         `}
       >
