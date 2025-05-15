@@ -14,10 +14,14 @@ import images from "../../constants/images";
 import { CreateAccountSchemaRes } from "@/schemas/auth/preferences-schema";
 import { safeFetch } from "@/utils/safe-fetch";
 import { LOCAL_IP } from "@/config/api";
+import { useGoogleSignIn } from "@/hooks/useGoogleSignIn";
 
 const Preferences = () => {
   const router = useRouter();
   const { name, email, dateBirth } = useLocalSearchParams();
+  const { promptGoogleLogin, isReady } = useGoogleSignIn(() => {
+    //router.push("/home");
+  });
   console.log(
     "Proceeding with name in code-verification:",
     name,
@@ -31,17 +35,28 @@ const Preferences = () => {
     if (
       typeof name !== "string" ||
       typeof email !== "string" ||
-      dateBirth !== "string"
+      typeof dateBirth !== "string"
     ) {
+      console.log(
+        "Invalid parameters in preferences screen:",
+        name,
+        email,
+        dateBirth);
       //ToDo: manejar error
       return;
     }
     const { success } = await createAccount(name, email, dateBirth);
     if (success) {
-      console.log("Account created successfully");
-      router.push("/home");
+      console.log("Account created, now signing in with Google");
+      if (isReady) {
+        await promptGoogleLogin();
+        router.replace("/home");
+      } else {
+        console.log("Google sign-in not ready");
+        router.push("/sign-in");
+      }
     } else {
-      console.log("Error creating account"); //TODO HANDLEAR MEJOR
+      console.log("Account creation failed");
       router.push("/sign-in");
     }
   }
@@ -49,7 +64,7 @@ const Preferences = () => {
   return (
     <SafeAreaView className="bg-brown-strong flex-1 h-full w-full">
       <View className="flex flex-grow flex-col w-full justify-between px-14 pt-3">
-        <View className="flex flex-col w-full">
+        <View className="flex-1 flex-col w-full">
           <LogoCircle classname="w-[60] h-[60] mb-1 self-center" />
           <Text className="text-white text-[27px] font-pbold pt-6">
             How would you describe your fashion style?
@@ -169,7 +184,7 @@ const SelectionList = ({
   };
 
   return (
-    <View className="w-full mt-6">
+    <View className="w-full mt-6 flex-1">
       <FlatList
         data={DATA}
         renderItem={renderItem}
@@ -227,7 +242,7 @@ async function createAccount(
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ name, email, dateString }),
+      body: JSON.stringify({ name, email, date_of_birth: dateString }),
       schema: CreateAccountSchemaRes,
       method: "POST",
     });

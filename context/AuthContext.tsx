@@ -65,12 +65,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             return newAccessToken;
         } catch (err) {
             console.error("Refresh token error:", err);
-            await logout();
+            await SecureStore.deleteItemAsync("accessToken");
             return null;
         }
     };
 
     const checkSession = async () => {
+        console.log("Checking session...");
         let token = await SecureStore.getItemAsync("accessToken");
 
         if (!token) {
@@ -106,7 +107,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 if (retryData.email) {
                     setUser({ ...retryData });
                 } else {
-                    await logout();
+                    await SecureStore.deleteItemAsync("accessToken");
                 }
                 setLoading(false);
                 return;
@@ -115,6 +116,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             const data = await res.json();
             if (data.email) {
                 setUser({ ...data, token });
+                console.log("User already logged in")
+
             } else {
                 await SecureStore.deleteItemAsync("accessToken");
             }

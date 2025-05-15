@@ -82,7 +82,6 @@ export const VerifyUserResponseSchema = z.union([
     exists: z.boolean(),
     user: z
       .object({
-        id: z.number(),
         name: z.string(),
         email: z.string(),
         date_of_birth: z.string().nullable(),
@@ -96,13 +95,19 @@ export const VerifyUserResponseSchema = z.union([
 ]);
 const queryDbSchemaUsers = z.array(
   z.object({
-    id: z.string(),
     name: z.string(),
     email: z.string(),
     date_of_birth: z.string(),
   })
 );
 export { queryDbSchemaUsers };
+
+const queryDbSchemaEmail = z.array(
+  z.object({
+    email: z.string(),
+  })
+);
+export { queryDbSchemaEmail };
 
 export const BodyUserCreationPostSchema = z.object({
   name: z.string().min(1),

@@ -21,6 +21,7 @@ import {
   queryDbSchemaUsers,
   BodyUserCreationPostSchema,
   VerifyAccountDeletedSchema,
+  queryDbSchemaEmail,
 } from "../schemas/auth/sign-up-schema";
 import {
   QueryVerifyCodeSchema,
@@ -118,9 +119,8 @@ app.openapi(verifiedEmailRoute, async (c) => {
       "SELECT id FROM users WHERE email = ?",
       [email]
     );
-    const parsedRows = queryDbSchemaUsers.parse(rows);
 
-    if (parsedRows.length > 0) {
+    if (rows.length > 0) {
       // Email ya registrado
       res = {
         error: false,
@@ -314,8 +314,8 @@ app.openapi(verifyUserRoute, async (c) => {
     return c.json({ error: true as true, details: "Missing email" }, 200);
   }
   // ToDo: borrar esto
-  const [userExistente]: any[] = await db.query("SELECT * FROM users");
-  return c.json({ exists: true as true, user: userExistente[0] }, 200);
+  //const [userExistente]: any[] = await db.query("SELECT * FROM users");
+  //return c.json({ exists: true as true, user: userExistente[0] }, 200);
 
   // ToDo: usar esto
   const [rows]: any[] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
@@ -355,6 +355,7 @@ app.openapi(createUserRoute, async (c) => {
   const { name, email, date_of_birth } = c.req.valid("json");
 
   if (!name || !email) {
+    console.error("Missing name or email");
     return c.json({ error: true as true, details: "Missing name or email" }, 200);
   }
 
@@ -362,17 +363,20 @@ app.openapi(createUserRoute, async (c) => {
     const [existing]: any[] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
 
     if (existing.length > 0) {
+      console.error("Email already registered");
       return c.json({ error: true as true, details: "Email already registered" }, 200);
     }
 
+    const onlyDate = new Date(date_of_birth).toISOString().slice(0, 10);
     const [result]: any = await db.query(
       "INSERT INTO users (name, email, date_of_birth) VALUES (?, ?, ?)",
-      [name, email, date_of_birth ?? null]
+      [name, email, onlyDate]
     );
+    console.log("User created");
 
     return c.json({ error: false as false }, 200);
   } catch (err) {
-    console.error(err);
+    console.error("Error creating user:", err);
     return c.json({ error: true as true, details: "Server error" }, 200);
   }
 });
