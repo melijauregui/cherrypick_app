@@ -13,7 +13,7 @@ export default function App() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      router.push("/code-verification"); // Redirect to /sign-in after 1 second
+      router.push("/preferences"); // Redirect to /sign-in after 1 second
     }, 1000);
 
     return () => clearTimeout(timer); // Cleanup in case component unmounts

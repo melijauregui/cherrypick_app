@@ -27,17 +27,17 @@ import { ResCodeVerificationPostSchema } from "@/schemas/auth/sign-up-schema";
 
 const CodeVerification = () => {
   const router = useRouter();
-  // const params = useLocalSearchParams<{
-  //   name?: string;
-  //   email?: string;
-  //   dateBirth?: string;
-  // }>();
+  const params = useLocalSearchParams<{
+    name?: string;
+    email?: string;
+    dateBirth?: string;
+  }>();
 
-  // const { name, email, dateBirth } = params;
+  const { name, email, dateBirth } = params;
 
-  const name = "meli";
-  const email = "m@fi.uba.ar";
-  const dateBirth = "2023-10-10";
+  // const name = "meli";
+  // const email = "m@fi.uba.ar";
+  // const dateBirth = "2023-10-10";
   if (
     typeof name !== "string" ||
     typeof email !== "string" ||

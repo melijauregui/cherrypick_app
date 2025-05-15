@@ -28,7 +28,7 @@ const Preferences = () => {
   const [selectedOne, setSelectedOne] = useState<boolean>(false);
   return (
     <SafeAreaView className="bg-brown-strong flex-1 h-full w-full">
-      <View className="flex flex-grow flex-col w-full justify-between px-14 py-3">
+      <View className="flex flex-grow flex-col w-full justify-between px-14 pt-3">
         <View className="flex flex-col w-full">
           <LogoCircle classname="w-[60] h-[60] mb-1 self-center" />
           <Text className="text-white text-[27px] font-pbold pt-6">
@@ -105,8 +105,8 @@ const Item = ({
         source={item.image}
         className={`
           w-full  
-          h-[170px]        
-          aspect-[0.9]   
+          h-[160px]        
+          aspect-[1]   
           rounded-2xl
           mb-1
           ${isSelected ? "border-2 border-white" : ""}
@@ -174,7 +174,7 @@ const NextButton = ({
   const isDisabled = !codeReady;
 
   return (
-    <View className="flex flex-row justify-end mb-2">
+    <View className="flex flex-row justify-end mb-4">
       <TouchableOpacity
         disabled={isDisabled}
         onPress={isDisabled ? undefined : onPress}
