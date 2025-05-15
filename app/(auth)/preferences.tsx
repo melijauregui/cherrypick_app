@@ -4,27 +4,38 @@ import {
   TouchableOpacity,
   Image,
   ImageSourcePropType,
-  Dimensions,
   FlatList,
-  StyleSheet,
 } from "react-native";
 import React, { useState } from "react";
 import { LogoCircle } from "@/components/LogoCircle";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import images from "../../constants/images";
+import { CreateAccountSchemaRes } from "@/schemas/auth/preferences-schema";
+import { safeFetch } from "@/utils/safe-fetch";
 
 const Preferences = () => {
-  // const router = useRouter();
-  // const { name, email, dateBirth } = useLocalSearchParams();
-  // console.log(
-  //   "Proceeding with name in code-verification:",
-  //   name,
-  //   "and email:",
-  //   email,
-  //   "and date:",
-  //   dateBirth
-  // );
+  const router = useRouter();
+  const { name, email, dateBirth } = useLocalSearchParams();
+  console.log(
+    "Proceeding with name in code-verification:",
+    name,
+    "and email:",
+    email,
+    "and date:",
+    dateBirth
+  );
+  async function handleSubmit() {
+    console.log("Creating an account");
+    const { success } = await createAccount(name, email, dateBirth);
+    if (success) {
+      console.log("Account created successfully");
+      router.push("/home");
+    } else {
+      console.log("Error creating account"); //TODO HANDLEAR MEJOR
+      router.push("/sign-in");
+    }
+  }
   const [selectedOne, setSelectedOne] = useState<boolean>(false);
   return (
     <SafeAreaView className="bg-brown-strong flex-1 h-full w-full">
@@ -41,7 +52,7 @@ const Preferences = () => {
         </View>
         <NextButton
           onPress={() => {
-            console.log("Creating an account");
+            handleSubmit();
           }}
           codeReady={selectedOne}
         />
@@ -195,3 +206,38 @@ const NextButton = ({
     </View>
   );
 };
+
+async function createAccount(
+  code: string,
+  email: string,
+  dateString: string
+): Promise<{ success: boolean }> {
+  try {
+    const IP = process.env.EXPO_PUBLIC_IP || "localhost";
+    const { data } = await safeFetch({
+      url: `http://${IP}:3000/create-account`,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name, email, dateString }),
+      schema: CreateAccountSchemaRes,
+      method: "POST",
+    });
+
+    if (data.error) {
+      console.log("Error:", data.details);
+      throw new Error(data.details);
+    }
+    return {
+      success: true,
+    };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Error:", error.message);
+      throw error;
+    } else {
+      console.error("Unexpected error:", error);
+      throw new Error("Unexpected error");
+    }
+  }
+}
