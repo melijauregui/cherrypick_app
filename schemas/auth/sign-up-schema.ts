@@ -69,3 +69,13 @@ const BodyCodeVerificationPostSchema = z.object({
     .email({ message: "Invalid email address" }),
 });
 export { BodyCodeVerificationPostSchema };
+
+const queryDbSchemaUsers = z.array(
+  z.object({
+    id: z.string(),
+    name: z.string(),
+    email: z.string(),
+    date_of_birth: z.string(),
+  })
+);
+export { queryDbSchemaUsers };

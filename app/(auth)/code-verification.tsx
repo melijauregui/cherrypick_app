@@ -31,23 +31,13 @@ const CodeVerification = () => {
   }>();
 
   const { name, email, dateBirth } = params;
-  console.log(
-    "Proceeding with name in code-verification:",
-    name,
-    "and email:",
-    email,
-    "and date:",
-    dateBirth
-  );
 
-  // Guard para que sean strings (y no null, undefined o array)
   if (
     typeof name !== "string" ||
     typeof email !== "string" ||
     typeof dateBirth !== "string"
   ) {
     console.error("Missing or invalid parameters in CodeVerification:", params);
-    // opcional: rediriges al usuario a la pantalla anterior
     router.replace("/sign-up");
     return null;
   }

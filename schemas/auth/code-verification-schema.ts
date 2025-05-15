@@ -27,10 +27,10 @@ const QueryVerifyCodeSchema = z.object({
 export { QueryVerifyCodeSchema };
 export type VerifyCodeSchemaType = z.infer<typeof VerifyCodeSchema>;
 
-const queryDbSchema = z.tuple([
+const queryDbSchemaRegisterInProgress = z.tuple([
   z.object({
     verification_code: z.string(),
     verification_code_expiration: z.string(),
   }),
 ]);
-export { queryDbSchema };
+export { queryDbSchemaRegisterInProgress };

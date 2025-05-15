@@ -16,12 +16,13 @@ import {
   ResCodeVerificationPostSchema,
   BodyCodeVerificationPostSchema,
   ErrorResponseSchema,
+  queryDbSchemaUsers,
 } from "../schemas/auth/sign-up-schema";
 import {
   QueryVerifyCodeSchema,
   VerifyCodeSchema,
   VerifyCodeSchemaType,
-  queryDbSchema,
+  queryDbSchemaRegisterInProgress,
 } from "../schemas/auth/code-verification-schema";
 import { db } from "./db";
 const app = new OpenAPIHono();
@@ -112,8 +113,9 @@ app.openapi(verifiedEmailRoute, async (c) => {
       "SELECT id FROM users WHERE email = ?",
       [email]
     );
+    const parsedRows = queryDbSchemaUsers.parse(rows);
 
-    if (rows.length > 0) {
+    if (parsedRows.length > 0) {
       // Email ya registrado
       res = {
         error: false,
@@ -133,32 +135,6 @@ app.openapi(verifiedEmailRoute, async (c) => {
       details: "Error querying the database",
     };
   }
-  /* 
-    if (!verifyGoogleMail(email)) {
-      // Simulación de un email no registrado en google
-      console.log("Email not registered in Google");
-      res = {
-        error: true,
-        details: "Email not registered in Google",
-      };
-    } else {
-      console.log("Email registered in Google");
-      if (email === "p@gmail.com") {
-        console.log("Email registered in the database");
-        // Simulación de un email no registrado en la base de datos
-        res = {
-          error: false,
-          isAvailable: false,
-        };
-      } else {
-        console.log("Email not registered in the database");
-        // Simulación de un email registrado en la base de datos
-        res = {
-          error: false,
-          isAvailable: true,
-        };
-      }
-    } */
   return c.json(res, 200);
 });
 
@@ -313,7 +289,7 @@ app.openapi(verifiedCodeRoute, async (c) => {
       `SELECT verification_code, verification_code_expiration FROM registerInProgress WHERE email = ?`,
       [email]
     );
-    const parsedRows = queryDbSchema.parse(rows);
+    const parsedRows = queryDbSchemaRegisterInProgress.parse(rows);
 
     const { verification_code, verification_code_expiration } = parsedRows[0];
 
