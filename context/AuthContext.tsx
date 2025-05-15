@@ -31,13 +31,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         try {
             console.log("Refreshing access token...");
-            const res = await fetch("https://your-backend.com/api/refresh-token", {
+            const body = new URLSearchParams({
+                client_id: process.env.EXPO_PUBLIC_EXPO_CLIENT_ID!,
+                grant_type: "refresh_token",
+                refresh_token: refreshToken,
+            }).toString();
+
+            const res = await fetch("https://oauth2.googleapis.com/token", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ refresh_token: refreshToken }),
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body,
             });
 
-            if (!res.ok) throw new Error("Failed to refresh token");
+            if (!res.ok) {
+                const errorText = await res.text();
+                console.error("Failed to refresh token, response:", errorText);
+                throw new Error("Failed to refresh token");
+            }
 
             const data = await res.json();
             const newAccessToken = data.access_token;
