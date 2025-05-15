@@ -18,6 +18,7 @@ import {
 } from "@/schemas/auth/sign-up-schema";
 import { useRouter } from "expo-router";
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { LOCAL_IP } from "../../config/api";
 
 const SignIn = () => {
   const router = useRouter();
@@ -245,9 +246,8 @@ async function verifyMailAvailability(
 ): Promise<{ isAvailable: boolean }> {
   try {
 
-    const IP = process.env.EXPO_PUBLIC_IP || "localhost";
     const { data } = await safeFetch({
-      url: `http://${IP}:3000/verify-email?email=${email}`,
+      url: `http://${LOCAL_IP}:3000/verify-email?email=${email}`,
       schema: VerifyAvailabilitySchema,
       method: "GET",
     });
@@ -272,9 +272,8 @@ async function verifyMailAvailability(
 
 async function postCodeVerification({ email }: { email: string }) {
   try {
-    const IP = process.env.EXPO_PUBLIC_IP || "localhost";
     const { data } = await safeFetch({
-      url: `http://${IP}:3000/code-verification`,
+      url: `http://${LOCAL_IP}:3000/code-verification`,
       method: "POST",
       headers: {
         'Content-Type': 'application/json',

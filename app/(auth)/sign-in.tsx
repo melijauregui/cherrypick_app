@@ -18,6 +18,7 @@ import Constants from 'expo-constants';
 import * as WebBrowser from 'expo-web-browser';
 import { safeFetch } from "@/utils/safe-fetch";
 import { VerifyUserResponseSchema } from "@/schemas/auth/sign-up-schema";
+import { LOCAL_IP } from "@/config/api";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -75,9 +76,8 @@ const GoogleSignInButton = () => {
 
           const userInfo = await userInfoResponse.json();
           console.log("User Info:", userInfo);
-          const IP = process.env.EXPO_PUBLIC_IP || "localhost";
           const { data } = await safeFetch({
-            url: `http://${IP}:3000/verify-user`,
+            url: `http://${LOCAL_IP}:3000/verify-user`,
             method: "POST",
             headers: {
               'Content-Type': 'application/json',
@@ -87,7 +87,7 @@ const GoogleSignInButton = () => {
           });
 
 
-          if (data.exists) {
+          if ('exists' in data && data.exists) {
             console.log("User verification result:", data.user);
             await SecureStore.setItemAsync("accessToken", response.authentication.accessToken);
             router.push("/home");

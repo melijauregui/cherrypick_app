@@ -21,6 +21,7 @@ import { useRouter } from "expo-router";
 import { safeFetch } from "@/utils/safe-fetch";
 import { useLocalSearchParams } from "expo-router";
 import { ResCodeVerificationPostSchema } from "@/schemas/auth/sign-up-schema";
+import { LOCAL_IP } from "@/config/api";
 
 const CodeVerification = () => {
   const router = useRouter();
@@ -75,9 +76,8 @@ const CodeVerification = () => {
       setCodeError(undefined);
       setCode("");
 
-      const IP = process.env.EXPO_PUBLIC_IP || "localhost";
       const { data } = await safeFetch({
-        url: `http://${IP}:3000/code-verification`,
+        url: `http://${LOCAL_IP}:3000/code-verification`,
         method: "POST",
         headers: {
           'Content-Type': 'application/json',
@@ -330,9 +330,9 @@ export const CodeInput: React.FC<CodeInputProps> = ({
 
 async function verifyCode(code: string, email: string): Promise<{ isCorrect: boolean }> {
   try {
-    const IP = process.env.EXPO_PUBLIC_IP || "localhost";
+    console.log("Local IP:", LOCAL_IP);
     const { data } = await safeFetch({
-      url: `http://${IP}:3000/verify-code?code=${code}&email=${email}`,
+      url: `http://${LOCAL_IP}:3000/verify-code?code=${code}&email=${email}`,
       schema: VerifyCodeSchema,
       method: "GET",
     });

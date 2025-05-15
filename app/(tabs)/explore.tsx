@@ -5,6 +5,7 @@ import { ClothingItemComponent } from "@/components/ClothingItemComponent";
 import { TextInput, View, Image } from 'react-native';
 import icons from "../../constants/icons";
 import { Metadata } from "./home";
+import { LOCAL_IP } from "@/config/api";
 
 
 const Explore = () => {
@@ -64,9 +65,8 @@ async function getClothingItems(): Promise<Metadata[]> {
   const limit = "10";
 
   try {
-    const IP = process.env.EXPO_PUBLIC_IP || "localhost";
     const response: Response = await fetch(
-      `http://${IP}:3000/all?page=${page}&limit=${limit}`,
+      `http://${LOCAL_IP}:3000/all?page=${page}&limit=${limit}`,
       {
         method: "GET",
       }

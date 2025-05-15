@@ -77,14 +77,20 @@ const BodyUserVerificationPostSchema = z.object({
 });
 export { BodyUserVerificationPostSchema };
 
-export const VerifyUserResponseSchema = z.object({
-  exists: z.boolean(),
-  user: z
-    .object({
-      id: z.number(),
-      name: z.string(),
-      email: z.string(),
-      date_of_birth: z.string().nullable(),
-    })
-    .optional(),
-});
+export const VerifyUserResponseSchema = z.union([
+  z.object({
+    exists: z.boolean(),
+    user: z
+      .object({
+        id: z.number(),
+        name: z.string(),
+        email: z.string(),
+        date_of_birth: z.string().nullable(),
+      })
+      .optional(),
+  }),
+  z.object({
+    error: z.literal(true),
+    details: z.string(),
+  }),
+]);

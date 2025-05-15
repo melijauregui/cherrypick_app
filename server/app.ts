@@ -155,22 +155,6 @@ const codeVerificationRoute = createRoute({
       description:
         "Devuelve un booleano que indica si se pudo enviar el código de verificación",
     },
-    404: {
-      description: "Mail incorrecto",
-      content: {
-        "application/json": {
-          schema: ErrorResponseSchema,
-        },
-      },
-    },
-    500: {
-      description: "Error del servidor",
-      content: {
-        "application/json": {
-          schema: ErrorResponseSchema,
-        },
-      },
-    },
   },
 });
 app.openapi(codeVerificationRoute, async (c) => {
@@ -179,7 +163,7 @@ app.openapi(codeVerificationRoute, async (c) => {
   const emailSent = await sendEmail(email, code);
 
   if (!emailSent) {
-    return c.json({ error: true as true, details: "Invalid email" }, 404);
+    return c.json({ error: true as true, details: "Invalid email" }, 200);
   }
 
   // Guardar (o reemplazar) en DB
@@ -199,7 +183,7 @@ app.openapi(codeVerificationRoute, async (c) => {
     return c.json({ error: false as false }, 200);
   } catch (err) {
     console.error("Error al guardar código:", err);
-    return c.json({ error: true as true, details: "Error al guardar en la base" }, 500);
+    return c.json({ error: true as true, details: "Error al guardar en la base" }, 200);
   }
 });
 
@@ -258,22 +242,6 @@ const verifiedCodeRoute = createRoute({
       description:
         "Devuelve un booleano que indica si el codigo de verificación es correcto",
     },
-    404: {
-      description: "Código incorrecto",
-      content: {
-        "application/json": {
-          schema: ErrorResponseSchema,
-        },
-      },
-    },
-    500: {
-      description: "Error del servidor",
-      content: {
-        "application/json": {
-          schema: ErrorResponseSchema,
-        },
-      },
-    },
   },
 });
 app.openapi(verifiedCodeRoute, async (c) => {
@@ -285,14 +253,18 @@ app.openapi(verifiedCodeRoute, async (c) => {
       [email]
     );
 
+    if (rows.length === 0) {
+      return c.json({ error: true as true, details: "Email not found" }, 200);
+    }
+
     const { verification_code, verification_code_expiration } = rows[0];
 
     if (!verification_code || verification_code !== code) {
-      return c.json({ error: true as true, details: "Invalid verification code" }, 404);
+      return c.json({ error: false as false, isCorrect: false }, 200);
     }
 
     if (new Date() > new Date(verification_code_expiration)) {
-      return c.json({ error: true as true, details: "Verification code expired" }, 404);
+      return c.json({ error: true as true, details: "Verification code expired" }, 200);
     }
 
     await db.query(
@@ -305,7 +277,7 @@ app.openapi(verifiedCodeRoute, async (c) => {
     return c.json({ error: false as false, isCorrect: true }, 200);
   } catch (err) {
     console.error("Error al verificar código:", err);
-    return c.json({ error: true as true, details: "DB error" }, 500);
+    return c.json({ error: true as true, details: "DB error" }, 200);
   }
 });
 
@@ -328,29 +300,13 @@ const verifyUserRoute = createRoute({
       },
       description: "Devuelve si el usuario existe o no",
     },
-    404: {
-      description: "Faltan datos",
-      content: {
-        "application/json": {
-          schema: ErrorResponseSchema,
-        },
-      },
-    },
-    500: {
-      description: "Error del servidor",
-      content: {
-        "application/json": {
-          schema: ErrorResponseSchema,
-        },
-      },
-    },
   },
 });
 app.openapi(verifyUserRoute, async (c) => {
   const { email } = c.req.valid("json");
 
   if (!email) {
-    return c.json({ error: true as true, details: "Missing email" }, 404);
+    return c.json({ error: true as true, details: "Missing email" }, 200);
   }
 
   const [userExistente]: any[] = await db.query("SELECT * FROM users");
