@@ -107,5 +107,17 @@ export { queryDbSchemaUsers };
 export const BodyUserCreationPostSchema = z.object({
   name: z.string().min(1),
   email: z.string().email(),
-  date_of_birth: z.string().optional(), // formato: 'YYYY-MM-DD'
+  date_of_birth: z.string(), // formato: 'YYYY-MM-DD'
 });
+
+const VerifyAccountDeletedSchema = z.union([
+  z.object({
+    error: z.literal(false),
+    success: z.boolean(),
+  }),
+  z.object({
+    error: z.literal(true),
+    details: z.string(),
+  }),
+]);
+export { VerifyAccountDeletedSchema };

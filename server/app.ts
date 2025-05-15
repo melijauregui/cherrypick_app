@@ -20,6 +20,7 @@ import {
   BodyUserVerificationPostSchema,
   queryDbSchemaUsers,
   BodyUserCreationPostSchema,
+  VerifyAccountDeletedSchema,
 } from "../schemas/auth/sign-up-schema";
 import {
   QueryVerifyCodeSchema,
@@ -372,6 +373,51 @@ app.openapi(createUserRoute, async (c) => {
     return c.json({ error: false as false }, 200);
   } catch (err) {
     console.error(err);
+    return c.json({ error: true as true, details: "Server error" }, 200);
+  }
+});
+
+const deleteAccountRoute = createRoute({
+  method: "post",
+  path: "/delete-account",
+  request: {
+    body: {
+      content: {
+        "application/json": {
+          schema: BodyUserVerificationPostSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: "Elimina la cuenta del usuario",
+      content: {
+        "application/json": {
+          schema: VerifyAccountDeletedSchema,
+        },
+      },
+    },
+  },
+});
+
+app.openapi(deleteAccountRoute, async (c) => {
+  const { email } = c.req.valid("json");
+
+  if (!email) {
+    return c.json({ error: true as true, details: "Missing email" }, 200);
+  }
+
+  try {
+    const [result]: any = await db.query("DELETE FROM users WHERE email = ?", [email]);
+
+    if (result.affectedRows > 0) {
+      return c.json({ success: true as true, error: false as false }, 200);
+    } else {
+      return c.json({ error: true as true, details: "User not found" }, 200);
+    }
+  } catch (error) {
+    console.error(error);
     return c.json({ error: true as true, details: "Server error" }, 200);
   }
 });
