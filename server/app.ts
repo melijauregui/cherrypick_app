@@ -18,8 +18,9 @@ import {
   ErrorResponseSchema,
   VerifyUserResponseSchema,
   BodyUserVerificationPostSchema,
-
   queryDbSchemaUsers,
+  BodyUserCreationPostSchema,
+  CreateUserResponseSchema,
 } from "../schemas/auth/sign-up-schema";
 import {
   QueryVerifyCodeSchema,
@@ -311,17 +312,68 @@ app.openapi(verifyUserRoute, async (c) => {
   if (!email) {
     return c.json({ error: true as true, details: "Missing email" }, 200);
   }
-
+  // ToDo: borrar esto
   const [userExistente]: any[] = await db.query("SELECT * FROM users");
   return c.json({ exists: true as true, user: userExistente[0] }, 200);
 
-  // ToDo:
-
+  // ToDo: usar esto
   const [rows]: any[] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
 
   if (rows.length > 0) {
     return c.json({ exists: true as true, user: rows[0] }, 200);
   } else {
     return c.json({ exists: false as false }, 200);
+  }
+});
+
+const createUserRoute = createRoute({
+  method: "post",
+  path: "/create-user",
+  request: {
+    body: {
+      content: {
+        "application/json": {
+          schema: BodyUserCreationPostSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: "Crea un nuevo usuario",
+      content: {
+        "application/json": {
+          schema: CreateUserResponseSchema,
+        },
+      },
+    },
+  },
+});
+
+app.openapi(createUserRoute, async (c) => {
+  const { name, email, date_of_birth } = c.req.valid("json");
+
+  if (!name || !email) {
+    return c.json({ success: false, error: "Missing name or email" }, 200);
+  }
+
+  try {
+    const [existing]: any[] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
+
+    if (existing.length > 0) {
+      return c.json({ success: false, error: "Email already registered" }, 200);
+    }
+
+    const [result]: any = await db.query(
+      "INSERT INTO users (name, email, date_of_birth) VALUES (?, ?, ?)",
+      [name, email, date_of_birth ?? null]
+    );
+
+    const [user]: any[] = await db.query("SELECT * FROM users WHERE id = ?", [result.insertId]);
+
+    return c.json({ success: true, user: user[0] }, 200);
+  } catch (err) {
+    console.error(err);
+    return c.json({ success: false, error: "Server error" }, 200);
   }
 });
