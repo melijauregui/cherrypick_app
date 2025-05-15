@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import * as SecureStore from 'expo-secure-store';
+import { Platform } from 'react-native';
 
 interface UserInfo {
     email: string;
@@ -25,19 +26,38 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(null);
     };
 
-    const refreshAccessToken = async (): Promise<string | null> => {
+    const refreshAccessToken: () => Promise<string | null> = async () => {
         const refreshToken = await SecureStore.getItemAsync("refreshToken");
         if (!refreshToken || refreshToken == "") return null;
 
         try {
             console.log("Refreshing access token...");
-            const res = await fetch("https://your-backend.com/api/refresh-token", {
+            var client_id = process.env.EXPO_PUBLIC_EXPO_CLIENT_ID;
+            if (Platform.OS === "android") {
+                client_id = process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID;
+            }
+            if (Platform.OS === "ios") {
+                client_id = process.env.EXPO_PUBLIC_IOS_CLIENT_ID;
+            }
+            const body = new URLSearchParams({
+                client_id: client_id!,
+                grant_type: "refresh_token",
+                refresh_token: refreshToken,
+            }).toString();
+
+            const res = await fetch("https://oauth2.googleapis.com/token", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ refresh_token: refreshToken }),
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body,
             });
 
-            if (!res.ok) throw new Error("Failed to refresh token");
+            if (!res.ok) {
+                const errorText = await res.text();
+                console.error("Failed to refresh token:", errorText);
+                throw new Error("Failed to refresh token");
+            }
 
             const data = await res.json();
             const newAccessToken = data.access_token;
