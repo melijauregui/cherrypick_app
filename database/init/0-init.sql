@@ -13,7 +13,8 @@ FLUSH PRIVILEGES;
 CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(50) PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
-    date_of_birth DATE NOT NULL
+    date_of_birth DATE NOT NULL,
+    preferences JSON
 );
 
 CREATE TABLE IF NOT EXISTS registerInProgress (

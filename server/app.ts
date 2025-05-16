@@ -19,9 +19,11 @@ import {
   VerifyUserResponseSchema,
   BodyUserVerificationPostSchema,
   queryDbSchemaUser,
-  BodyUserCreationPostSchema,
   VerifyUserResponseSchemaType,
   ResCodeVerificationPostSchemaType,
+  VerifyAccountDeletedSchema,
+  queryDbSchemaEmail,
+  VerifyAccountDeletedSchemaType,
 } from "../schemas/auth/sign-up-schema";
 import {
   QueryVerifyCodeSchema,
@@ -36,6 +38,7 @@ import { RowDataPacket } from "mysql2/promise";
 import {
   CreateAccountSchemaRes,
   CreateAccountSchemaResType,
+  CreateAccountSchema,
 } from "../schemas/auth/preferences-schema";
 
 // endpoint que recibe una imagen y devuelve los 10 resultados más similares paginados WIP
@@ -128,8 +131,6 @@ app.openapi(verifiedEmailRoute, async (c) => {
         error: false,
       };
     } else {
-      //chequeo que sea un user valido
-      // const parsedRows = queryDbSchemaUser.parse(rows);
       // Email ya registrado
       res = {
         error: true,
@@ -348,14 +349,15 @@ app.openapi(verifyUserRoute, async (c) => {
     };
   } else {
     const parsedRows = queryDbSchemaUser.parse(rows);
-    const { name, email, date_of_birth } = parsedRows[0];
-    const date_of_birth_str = date_of_birth.toISOString();
+    const { name, email, date, preferences } = parsedRows[0];
+    const dateString = date.toISOString();
     res = {
       error: false,
       user: {
         name: name,
         email: email,
-        date_of_birth: date_of_birth_str,
+        dateString: dateString,
+        preferences: preferences,
       },
     };
   }
@@ -370,7 +372,7 @@ const createUserRoute = createRoute({
     body: {
       content: {
         "application/json": {
-          schema: BodyUserCreationPostSchema,
+          schema: CreateAccountSchema,
         },
       },
     },
@@ -388,9 +390,9 @@ const createUserRoute = createRoute({
 });
 
 app.openapi(createUserRoute, async (c) => {
-  const { name, email, date_of_birth } = c.req.valid("json");
+  const { name, email, dateString, preferences } = c.req.valid("json");
   let res: CreateAccountSchemaResType;
-  console.log("Creating user:", name, email, date_of_birth);
+  console.log("Creating user:", name, email, dateString, preferences);
 
   try {
     const [existing]: any[] = await db.query(
@@ -405,11 +407,11 @@ app.openapi(createUserRoute, async (c) => {
       };
     }
 
-    const dateBirth = new Date(date_of_birth);
+    const dateBirth = new Date(dateString);
 
     const [result]: any = await db.query(
-      "INSERT INTO users (name, email, date_of_birth) VALUES (?, ?, ?)",
-      [name, email, dateBirth]
+      "INSERT INTO users (name, email, date_of_birth, preferences) VALUES (?, ?, ?, ?)",
+      [name, email, dateBirth, JSON.stringify(preferences)]
     );
     console.log("User created:", result);
     res = {
@@ -421,6 +423,59 @@ app.openapi(createUserRoute, async (c) => {
       error: true,
       details: "Server error",
     };
+  }
+  return c.json(res, 200);
+});
+
+const deleteAccountRoute = createRoute({
+  method: "post",
+  path: "/delete-account",
+  request: {
+    body: {
+      content: {
+        "application/json": {
+          schema: BodyUserVerificationPostSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: "Elimina la cuenta del usuario",
+      content: {
+        "application/json": {
+          schema: VerifyAccountDeletedSchema,
+        },
+      },
+    },
+  },
+});
+
+app.openapi(deleteAccountRoute, async (c) => {
+  const { email } = c.req.valid("json");
+  let res: VerifyAccountDeletedSchemaType;
+
+  try {
+    const [result]: any = await db.query("DELETE FROM users WHERE email = ?", [
+      email,
+    ]);
+
+    if (result.affectedRows > 0) {
+      // return c.json({ success: true as true, error: false as false }, 200);
+      res = {
+        error: false,
+        success: true,
+      };
+    } else {
+      // return c.json({ error: true as true, details: "User not found" }, 200);
+      res = {
+        error: true,
+        details: "User not found",
+      };
+    }
+  } catch (error) {
+    console.error(error);
+    return c.json({ error: true as true, details: "Server error" }, 200);
   }
   return c.json(res, 200);
 });

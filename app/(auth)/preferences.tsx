@@ -11,21 +11,30 @@ import { LogoCircle } from "@/components/LogoCircle";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import images from "../../constants/images";
-import { CreateAccountSchemaRes } from "@/schemas/auth/preferences-schema";
-import { BodyUserCreationPostSchema } from "@/schemas/auth/sign-up-schema";
+import {
+  CreateAccountSchemaRes,
+  CreateAccountSchema,
+} from "@/schemas/auth/preferences-schema";
 import { safeFetch } from "@/utils/safe-fetch";
 import { LOCAL_IP } from "@/config/api";
+import { useGoogleSignIn } from "@/hooks/useGoogleSignIn";
 
 const Preferences = () => {
   const router = useRouter();
+  const [preferences, setPreferences] = useState<string[]>([]);
   const { name, email, dateBirth } = useLocalSearchParams();
+  const { promptGoogleLogin, isReady } = useGoogleSignIn(() => {
+    router.replace("/home");
+  });
   console.log(
     "Proceeding with name in code-verification:",
     name,
     "and email:",
     email,
     "and date:",
-    dateBirth
+    dateBirth,
+    "and preferences:",
+    preferences
   );
   async function handleSubmit() {
     console.log("Creating an account");
@@ -34,19 +43,26 @@ const Preferences = () => {
       typeof email !== "string" ||
       typeof dateBirth !== "string"
     ) {
-      console.log("typeof name", typeof name);
-      console.log("typeof email", typeof email);
-      console.log("typeof dateBirth", typeof dateBirth);
       console.log("Invalid parameters");
       return;
     }
     try {
-      const { success } = await createAccount(name, email, dateBirth);
+      const { success } = await createAccount(
+        name,
+        email,
+        dateBirth,
+        preferences
+      );
       if (success) {
-        console.log("Account created successfully");
-        router.push("/home");
+        console.log("Account created, now signing in with Google");
+        if (isReady) {
+          await promptGoogleLogin();
+        } else {
+          console.log("Google sign-in not ready");
+          router.push("/sign-in");
+        }
       } else {
-        console.log("Error creating account"); //TODO HANDLEAR MEJOR
+        console.log("Account creation failed");
         router.push("/sign-in");
       }
     } catch (error) {
@@ -58,7 +74,7 @@ const Preferences = () => {
   return (
     <SafeAreaView className="bg-brown-strong flex-1 h-full w-full">
       <View className="flex flex-grow flex-col w-full justify-between px-14 pt-3">
-        <View className="flex flex-col w-full">
+        <View className="flex-1 flex-col w-full">
           <LogoCircle classname="w-[60] h-[60] mb-1 self-center" />
           <Text className="text-white text-[27px] font-pbold pt-6">
             How would you describe your fashion style?
@@ -66,7 +82,10 @@ const Preferences = () => {
           <Text className="text-gray-400 text-[15px] font-pregular pt-3">
             Pick at least 1 to customize your home feed.
           </Text>
-          <SelectionList setSelectedOne={setSelectedOne} />
+          <SelectionList
+            setSelectedOne={setSelectedOne}
+            setPreferences={setPreferences}
+          />
         </View>
         <NextButton
           onPress={() => {
@@ -149,8 +168,10 @@ const Item = ({
 
 const SelectionList = ({
   setSelectedOne,
+  setPreferences,
 }: {
   setSelectedOne: (value: boolean) => void;
+  setPreferences: (value: string[]) => void;
 }) => {
   const [selectedIdxs, setSelectedIdxs] = useState<string[]>([]);
 
@@ -161,6 +182,7 @@ const SelectionList = ({
 
     setSelectedIdxs(updated);
     setSelectedOne(updated.length > 0);
+    setPreferences(updated);
     console.log("Selected items:", updated);
   }
 
@@ -178,7 +200,7 @@ const SelectionList = ({
   };
 
   return (
-    <View className="w-full mt-6">
+    <View className="w-full mt-6 flex-1">
       <FlatList
         data={DATA}
         renderItem={renderItem}
@@ -228,7 +250,8 @@ const NextButton = ({
 async function createAccount(
   name: string,
   email: string,
-  dateString: string
+  dateString: string,
+  preferences: string[]
 ): Promise<{ success: boolean }> {
   console.log(
     "Creating account with name:",
@@ -236,14 +259,16 @@ async function createAccount(
     "email:",
     email,
     "date:",
-    dateString
+    dateString,
+    "preferences:",
+    preferences
   );
   try {
-    const date_of_birth = dateString;
-    const parsedReq = BodyUserCreationPostSchema.parse({
+    const parsedReq = CreateAccountSchema.parse({
       name,
       email,
-      date_of_birth,
+      dateString,
+      preferences,
     });
     console.log("Parsed request:", parsedReq);
     const { data } = await safeFetch({
@@ -251,7 +276,12 @@ async function createAccount(
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ name, email, date_of_birth }),
+      body: JSON.stringify({
+        name,
+        email,
+        dateString: dateString,
+        preferences,
+      }),
       schema: CreateAccountSchemaRes,
       method: "POST",
     });

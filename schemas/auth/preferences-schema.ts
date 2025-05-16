@@ -12,7 +12,7 @@ const CreateAccountSchema = z.object({
     .email("Invalid email format"),
   dateString: z.string({ required_error: "Valid date is required" }),
   preferences: z
-    .array(z.string(), {
+    .array(z.string().min(1), {
       required_error: "Preferences are required",
       invalid_type_error: "Preferences must be an array of strings",
     })
@@ -21,6 +21,7 @@ const CreateAccountSchema = z.object({
     }),
 });
 export { CreateAccountSchema };
+export type CreateAccountSchemaType = z.infer<typeof CreateAccountSchema>;
 
 const CreateAccountSchemaRes = z.union([
   z.object({

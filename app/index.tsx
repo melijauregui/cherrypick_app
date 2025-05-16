@@ -16,14 +16,14 @@ import { VerifyUserResponseSchema } from "@/schemas/auth/sign-up-schema";
 
 export default function App() {
   const router = useRouter();
-  const authContext = useAuth();
-  const user = authContext?.user;
+
+  const { user, loading } = useAuth();
 
   useEffect(() => {
+    if (loading) return;
+
     const checkSession = async () => {
-      console.log("Checking session...");
       if (user) {
-        console.log("Checking if the user is logged in");
         const { data } = await safeFetch({
           url: `http://${LOCAL_IP}:3000/verify-user`,
           method: "POST",
@@ -33,22 +33,19 @@ export default function App() {
           body: JSON.stringify({ email: user.email }),
           schema: VerifyUserResponseSchema,
         });
-
         if ('exists' in data && data.exists) {
-          console.log("User already logged in")
           router.replace("/home");
+        } else {
+          router.replace("/sign-in");
         }
+      } else {
+        router.replace("/sign-in");
       }
     };
 
     checkSession();
+  }, [user, loading]);
 
-    const timer = setTimeout(() => {
-      router.push("/sign-in"); // Redirect to /sign-in after 1 second
-    }, 1000);
-
-    return () => clearTimeout(timer); // Cleanup in case component unmounts
-  }, [user]);
   return (
     <SafeAreaView className="flex-1 h-full bg-brown-strong">
       <ScrollView className="my-1 ">

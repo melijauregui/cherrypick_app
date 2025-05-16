@@ -83,7 +83,8 @@ export const VerifyUserResponseSchema = z.union([
     user: z.object({
       name: z.string(),
       email: z.string(),
-      date_of_birth: z.string(),
+      dateString: z.string(),
+      preferences: z.string(),
     }),
   }),
   z.object({
@@ -98,14 +99,31 @@ const queryDbSchemaUser = z.tuple([
   z.object({
     name: z.string(),
     email: z.string(),
-    date_of_birth: z.date(),
+    date: z.date(),
+    preferences: z.string(),
   }),
 ]);
 
 export { queryDbSchemaUser };
 
-export const BodyUserCreationPostSchema = z.object({
-  name: z.string().min(1),
-  email: z.string().email(),
-  date_of_birth: z.string(), // formato: 'YYYY-MM-DD'
-});
+const queryDbSchemaEmail = z.array(
+  z.object({
+    email: z.string(),
+  })
+);
+export { queryDbSchemaEmail };
+
+const VerifyAccountDeletedSchema = z.union([
+  z.object({
+    error: z.literal(false),
+    success: z.boolean(),
+  }),
+  z.object({
+    error: z.literal(true),
+    details: z.string(),
+  }),
+]);
+export { VerifyAccountDeletedSchema };
+export type VerifyAccountDeletedSchemaType = z.infer<
+  typeof VerifyAccountDeletedSchema
+>;
