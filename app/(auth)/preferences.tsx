@@ -21,7 +21,7 @@ const Preferences = () => {
   const [preferences, setPreferences] = useState<string[]>([]);
   const { name, email, dateBirth } = useLocalSearchParams();
   const { promptGoogleLogin, isReady } = useGoogleSignIn(() => {
-    //router.push("/home");
+    router.replace("/home");
   });
   console.log(
     "Proceeding with name in code-verification:",
@@ -51,7 +51,7 @@ const Preferences = () => {
       console.log("Account created, now signing in with Google");
       if (isReady) {
         await promptGoogleLogin();
-        router.replace("/home");
+
       } else {
         console.log("Google sign-in not ready");
         router.push("/sign-in");

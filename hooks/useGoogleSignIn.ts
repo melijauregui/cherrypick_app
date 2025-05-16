@@ -27,9 +27,14 @@ export function useGoogleSignIn(onSuccess: () => void) {
     });
 
     const { setUser } = useAuth();
+    const router = useRouter();
 
     useEffect(() => {
         const fetchAndStoreTokens = async () => {
+            if (response?.type === "error" || response?.type === "dismiss" || response?.type === "cancel") {
+                router.replace({ pathname: "/sign-in", params: { loading: "false" } });
+                return;
+            }
             if (response?.type === "success" && response.authentication?.accessToken) {
                 try {
                     const userInfoResponse = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
@@ -52,10 +57,15 @@ export function useGoogleSignIn(onSuccess: () => void) {
                         await SecureStore.setItemAsync("accessToken", response.authentication.accessToken);
                         await SecureStore.setItemAsync("refreshToken", response.authentication.refreshToken ?? "");
                         setUser(userInfo);
-                        //onSuccess();
+                        onSuccess();
+                    } else {
+                        router.replace({ pathname: "/sign-in", params: { error: "not-registered", loading: "false" } });
+                        return;
                     }
                 } catch (err) {
                     console.error("Google sign-in failed:", err);
+                    router.replace({ pathname: "/sign-in", params: { error: "not-registered", loading: "false" } });
+                    return;
                 }
             }
         };

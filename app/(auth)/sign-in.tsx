@@ -94,6 +94,10 @@ const GoogleSignInButton: React.FC<{
 
   useEffect(() => {
     const fetchUserInfo = async () => {
+      if (response?.type === "error" || response?.type === "dismiss" || response?.type === "cancel") {
+        router.replace({ pathname: "/sign-in", params: { loading: "false" } });
+        return;
+      }
       if (response?.type === "success" && response.authentication?.accessToken) {
         try {
           const userInfoResponse = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
