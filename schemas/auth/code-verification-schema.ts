@@ -29,8 +29,10 @@ export { QueryVerifyCodeSchema };
 
 const queryDbSchemaRegisterInProgress = z.tuple([
   z.object({
-    verification_code: z.string(),
-    verification_code_expiration: z.string(),
+    verification_code: z.string({ required_error: "Code must ve string" }),
+    verification_code_expiration: z.string({
+      required_error: "Code must ve string",
+    }),
   }),
 ]);
 export { queryDbSchemaRegisterInProgress };

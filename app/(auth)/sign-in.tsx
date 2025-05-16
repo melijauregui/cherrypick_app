@@ -18,7 +18,7 @@ import { makeRedirectUri } from "expo-auth-session";
 import Constants from "expo-constants";
 import * as WebBrowser from "expo-web-browser";
 import { safeFetch } from "@/utils/safe-fetch";
-import { VerifyUserResponseSchema } from "@/schemas/auth/sign-up-schema";
+import { VerifyUserResponseSchema } from "@/schemas/auth/sign-in-schema";
 import { LOCAL_IP } from "@/config/api";
 import { set } from "zod";
 import { useAuth } from "@/context/AuthContext";
@@ -131,7 +131,7 @@ const GoogleSignInButton: React.FC<{
             schema: VerifyUserResponseSchema,
           });
 
-          if ("exists" in data && data.exists) {
+          if (!data.error) {
             await SecureStore.setItemAsync(
               "accessToken",
               response.authentication?.accessToken

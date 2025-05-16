@@ -15,14 +15,9 @@ import {
   VerifyAvailabilitySchemaType,
   ResCodeVerificationPostSchema,
   BodyCodeVerificationPostSchema,
-  ErrorResponseSchema,
-  VerifyUserResponseSchema,
   BodyUserVerificationPostSchema,
-  queryDbSchemaUser,
-  VerifyUserResponseSchemaType,
   ResCodeVerificationPostSchemaType,
   VerifyAccountDeletedSchema,
-  queryDbSchemaEmail,
   VerifyAccountDeletedSchemaType,
 } from "../schemas/auth/sign-up-schema";
 import {
@@ -40,6 +35,11 @@ import {
   CreateAccountSchemaResType,
   CreateAccountSchema,
 } from "../schemas/auth/preferences-schema";
+import {
+  queryDbSchemaUser,
+  VerifyUserResponseSchema,
+  VerifyUserResponseSchemaType,
+} from "../schemas/auth/sign-in-schema";
 
 // endpoint que recibe una imagen y devuelve los 10 resultados más similares paginados WIP
 const routeVector = createRoute({
@@ -348,9 +348,10 @@ app.openapi(verifyUserRoute, async (c) => {
       details: "User not found",
     };
   } else {
+    console.log("User found:", rows);
     const parsedRows = queryDbSchemaUser.parse(rows);
-    const { name, email, date, preferences } = parsedRows[0];
-    const dateString = date.toISOString();
+    const { name, email, date_of_birth, preferences } = parsedRows[0];
+    const dateString = date_of_birth.toISOString();
     res = {
       error: false,
       user: {

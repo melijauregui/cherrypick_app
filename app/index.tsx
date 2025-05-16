@@ -11,8 +11,7 @@ import * as SecureStore from "expo-secure-store";
 import { useAuth } from "@/context/AuthContext";
 import { safeFetch } from "@/utils/safe-fetch";
 import { LOCAL_IP } from "@/config/api";
-import { VerifyUserResponseSchema } from "@/schemas/auth/sign-up-schema";
-
+import { VerifyUserResponseSchema } from "@/schemas/auth/sign-in-schema";
 
 export default function App() {
   const router = useRouter();
@@ -28,12 +27,12 @@ export default function App() {
           url: `http://${LOCAL_IP}:3000/verify-user`,
           method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({ email: user.email }),
           schema: VerifyUserResponseSchema,
         });
-        if ('exists' in data && data.exists) {
+        if ("exists" in data && data.exists) {
           router.replace("/home");
         } else {
           router.replace("/sign-in");

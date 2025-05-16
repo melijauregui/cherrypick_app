@@ -1,4 +1,3 @@
-import { error } from "console";
 import { z } from "zod";
 const FormSchemaSignUp = z.object({
   name: z
@@ -77,38 +76,12 @@ const BodyUserVerificationPostSchema = z.object({
 });
 export { BodyUserVerificationPostSchema };
 
-export const VerifyUserResponseSchema = z.union([
-  z.object({
-    error: z.literal(false),
-    user: z.object({
-      name: z.string(),
-      email: z.string(),
-      dateString: z.string(),
-      preferences: z.string(),
-    }),
-  }),
-  z.object({
-    error: z.literal(true),
-    details: z.string(),
-  }),
-]);
-export type VerifyUserResponseSchemaType = z.infer<
-  typeof VerifyUserResponseSchema
->;
-const queryDbSchemaUser = z.tuple([
-  z.object({
-    name: z.string(),
-    email: z.string(),
-    date: z.date(),
-    preferences: z.string(),
-  }),
-]);
-
-export { queryDbSchemaUser };
-
 const queryDbSchemaEmail = z.array(
   z.object({
-    email: z.string(),
+    email: z.string({
+      required_error: "Email is required",
+      invalid_type_error: "Email must be string",
+    }),
   })
 );
 export { queryDbSchemaEmail };

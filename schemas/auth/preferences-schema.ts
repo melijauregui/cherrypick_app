@@ -21,7 +21,6 @@ const CreateAccountSchema = z.object({
     }),
 });
 export { CreateAccountSchema };
-export type CreateAccountSchemaType = z.infer<typeof CreateAccountSchema>;
 
 const CreateAccountSchemaRes = z.union([
   z.object({

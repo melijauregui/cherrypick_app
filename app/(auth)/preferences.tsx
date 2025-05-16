@@ -24,10 +24,11 @@ const Preferences = () => {
   const [preferences, setPreferences] = useState<string[]>([]);
   const { name, email, dateBirth } = useLocalSearchParams();
   const { promptGoogleLogin, isReady } = useGoogleSignIn(() => {
+    console.log("Google sign-in successful going to home");
     router.replace("/home");
   });
   console.log(
-    "Proceeding with name in code-verification:",
+    "Proceeding with name in preferences:",
     name,
     "and email:",
     email,
@@ -57,6 +58,7 @@ const Preferences = () => {
         console.log("Account created, now signing in with Google");
         if (isReady) {
           await promptGoogleLogin();
+          console.log("Google sign-in successful");
         } else {
           console.log("Google sign-in not ready");
           router.push("/sign-in");
@@ -67,8 +69,9 @@ const Preferences = () => {
       }
     } catch (error) {
       console.error("Error creating account:", error);
-      // router.push("/sign-in");
+      router.push("/sign-in");
     }
+    console.log("Redirecting to home...");
   }
   const [selectedOne, setSelectedOne] = useState<boolean>(false);
   return (
@@ -264,6 +267,7 @@ async function createAccount(
     preferences
   );
   try {
+    console.log("Parsing request with Zod schema");
     const parsedReq = CreateAccountSchema.parse({
       name,
       email,
