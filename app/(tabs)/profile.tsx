@@ -258,8 +258,8 @@ function CustomBottomSheetDate({
             </Text>
           </TouchableOpacity>
         </View>
-        <View className="flex flex-col justify-center items-center flex-1 px-5">
-          <View className="flex flex-col justify-center items-center h-[190px] px-[10px] bg-white rounded-2xl border-[2px] border-gray-300 w-full">
+        <View className="flex flex-col justify-center items-center flex-1 px-3">
+          <View className="flex flex-col justify-center items-center h-[90%] bg-white rounded-2xl border-[2px] border-gray-300 w-full">
             <DatePicker
               modal={false}
               open={true}
