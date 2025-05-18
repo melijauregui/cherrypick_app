@@ -25,6 +25,7 @@
     "@react-navigation/native": "^7.0.14",
     "@shopify/flash-list": "^1.7.3",
     "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
     "dotenv": "^16.5.0",
     "eslint": "^9.26.0",
     "expo": "~52.0.37",

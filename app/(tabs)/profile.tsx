@@ -11,33 +11,28 @@ import { VerifyAccountDeletedSchema } from "@/schemas/auth/sign-up-schema";
 import * as SecureStore from "expo-secure-store";
 import { Ionicons } from "@expo/vector-icons";
 import { TextInput } from "react-native";
-import { set } from "zod";
-import { on } from "events";
-// import { X } from "lucide-react-native";
+import DatePicker from "react-native-date-picker";
+import { format, set } from "date-fns";
 
 const Profile = () => {
   const [profileData, setProfileData] = useState({
     username: "Amanda Jane",
     email: "amanda@gmail.com",
-    dateOfBirth: "20/05/1990",
+    dateOfBirth: new Date("2002-11-11"),
   });
 
-  const [typeValue, setTypeValue] = useState("");
-  const [editInputValue, setEditInputValue] = useState<string>("");
-  const [lastValue, setLastValue] = useState<string>("");
-  const [onSubmit, setOnSubmit] = useState<() => void>();
-
-  // ref
   const bottomSheetRef = useRef<BottomSheet>(null);
 
-  // callbacks
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log("handleSheetChanges", index);
-  }, []);
+  const bottomSheetRefDate = useRef<BottomSheet>(null);
 
-  const snapPoints = useMemo(() => ["20%"], []);
-  const openSheet = () => {
+  const openUsernameSheet = () => {
+    bottomSheetRefDate.current?.close();
     bottomSheetRef.current?.snapToIndex(0); // abre al 20%
+  };
+
+  const openUsernameSheetDate = () => {
+    bottomSheetRef.current?.close();
+    bottomSheetRefDate.current?.snapToIndex(0); // abre al 20%
   };
 
   return (
@@ -54,55 +49,68 @@ const Profile = () => {
                   Profile
                 </Text>
               </View>
-              {userNameInput(
-                profileData,
-                setTypeValue,
-                setLastValue,
-                setEditInputValue,
-                setOnSubmit,
-                () => {
-                  console.log(
-                    "Submit with Edit input value YESS2:",
-                    editInputValue
-                  );
-                  setProfileData((prev) => ({
-                    ...prev,
-                    username: editInputValue,
-                  }));
-                },
-                openSheet
-              )}
-              {renderProfileItem("Email", profileData.email, false)}
-              {renderProfileItem(
-                "Date of birth",
-                profileData.dateOfBirth,
-                true,
-                () => {
-                  setTypeValue("Date of birth");
-                  setLastValue(profileData.dateOfBirth);
-                  setEditInputValue(profileData.dateOfBirth);
-                  setOnSubmit(() => () => {
-                    setProfileData((prev) => ({
-                      ...prev,
-                      dateOfBirth: editInputValue,
-                    }));
-                  });
-                  openSheet();
-                }
-              )}
+              <RenderProfileItem
+                label="Username"
+                value={profileData.username}
+                canEdit={true}
+                onPress={openUsernameSheet}
+              />
+              <RenderProfileItem
+                label="Email"
+                value={profileData.email}
+                canEdit={false}
+              />
+              <RenderProfileItem
+                label="Date of Birth"
+                value={format(profileData.dateOfBirth, "dd/MM/yyyy")}
+                canEdit={true}
+                onPress={openUsernameSheetDate}
+              />
             </View>
           </View>
         </ScrollView>
-        {bottomSheet(
-          bottomSheetRef,
-          handleSheetChanges,
-          snapPoints,
-          typeValue,
-          editInputValue,
-          setEditInputValue,
-          lastValue,
-          onSubmit
-        )}
+        <CustomBottomSheet
+          bottomSheetRef={bottomSheetRef}
+          lastValue={profileData.username}
+          onSubmit={({ editInputValue }: { editInputValue: string }) => {
+            setProfileData((prev) => ({
+              ...prev,
+              username: editInputValue,
+            }));
+          }}
+        />
+        <CustomBottomSheet
+          bottomSheetRef={bottomSheetRef}
+          lastValue={profileData.username}
+          onSubmit={({ editInputValue }: { editInputValue: string }) => {
+            setProfileData((prev) => ({
+              ...prev,
+              username: editInputValue,
+            }));
+          }}
+        />
+        <CustomBottomSheetDate
+          bottomSheetRef={bottomSheetRefDate}
+          lastValue={profileData.dateOfBirth}
+          onSubmit={(val: Date) => {
+            setProfileData((prev) => ({
+              ...prev,
+              dateOfBirth: val,
+            }));
+          }}
+        />
+        {/* <DatePickerCustom
+          open={open}
+          setOpen={setOpen}
+          onSubmit={(newDate: Date) => {
+            setProfileData((prev) => ({
+              ...prev,
+              dateOfBirth: newDate,
+            }));
+          }}
+          lastValue={profileData.dateOfBirth}
+          modal={false}
+        /> */}
       </SafeAreaView>
     </GestureHandlerRootView>
   );
@@ -110,41 +118,25 @@ const Profile = () => {
 
 export default Profile;
 
-function userNameInput(
-  profileData: { username: string; email: string; dateOfBirth: string },
-  setTypeValue: React.Dispatch<React.SetStateAction<string>>,
-  setLastValue: React.Dispatch<React.SetStateAction<string>>,
-  setEditInputValue: React.Dispatch<React.SetStateAction<string>>,
-  setOnSubmit: React.Dispatch<React.SetStateAction<(() => void) | undefined>>,
-  funcWhenSubmit: () => void,
-  openSheet: () => void
-): React.ReactNode {
-  return renderProfileItem("Username", profileData.username, true, () => {
-    setTypeValue("username");
-    setLastValue(profileData.username);
-    setEditInputValue(profileData.username);
-    setOnSubmit(
-      () =>
-        // ← this outer arrow is React’s “updater” (called once),
-        //     and it returns the inner function as the new state.
-        () =>
-          funcWhenSubmit()
-    );
-    openSheet();
-  });
-}
-
-function bottomSheet(
-  bottomSheetRef: React.RefObject<BottomSheet>,
-  handleSheetChanges: (index: number) => void,
-  snapPoints: string[],
-  typeValue: string,
-  editInputValue: string,
-  setEditInputValue: React.Dispatch<React.SetStateAction<string>>,
-  lastValue: string,
-  onSubmit: (() => void) | undefined
-) {
+function CustomBottomSheet({
+  bottomSheetRef,
+  lastValue,
+  onSubmit,
+}: {
+  bottomSheetRef: React.RefObject<BottomSheet>;
+  lastValue: string;
+  onSubmit:
+    | (({ editInputValue }: { editInputValue: string }) => void)
+    | undefined;
+}) {
+  const [editInputValue, setEditInputValue] = useState<string>(lastValue);
+  const snapPoints = useMemo(() => ["20%"], []);
   const isReady = editInputValue.length > 0 && editInputValue !== lastValue;
+
+  // callbacks
+  const handleSheetChanges = useCallback((index: number) => {
+    console.log("handleSheetChanges", index);
+  }, []);
   return (
     <BottomSheet
       ref={bottomSheetRef}
@@ -172,7 +164,7 @@ function bottomSheet(
                 "onSubmit",
                 onSubmit == undefined
               );
-              onSubmit?.();
+              onSubmit?.({ editInputValue });
               bottomSheetRef.current?.close();
               console.log("onSubmit done");
             }}
@@ -191,7 +183,7 @@ function bottomSheet(
 
         <View className="flex flex-col justify-center items-center flex-1 px-5">
           <View className="flex flex-col h-[60px] px-[16px] bg-white rounded-2xl border-[2px] border-gray-300 w-full py-2">
-            <Text className="text-black font-pregular">{typeValue}</Text>
+            <Text className="text-black font-pregular">username</Text>
             <TextInput
               className="flex-1 text-black font-plight text-[16px] h-full"
               value={editInputValue}
@@ -203,6 +195,80 @@ function bottomSheet(
             {/* {name.length > 0 && (
 
         )} */}
+          </View>
+        </View>
+      </BottomSheetView>
+    </BottomSheet>
+  );
+}
+
+function CustomBottomSheetDate({
+  bottomSheetRef,
+  lastValue,
+  onSubmit,
+}: {
+  bottomSheetRef: React.RefObject<BottomSheet>;
+  lastValue: Date;
+  onSubmit?: (editInputValue: Date) => void;
+}) {
+  const [editInputValue, setEditInputValue] = useState<Date>(lastValue);
+  const snapPoints = useMemo(() => ["33%"], []);
+  const isReady =
+    editInputValue.getFullYear() !== lastValue.getFullYear() ||
+    editInputValue.getMonth() !== lastValue.getMonth() ||
+    editInputValue.getDate() !== lastValue.getDate();
+
+  // callbacks
+  const handleSheetChanges = useCallback((index: number) => {
+    console.log("handleSheetChanges", index);
+  }, []);
+  return (
+    <BottomSheet
+      ref={bottomSheetRef}
+      onChange={handleSheetChanges}
+      index={-1}
+      snapPoints={snapPoints}
+    >
+      <BottomSheetView className="flex-1 bg-white w-full">
+        <View className="flex flex-row justify-between items-center py-3 border-b border-gray-300 px-6">
+          <TouchableOpacity
+            className="justify-center"
+            onPress={() => bottomSheetRef.current?.close()}
+          >
+            <Text className="text-xl text-black font-pmedium">Cancel</Text>
+          </TouchableOpacity>
+
+          <Text className="text-black font-pmedium text-xl ">Edit Profile</Text>
+
+          <TouchableOpacity
+            className="flex flex-row"
+            onPress={() => {
+              onSubmit?.(editInputValue);
+              bottomSheetRef.current?.close();
+            }}
+            disabled={!isReady}
+          >
+            <Text
+              className={`
+              text-xl  font-pmedium
+              ${!isReady ? "text-black opacity-40" : "text-black"}
+            `}
+            >
+              Done
+            </Text>
+          </TouchableOpacity>
+        </View>
+        <View className="flex flex-col justify-center items-center flex-1 px-5">
+          <View className="flex flex-col justify-center items-center h-[190px] px-[10px] bg-white rounded-2xl border-[2px] border-gray-300 w-full">
+            <DatePicker
+              modal={false}
+              open={true}
+              date={editInputValue}
+              mode="date"
+              // @ts-ignore
+              androidVariant="nativeAndroid"
+              onDateChange={setEditInputValue}
+            />
           </View>
         </View>
       </BottomSheetView>
@@ -276,19 +342,24 @@ const DeleteAccountButton: React.FC<{
   );
 };
 
-const renderProfileItem = (
-  label: string,
-  value: string,
-  canEdit: boolean,
-  onPress?: () => void
-) => {
+const RenderProfileItem = ({
+  label,
+  value,
+  canEdit,
+  onPress,
+}: {
+  label: string;
+  value: string;
+  canEdit: boolean;
+  onPress?: () => void;
+}) => {
   return (
     <View className="flex flex-row justify-between py-5 border-b-[0.5px] border-b-gray-500">
       <Text className="text-xl text-white">{label}</Text>
       <View className="flex flex-row ">
         <Text className="text-xl text-white ">{value}</Text>
         {canEdit && (
-          <TouchableOpacity className="ml-2 p-2 " onPress={onPress}>
+          <TouchableOpacity className="ml-4" onPress={onPress}>
             <Ionicons name="pencil-outline" size={18} color="#6b7280" />
           </TouchableOpacity>
         )}
@@ -296,3 +367,27 @@ const renderProfileItem = (
     </View>
   );
 };
+
+function DatePickerCustom({
+  open,
+  date,
+  setDate,
+  modal,
+}: {
+  open: boolean;
+  date: Date;
+  setDate: React.Dispatch<React.SetStateAction<Date>>;
+  modal: boolean;
+}) {
+  return (
+    <DatePicker
+      modal={modal}
+      open={open}
+      date={date}
+      mode="date"
+      // @ts-ignore
+      androidVariant="nativeAndroid"
+      onDateChange={setDate}
+    />
+  );
+}

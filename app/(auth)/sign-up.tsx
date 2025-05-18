@@ -328,3 +328,40 @@ const DateOfBirthInput = ({
     {error && <Text className="text-red-500 pt-0.5">{error}</Text>}
   </View>
 );
+
+// function DatePickerCustom({
+//   open,
+//   setOpen,
+//   onSubmit,
+//   lastValue,
+//   modal,
+// }: {
+//   open: boolean;
+//   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+//   onSubmit: (newDate: Date) => void;
+//   lastValue: Date;
+//   modal: boolean;
+// }) {
+//   const [date, setDate] = useState<Date>(
+//     lastValue ? new Date(lastValue) : new Date()
+//   );
+
+//   return (
+//     <DatePicker
+//       modal={modal}
+//       open={open}
+//       date={date}
+//       mode="date"
+//       // @ts-ignore
+//       androidVariant="nativeAndroid"
+//       onConfirm={(date: Date) => {
+//         setOpen(false);
+//         onSubmit?.(date);
+//       }}
+//       onCancel={() => {
+//         setOpen(false);
+//         onSubmit?.(lastValue);
+//       }}
+//     />
+//   );
+// }
