@@ -1,5 +1,5 @@
 import { ImageSourcePropType } from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { GestureHandlerRootView, gestureHandlerRootHOC } from "react-native-gesture-handler";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useCallback, useMemo, useRef } from "react";
@@ -105,6 +105,7 @@ const Profile = () => {
     bottomSheetRefPreferences.current?.close();
     bottomSheetRefLogout.current?.close();
     bottomSheetRef.current?.snapToIndex(0); // abre al 20%
+
   };
 
   const openUsernameSheetDate = () => {
@@ -129,115 +130,118 @@ const Profile = () => {
   };
 
   return (
-    <GestureHandlerRootView className="bg-brown-strong flex-1 h-full w-full">
-      <SafeAreaView className="flex-1 flex-col px-14 pt-3 ">
-        <View className="w-full">
-          <View className="flex  flex-col w-full justify-between">
-            <View className="flex flex-col w-full">
-              <View className="flex flex-row w-full items-center relative py-6">
-                <Text className="text-white text-[27px] font-pregular  absolute left-0 right-0 text-center">
-                  Profile
-                </Text>
-                <View className="flex flex-row mr-auto">
-                  <TouchableOpacity onPress={openUsernameSheetLogout}>
-                    <Ionicons
-                      name="settings-outline"
-                      size={25}
-                      color="#6b7280"
-                    />
-                    {/* <MaterialIcons name="logout" size={25} color="#6b7280" /> */}
-                  </TouchableOpacity>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <View className="bg-brown-strong flex-1">
+
+        <SafeAreaView className="flex-1 flex-col px-14 pt-3 ">
+          <View className="w-full">
+            <View className="flex  flex-col w-full justify-between">
+              <View className="flex flex-col w-full">
+                <View className="flex flex-row w-full items-center relative py-6">
+                  <Text className="text-white text-[27px] font-pregular  absolute left-0 right-0 text-center">
+                    Profile
+                  </Text>
+                  <View className="flex flex-row mr-auto">
+                    <TouchableOpacity onPress={openUsernameSheetLogout}>
+                      <Ionicons
+                        name="settings-outline"
+                        size={25}
+                        color="#6b7280"
+                      />
+                      {/* <MaterialIcons name="logout" size={25} color="#6b7280" /> */}
+                    </TouchableOpacity>
+                  </View>
                 </View>
+                <RenderProfileItem
+                  label="Username"
+                  value={profileData.username}
+                  canEdit={true}
+                  onPress={openUsernameSheet}
+                />
+                <RenderProfileItem
+                  label="Email"
+                  value={profileData.email}
+                  canEdit={false}
+                />
+                <RenderProfileItem
+                  label="Date of Birth"
+                  value={format(profileData.dateOfBirth, "dd/MM/yyyy")}
+                  canEdit={true}
+                  onPress={openUsernameSheetDate}
+                />
               </View>
-              <RenderProfileItem
-                label="Username"
-                value={profileData.username}
-                canEdit={true}
-                onPress={openUsernameSheet}
-              />
-              <RenderProfileItem
-                label="Email"
-                value={profileData.email}
-                canEdit={false}
-              />
-              <RenderProfileItem
-                label="Date of Birth"
-                value={format(profileData.dateOfBirth, "dd/MM/yyyy")}
-                canEdit={true}
-                onPress={openUsernameSheetDate}
-              />
             </View>
           </View>
-        </View>
-        <View className="flex flex-col w-full h-full">
-          <RenderProfileItemPreferences
-            label="Preferences"
-            value={profileData.preferences.map((item) => ({
-              title: item,
-              image: DATA_MAP.get(item) ?? images.bohoChicImage, // TODO !!
-            }))}
-            onPress={openUsernameSheetPreferences}
+          <View className="flex flex-col w-full h-full">
+            <RenderProfileItemPreferences
+              label="Preferences"
+              value={profileData.preferences.map((item) => ({
+                title: item,
+                image: DATA_MAP.get(item) ?? images.bohoChicImage, // TODO !!
+              }))}
+              onPress={openUsernameSheetPreferences}
+            />
+          </View>
+          <CustomBottomSheet
+            bottomSheetRef={bottomSheetRef}
+            lastValue={profileData.username}
+            onSubmit={async (editInputValue: string) => {
+              try {
+                await updateUser({ username: editInputValue, email: profileData.email, dateOfBirth: profileData.dateOfBirth, preferences: profileData.preferences });
+                setProfileData(prev => ({ ...prev, username: editInputValue }));
+              } catch (error) {
+                console.error("Error updating username:", error);
+              }
+            }}
           />
-        </View>
-        <CustomBottomSheet
-          bottomSheetRef={bottomSheetRef}
-          lastValue={profileData.username}
-          onSubmit={async (editInputValue: string) => {
-            try {
-              await updateUser({ username: editInputValue, email: profileData.email, dateOfBirth: profileData.dateOfBirth, preferences: profileData.preferences });
-              setProfileData(prev => ({ ...prev, username: editInputValue }));
-            } catch (error) {
-              console.error("Error updating username:", error);
-            }
-          }}
-        />
-        <CustomBottomSheet
-          bottomSheetRef={bottomSheetRef}
-          lastValue={profileData.username}
-          onSubmit={async (editInputValue: string) => {
-            try {
-              await updateUser({ username: editInputValue, email: profileData.email, dateOfBirth: profileData.dateOfBirth, preferences: profileData.preferences });
-              setProfileData(prev => ({ ...prev, username: editInputValue }));
-            } catch (error) {
-              console.error("Error updating username:", error);
-            }
-          }}
-        />
-        <CustomBottomSheetDate
-          bottomSheetRef={bottomSheetRefDate}
-          lastValue={profileData.dateOfBirth}
-          onSubmit={async (editInputValue: Date) => {
-            try {
-              await updateUser({ dateOfBirth: editInputValue, username: profileData.username, email: profileData.email, preferences: profileData.preferences });
-              setProfileData(prev => ({ ...prev, dateOfBirth: editInputValue }));
-            } catch (error) {
-              console.error("Error updating date of birth:", error);
-            }
-          }}
-        />
-        <CustomBottomSheetPreferences
-          bottomSheetRef={bottomSheetRefPreferences}
-          lastValue={profileData.preferences}
-          totalItems={DATA}
-          onSubmit={async (val: string[]) => {
-            try {
-              await updateUser({ preferences: val, username: profileData.username, email: profileData.email, dateOfBirth: profileData.dateOfBirth });
-              setProfileData((prev) => ({
-                ...prev,
-                preferences: val,
-              }));
-            } catch (error) {
-              console.error("Error updating preferences:", error);
-            }
-          }}
-        />
-        <CustomBottomLogout
-          bottomSheetRef={bottomSheetRefLogout}
-          logout={logout}
-          loading={loading}
-          user={user}
-        />
-      </SafeAreaView>
+          <CustomBottomSheet
+            bottomSheetRef={bottomSheetRef}
+            lastValue={profileData.username}
+            onSubmit={async (editInputValue: string) => {
+              try {
+                await updateUser({ username: editInputValue, email: profileData.email, dateOfBirth: profileData.dateOfBirth, preferences: profileData.preferences });
+                setProfileData(prev => ({ ...prev, username: editInputValue }));
+              } catch (error) {
+                console.error("Error updating username:", error);
+              }
+            }}
+          />
+          <CustomBottomSheetDate
+            bottomSheetRef={bottomSheetRefDate}
+            lastValue={profileData.dateOfBirth}
+            onSubmit={async (editInputValue: Date) => {
+              try {
+                await updateUser({ dateOfBirth: editInputValue, username: profileData.username, email: profileData.email, preferences: profileData.preferences });
+                setProfileData(prev => ({ ...prev, dateOfBirth: editInputValue }));
+              } catch (error) {
+                console.error("Error updating date of birth:", error);
+              }
+            }}
+          />
+          <CustomBottomSheetPreferences
+            bottomSheetRef={bottomSheetRefPreferences}
+            lastValue={profileData.preferences}
+            totalItems={DATA}
+            onSubmit={async (val: string[]) => {
+              try {
+                await updateUser({ preferences: val, username: profileData.username, email: profileData.email, dateOfBirth: profileData.dateOfBirth });
+                setProfileData((prev) => ({
+                  ...prev,
+                  preferences: val,
+                }));
+              } catch (error) {
+                console.error("Error updating preferences:", error);
+              }
+            }}
+          />
+          <CustomBottomLogout
+            bottomSheetRef={bottomSheetRefLogout}
+            logout={logout}
+            loading={loading}
+            user={user}
+          />
+        </SafeAreaView>
+      </View>
     </GestureHandlerRootView>
   );
 };
@@ -259,7 +263,7 @@ function CustomBottomSheet({
 
   const userNameInput = (
     <View className="flex flex-col justify-center items-center flex-1 px-5">
-      <View className="flex flex-col h-[60px] px-[16px] bg-white rounded-2xl border-[2px] border-gray-300 w-full py-2">
+      <View className="flex flex-col h-[70px] px-[16px] bg-white rounded-2xl border-[2px] border-gray-300 w-full py-2">
         <Text className="text-black font-pregular">username</Text>
         <TextInput
           className="flex-1 text-black font-plight text-[16px] h-full"
