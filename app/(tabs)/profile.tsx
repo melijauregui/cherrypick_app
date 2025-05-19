@@ -9,7 +9,12 @@ import { TouchableOpacity, Text, ScrollView } from "react-native";
 import { safeFetch } from "@/utils/safe-fetch";
 import { VerifyAccountDeletedSchema } from "@/schemas/auth/sign-up-schema";
 import * as SecureStore from "expo-secure-store";
-import { Ionicons } from "@expo/vector-icons";
+import {
+  Ionicons,
+  MaterialIcons,
+  AntDesign,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import { TextInput } from "react-native";
 import DatePicker from "react-native-date-picker";
 import { format, set } from "date-fns";
@@ -41,29 +46,40 @@ const Profile = () => {
     username: "Amanda Jane",
     email: "amanda@gmail.com",
     dateOfBirth: new Date("2002-11-11"),
-    preferences: ["Boho-chic", "Sporty"],
+    preferences: ["Boho-chic", "Sporty", "Old money"],
   });
 
   const bottomSheetRef = useRef<BottomSheet>(null);
   const bottomSheetRefDate = useRef<BottomSheet>(null);
   const bottomSheetRefPreferences = useRef<BottomSheet>(null);
+  const bottomSheetRefLogout = useRef<BottomSheet>(null);
 
   const openUsernameSheet = () => {
     bottomSheetRefDate.current?.close();
     bottomSheetRefPreferences.current?.close();
+    bottomSheetRefLogout.current?.close();
     bottomSheetRef.current?.snapToIndex(0); // abre al 20%
   };
 
   const openUsernameSheetDate = () => {
     bottomSheetRef.current?.close();
     bottomSheetRefPreferences.current?.close();
+    bottomSheetRefLogout.current?.close();
     bottomSheetRefDate.current?.snapToIndex(0);
   };
 
   const openUsernameSheetPreferences = () => {
     bottomSheetRef.current?.close();
     bottomSheetRefDate.current?.close();
+    bottomSheetRefLogout.current?.close();
     bottomSheetRefPreferences.current?.snapToIndex(0);
+  };
+
+  const openUsernameSheetLogout = () => {
+    bottomSheetRef.current?.close();
+    bottomSheetRefDate.current?.close();
+    bottomSheetRefPreferences.current?.close();
+    bottomSheetRefLogout.current?.snapToIndex(0);
   };
 
   return (
@@ -72,10 +88,15 @@ const Profile = () => {
         <View className="w-full">
           <View className="flex  flex-col w-full justify-between">
             <View className="flex flex-col w-full">
-              <View className="items-center justify-center p-6">
-                <Text className="text-white text-[27px] font-psemibold text-justify">
+              <View className="flex flex-row w-full items-center relative py-6">
+                <Text className="text-white text-[27px] font-pregular  absolute left-0 right-0 text-center">
                   Profile
                 </Text>
+                <View className="flex flex-row mr-auto">
+                  <TouchableOpacity onPress={openUsernameSheetLogout}>
+                    <MaterialIcons name="logout" size={25} color="#6b7280" />
+                  </TouchableOpacity>
+                </View>
               </View>
               <RenderProfileItem
                 label="Username"
@@ -110,7 +131,7 @@ const Profile = () => {
         <CustomBottomSheet
           bottomSheetRef={bottomSheetRef}
           lastValue={profileData.username}
-          onSubmit={({ editInputValue }: { editInputValue: string }) => {
+          onSubmit={(editInputValue: string) => {
             setProfileData((prev) => ({
               ...prev,
               username: editInputValue,
@@ -120,7 +141,7 @@ const Profile = () => {
         <CustomBottomSheet
           bottomSheetRef={bottomSheetRef}
           lastValue={profileData.username}
-          onSubmit={({ editInputValue }: { editInputValue: string }) => {
+          onSubmit={(editInputValue: string) => {
             setProfileData((prev) => ({
               ...prev,
               username: editInputValue,
@@ -162,77 +183,68 @@ function CustomBottomSheet({
 }: {
   bottomSheetRef: React.RefObject<BottomSheet>;
   lastValue: string;
-  onSubmit:
-    | (({ editInputValue }: { editInputValue: string }) => void)
-    | undefined;
+  onSubmit: (editInputValue: string) => void;
 }) {
   const [editInputValue, setEditInputValue] = useState<string>(lastValue);
   const snapPoints = useMemo(() => ["20%"], []);
   const isReady = editInputValue.length > 0 && editInputValue !== lastValue;
 
-  // callbacks
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log("handleSheetChanges", index);
-  }, []);
+  const userNameInput = (
+    <View className="flex flex-col justify-center items-center flex-1 px-5">
+      <View className="flex flex-col h-[60px] px-[16px] bg-white rounded-2xl border-[2px] border-gray-300 w-full py-2">
+        <Text className="text-black font-pregular">username</Text>
+        <TextInput
+          className="flex-1 text-black font-plight text-[16px] h-full"
+          value={editInputValue}
+          onChangeText={setEditInputValue}
+          placeholder={lastValue}
+          placeholderTextColor="#666"
+          selectionColor="#3478F6"
+        />
+      </View>
+    </View>
+  );
   return (
-    <BottomSheet
-      ref={bottomSheetRef}
-      onChange={handleSheetChanges}
-      index={-1}
+    <BottomSheetSame
+      bottomSheetRef={bottomSheetRef}
+      onSubmit={onSubmit ? () => onSubmit(editInputValue) : undefined}
+      isReady={isReady}
+      hasDone={true}
       snapPoints={snapPoints}
-    >
-      <BottomSheetView className="flex-1 bg-white">
-        <View className="flex flex-row justify-between items-center py-3 border-b border-gray-300 px-6">
-          <TouchableOpacity
-            className="justify-center"
-            onPress={() => bottomSheetRef.current?.close()}
-          >
-            <Text className="text-xl text-black font-pmedium">Cancel</Text>
-          </TouchableOpacity>
+      componentView={userNameInput}
+    />
+  );
+}
 
-          <Text className="text-black font-pmedium text-xl ">Edit Profile</Text>
+function CustomBottomLogout({
+  bottomSheetRef,
+  lastValue,
+  onSubmit,
+}: {
+  bottomSheetRef: React.RefObject<BottomSheet>;
+  lastValue: string;
+  onSubmit: (editInputValue: string) => void;
+}) {
+  const [editInputValue, setEditInputValue] = useState<string>(lastValue);
+  const snapPoints = useMemo(() => ["20%"], []);
+  const isReady = editInputValue.length > 0 && editInputValue !== lastValue;
 
-          <TouchableOpacity
-            className="flex flex-row"
-            onPress={() => {
-              console.log(
-                "Submit YESS:",
-                editInputValue,
-                "onSubmit",
-                onSubmit == undefined
-              );
-              onSubmit?.({ editInputValue });
-              bottomSheetRef.current?.close();
-              console.log("onSubmit done");
-            }}
-            disabled={!isReady}
-          >
-            <Text
-              className={`
-              text-xl  font-pmedium
-              ${!isReady ? "text-black opacity-40" : "text-black"}
-            `}
-            >
-              Done
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        <View className="flex flex-col justify-center items-center flex-1 px-5">
-          <View className="flex flex-col h-[60px] px-[16px] bg-white rounded-2xl border-[2px] border-gray-300 w-full py-2">
-            <Text className="text-black font-pregular">username</Text>
-            <TextInput
-              className="flex-1 text-black font-plight text-[16px] h-full"
-              value={editInputValue}
-              onChangeText={setEditInputValue}
-              placeholder={lastValue}
-              placeholderTextColor="#666"
-              selectionColor="#3478F6"
-            />
-          </View>
-        </View>
-      </BottomSheetView>
-    </BottomSheet>
+  const buttonsLogoutDelete = (
+    <View className="flex flex-col justify-center items-center flex-1 px-5">
+      <View className="flex flex-col h-[60px] px-[16px] bg-white rounded-2xl border-[2px] border-gray-300 w-full py-2">
+        {/* <LogOutButton logout={onSubmit} /> */}
+      </View>
+    </View>
+  );
+  return (
+    <BottomSheetSame
+      bottomSheetRef={bottomSheetRef}
+      onSubmit={onSubmit ? () => onSubmit(editInputValue) : undefined}
+      isReady={isReady}
+      hasDone={true}
+      snapPoints={snapPoints}
+      componentView={buttonsLogoutDelete}
+    />
   );
 }
 
@@ -252,61 +264,30 @@ function CustomBottomSheetDate({
     editInputValue.getMonth() !== lastValue.getMonth() ||
     editInputValue.getDate() !== lastValue.getDate();
 
-  // callbacks
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log("handleSheetChanges", index);
-  }, []);
+  const datePicker = (
+    <View className="flex flex-col justify-center items-center flex-1 px-3">
+      <View className="flex flex-col justify-center items-center h-[90%] bg-white rounded-2xl border-[2px] border-gray-300 w-full">
+        <DatePicker
+          modal={false}
+          open={true}
+          date={editInputValue}
+          mode="date"
+          // @ts-ignore
+          androidVariant="nativeAndroid"
+          onDateChange={setEditInputValue}
+        />
+      </View>
+    </View>
+  );
   return (
-    <BottomSheet
-      ref={bottomSheetRef}
-      onChange={handleSheetChanges}
-      index={-1}
+    <BottomSheetSame
+      bottomSheetRef={bottomSheetRef}
+      onSubmit={onSubmit ? () => onSubmit(editInputValue) : undefined}
+      isReady={isReady}
+      hasDone={true}
       snapPoints={snapPoints}
-    >
-      <BottomSheetView className="flex-1 bg-white w-full">
-        <View className="flex flex-row justify-between items-center py-3 border-b border-gray-300 px-6">
-          <TouchableOpacity
-            className="justify-center"
-            onPress={() => bottomSheetRef.current?.close()}
-          >
-            <Text className="text-xl text-black font-pmedium">Cancel</Text>
-          </TouchableOpacity>
-
-          <Text className="text-black font-pmedium text-xl ">Edit Profile</Text>
-
-          <TouchableOpacity
-            className="flex flex-row"
-            onPress={() => {
-              onSubmit?.(editInputValue);
-              bottomSheetRef.current?.close();
-            }}
-            disabled={!isReady}
-          >
-            <Text
-              className={`
-              text-xl  font-pmedium
-              ${!isReady ? "text-black opacity-40" : "text-black"}
-            `}
-            >
-              Done
-            </Text>
-          </TouchableOpacity>
-        </View>
-        <View className="flex flex-col justify-center items-center flex-1 px-3">
-          <View className="flex flex-col justify-center items-center h-[90%] bg-white rounded-2xl border-[2px] border-gray-300 w-full">
-            <DatePicker
-              modal={false}
-              open={true}
-              date={editInputValue}
-              mode="date"
-              // @ts-ignore
-              androidVariant="nativeAndroid"
-              onDateChange={setEditInputValue}
-            />
-          </View>
-        </View>
-      </BottomSheetView>
-    </BottomSheet>
+      componentView={datePicker}
+    />
   );
 }
 
@@ -323,8 +304,47 @@ function CustomBottomSheetPreferences({
 }) {
   const [editInputValue, setEditInputValue] = useState<string[]>(lastValue);
   const snapPoints = useMemo(() => ["33%"], []);
-  const isReady = !setsEqual(editInputValue, lastValue);
+  const isReady =
+    !setsEqual(editInputValue, lastValue) && editInputValue.length > 0;
 
+  const carouselPreferences = (
+    <View className="flex flex-col justify-center items-center flex-1">
+      <View className="flex flex-col  justify-center items-center h-[90%] bg-white rounded-2xl w-full py-2">
+        <CarouselWithFlatList
+          data={totalItems}
+          itemsSelected={editInputValue}
+          setItemsSelected={setEditInputValue}
+        />
+      </View>
+    </View>
+  );
+  return (
+    <BottomSheetSame
+      bottomSheetRef={bottomSheetRef}
+      onSubmit={onSubmit ? () => onSubmit(editInputValue) : undefined}
+      isReady={isReady}
+      hasDone={true}
+      snapPoints={snapPoints}
+      componentView={carouselPreferences}
+    />
+  );
+}
+
+function BottomSheetSame({
+  bottomSheetRef,
+  onSubmit,
+  isReady,
+  hasDone = true,
+  snapPoints,
+  componentView,
+}: {
+  bottomSheetRef: React.RefObject<BottomSheet>;
+  onSubmit: (() => void) | undefined;
+  isReady: boolean;
+  hasDone?: boolean;
+  snapPoints: string[];
+  componentView: React.ReactNode;
+}) {
   // callbacks
   const handleSheetChanges = useCallback((index: number) => {
     console.log("handleSheetChanges", index);
@@ -347,33 +367,27 @@ function CustomBottomSheetPreferences({
 
           <Text className="text-black font-pmedium text-xl ">Edit Profile</Text>
 
-          <TouchableOpacity
-            className="flex flex-row"
-            onPress={() => {
-              onSubmit?.(editInputValue);
-              bottomSheetRef.current?.close();
-            }}
-            disabled={!isReady}
-          >
-            <Text
-              className={`
+          {hasDone && (
+            <TouchableOpacity
+              className="flex flex-row"
+              onPress={() => {
+                onSubmit?.();
+                bottomSheetRef.current?.close();
+              }}
+              disabled={!isReady}
+            >
+              <Text
+                className={`
               text-xl  font-pmedium
               ${!isReady ? "text-black opacity-40" : "text-black"}
             `}
-            >
-              Done
-            </Text>
-          </TouchableOpacity>
+              >
+                Done
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
-        <View className="flex flex-col justify-center items-center flex-1">
-          <View className="flex flex-col  justify-center items-center h-[90%] bg-white rounded-2xl w-full py-2">
-            <CarouselWithFlatList
-              data={totalItems}
-              itemsSelected={editInputValue}
-              setItemsSelected={setEditInputValue}
-            />
-          </View>
-        </View>
+        {componentView}
       </BottomSheetView>
     </BottomSheet>
   );
@@ -458,9 +472,10 @@ const RenderProfileItem = ({
 }) => {
   return (
     <View className="flex flex-row justify-between py-5 border-b-[0.5px] border-b-gray-500">
-      <Text className="text-xl text-white">{label}</Text>
+      {/* <View className="flex flex-row justify-between py-3 my-2 px-[16px] rounded-2xl border-[1px] border-gray-500 "> */}
+      <Text className="text-xl text-white font-pregular">{label}</Text>
       <View className="flex flex-row ">
-        <Text className="text-xl text-white ">{value}</Text>
+        <Text className="text-xl text-white font-plight">{value}</Text>
         {canEdit && (
           <TouchableOpacity className="ml-4" onPress={onPress}>
             <Ionicons name="pencil-outline" size={18} color="#6b7280" />
@@ -483,7 +498,7 @@ const RenderProfileItemPreferences = ({
   return (
     <View className="flex flex-1 flex-col w-full h-full">
       <View className="flex flex-row  py-5 items-center relative">
-        <Text className="text-xl text-white absolute left-0 right-0 text-center">
+        <Text className="text-xl text-white absolute left-0 right-0 text-center font-pmedium">
           {label}
         </Text>
         <View className="flex flex-row ml-auto">
@@ -497,7 +512,6 @@ const RenderProfileItemPreferences = ({
           data={value}
           renderItem={renderItem2}
           keyExtractor={(item) => item.title}
-          // extraData={selectedIdxs}
           numColumns={2}
           columnWrapperStyle={{
             justifyContent: "space-between",
@@ -518,7 +532,6 @@ function setsEqual(a: string[], b: string[]): boolean {
 
 const renderItem = ({
   item,
-  index,
   itemsSelected,
   setItemsSelected,
 }: {
@@ -538,7 +551,6 @@ const renderItem = ({
   }
 
   return (
-    // <View className="aspect-[1] px-1" style={{ width: width * 0.45 }}>
     <TouchableOpacity
       onPress={() => handleOnpress(item.title)}
       className="aspect-[1] px-1 pb-3"
@@ -550,16 +562,15 @@ const renderItem = ({
             w-full
             h-full
             rounded-2xl
-            ${isSelected ? "border-4 border-brown-strong" : ""}
+            ${isSelected ? "" : "opacity-50"}
           `}
         resizeMode="cover"
       />
     </TouchableOpacity>
-    // </View>
   );
 };
 
-const renderItem2 = ({ item, index }: { item: ItemData; index: number }) => {
+const renderItem2 = ({ item }: { item: ItemData; index: number }) => {
   return (
     <View className="w-[49%] aspect-[1] pb-2">
       <Image
