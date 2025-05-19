@@ -150,21 +150,19 @@ const Item = ({
   return (
     <TouchableOpacity
       onPress={onPress}
-      className="w-[50%] flex flex-col items-center justify-center mb-4 "
+      className="w-[49%] aspect-[1] my-4 flex flex-col items-center justify-center "
     >
       <Image
         source={item.image}
         className={`
           w-full  
-          h-[160px]        
-          aspect-[1]   
+          h-full
           rounded-2xl
-          mb-1
           ${isSelected ? "border-2 border-white" : ""}
         `}
         resizeMode="cover"
       />
-      <Text className="text-gray-400">{item.title}</Text>
+      <Text className="mt-1 text-gray-400">{item.title}</Text>
     </TouchableOpacity>
   );
 };
