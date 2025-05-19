@@ -34,6 +34,9 @@ import {
   CreateAccountSchemaRes,
   CreateAccountSchemaResType,
   CreateAccountSchema,
+  QueryGetUserSchema,
+  UserSchemaRes,
+  UserSchemaResType,
 } from "../schemas/auth/preferences-schema";
 import {
   queryDbSchemaUser,
@@ -469,6 +472,59 @@ app.openapi(deleteAccountRoute, async (c) => {
       };
     } else {
       // return c.json({ error: true as true, details: "User not found" }, 200);
+      res = {
+        error: true,
+        details: "User not found",
+      };
+    }
+  } catch (error) {
+    console.error(error);
+    return c.json({ error: true as true, details: "Server error" }, 200);
+  }
+  return c.json(res, 200);
+});
+
+const getUserRoute = createRoute({
+  method: "get",
+  path: "/get-user",
+  request: {
+    query: QueryGetUserSchema,
+  },
+  responses: {
+    200: {
+      description: "Obtiene la información del usuario",
+      content: {
+        "application/json": {
+          schema: UserSchemaRes,
+        },
+      },
+    },
+  },
+});
+
+app.openapi(getUserRoute, async (c) => {
+  const { email } = c.req.valid("query");
+  let res: UserSchemaResType;
+
+  try {
+    const [result]: any = await db.query("SELECT * FROM users WHERE email = ?", [
+      email,
+    ]);
+
+    if (result.length > 0) {
+      const parsedRows = queryDbSchemaUser.parse(result);
+      const { name, email, date_of_birth, preferences } = parsedRows[0];
+      console.log("User found (get):", parsedRows[0]);
+      res = {
+        error: false,
+        user: {
+          username: name,
+          email: email,
+          dateOfBirth: date_of_birth,
+          preferences: preferences,
+        },
+      };
+    } else {
       res = {
         error: true,
         details: "User not found",

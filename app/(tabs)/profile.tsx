@@ -22,6 +22,7 @@ import images from "../../constants/images";
 import { FlatList, View, Image } from "react-native";
 import { Dimensions } from "react-native";
 import { useAuth } from "@/context/AuthContext";
+import { CreateAccountSchema, UserSchemaRes } from "@/schemas/auth/preferences-schema";
 
 type ItemData = {
   title: string;
@@ -43,12 +44,60 @@ const DATA = Array.from(DATA_MAP.entries()).map(([title, image]) => ({
 }));
 
 const Profile = () => {
-  const [profileData, setProfileData] = useState({
-    username: "Amanda Jane",
-    email: "amanda@gmail.com",
-    dateOfBirth: new Date("2002-11-11"),
-    preferences: ["Boho-chic", "Sporty", "Old money"],
+  const { user, loading, logout } = useAuth();
+
+  const [profileData, setProfileData] = useState<{
+    username: string;
+    email: string;
+    dateOfBirth: Date;
+    preferences: string[];
+  }>({
+    username: "",
+    email: "",
+    dateOfBirth: new Date(),
+    preferences: [],
   });
+
+  React.useEffect(() => {
+    if (!user || !user.email) {
+      console.log("No user or email found");
+      return;
+    }
+    const fetchUserData = async () => {
+      console.log("Fetching user data for email:", user.email);
+      try {
+        const { data } = await safeFetch({
+          url: `http://${LOCAL_IP}:3000/get-user?email=${user.email}`,
+          method: "GET",
+          //headers: { "Content-Type": "application/json" },
+          schema: UserSchemaRes,
+        });
+        console.log("data", data);
+        if (data.error) {
+          console.log("Error fetching user data:", data.details);
+          return;
+        }
+        console.log("User data fetched successfully:", data.user);
+        setProfileData({
+          username: data.user.username,
+          email: data.user.email,
+          preferences: data.user.preferences,
+          dateOfBirth: new Date(data.user.dateOfBirth),
+        });
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+    fetchUserData();
+  }, [user]);
+
+  //const [profileData, setProfileData] = useState({
+  //  username: "Amanda Jane",
+  //  email: "amanda@gmail.com",
+  //  dateOfBirth: new Date("2002-11-11"),
+  //  preferences: ["Boho-chic", "Sporty", "Old money"],
+  //});
+  console.log("profileData", profileData);
 
   const bottomSheetRef = useRef<BottomSheet>(null);
   const bottomSheetRefDate = useRef<BottomSheet>(null);
@@ -81,15 +130,6 @@ const Profile = () => {
     bottomSheetRefDate.current?.close();
     bottomSheetRefPreferences.current?.close();
     bottomSheetRefLogout.current?.snapToIndex(0);
-  };
-
-  // const { user, loading, logout, setUser } = useAuth();
-  const user = null;
-  const loading = false;
-  const logout = async () => {
-    // Simulate a logout function
-    await new Promise((resolve) => setTimeout(resolve, 1));
-    // setUser(null);
   };
 
   return (
@@ -399,9 +439,8 @@ function BottomSheetSame({
           )}
 
           <Text
-            className={`text-black font-pmedium text-xl ${
-              hasDone ? "" : "absolute right-0 left-0 text-center"
-            }`}
+            className={`text-black font-pmedium text-xl ${hasDone ? "" : "absolute right-0 left-0 text-center"
+              }`}
           >
             {value}
           </Text>
