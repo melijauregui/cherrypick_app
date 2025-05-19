@@ -21,6 +21,7 @@ import { format, set } from "date-fns";
 import images from "../../constants/images";
 import { FlatList, View, Image } from "react-native";
 import { Dimensions } from "react-native";
+import { useAuth } from "@/context/AuthContext";
 
 type ItemData = {
   title: string;
@@ -82,6 +83,15 @@ const Profile = () => {
     bottomSheetRefLogout.current?.snapToIndex(0);
   };
 
+  // const { user, loading, logout, setUser } = useAuth();
+  const user = null;
+  const loading = false;
+  const logout = async () => {
+    // Simulate a logout function
+    await new Promise((resolve) => setTimeout(resolve, 1));
+    // setUser(null);
+  };
+
   return (
     <GestureHandlerRootView className="bg-brown-strong flex-1 h-full w-full">
       <SafeAreaView className="flex-1 flex-col px-14 pt-3 ">
@@ -94,7 +104,12 @@ const Profile = () => {
                 </Text>
                 <View className="flex flex-row mr-auto">
                   <TouchableOpacity onPress={openUsernameSheetLogout}>
-                    <MaterialIcons name="logout" size={25} color="#6b7280" />
+                    <Ionicons
+                      name="settings-outline"
+                      size={25}
+                      color="#6b7280"
+                    />
+                    {/* <MaterialIcons name="logout" size={25} color="#6b7280" /> */}
                   </TouchableOpacity>
                 </View>
               </View>
@@ -169,6 +184,12 @@ const Profile = () => {
             }));
           }}
         />
+        <CustomBottomLogout
+          bottomSheetRef={bottomSheetRefLogout}
+          logout={logout}
+          loading={loading}
+          user={user}
+        />
       </SafeAreaView>
     </GestureHandlerRootView>
   );
@@ -218,32 +239,32 @@ function CustomBottomSheet({
 
 function CustomBottomLogout({
   bottomSheetRef,
-  lastValue,
-  onSubmit,
+  logout,
+  loading,
+  user,
 }: {
   bottomSheetRef: React.RefObject<BottomSheet>;
-  lastValue: string;
-  onSubmit: (editInputValue: string) => void;
+  logout: () => Promise<void>;
+  loading: boolean;
+  user: { email: string } | null;
 }) {
-  const [editInputValue, setEditInputValue] = useState<string>(lastValue);
-  const snapPoints = useMemo(() => ["20%"], []);
-  const isReady = editInputValue.length > 0 && editInputValue !== lastValue;
+  const snapPoints = useMemo(() => ["25%"], []);
 
   const buttonsLogoutDelete = (
     <View className="flex flex-col justify-center items-center flex-1 px-5">
-      <View className="flex flex-col h-[60px] px-[16px] bg-white rounded-2xl border-[2px] border-gray-300 w-full py-2">
-        {/* <LogOutButton logout={onSubmit} /> */}
+      <View className="flex flex-col px-[16px] bg-white rounded-2xl w-full py-2 gap-2">
+        <LogOutButton logout={logout} />
+        <DeleteAccountButton user={user} loading={loading} logout={logout} />
       </View>
     </View>
   );
   return (
     <BottomSheetSame
       bottomSheetRef={bottomSheetRef}
-      onSubmit={onSubmit ? () => onSubmit(editInputValue) : undefined}
-      isReady={isReady}
-      hasDone={true}
+      hasDone={false}
       snapPoints={snapPoints}
       componentView={buttonsLogoutDelete}
+      value={"Account Settings"}
     />
   );
 }
@@ -337,13 +358,15 @@ function BottomSheetSame({
   hasDone = true,
   snapPoints,
   componentView,
+  value = "Edit Profile",
 }: {
   bottomSheetRef: React.RefObject<BottomSheet>;
-  onSubmit: (() => void) | undefined;
-  isReady: boolean;
+  onSubmit?: () => void;
+  isReady?: boolean;
   hasDone?: boolean;
   snapPoints: string[];
   componentView: React.ReactNode;
+  value?: string;
 }) {
   // callbacks
   const handleSheetChanges = useCallback((index: number) => {
@@ -357,19 +380,35 @@ function BottomSheetSame({
       snapPoints={snapPoints}
     >
       <BottomSheetView className="flex-1 bg-white w-full">
-        <View className="flex flex-row justify-between items-center py-3 border-b border-gray-300 px-6">
-          <TouchableOpacity
-            className="justify-center"
-            onPress={() => bottomSheetRef.current?.close()}
-          >
-            <Text className="text-xl text-black font-pmedium">Cancel</Text>
-          </TouchableOpacity>
+        <View className="flex flex-row justify-between items-center  relative py-3 border-b border-gray-300 px-6">
+          {hasDone && (
+            <TouchableOpacity
+              className={`flex flex-row  mr-auto`}
+              onPress={() => {
+                bottomSheetRef.current?.close();
+              }}
+            >
+              <Text
+                className={`
+              ${hasDone ? "text-xl  font-pmedium" : "text-xl  font-plight"}
+            `}
+              >
+                Cancel
+              </Text>
+            </TouchableOpacity>
+          )}
 
-          <Text className="text-black font-pmedium text-xl ">Edit Profile</Text>
+          <Text
+            className={`text-black font-pmedium text-xl ${
+              hasDone ? "" : "absolute right-0 left-0 text-center"
+            }`}
+          >
+            {value}
+          </Text>
 
           {hasDone && (
             <TouchableOpacity
-              className="flex flex-row"
+              className="flex flex-row ml-auto"
               onPress={() => {
                 onSubmit?.();
                 bottomSheetRef.current?.close();
@@ -383,6 +422,23 @@ function BottomSheetSame({
             `}
               >
                 Done
+              </Text>
+            </TouchableOpacity>
+          )}
+
+          {!hasDone && (
+            <TouchableOpacity
+              className={`flex flex-row ${hasDone ? "mr-auto" : "ml-auto"}`}
+              onPress={() => {
+                bottomSheetRef.current?.close();
+              }}
+            >
+              <Text
+                className={`
+              ${hasDone ? "text-xl  font-pmedium" : "text-xl  font-plight"}
+            `}
+              >
+                Cancel
               </Text>
             </TouchableOpacity>
           )}
@@ -405,7 +461,7 @@ const LogOutButton: React.FC<{ logout: () => Promise<void> }> = ({
 
   return (
     <TouchableOpacity
-      className="flex flex-row bg-white h-[50px] justify-center items-center rounded-full"
+      className="flex flex-row bg-white h-[50px] justify-center items-center rounded-full border-[1.15px] border-gray-400"
       onPress={handleLogout}
     >
       <Text className="text-black font-psemibold text-[15px]">Log Out</Text>
