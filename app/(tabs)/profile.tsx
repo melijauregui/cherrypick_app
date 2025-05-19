@@ -22,7 +22,7 @@ import images from "../../constants/images";
 import { FlatList, View, Image } from "react-native";
 import { Dimensions } from "react-native";
 import { useAuth } from "@/context/AuthContext";
-import { CreateAccountSchema, UserSchemaRes } from "@/schemas/auth/preferences-schema";
+import { CreateAccountSchema, CreateAccountSchemaRes, UserSchemaRes } from "@/schemas/auth/preferences-schema";
 
 type ItemData = {
   title: string;
@@ -64,7 +64,6 @@ const Profile = () => {
       return;
     }
     const fetchUserData = async () => {
-      console.log("Fetching user data for email:", user.email);
       try {
         const { data } = await safeFetch({
           url: `http://${LOCAL_IP}:3000/get-user?email=${user.email}`,
@@ -72,12 +71,10 @@ const Profile = () => {
           //headers: { "Content-Type": "application/json" },
           schema: UserSchemaRes,
         });
-        console.log("data", data);
         if (data.error) {
           console.log("Error fetching user data:", data.details);
           return;
         }
-        console.log("User data fetched successfully:", data.user);
         setProfileData({
           username: data.user.username,
           email: data.user.email,
@@ -97,7 +94,6 @@ const Profile = () => {
   //  dateOfBirth: new Date("2002-11-11"),
   //  preferences: ["Boho-chic", "Sporty", "Old money"],
   //});
-  console.log("profileData", profileData);
 
   const bottomSheetRef = useRef<BottomSheet>(null);
   const bottomSheetRefDate = useRef<BottomSheet>(null);
@@ -186,42 +182,53 @@ const Profile = () => {
         <CustomBottomSheet
           bottomSheetRef={bottomSheetRef}
           lastValue={profileData.username}
-          onSubmit={(editInputValue: string) => {
-            setProfileData((prev) => ({
-              ...prev,
-              username: editInputValue,
-            }));
+          onSubmit={async (editInputValue: string) => {
+            try {
+              await updateUser({ username: editInputValue, email: profileData.email, dateOfBirth: profileData.dateOfBirth, preferences: profileData.preferences });
+              setProfileData(prev => ({ ...prev, username: editInputValue }));
+            } catch (error) {
+              console.error("Error updating username:", error);
+            }
           }}
         />
         <CustomBottomSheet
           bottomSheetRef={bottomSheetRef}
           lastValue={profileData.username}
-          onSubmit={(editInputValue: string) => {
-            setProfileData((prev) => ({
-              ...prev,
-              username: editInputValue,
-            }));
+          onSubmit={async (editInputValue: string) => {
+            try {
+              await updateUser({ username: editInputValue, email: profileData.email, dateOfBirth: profileData.dateOfBirth, preferences: profileData.preferences });
+              setProfileData(prev => ({ ...prev, username: editInputValue }));
+            } catch (error) {
+              console.error("Error updating username:", error);
+            }
           }}
         />
         <CustomBottomSheetDate
           bottomSheetRef={bottomSheetRefDate}
           lastValue={profileData.dateOfBirth}
-          onSubmit={(val: Date) => {
-            setProfileData((prev) => ({
-              ...prev,
-              dateOfBirth: val,
-            }));
+          onSubmit={async (editInputValue: Date) => {
+            try {
+              await updateUser({ dateOfBirth: editInputValue, username: profileData.username, email: profileData.email, preferences: profileData.preferences });
+              setProfileData(prev => ({ ...prev, dateOfBirth: editInputValue }));
+            } catch (error) {
+              console.error("Error updating date of birth:", error);
+            }
           }}
         />
         <CustomBottomSheetPreferences
           bottomSheetRef={bottomSheetRefPreferences}
           lastValue={profileData.preferences}
           totalItems={DATA}
-          onSubmit={(val: string[]) => {
-            setProfileData((prev) => ({
-              ...prev,
-              preferences: val,
-            }));
+          onSubmit={async (val: string[]) => {
+            try {
+              await updateUser({ preferences: val, username: profileData.username, email: profileData.email, dateOfBirth: profileData.dateOfBirth });
+              setProfileData((prev) => ({
+                ...prev,
+                preferences: val,
+              }));
+            } catch (error) {
+              console.error("Error updating preferences:", error);
+            }
           }}
         />
         <CustomBottomLogout
@@ -708,4 +715,34 @@ export function CarouselWithFlatList({
       style={{ backgroundColor: "white" }}
     />
   );
+}
+
+async function updateUser(data: {
+  username?: string;
+  email?: string;
+  dateOfBirth?: Date;
+  preferences?: string[];
+}) {
+  try {
+    const response = await safeFetch({
+      url: `http://${LOCAL_IP}:3000/update-user`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: data.username,
+        email: data.email,
+        dateString: data.dateOfBirth?.toISOString(),
+        preferences: data.preferences,
+      }),
+      schema: CreateAccountSchemaRes,
+    });
+
+    if (response.data.error) {
+      console.error("Error updating user:", response.data.details);
+      return;
+    }
+  } catch (error) {
+    console.error("Failed to update user:", error);
+    throw error;
+  }
 }

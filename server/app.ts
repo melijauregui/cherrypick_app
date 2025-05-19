@@ -514,7 +514,7 @@ app.openapi(getUserRoute, async (c) => {
     if (result.length > 0) {
       const parsedRows = queryDbSchemaUser.parse(result);
       const { name, email, date_of_birth, preferences } = parsedRows[0];
-      console.log("User found (get):", parsedRows[0]);
+      // console.log("User found (get):", parsedRows[0]);
       res = {
         error: false,
         user: {
@@ -530,6 +530,76 @@ app.openapi(getUserRoute, async (c) => {
         details: "User not found",
       };
     }
+  } catch (error) {
+    console.error(error);
+    return c.json({ error: true as true, details: "Server error" }, 200);
+  }
+  return c.json(res, 200);
+});
+
+const updateUser = createRoute({
+  method: "post",
+  path: "/update-user",
+  request: {
+    body: {
+      content: {
+        "application/json": {
+          schema: CreateAccountSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: "Actualiza la información del usuario",
+      content: {
+        "application/json": {
+          schema: CreateAccountSchemaRes,
+        },
+      },
+    },
+  },
+});
+
+app.openapi(updateUser, async (c) => {
+  var { name, email, dateString, preferences } = c.req.valid("json");
+  let res: CreateAccountSchemaResType;
+  console.log("Updating user:", name, email, dateString, preferences);
+  try {
+    const [existing]: any[] = await db.query(
+      "SELECT * FROM users WHERE email = ?",
+      [email]
+    );
+    if (existing.length === 0) {
+      console.log("User not found");
+      res = {
+        error: true,
+        details: "Email not registered",
+      };
+      return c.json(res, 200);
+    }
+
+    const parsedRows = queryDbSchemaUser.parse(existing);
+    if (name === undefined) {
+      name = parsedRows[0].name;
+    }
+    if (preferences === undefined) {
+      preferences = parsedRows[0].preferences;
+    }
+    if (dateString === undefined) {
+      dateString = parsedRows[0].date_of_birth.toISOString();
+    }
+
+    const dateBirth = new Date(dateString);
+
+    const [result]: any = await db.query(
+      "UPDATE users SET name = ?, date_of_birth = ?, preferences = ? WHERE email = ?",
+      [name, dateBirth, JSON.stringify(preferences), email]
+    );
+    console.log("User updated");
+    res = {
+      error: false,
+    };
   } catch (error) {
     console.error(error);
     return c.json({ error: true as true, details: "Server error" }, 200);
