@@ -357,54 +357,6 @@ function CustomBottomLogout({
   );
 }
 
-function CustomBottomSheetDate({
-  bottomSheetRef,
-  lastValue,
-  onSubmit,
-}: {
-  bottomSheetRef: React.RefObject<BottomSheet>;
-  lastValue: Date;
-  onSubmit?: (editInputValue: Date) => void;
-}) {
-  const [editInputValue, setEditInputValue] = useState<Date>(lastValue);
-
-  useEffect(() => {
-    setEditInputValue(lastValue);
-  }, [lastValue]);
-
-  const snapPoints = useMemo(() => ["33%"], []);
-  const isReady =
-    editInputValue.getFullYear() !== lastValue.getFullYear() ||
-    editInputValue.getMonth() !== lastValue.getMonth() ||
-    editInputValue.getDate() !== lastValue.getDate();
-
-  const datePicker = (
-    <View className="flex flex-col justify-center items-center flex-1 px-3">
-      <View className="flex flex-col justify-center items-center h-[90%] bg-white rounded-2xl border-[2px] border-gray-300 w-full">
-        <DatePicker
-          modal={false}
-          open={true}
-          date={editInputValue}
-          mode="date"
-          // @ts-ignore
-          androidVariant="nativeAndroid"
-          onDateChange={setEditInputValue}
-        />
-      </View>
-    </View>
-  );
-  return (
-    <BottomSheetSame
-      bottomSheetRef={bottomSheetRef}
-      onSubmit={onSubmit ? () => onSubmit(editInputValue) : undefined}
-      isReady={isReady}
-      hasDone={true}
-      snapPoints={snapPoints}
-      componentView={datePicker}
-    />
-  );
-}
-
 function CustomBottomSheetPreferences({
   bottomSheetRef,
   lastValue,
@@ -444,6 +396,55 @@ function CustomBottomSheetPreferences({
       hasDone={true}
       snapPoints={snapPoints}
       componentView={carouselPreferences}
+    />
+  );
+}
+
+function CustomBottomSheetDate({
+  bottomSheetRef,
+  lastValue,
+  onSubmit,
+}: {
+  bottomSheetRef: React.RefObject<BottomSheet>;
+  lastValue: Date;
+  onSubmit?: (editInputValue: Date) => void;
+}) {
+  const [editInputValue, setEditInputValue] = useState<Date>(lastValue);
+
+  useEffect(() => {
+    setEditInputValue(lastValue);
+  }, [lastValue]);
+
+  const snapPoints = useMemo(() => ["33%"], []);
+  const isReady =
+    editInputValue.getFullYear() !== lastValue.getFullYear() ||
+    editInputValue.getMonth() !== lastValue.getMonth() ||
+    editInputValue.getDate() !== lastValue.getDate();
+
+  const datePicker = (
+    <View className="flex flex-col justify-center items-center flex-1 px-3">
+      <View className="flex flex-col justify-center items-center h-[90%] bg-white rounded-2xl border-[2px] border-gray-300 w-full">
+        <DatePicker
+          modal={false}
+          open={true}
+          date={editInputValue}
+          mode="date"
+          // @ts-ignore
+          androidVariant="nativeAndroid"
+          onDateChange={setEditInputValue}
+          theme="light"
+        />
+      </View>
+    </View>
+  );
+  return (
+    <BottomSheetSame
+      bottomSheetRef={bottomSheetRef}
+      onSubmit={onSubmit ? () => onSubmit(editInputValue) : undefined}
+      isReady={isReady}
+      hasDone={true}
+      snapPoints={snapPoints}
+      componentView={datePicker}
     />
   );
 }
@@ -496,9 +497,8 @@ function BottomSheetSame({
           )}
 
           <Text
-            className={`text-black font-pmedium text-xl ${
-              hasDone ? "" : "absolute right-0 left-0 text-center"
-            }`}
+            className={`text-black font-pmedium text-xl ${hasDone ? "" : "absolute right-0 left-0 text-center"
+              }`}
           >
             {value}
           </Text>
