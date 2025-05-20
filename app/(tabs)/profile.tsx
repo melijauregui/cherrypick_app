@@ -1,8 +1,17 @@
 import { ImageSourcePropType } from "react-native";
-import { GestureHandlerRootView, gestureHandlerRootHOC } from "react-native-gesture-handler";
+import {
+  GestureHandlerRootView,
+  gestureHandlerRootHOC,
+} from "react-native-gesture-handler";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { SafeAreaView } from "react-native-safe-area-context";
-import React, { useState, useCallback, useMemo, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import { LOCAL_IP } from "@/config/api";
 import { useRouter } from "expo-router";
 import { TouchableOpacity, Text, ScrollView } from "react-native";
@@ -22,7 +31,11 @@ import images from "../../constants/images";
 import { FlatList, View, Image } from "react-native";
 import { Dimensions } from "react-native";
 import { useAuth } from "@/context/AuthContext";
-import { CreateAccountSchema, CreateAccountSchemaRes, UserSchemaRes } from "@/schemas/auth/preferences-schema";
+import {
+  CreateAccountSchema,
+  CreateAccountSchemaRes,
+  UserSchemaRes,
+} from "@/schemas/auth/preferences-schema";
 
 type ItemData = {
   title: string;
@@ -83,6 +96,12 @@ const Profile = () => {
         });
       } catch (error) {
         console.error("Error fetching user data:", error);
+        setProfileData({
+          username: "Amanda Jane",
+          email: "amanda@gmail.com",
+          dateOfBirth: new Date("2002-11-11"),
+          preferences: ["Boho-chic", "Sporty", "Old money"],
+        });
       }
     };
     fetchUserData();
@@ -105,7 +124,6 @@ const Profile = () => {
     bottomSheetRefPreferences.current?.close();
     bottomSheetRefLogout.current?.close();
     bottomSheetRef.current?.snapToIndex(0); // abre al 20%
-
   };
 
   const openUsernameSheetDate = () => {
@@ -132,7 +150,6 @@ const Profile = () => {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View className="bg-brown-strong flex-1">
-
         <SafeAreaView className="flex-1 flex-col px-14 pt-3 ">
           <View className="w-full">
             <View className="flex  flex-col w-full justify-between">
@@ -187,8 +204,16 @@ const Profile = () => {
             lastValue={profileData.username}
             onSubmit={async (editInputValue: string) => {
               try {
-                await updateUser({ username: editInputValue, email: profileData.email, dateOfBirth: profileData.dateOfBirth, preferences: profileData.preferences });
-                setProfileData(prev => ({ ...prev, username: editInputValue }));
+                await updateUser({
+                  username: editInputValue,
+                  email: profileData.email,
+                  dateOfBirth: profileData.dateOfBirth,
+                  preferences: profileData.preferences,
+                });
+                setProfileData((prev) => ({
+                  ...prev,
+                  username: editInputValue,
+                }));
               } catch (error) {
                 console.error("Error updating username:", error);
               }
@@ -199,8 +224,16 @@ const Profile = () => {
             lastValue={profileData.username}
             onSubmit={async (editInputValue: string) => {
               try {
-                await updateUser({ username: editInputValue, email: profileData.email, dateOfBirth: profileData.dateOfBirth, preferences: profileData.preferences });
-                setProfileData(prev => ({ ...prev, username: editInputValue }));
+                await updateUser({
+                  username: editInputValue,
+                  email: profileData.email,
+                  dateOfBirth: profileData.dateOfBirth,
+                  preferences: profileData.preferences,
+                });
+                setProfileData((prev) => ({
+                  ...prev,
+                  username: editInputValue,
+                }));
               } catch (error) {
                 console.error("Error updating username:", error);
               }
@@ -211,8 +244,16 @@ const Profile = () => {
             lastValue={profileData.dateOfBirth}
             onSubmit={async (editInputValue: Date) => {
               try {
-                await updateUser({ dateOfBirth: editInputValue, username: profileData.username, email: profileData.email, preferences: profileData.preferences });
-                setProfileData(prev => ({ ...prev, dateOfBirth: editInputValue }));
+                await updateUser({
+                  dateOfBirth: editInputValue,
+                  username: profileData.username,
+                  email: profileData.email,
+                  preferences: profileData.preferences,
+                });
+                setProfileData((prev) => ({
+                  ...prev,
+                  dateOfBirth: editInputValue,
+                }));
               } catch (error) {
                 console.error("Error updating date of birth:", error);
               }
@@ -224,7 +265,12 @@ const Profile = () => {
             totalItems={DATA}
             onSubmit={async (val: string[]) => {
               try {
-                await updateUser({ preferences: val, username: profileData.username, email: profileData.email, dateOfBirth: profileData.dateOfBirth });
+                await updateUser({
+                  preferences: val,
+                  username: profileData.username,
+                  email: profileData.email,
+                  dateOfBirth: profileData.dateOfBirth,
+                });
                 setProfileData((prev) => ({
                   ...prev,
                   preferences: val,
@@ -258,6 +304,10 @@ function CustomBottomSheet({
   onSubmit: (editInputValue: string) => void;
 }) {
   const [editInputValue, setEditInputValue] = useState<string>(lastValue);
+  useEffect(() => {
+    setEditInputValue(lastValue);
+  }, [lastValue]);
+
   const snapPoints = useMemo(() => ["20%"], []);
   const isReady = editInputValue.length > 0 && editInputValue !== lastValue;
 
@@ -330,6 +380,11 @@ function CustomBottomSheetDate({
   onSubmit?: (editInputValue: Date) => void;
 }) {
   const [editInputValue, setEditInputValue] = useState<Date>(lastValue);
+
+  useEffect(() => {
+    setEditInputValue(lastValue);
+  }, [lastValue]);
+
   const snapPoints = useMemo(() => ["33%"], []);
   const isReady =
     editInputValue.getFullYear() !== lastValue.getFullYear() ||
@@ -375,6 +430,10 @@ function CustomBottomSheetPreferences({
   totalItems: ItemData[];
 }) {
   const [editInputValue, setEditInputValue] = useState<string[]>(lastValue);
+  useEffect(() => {
+    setEditInputValue(lastValue);
+  }, [lastValue]);
+
   const snapPoints = useMemo(() => ["33%"], []);
   const isReady =
     !setsEqual(editInputValue, lastValue) && editInputValue.length > 0;
@@ -450,8 +509,9 @@ function BottomSheetSame({
           )}
 
           <Text
-            className={`text-black font-pmedium text-xl ${hasDone ? "" : "absolute right-0 left-0 text-center"
-              }`}
+            className={`text-black font-pmedium text-xl ${
+              hasDone ? "" : "absolute right-0 left-0 text-center"
+            }`}
           >
             {value}
           </Text>
