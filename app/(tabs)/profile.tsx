@@ -3,7 +3,7 @@ import {
   GestureHandlerRootView,
   gestureHandlerRootHOC,
 } from "react-native-gesture-handler";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetView, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, {
   useState,
@@ -28,7 +28,8 @@ import { TextInput } from "react-native";
 import DatePicker from "react-native-date-picker";
 import { format, set } from "date-fns";
 import images from "../../constants/images";
-import { FlatList, View, Image } from "react-native";
+import { View, Image } from "react-native";
+import { FlatList } from "react-native-gesture-handler";
 import { Dimensions } from "react-native";
 import { useAuth } from "@/context/AuthContext";
 import {
@@ -378,8 +379,8 @@ function CustomBottomSheetPreferences({
     !setsEqual(editInputValue, lastValue) && editInputValue.length > 0;
 
   const carouselPreferences = (
-    <View className="flex flex-col justify-center items-center flex-1">
-      <View className="flex flex-col  justify-center items-center h-[90%] bg-white rounded-2xl w-full py-2">
+    <View className="flex flex-col justify-center items-center">
+      <View className="flex flex-col justify-center items-center h-[100%] bg-white rounded-2xl w-full py-2">
         <CarouselWithFlatList
           data={totalItems}
           itemsSelected={editInputValue}
@@ -541,6 +542,7 @@ function BottomSheetSame({
           )}
         </View>
         {componentView}
+
       </BottomSheetView>
     </BottomSheet>
   );
@@ -753,6 +755,8 @@ export function CarouselWithFlatList({
     <FlatList
       data={data}
       horizontal
+      /*  scrollEnabled={true}
+       nestedScrollEnabled={true} */
       showsHorizontalScrollIndicator={false}
       keyExtractor={(item) => item.title}
       renderItem={({ item, index }) =>
@@ -797,3 +801,4 @@ async function updateUser(data: {
     throw error;
   }
 }
+
