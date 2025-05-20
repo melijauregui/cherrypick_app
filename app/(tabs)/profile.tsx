@@ -700,7 +700,13 @@ const renderItem = ({
           `}
         resizeMode="cover"
       />
-      <Text className="mt-1 text-black font-pregular">{item.title}</Text>
+      <Text
+        className={`mt-1 font-pregular ${
+          isSelected ? " text-black" : " text-gray-500"
+        }`}
+      >
+        {item.title}
+      </Text>
     </TouchableOpacity>
   );
 };
