@@ -96,23 +96,10 @@ const Profile = () => {
         });
       } catch (error) {
         console.error("Error fetching user data:", error);
-        setProfileData({
-          username: "Amanda Jane",
-          email: "amanda@gmail.com",
-          dateOfBirth: new Date("2002-11-11"),
-          preferences: ["Boho-chic", "Sporty", "Old money"],
-        });
       }
     };
     fetchUserData();
   }, [user]);
-
-  //const [profileData, setProfileData] = useState({
-  //  username: "Amanda Jane",
-  //  email: "amanda@gmail.com",
-  //  dateOfBirth: new Date("2002-11-11"),
-  //  preferences: ["Boho-chic", "Sporty", "Old money"],
-  //});
 
   const bottomSheetRef = useRef<BottomSheet>(null);
   const bottomSheetRefDate = useRef<BottomSheet>(null);
