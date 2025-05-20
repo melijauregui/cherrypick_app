@@ -46,7 +46,7 @@ const SignIn = () => {
         <View className="flex flex-grow flex-col w-full px-14 py-3">
           <LogoCircle classname="w-[60] h-[60] mb-1 self-center" />
           <View className="w-full mt-40">
-            <Text className="text-white text-[25px] font-pbold relative text-justify">
+            <Text className="text-white text-[25px] font-pbold relative">
               Instantly match any outfit to real shopping options.
             </Text>
             <View className="w-full mt-40 flex flex-col gap-4">

@@ -162,7 +162,7 @@ const Item = ({
         `}
         resizeMode="cover"
       />
-      <Text className="mt-1 text-gray-400">{item.title}</Text>
+      <Text className="mt-1 text-gray-400 font-pregular">{item.title}</Text>
     </TouchableOpacity>
   );
 };

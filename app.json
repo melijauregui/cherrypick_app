@@ -18,12 +18,25 @@
       "bundleIdentifier": "com.cherrypickapp.googleauthern",
       "supportsTablet": true,
       "infoPlist": {
-        "CFBundleURLTypes": {
-          "CFBundleURLSchemes": [
-            "com.googleusercontent.apps.321366117154-gq34d2c6r30i8tl8r45dpte4i0ba8nk9"
-          ]
-        }
-      }
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": [
+              "com.googleusercontent.apps.321366117154-gq34d2c6r30i8tl8r45dpte4i0ba8nk9"
+            ]
+          },
+          {
+            "CFBundleURLSchemes": [
+              "com.googleusercontent.apps.321366117154-gq34d2c6r30i8tl8r45dpte4i0ba8nk9"
+            ]
+          }
+        ],
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "build": {
+        "production": {
+          "ios": { "buildType": "archive" }
+    }
+  }
     },
     "android": {
       "package": "com.cherrypickapp.googleauthern",

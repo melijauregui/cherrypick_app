@@ -1,9 +1,6 @@
 import { ImageSourcePropType } from "react-native";
-import {
-  GestureHandlerRootView,
-  gestureHandlerRootHOC,
-} from "react-native-gesture-handler";
-import BottomSheet, { BottomSheetView, BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, {
   useState,
@@ -18,12 +15,7 @@ import { TouchableOpacity, Text, ScrollView } from "react-native";
 import { safeFetch } from "@/utils/safe-fetch";
 import { VerifyAccountDeletedSchema } from "@/schemas/auth/sign-up-schema";
 import * as SecureStore from "expo-secure-store";
-import {
-  Ionicons,
-  MaterialIcons,
-  AntDesign,
-  MaterialCommunityIcons,
-} from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { TextInput } from "react-native";
 import DatePicker from "react-native-date-picker";
 import { format, set } from "date-fns";
@@ -33,7 +25,6 @@ import { FlatList } from "react-native-gesture-handler";
 import { Dimensions } from "react-native";
 import { useAuth } from "@/context/AuthContext";
 import {
-  CreateAccountSchema,
   CreateAccountSchemaRes,
   UserSchemaRes,
 } from "@/schemas/auth/preferences-schema";
@@ -137,145 +128,145 @@ const Profile = () => {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <View className="bg-brown-strong flex-1">
-        <SafeAreaView className="flex-1 flex-col px-14 pt-3 ">
-          <View className="w-full">
-            <View className="flex  flex-col w-full justify-between">
-              <View className="flex flex-col w-full">
-                <View className="flex flex-row w-full items-center relative py-6">
-                  <Text className="text-white text-[27px] font-pregular  absolute left-0 right-0 text-center">
-                    Profile
-                  </Text>
-                  <View className="flex flex-row mr-auto">
-                    <TouchableOpacity onPress={openUsernameSheetLogout}>
-                      <Ionicons
-                        name="settings-outline"
-                        size={25}
-                        color="#6b7280"
-                      />
-                      {/* <MaterialIcons name="logout" size={25} color="#6b7280" /> */}
-                    </TouchableOpacity>
-                  </View>
+      {/* <View className="bg-brown-strong flex-1"> */}
+      <SafeAreaView className="flex-1 flex-col px-14 pt-3 bg-brown-strong">
+        <View className="w-full">
+          <View className="flex  flex-col w-full justify-between">
+            <View className="flex flex-col w-full">
+              <View className="flex flex-row w-full items-center relative py-6">
+                <Text className="text-white text-[27px] font-pregular  absolute left-0 right-0 text-center">
+                  Profile
+                </Text>
+                <View className="flex flex-row mr-auto">
+                  <TouchableOpacity onPress={openUsernameSheetLogout}>
+                    <Ionicons
+                      name="settings-outline"
+                      size={25}
+                      color="#6b7280"
+                    />
+                    {/* <MaterialIcons name="logout" size={25} color="#6b7280" /> */}
+                  </TouchableOpacity>
                 </View>
-                <RenderProfileItem
-                  label="Username"
-                  value={profileData.username}
-                  canEdit={true}
-                  onPress={openUsernameSheet}
-                />
-                <RenderProfileItem
-                  label="Email"
-                  value={profileData.email}
-                  canEdit={false}
-                />
-                <RenderProfileItem
-                  label="Date of Birth"
-                  value={format(profileData.dateOfBirth, "dd/MM/yyyy")}
-                  canEdit={true}
-                  onPress={openUsernameSheetDate}
-                />
               </View>
+              <RenderProfileItem
+                label="Username"
+                value={profileData.username}
+                canEdit={true}
+                onPress={openUsernameSheet}
+              />
+              <RenderProfileItem
+                label="Email"
+                value={profileData.email}
+                canEdit={false}
+              />
+              <RenderProfileItem
+                label="Date of Birth"
+                value={format(profileData.dateOfBirth, "dd/MM/yyyy")}
+                canEdit={true}
+                onPress={openUsernameSheetDate}
+              />
             </View>
           </View>
-          <View className="flex flex-col w-full h-full">
-            <RenderProfileItemPreferences
-              label="Preferences"
-              value={profileData.preferences.map((item) => ({
-                title: item,
-                image: DATA_MAP.get(item) ?? images.bohoChicImage, // TODO !!
-              }))}
-              onPress={openUsernameSheetPreferences}
-            />
-          </View>
-          <CustomBottomSheet
-            bottomSheetRef={bottomSheetRef}
-            lastValue={profileData.username}
-            onSubmit={async (editInputValue: string) => {
-              try {
-                await updateUser({
-                  username: editInputValue,
-                  email: profileData.email,
-                  dateOfBirth: profileData.dateOfBirth,
-                  preferences: profileData.preferences,
-                });
-                setProfileData((prev) => ({
-                  ...prev,
-                  username: editInputValue,
-                }));
-              } catch (error) {
-                console.error("Error updating username:", error);
-              }
-            }}
-          />
-          <CustomBottomSheet
-            bottomSheetRef={bottomSheetRef}
-            lastValue={profileData.username}
-            onSubmit={async (editInputValue: string) => {
-              try {
-                await updateUser({
-                  username: editInputValue,
-                  email: profileData.email,
-                  dateOfBirth: profileData.dateOfBirth,
-                  preferences: profileData.preferences,
-                });
-                setProfileData((prev) => ({
-                  ...prev,
-                  username: editInputValue,
-                }));
-              } catch (error) {
-                console.error("Error updating username:", error);
-              }
-            }}
-          />
-          <CustomBottomSheetDate
-            bottomSheetRef={bottomSheetRefDate}
-            lastValue={profileData.dateOfBirth}
-            onSubmit={async (editInputValue: Date) => {
-              try {
-                await updateUser({
-                  dateOfBirth: editInputValue,
-                  username: profileData.username,
-                  email: profileData.email,
-                  preferences: profileData.preferences,
-                });
-                setProfileData((prev) => ({
-                  ...prev,
-                  dateOfBirth: editInputValue,
-                }));
-              } catch (error) {
-                console.error("Error updating date of birth:", error);
-              }
-            }}
-          />
-          <CustomBottomSheetPreferences
-            bottomSheetRef={bottomSheetRefPreferences}
-            lastValue={profileData.preferences}
-            totalItems={DATA}
-            onSubmit={async (val: string[]) => {
-              try {
-                await updateUser({
-                  preferences: val,
-                  username: profileData.username,
-                  email: profileData.email,
-                  dateOfBirth: profileData.dateOfBirth,
-                });
-                setProfileData((prev) => ({
-                  ...prev,
-                  preferences: val,
-                }));
-              } catch (error) {
-                console.error("Error updating preferences:", error);
-              }
-            }}
-          />
-          <CustomBottomLogout
-            bottomSheetRef={bottomSheetRefLogout}
-            logout={logout}
-            loading={loading}
-            user={user}
-          />
-        </SafeAreaView>
-      </View>
+        </View>
+        {/* <View className="flex flex-col w-full"> */}
+        <RenderProfileItemPreferences
+          label="Preferences"
+          value={profileData.preferences.map((item) => ({
+            title: item,
+            image: DATA_MAP.get(item) ?? images.bohoChicImage, // TODO !!
+          }))}
+          onPress={openUsernameSheetPreferences}
+        />
+        {/* </View> */}
+        <CustomBottomSheet
+          bottomSheetRef={bottomSheetRef}
+          lastValue={profileData.username}
+          onSubmit={async (editInputValue: string) => {
+            try {
+              await updateUser({
+                username: editInputValue,
+                email: profileData.email,
+                dateOfBirth: profileData.dateOfBirth,
+                preferences: profileData.preferences,
+              });
+              setProfileData((prev) => ({
+                ...prev,
+                username: editInputValue,
+              }));
+            } catch (error) {
+              console.error("Error updating username:", error);
+            }
+          }}
+        />
+        <CustomBottomSheet
+          bottomSheetRef={bottomSheetRef}
+          lastValue={profileData.username}
+          onSubmit={async (editInputValue: string) => {
+            try {
+              await updateUser({
+                username: editInputValue,
+                email: profileData.email,
+                dateOfBirth: profileData.dateOfBirth,
+                preferences: profileData.preferences,
+              });
+              setProfileData((prev) => ({
+                ...prev,
+                username: editInputValue,
+              }));
+            } catch (error) {
+              console.error("Error updating username:", error);
+            }
+          }}
+        />
+        <CustomBottomSheetDate
+          bottomSheetRef={bottomSheetRefDate}
+          lastValue={profileData.dateOfBirth}
+          onSubmit={async (editInputValue: Date) => {
+            try {
+              await updateUser({
+                dateOfBirth: editInputValue,
+                username: profileData.username,
+                email: profileData.email,
+                preferences: profileData.preferences,
+              });
+              setProfileData((prev) => ({
+                ...prev,
+                dateOfBirth: editInputValue,
+              }));
+            } catch (error) {
+              console.error("Error updating date of birth:", error);
+            }
+          }}
+        />
+        <CustomBottomSheetPreferences
+          bottomSheetRef={bottomSheetRefPreferences}
+          lastValue={profileData.preferences}
+          totalItems={DATA}
+          onSubmit={async (val: string[]) => {
+            try {
+              await updateUser({
+                preferences: val,
+                username: profileData.username,
+                email: profileData.email,
+                dateOfBirth: profileData.dateOfBirth,
+              });
+              setProfileData((prev) => ({
+                ...prev,
+                preferences: val,
+              }));
+            } catch (error) {
+              console.error("Error updating preferences:", error);
+            }
+          }}
+        />
+        <CustomBottomLogout
+          bottomSheetRef={bottomSheetRefLogout}
+          logout={logout}
+          loading={loading}
+          user={user}
+        />
+      </SafeAreaView>
+      {/* </View> */}
     </GestureHandlerRootView>
   );
 };
@@ -296,15 +287,14 @@ function CustomBottomSheet({
     setEditInputValue(lastValue);
   }, [lastValue]);
 
-  const snapPoints = useMemo(() => ["20%"], []);
   const isReady = editInputValue.length > 0 && editInputValue !== lastValue;
 
   const userNameInput = (
-    <View className="flex flex-col justify-center items-center flex-1 px-5">
-      <View className="flex flex-col h-[70px] px-[16px] bg-white rounded-2xl border-[2px] border-gray-300 w-full py-2">
+    <View className="flex flex-col justify-center items-center px-5 py-4">
+      <View className="flex flex-col  px-[16px] bg-white rounded-2xl border-[2px] border-gray-300 w-full">
         <Text className="text-black font-pregular">username</Text>
         <TextInput
-          className="flex-1 text-black font-plight text-[16px] h-full"
+          className=" text-black font-plight text-[16px] p-1"
           value={editInputValue}
           onChangeText={setEditInputValue}
           placeholder={lastValue}
@@ -320,7 +310,6 @@ function CustomBottomSheet({
       onSubmit={onSubmit ? () => onSubmit(editInputValue) : undefined}
       isReady={isReady}
       hasDone={true}
-      snapPoints={snapPoints}
       componentView={userNameInput}
     />
   );
@@ -337,8 +326,6 @@ function CustomBottomLogout({
   loading: boolean;
   user: { email: string } | null;
 }) {
-  const snapPoints = useMemo(() => ["25%"], []);
-
   const buttonsLogoutDelete = (
     <View className="flex flex-col justify-center items-center flex-1 px-5">
       <View className="flex flex-col px-[16px] bg-white rounded-2xl w-full py-2 gap-2">
@@ -351,7 +338,6 @@ function CustomBottomLogout({
     <BottomSheetSame
       bottomSheetRef={bottomSheetRef}
       hasDone={false}
-      snapPoints={snapPoints}
       componentView={buttonsLogoutDelete}
       value={"Account Settings"}
     />
@@ -374,13 +360,12 @@ function CustomBottomSheetPreferences({
     setEditInputValue(lastValue);
   }, [lastValue]);
 
-  const snapPoints = useMemo(() => ["33%"], []);
   const isReady =
     !setsEqual(editInputValue, lastValue) && editInputValue.length > 0;
 
   const carouselPreferences = (
     <View className="flex flex-col justify-center items-center">
-      <View className="flex flex-col justify-center items-center h-[100%] bg-white rounded-2xl w-full py-2">
+      <View className="flex flex-col justify-center items-center  bg-white rounded-2xl w-full py-2">
         <CarouselWithFlatList
           data={totalItems}
           itemsSelected={editInputValue}
@@ -395,7 +380,6 @@ function CustomBottomSheetPreferences({
       onSubmit={onSubmit ? () => onSubmit(editInputValue) : undefined}
       isReady={isReady}
       hasDone={true}
-      snapPoints={snapPoints}
       componentView={carouselPreferences}
     />
   );
@@ -416,7 +400,6 @@ function CustomBottomSheetDate({
     setEditInputValue(lastValue);
   }, [lastValue]);
 
-  const snapPoints = useMemo(() => ["33%"], []);
   const isReady =
     editInputValue.getFullYear() !== lastValue.getFullYear() ||
     editInputValue.getMonth() !== lastValue.getMonth() ||
@@ -444,7 +427,6 @@ function CustomBottomSheetDate({
       onSubmit={onSubmit ? () => onSubmit(editInputValue) : undefined}
       isReady={isReady}
       hasDone={true}
-      snapPoints={snapPoints}
       componentView={datePicker}
     />
   );
@@ -455,7 +437,6 @@ function BottomSheetSame({
   onSubmit,
   isReady,
   hasDone = true,
-  snapPoints,
   componentView,
   value = "Edit Profile",
 }: {
@@ -463,7 +444,6 @@ function BottomSheetSame({
   onSubmit?: () => void;
   isReady?: boolean;
   hasDone?: boolean;
-  snapPoints: string[];
   componentView: React.ReactNode;
   value?: string;
 }) {
@@ -476,7 +456,7 @@ function BottomSheetSame({
       ref={bottomSheetRef}
       onChange={handleSheetChanges}
       index={-1}
-      snapPoints={snapPoints}
+      enableDynamicSizing={true}
     >
       <BottomSheetView className="flex-1 bg-white w-full">
         <View className="flex flex-row justify-between items-center  relative py-3 border-b border-gray-300 px-6">
@@ -498,8 +478,9 @@ function BottomSheetSame({
           )}
 
           <Text
-            className={`text-black font-pmedium text-xl ${hasDone ? "" : "absolute right-0 left-0 text-center"
-              }`}
+            className={`text-black font-pmedium text-xl ${
+              hasDone ? "" : "absolute right-0 left-0 text-center"
+            }`}
           >
             {value}
           </Text>
@@ -542,7 +523,6 @@ function BottomSheetSame({
           )}
         </View>
         {componentView}
-
       </BottomSheetView>
     </BottomSheet>
   );
@@ -651,7 +631,7 @@ const RenderProfileItemPreferences = ({
   onPress?: () => void;
 }) => {
   return (
-    <View className="flex flex-1 flex-col w-full h-full">
+    <View className="flex flex-col w-full flex-1">
       <View className="flex flex-row  py-5 items-center relative">
         <Text className="text-xl text-white absolute left-0 right-0 text-center font-pmedium">
           {label}
@@ -662,17 +642,16 @@ const RenderProfileItemPreferences = ({
           </TouchableOpacity>
         </View>
       </View>
-      <View className="w-full mt-1 flex-1">
-        <FlatList
-          data={value}
-          renderItem={renderItem2}
-          keyExtractor={(item) => item.title}
-          numColumns={2}
-          columnWrapperStyle={{
-            justifyContent: "space-between",
-          }}
-        />
-      </View>
+      <FlatList
+        data={value}
+        renderItem={renderItem2}
+        keyExtractor={(item) => item.title}
+        numColumns={2}
+        columnWrapperStyle={{
+          justifyContent: "space-between",
+        }}
+        showsVerticalScrollIndicator={false}
+      />
     </View>
   );
 };
@@ -708,36 +687,37 @@ const renderItem = ({
   return (
     <TouchableOpacity
       onPress={() => handleOnpress(item.title)}
-      className="aspect-[1] px-1 pb-3"
+      className="aspect-[0.9] px-1 pt-2 pb-1 flex flex-col items-center"
       style={{ width: width * 0.45 }}
     >
       <Image
         source={item.image}
         className={`
             w-full
-            h-full
+            h-[85%]
             rounded-2xl
             ${isSelected ? "" : "opacity-50"}
           `}
         resizeMode="cover"
       />
+      <Text className="mt-1 text-black font-pregular">{item.title}</Text>
     </TouchableOpacity>
   );
 };
 
 const renderItem2 = ({ item }: { item: ItemData; index: number }) => {
   return (
-    <View className="w-[49%] aspect-[1] pb-2">
+    <View className="w-[49%] aspect-[0.85] pb-2 flex flex-col items-center">
       <Image
         source={item.image}
         className={`
             w-full
-            h-full
+            h-[80%]
             rounded-2xl
-            
           `}
         resizeMode="cover"
       />
+      <Text className="mt-1 text-gray-400 font-pregular">{item.title}</Text>
     </View>
   );
 };
@@ -755,8 +735,6 @@ export function CarouselWithFlatList({
     <FlatList
       data={data}
       horizontal
-      /*  scrollEnabled={true}
-       nestedScrollEnabled={true} */
       showsHorizontalScrollIndicator={false}
       keyExtractor={(item) => item.title}
       renderItem={({ item, index }) =>
@@ -801,4 +779,3 @@ async function updateUser(data: {
     throw error;
   }
 }
-

@@ -111,7 +111,7 @@ const SignIn = () => {
         <View className="flex flex-grow flex-col w-full justify-between px-14 pt-3">
           <View className="flex flex-col w-full">
             <LogoCircle classname="w-[60] h-[60] mb-1 self-center" />
-            <Text className="text-white text-[27px] font-pbold text-justify pt-6">
+            <Text className="text-white text-[27px] font-pbold pt-6">
               Create your account
             </Text>
             <View className="flex flex-col w-full gap-10 mt-4">
