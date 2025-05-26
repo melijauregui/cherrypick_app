@@ -110,7 +110,7 @@ def find_similarities_matrix2(model, processor, description, image_paths, images
     return probabilities
 
 
-def test_text_clasification(probabilities, image_paths, has, clasification_img, yellow_flags=[]):
+def test_text_clasification(probabilities, image_paths, has, clasification_img, yellow_flags=[], imprimir_mayores_al_minimo = False):
     # Extraer nombres de archivo
     image_names = [os.path.basename(path) for path in image_paths]
 
@@ -180,7 +180,19 @@ def test_text_clasification(probabilities, image_paths, has, clasification_img, 
 
         print(
             f"\n🎯 Porcentaje de acierto incluyendo 🟨: {accuracy:.2f}% ({correct_aprox}/{total})")
+        
+    #imprimo todos los que estan arriba del minimo rotura
+    
+    if imprimir_mayores_al_minimo:
+        # imprimo la probabilidad mas chica de roturas
+        if rotura_imgs:
+            min_rotura = min(probabilities[i] for i in rotura_imgs)
+            print(f"\nProbabilidad más baja: {min_rotura:.3f}")
 
+        print("\nImágenes con probabilidad mayor al mínimo:")
+        for i, value in enumerate(probabilities):
+            if value > min_rotura and i not in rotura_imgs:
+                print(f"Esta imagen sobrepaso al minimo: {image_names[i]}: {value:.3f}") 
 
 """ 
 Resultados:
