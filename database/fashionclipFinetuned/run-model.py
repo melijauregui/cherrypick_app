@@ -1,18 +1,19 @@
 
 import os
 from PIL import Image
+from rm_bg import remove_background
 import numpy as np
 from transformers import AutoProcessor, AutoModel
 import torch
 import torch.optim as optim
-from fashionclipFinetuned.fashionClipTestingText import test_text_clasification, find_similarities_matrix2
+from fashionClipTestingText import test_text_clasification, find_similarities_matrix2
 
 # cd database && python3 run-model.py > test.txt
 
 # --- CONFIGURACIÓN ---
 ORIGINAL_MODEL_NAME = "Marqo/marqo-fashionSigLIP"
 MODEL_NAME_TO_FINETUNE = "Marqo/marqo-fashionSigLIP"
-MODEL_NAME_TO_PUSH = "Sofia-gb/fashionSigLIP-roturas23"
+MODEL_NAME_TO_PUSH = "Sofia-gb/fashionSigLIP-roturas26"
 # CSV_PATH = "datasets/con-sin-roturas.csv"
 FOLDER_IMAGES_TESTING = "images-testing"
 
@@ -39,11 +40,17 @@ processor = AutoProcessor.from_pretrained(
 model.eval()
 torch.manual_seed(42)
 
+input_folder = FOLDER_IMAGES_TESTING
+output_folder = "images-testing-nob"
+if not os.path.exists(output_folder):
+    remove_background(input_folder, output_folder)
+
 image_paths = []
-for root, _, files in os.walk(FOLDER_IMAGES_TESTING):
+for root, _, files in os.walk(output_folder):
     for file in files:
         if file.endswith(('.png', '.jpg', '.jpeg')):
             image_paths.append(os.path.join(root, file))
+
 
 images = [Image.open(p).convert("RGB") for p in image_paths]
 

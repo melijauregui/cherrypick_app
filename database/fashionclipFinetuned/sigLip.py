@@ -3,6 +3,7 @@ import random
 from huggingface_hub import HfApi, HfFolder, Repository
 from io import BytesIO
 import os
+from rembg import remove
 import pandas as pd
 from PIL import Image
 import requests
@@ -74,18 +75,29 @@ class FashionDataset(Dataset):
 
         url = row["image"]
         filename = os.path.join(CACHE_DIR, os.path.basename(url).split("?")[0])
+        processed_filename = filename.replace(
+            ".jpg", "_nobg.jpg").replace(".png", "_nobg.png")
+        name = processed_filename.split(".")[0]
+        output_filename = name + ".png"
 
         try:
-            if not os.path.exists(filename):
-                response = requests.get(url, timeout=10)
-                response.raise_for_status()
-                image = Image.open(BytesIO(response.content)).convert("RGB")
-                image.save(filename)
-            else:
-                image = Image.open(filename).convert("RGB")
+            if not os.path.exists(processed_filename):
+                if not os.path.exists(filename):
+                    response = requests.get(url, timeout=10)
+                    response.raise_for_status()
+                    image = Image.open(
+                        BytesIO(response.content)).convert("RGB")
+                    image.save(output_filename)
+                else:
+                    image = Image.open(filename).convert("RGB")
 
-            if is_augmented:
-                image = self.augment(image)
+                no_bg = remove(image)
+                no_bg.save(output_filename)
+            else:
+                no_bg = Image.open(processed_filename).convert("RGB")
+
+                if is_augmented:
+                    no_bg = self.augment(no_bg)
         except Exception as e:
             print(f"Error al cargar la imagen: {e}")
             return None
