@@ -71,39 +71,21 @@ class FashionDataset(Dataset):
         else:
             base_idx = idx // (self.n_augmented + 1)
             is_augmented = idx % (self.n_augmented + 1) != 0
-
             row = self.dataframe.iloc[base_idx]
 
-        url = row["image"]
-        filename = os.path.join(CACHE_DIR, os.path.basename(url).split("?")[0])
-        processed_filename = filename.replace(
-            ".jpg", "_nobg.jpg").replace(".png", "_nobg.png")
-        name = processed_filename.split(".")[0]
-        output_filename = name + ".png"
+        filename = row["image"]  # ahora es la ruta local a la imagen PNG ya procesada
 
         try:
-            if not os.path.exists(processed_filename):
-                if not os.path.exists(filename):
-                    response = requests.get(url, timeout=10)
-                    response.raise_for_status()
-                    image = Image.open(
-                        BytesIO(response.content)).convert("RGB")
-                    image.save(output_filename)
-                else:
-                    image = Image.open(filename).convert("RGB")
-
-                no_bg = remove(image)
-                no_bg.save(output_filename)
-            else:
-                no_bg = Image.open(processed_filename).convert("RGB")
-
-                if is_augmented:
-                    no_bg = self.augment(no_bg)
+            image = Image.open(filename).convert("RGB")
+            if is_augmented:
+                image = self.augment(image)
         except Exception as e:
-            print(f"Error al cargar la imagen: {e}")
+            print(f"⚠️ Error al cargar la imagen {filename}: {e}")
             return None
+
         text = row["description"]
         return image, text
+
 
 # --- FUNCIONES AUXILIARES ---
 
