@@ -56,7 +56,7 @@ test_text_clasification(probabilities=probabilities,
                         image_paths=image_paths, has=False, clasification_img="rotura")
 print("\n")
 
-description = "jeans with rips"
+description = "ripped jeans"
 print("\nDescripcion:", description)
 probabilities = find_similarities_matrix2(
     model, processor, description, image_paths, images)
