@@ -29,7 +29,6 @@ DEVICE = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 
 NUM_WORKERS = min(4, os.cpu_count() or 1)
 TEMPERATURE = 0.1
-CACHE_DIR = "cached_images"
 
 # print(f"Using {NUM_WORKERS} workers for data loading.")
 data_transforms = transforms.Compose([
@@ -255,7 +254,7 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
     #    optimizer, mode='min', patience=2, factor=0.5, verbose=True)
 
     # --- ENTRENAMIENTO ---
-    patience = 3
+    patience = 20
     best_loss = float('inf')
     counter = 0
     model.train()
@@ -339,7 +338,7 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
 
 if __name__ == "__main__":
     multiprocessing.freeze_support()
-    fine_tune(csv_path="datasets/con-sin-roturas-english.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
+    fine_tune(csv_path="datasets/con-sin-roturas-english-v2.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
               model_name_to_push="melijauregui/fashionSigLIP-roturas27", data_aug=False,
-              loss_func=contrastive_loss_InfoNCE, batch_size=8, epochs=32, lr=2e-5,
+              loss_func=contrastive_loss_InfoNCE, batch_size=8, epochs=200, lr=2e-5,
               n_layers=2)
