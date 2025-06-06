@@ -72,7 +72,8 @@ class FashionDataset(Dataset):
             is_augmented = idx % (self.n_augmented + 1) != 0
             row = self.dataframe.iloc[base_idx]
 
-        filename = row["image"]  # ahora es la ruta local a la imagen PNG ya procesada
+        # ahora es la ruta local a la imagen PNG ya procesada
+        filename = row["image"]
 
         try:
             image = Image.open(filename).convert("RGB")
@@ -254,7 +255,7 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
     #    optimizer, mode='min', patience=2, factor=0.5, verbose=True)
 
     # --- ENTRENAMIENTO ---
-    patience = 20
+    patience = 3
     best_loss = float('inf')
     counter = 0
     model.train()
@@ -338,7 +339,7 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
 
 if __name__ == "__main__":
     multiprocessing.freeze_support()
-    fine_tune(csv_path="datasets/con-sin-roturas-english-v2.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
-              model_name_to_push="melijauregui/fashionSigLIP-roturas27", data_aug=False,
-              loss_func=contrastive_loss_InfoNCE, batch_size=8, epochs=200, lr=2e-5,
+    fine_tune(csv_path="datasets/con-sin-roturas-english-v4.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
+              model_name_to_push="Sofia-gb/fashionSigLIP-roturas27", data_aug=False,
+              loss_func=contrastive_loss_InfoNCE, batch_size=8, epochs=32, lr=2e-5,
               n_layers=2)
