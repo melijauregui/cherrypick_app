@@ -1,7 +1,4 @@
 from torch.nn.functional import cosine_similarity
-import random
-from huggingface_hub import HfApi, HfFolder, Repository
-from io import BytesIO
 import os
 from rembg import remove
 import pandas as pd
@@ -11,15 +8,21 @@ from tqdm import tqdm
 from torch.utils.data import Dataset, DataLoader
 from transformers import AutoProcessor, AutoModel
 import torch
-import torch.nn as nn
 from torchvision import transforms
 import torch.optim as optim
-from huggingface_hub import create_repo, upload_file
 # pip install nlpaug transformers sentencepiece
-import random
 from sklearn.model_selection import train_test_split
 import torch.nn.functional as F
 import multiprocessing
+# import nltk
+from nltk.corpus import stopwords
+import re
+# import spacy
+# nlp = spacy.load("en_core_web_sm")  # python -m spacy download en_core_web_sm
+
+# nltk.download('stopwords')
+# stop_words_en = set(stopwords.words('english'))
+# stop_words_es = set(stopwords.words('spanish'))
 
 # --- CONFIGURACIÓN ---
 BATCH_SIZE = 30
@@ -38,6 +41,19 @@ data_transforms = transforms.Compose([
     transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1),
     transforms.RandomAffine(degrees=5, translate=(0.02, 0.02))
 ])
+
+
+# def clean_text(text):
+#    tokens = re.findall(r'\b\w+\b', text.lower())
+#    filtered = [word for word in tokens if word not in stop_words_en]
+#    return " ".join(filtered)
+
+# def clean_text2(text):
+#    doc = nlp(text.lower())
+#    lemmatized = [
+#        token.lemma_ for token in doc if not token.is_stop and not token.is_punct]
+#    return " ".join(lemmatized)
+
 
 # --- DATASET PERSONALIZADO ---
 
@@ -84,6 +100,8 @@ class FashionDataset(Dataset):
             return None
 
         text = row["description"]
+        if row["tags"] != "":
+            text += f" {row['tags']}"
         return image, text
 
 
@@ -134,6 +152,23 @@ def contrastive_loss(image_embeds, text_embeds, margin=0.5):
     negative = 1 - positive
     loss = torch.mean(torch.relu(margin - positive + negative))
     return loss
+
+
+def contrastive_loss_InfoNCE_hard_negatives(text_embeds, image_embeds, temperature=TEMPERATURE):
+    text_embeds = F.normalize(text_embeds, dim=-1)
+    image_embeds = F.normalize(image_embeds, dim=-1)
+
+    logits = torch.matmul(text_embeds, image_embeds.T) / temperature
+    labels = torch.arange(len(text_embeds)).to(logits.device)
+
+    # Seleccionar hard negatives
+    hard_negatives = logits.topk(k=1, dim=1, largest=True).indices.squeeze()
+
+    loss_hard_negatives = F.cross_entropy(logits, hard_negatives)
+    loss_i2t = F.cross_entropy(logits, labels)
+    loss_t2i = F.cross_entropy(logits.T, labels)
+
+    return (loss_i2t + loss_t2i + loss_hard_negatives) / 3
 
 
 def contrastive_loss_InfoNCE(text_embeds, image_embeds, temperature=TEMPERATURE):
