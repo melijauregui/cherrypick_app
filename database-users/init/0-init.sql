@@ -26,7 +26,8 @@ CREATE TABLE IF NOT EXISTS registerInProgress (
 CREATE TABLE IF NOT EXISTS brands (
     email VARCHAR(50) PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
-    catalog VARCHAR(255)
+    url VARCHAR(255) NOT NULL,
+    logo_url VARCHAR(255) NOT NULL
 );
 
 /* CREATE TABLE IF NOT EXISTS clothingItem (

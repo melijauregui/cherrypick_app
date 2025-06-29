@@ -5,8 +5,6 @@ import { ClothingItemComponent } from "@/components/ClothingItemComponent";
 import { LOCAL_IP } from "@/config/api";
 
 const Home = () => {
-
-
   const [clothingItems, setClothingItems] = useState<Metadata[]>([]);
 
   useEffect(() => {
@@ -21,18 +19,20 @@ const Home = () => {
 
   return (
     <SafeAreaProvider>
-      <SafeAreaView className="bg-brown-strong w-full flex-1 "  >
+      <SafeAreaView className="bg-brown-strong w-full flex-1 ">
         <MasonryFlashList
           data={clothingItems}
           numColumns={2}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingVertical: 10 }}
-          renderItem={({ item, index }: { item: Metadata, index: number }) => <ClothingItemComponent
-            i={index}
-            key={index}
-            id={(index).toString()}
-            url={item.image_url}
-          />}
+          renderItem={({ item, index }: { item: Metadata; index: number }) => (
+            <ClothingItemComponent
+              i={index}
+              key={index}
+              id={index.toString()}
+              url={item.image_url}
+            />
+          )}
           onEndReachedThreshold={0.1}
         />
       </SafeAreaView>
@@ -69,7 +69,6 @@ async function getClothingItems(): Promise<Metadata[]> {
     const clothingItems: Metadata[] = await response.json();
     //console.log("Clothing items:", clothingItems);
     return clothingItems;
-
   } catch (error: unknown) {
     if (error instanceof Error) {
       console.error("Error:", error.message);
@@ -79,4 +78,3 @@ async function getClothingItems(): Promise<Metadata[]> {
     return [];
   }
 }
-

@@ -68,7 +68,7 @@ export function useGoogleSignIn(onSuccess: () => void) {
           console.log("Verify user response:", data);
 
           if (!data.error) {
-            console.log("User is registered:", data.user);
+            console.log("User is registered");
             console.log("Setting tokens in SecureStore");
             await SecureStore.setItemAsync(
               "accessToken",

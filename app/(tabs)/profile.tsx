@@ -1,38 +1,31 @@
 import { ImageSourcePropType } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import BottomSheet from "@gorhom/bottom-sheet";
 import { SafeAreaView } from "react-native-safe-area-context";
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useMemo,
-  useRef,
-} from "react";
+import React, { useState, useRef } from "react";
 import { LOCAL_IP } from "@/config/api";
-import { useRouter } from "expo-router";
-import { TouchableOpacity, Text, ScrollView } from "react-native";
+import { router } from "expo-router";
+import { TouchableOpacity, Text } from "react-native";
 import { safeFetch } from "@/utils/safe-fetch";
-import { VerifyAccountDeletedSchema } from "@/schemas/auth/sign-up-schema";
-import * as SecureStore from "expo-secure-store";
 import { Ionicons } from "@expo/vector-icons";
-import { TextInput } from "react-native";
-import DatePicker from "react-native-date-picker";
-import { format, set } from "date-fns";
+import { format } from "date-fns";
 import images from "../../constants/images";
-import { View, Image } from "react-native";
-import { FlatList } from "react-native-gesture-handler";
-import { Dimensions } from "react-native";
+import { View } from "react-native";
 import { useAuth } from "@/context/AuthContext";
 import {
   CreateAccountSchemaRes,
   UserSchemaRes,
 } from "@/schemas/auth/preferences-schema";
-
-type ItemData = {
-  title: string;
-  image: ImageSourcePropType;
-};
+import {
+  RenderProfileItem,
+  RenderProfileItemPreferences,
+} from "@/components/profile/bottomSheets";
+import {
+  CustomBottomSheet,
+  CustomBottomSheetDate,
+  CustomBottomSheetPreferences,
+  CustomBottomLogout,
+} from "@/components/profile/bottomSheets";
 
 const DATA_MAP = new Map<string, ImageSourcePropType>([
   ["Boho-chic", images.bohoChicImage],
@@ -49,7 +42,16 @@ const DATA = Array.from(DATA_MAP.entries()).map(([title, image]) => ({
 }));
 
 const Profile = () => {
-  const { user, loading, logout } = useAuth();
+  const { user, loading, logout, userType } = useAuth();
+
+  // Función helper para verificar el tipo de usuario
+  const isBrand = () => userType === "brand";
+
+  // Verificar que el usuario es tipo client
+  if (userType && isBrand()) {
+    // Si es brand, no debería estar aquí
+    return null;
+  }
 
   const [profileData, setProfileData] = useState<{
     username: string;
@@ -66,6 +68,7 @@ const Profile = () => {
   React.useEffect(() => {
     if (!user || !user.email) {
       console.log("No user or email found");
+      router.replace("/sign-in");
       return;
     }
     const fetchUserData = async () => {
@@ -73,11 +76,10 @@ const Profile = () => {
         const { data } = await safeFetch({
           url: `http://${LOCAL_IP}:3000/get-user?email=${user.email}`,
           method: "GET",
-          //headers: { "Content-Type": "application/json" },
           schema: UserSchemaRes,
         });
         if (data.error) {
-          console.log("Error fetching user data:", data.details);
+          console.log("Error fetching user data1:", data.details);
           return;
         }
         setProfileData({
@@ -128,13 +130,12 @@ const Profile = () => {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      {/* <View className="bg-brown-strong flex-1"> */}
       <SafeAreaView className="flex-1 flex-col px-14 pt-3 bg-brown-strong">
         <View className="w-full">
-          <View className="flex  flex-col w-full justify-between">
+          <View className="flex flex-col w-full justify-between">
             <View className="flex flex-col w-full">
               <View className="flex flex-row w-full items-center relative py-6">
-                <Text className="text-white text-[27px] font-pregular  absolute left-0 right-0 text-center">
+                <Text className="text-white text-[27px] font-pregular absolute left-0 right-0 text-center">
                   Profile
                 </Text>
                 <View className="flex flex-row mr-auto">
@@ -144,10 +145,16 @@ const Profile = () => {
                       size={25}
                       color="#6b7280"
                     />
-                    {/* <MaterialIcons name="logout" size={25} color="#6b7280" /> */}
                   </TouchableOpacity>
                 </View>
               </View>
+              {userType && (
+                <View className="mb-4 p-3 bg-white/10 rounded-lg">
+                  <Text className="text-white text-sm font-medium">
+                    Tipo de cuenta: {isBrand() ? "Marca" : "Cliente"}
+                  </Text>
+                </View>
+              )}
               <RenderProfileItem
                 label="Username"
                 value={profileData.username}
@@ -168,16 +175,14 @@ const Profile = () => {
             </View>
           </View>
         </View>
-        {/* <View className="flex flex-col w-full"> */}
         <RenderProfileItemPreferences
           label="Preferences"
-          value={profileData.preferences.map((item) => ({
+          value={profileData.preferences.map(item => ({
             title: item,
             image: DATA_MAP.get(item) ?? images.bohoChicImage, // TODO !!
           }))}
           onPress={openUsernameSheetPreferences}
         />
-        {/* </View> */}
         <CustomBottomSheet
           bottomSheetRef={bottomSheetRef}
           lastValue={profileData.username}
@@ -189,27 +194,7 @@ const Profile = () => {
                 dateOfBirth: profileData.dateOfBirth,
                 preferences: profileData.preferences,
               });
-              setProfileData((prev) => ({
-                ...prev,
-                username: editInputValue,
-              }));
-            } catch (error) {
-              console.error("Error updating username:", error);
-            }
-          }}
-        />
-        <CustomBottomSheet
-          bottomSheetRef={bottomSheetRef}
-          lastValue={profileData.username}
-          onSubmit={async (editInputValue: string) => {
-            try {
-              await updateUser({
-                username: editInputValue,
-                email: profileData.email,
-                dateOfBirth: profileData.dateOfBirth,
-                preferences: profileData.preferences,
-              });
-              setProfileData((prev) => ({
+              setProfileData(prev => ({
                 ...prev,
                 username: editInputValue,
               }));
@@ -229,7 +214,7 @@ const Profile = () => {
                 email: profileData.email,
                 preferences: profileData.preferences,
               });
-              setProfileData((prev) => ({
+              setProfileData(prev => ({
                 ...prev,
                 dateOfBirth: editInputValue,
               }));
@@ -250,7 +235,7 @@ const Profile = () => {
                 email: profileData.email,
                 dateOfBirth: profileData.dateOfBirth,
               });
-              setProfileData((prev) => ({
+              setProfileData(prev => ({
                 ...prev,
                 preferences: val,
               }));
@@ -266,495 +251,11 @@ const Profile = () => {
           user={user}
         />
       </SafeAreaView>
-      {/* </View> */}
     </GestureHandlerRootView>
   );
 };
 
 export default Profile;
-
-function CustomBottomSheet({
-  bottomSheetRef,
-  lastValue,
-  onSubmit,
-}: {
-  bottomSheetRef: React.RefObject<BottomSheet>;
-  lastValue: string;
-  onSubmit: (editInputValue: string) => void;
-}) {
-  const [editInputValue, setEditInputValue] = useState<string>(lastValue);
-  useEffect(() => {
-    setEditInputValue(lastValue);
-  }, [lastValue]);
-
-  const isReady = editInputValue.length > 0 && editInputValue !== lastValue;
-
-  const userNameInput = (
-    <View className="flex flex-col justify-center items-center px-5 py-4">
-      <View className="flex flex-col  px-[16px] bg-white rounded-2xl border-[2px] border-gray-300 w-full">
-        <Text className="text-black font-pregular">username</Text>
-        <TextInput
-          className=" text-black font-plight text-[16px] p-1"
-          value={editInputValue}
-          onChangeText={setEditInputValue}
-          placeholder={lastValue}
-          placeholderTextColor="#666"
-          selectionColor="#3478F6"
-        />
-      </View>
-    </View>
-  );
-  return (
-    <BottomSheetSame
-      bottomSheetRef={bottomSheetRef}
-      onSubmit={onSubmit ? () => onSubmit(editInputValue) : undefined}
-      isReady={isReady}
-      hasDone={true}
-      componentView={userNameInput}
-    />
-  );
-}
-
-function CustomBottomLogout({
-  bottomSheetRef,
-  logout,
-  loading,
-  user,
-}: {
-  bottomSheetRef: React.RefObject<BottomSheet>;
-  logout: () => Promise<void>;
-  loading: boolean;
-  user: { email: string } | null;
-}) {
-  const buttonsLogoutDelete = (
-    <View className="flex flex-col justify-center items-center flex-1 px-5">
-      <View className="flex flex-col px-[16px] bg-white rounded-2xl w-full py-2 gap-2">
-        <LogOutButton logout={logout} />
-        <DeleteAccountButton user={user} loading={loading} logout={logout} />
-      </View>
-    </View>
-  );
-  return (
-    <BottomSheetSame
-      bottomSheetRef={bottomSheetRef}
-      hasDone={false}
-      componentView={buttonsLogoutDelete}
-      value={"Account Settings"}
-    />
-  );
-}
-
-function CustomBottomSheetPreferences({
-  bottomSheetRef,
-  lastValue,
-  totalItems,
-  onSubmit,
-}: {
-  bottomSheetRef: React.RefObject<BottomSheet>;
-  lastValue: string[];
-  onSubmit?: (editInputValue: string[]) => void;
-  totalItems: ItemData[];
-}) {
-  const [editInputValue, setEditInputValue] = useState<string[]>(lastValue);
-  useEffect(() => {
-    setEditInputValue(lastValue);
-  }, [lastValue]);
-
-  const isReady =
-    !setsEqual(editInputValue, lastValue) && editInputValue.length > 0;
-
-  const carouselPreferences = (
-    <View className="flex flex-col justify-center items-center">
-      <View className="flex flex-col justify-center items-center  bg-white rounded-2xl w-full py-2">
-        <CarouselWithFlatList
-          data={totalItems}
-          itemsSelected={editInputValue}
-          setItemsSelected={setEditInputValue}
-        />
-      </View>
-    </View>
-  );
-  return (
-    <BottomSheetSame
-      bottomSheetRef={bottomSheetRef}
-      onSubmit={onSubmit ? () => onSubmit(editInputValue) : undefined}
-      isReady={isReady}
-      hasDone={true}
-      componentView={carouselPreferences}
-    />
-  );
-}
-
-function CustomBottomSheetDate({
-  bottomSheetRef,
-  lastValue,
-  onSubmit,
-}: {
-  bottomSheetRef: React.RefObject<BottomSheet>;
-  lastValue: Date;
-  onSubmit?: (editInputValue: Date) => void;
-}) {
-  const [editInputValue, setEditInputValue] = useState<Date>(lastValue);
-
-  useEffect(() => {
-    setEditInputValue(lastValue);
-  }, [lastValue]);
-
-  const isReady =
-    editInputValue.getFullYear() !== lastValue.getFullYear() ||
-    editInputValue.getMonth() !== lastValue.getMonth() ||
-    editInputValue.getDate() !== lastValue.getDate();
-
-  const datePicker = (
-    <View className="flex flex-col justify-center items-center flex-1 px-3">
-      <View className="flex flex-col justify-center items-center h-[90%] bg-white rounded-2xl border-[2px] border-gray-300 w-full">
-        <DatePicker
-          modal={false}
-          open={true}
-          date={editInputValue}
-          mode="date"
-          // @ts-ignore
-          androidVariant="nativeAndroid"
-          onDateChange={setEditInputValue}
-          theme="light"
-        />
-      </View>
-    </View>
-  );
-  return (
-    <BottomSheetSame
-      bottomSheetRef={bottomSheetRef}
-      onSubmit={onSubmit ? () => onSubmit(editInputValue) : undefined}
-      isReady={isReady}
-      hasDone={true}
-      componentView={datePicker}
-    />
-  );
-}
-
-function BottomSheetSame({
-  bottomSheetRef,
-  onSubmit,
-  isReady,
-  hasDone = true,
-  componentView,
-  value = "Edit Profile",
-}: {
-  bottomSheetRef: React.RefObject<BottomSheet>;
-  onSubmit?: () => void;
-  isReady?: boolean;
-  hasDone?: boolean;
-  componentView: React.ReactNode;
-  value?: string;
-}) {
-  // callbacks
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log("handleSheetChanges", index);
-  }, []);
-  return (
-    <BottomSheet
-      ref={bottomSheetRef}
-      onChange={handleSheetChanges}
-      index={-1}
-      enableDynamicSizing={true}
-    >
-      <BottomSheetView className="flex-1 bg-white w-full">
-        <View className="flex flex-row justify-between items-center  relative py-3 border-b border-gray-300 px-6">
-          {hasDone && (
-            <TouchableOpacity
-              className={`flex flex-row  mr-auto`}
-              onPress={() => {
-                bottomSheetRef.current?.close();
-              }}
-            >
-              <Text
-                className={`
-              ${hasDone ? "text-xl  font-pmedium" : "text-xl  font-plight"}
-            `}
-              >
-                Cancel
-              </Text>
-            </TouchableOpacity>
-          )}
-
-          <Text
-            className={`text-black font-pmedium text-xl ${
-              hasDone ? "" : "absolute right-0 left-0 text-center"
-            }`}
-          >
-            {value}
-          </Text>
-
-          {hasDone && (
-            <TouchableOpacity
-              className="flex flex-row ml-auto"
-              onPress={() => {
-                onSubmit?.();
-                bottomSheetRef.current?.close();
-              }}
-              disabled={!isReady}
-            >
-              <Text
-                className={`
-              text-xl  font-pmedium
-              ${!isReady ? "text-black opacity-40" : "text-black"}
-            `}
-              >
-                Done
-              </Text>
-            </TouchableOpacity>
-          )}
-
-          {!hasDone && (
-            <TouchableOpacity
-              className={`flex flex-row ${hasDone ? "mr-auto" : "ml-auto"}`}
-              onPress={() => {
-                bottomSheetRef.current?.close();
-              }}
-            >
-              <Text
-                className={`
-              ${hasDone ? "text-xl  font-pmedium" : "text-xl  font-plight"}
-            `}
-              >
-                Cancel
-              </Text>
-            </TouchableOpacity>
-          )}
-        </View>
-        {componentView}
-      </BottomSheetView>
-    </BottomSheet>
-  );
-}
-
-const LogOutButton: React.FC<{ logout: () => Promise<void> }> = ({
-  logout,
-}) => {
-  const router = useRouter();
-
-  const handleLogout = async () => {
-    await logout();
-    router.replace("/sign-in");
-  };
-
-  return (
-    <TouchableOpacity
-      className="flex flex-row bg-white h-[50px] justify-center items-center rounded-full border-[1.15px] border-gray-400"
-      onPress={handleLogout}
-    >
-      <Text className="text-black font-psemibold text-[15px]">Log Out</Text>
-    </TouchableOpacity>
-  );
-};
-
-const DeleteAccountButton: React.FC<{
-  user: { email: string } | null;
-  loading: boolean;
-  logout: () => Promise<void>;
-}> = ({ user, loading, logout }) => {
-  const router = useRouter();
-
-  const handleDeleteAccount = async () => {
-    const token = await SecureStore.getItemAsync("accessToken");
-    if (loading || !user?.email) {
-      console.log("Still loading or no user:", { user, loading });
-      return;
-    }
-
-    const { data } = await safeFetch({
-      url: `http://${LOCAL_IP}:3000/delete-account`,
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email: user.email }),
-      schema: VerifyAccountDeletedSchema,
-    });
-
-    if ("success" in data && data.success) {
-      console.log("Account deleted successfully");
-      await logout();
-
-      router.replace("/sign-in");
-    } else if ("details" in data && data.details) {
-      console.log("Error:", data.details);
-    }
-  };
-
-  return (
-    <TouchableOpacity
-      className="flex flex-row bg-red-600 h-[50px] justify-center items-center rounded-full"
-      onPress={handleDeleteAccount}
-    >
-      <Text className="text-white font-psemibold text-[15px]">
-        Delete Account
-      </Text>
-    </TouchableOpacity>
-  );
-};
-
-const RenderProfileItem = ({
-  label,
-  value,
-  canEdit,
-  onPress,
-}: {
-  label: string;
-  value: string;
-  canEdit: boolean;
-  onPress?: () => void;
-}) => {
-  return (
-    <View className="flex flex-row justify-between py-5 border-b-[0.5px] border-b-gray-500">
-      {/* <View className="flex flex-row justify-between py-3 my-2 px-[16px] rounded-2xl border-[1px] border-gray-500 "> */}
-      <Text className="text-xl text-white font-pregular">{label}</Text>
-      <View className="flex flex-row ">
-        <Text className="text-xl text-white font-plight">{value}</Text>
-        {canEdit && (
-          <TouchableOpacity className="ml-4" onPress={onPress}>
-            <Ionicons name="pencil-outline" size={18} color="#6b7280" />
-          </TouchableOpacity>
-        )}
-      </View>
-    </View>
-  );
-};
-
-const RenderProfileItemPreferences = ({
-  label,
-  value,
-  onPress,
-}: {
-  label: string;
-  value: ItemData[];
-  onPress?: () => void;
-}) => {
-  return (
-    <View className="flex flex-col w-full flex-1">
-      <View className="flex flex-row  py-5 items-center relative">
-        <Text className="text-xl text-white absolute left-0 right-0 text-center font-pmedium">
-          {label}
-        </Text>
-        <View className="flex flex-row ml-auto">
-          <TouchableOpacity className="ml-4" onPress={onPress}>
-            <Ionicons name="pencil-outline" size={18} color="#6b7280" />
-          </TouchableOpacity>
-        </View>
-      </View>
-      <FlatList
-        data={value}
-        renderItem={renderItem2}
-        keyExtractor={(item) => item.title}
-        numColumns={2}
-        columnWrapperStyle={{
-          justifyContent: "space-between",
-        }}
-        showsVerticalScrollIndicator={false}
-      />
-    </View>
-  );
-};
-
-function setsEqual(a: string[], b: string[]): boolean {
-  const sa = new Set(a),
-    sb = new Set(b);
-  if (sa.size !== sb.size) return false;
-  for (const v of sa) if (!sb.has(v)) return false;
-  return true;
-}
-
-const renderItem = ({
-  item,
-  itemsSelected,
-  setItemsSelected,
-}: {
-  item: ItemData;
-  index: number;
-  itemsSelected: string[];
-  setItemsSelected: React.Dispatch<React.SetStateAction<string[]>>;
-}) => {
-  const isSelected = itemsSelected.includes(item.title);
-  const { width, height } = Dimensions.get("window");
-
-  function handleOnpress(title: string) {
-    const updated = itemsSelected.includes(title)
-      ? itemsSelected.filter((item) => item !== title)
-      : [...itemsSelected, title];
-    setItemsSelected(updated);
-  }
-
-  return (
-    <TouchableOpacity
-      onPress={() => handleOnpress(item.title)}
-      className="aspect-[0.9] px-1 pt-2 pb-1 flex flex-col items-center"
-      style={{ width: width * 0.45 }}
-    >
-      <Image
-        source={item.image}
-        className={`
-            w-full
-            h-[85%]
-            rounded-2xl
-            ${isSelected ? "" : "opacity-50"}
-          `}
-        resizeMode="cover"
-      />
-      <Text
-        className={`mt-1 font-pregular ${
-          isSelected ? " text-black" : " text-gray-500"
-        }`}
-      >
-        {item.title}
-      </Text>
-    </TouchableOpacity>
-  );
-};
-
-const renderItem2 = ({ item }: { item: ItemData; index: number }) => {
-  return (
-    <View className="w-[49%] aspect-[0.85] pb-2 flex flex-col items-center">
-      <Image
-        source={item.image}
-        className={`
-            w-full
-            h-[80%]
-            rounded-2xl
-          `}
-        resizeMode="cover"
-      />
-      <Text className="mt-1 text-gray-400 font-pregular">{item.title}</Text>
-    </View>
-  );
-};
-
-export function CarouselWithFlatList({
-  data,
-  itemsSelected,
-  setItemsSelected,
-}: {
-  data: ItemData[];
-  itemsSelected: string[];
-  setItemsSelected: React.Dispatch<React.SetStateAction<string[]>>;
-}) {
-  return (
-    <FlatList
-      data={data}
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      keyExtractor={(item) => item.title}
-      renderItem={({ item, index }) =>
-        renderItem({
-          item,
-          index,
-          itemsSelected,
-          setItemsSelected,
-        })
-      }
-      style={{ backgroundColor: "white" }}
-    />
-  );
-}
 
 async function updateUser(data: {
   username?: string;

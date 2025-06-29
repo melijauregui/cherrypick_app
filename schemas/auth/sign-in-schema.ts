@@ -30,7 +30,7 @@ export { queryDbSchemaUser };
 export const VerifyUserResponseSchema = z.union([
   z.object({
     error: z.literal(false),
-    user: CreateAccountSchema,
+    userType: z.enum(["client", "brand"]),
   }),
   z.object({
     error: z.literal(true),

@@ -3,6 +3,7 @@ import { SplashScreen } from "expo-router";
 import { useFonts } from "expo-font";
 import { useEffect } from "react";
 import { AuthProvider } from "@/context/AuthContext";
+import { AuthRedirect } from "@/components/AuthRedirect";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -40,6 +41,7 @@ const RootLayout = () => {
 
   return (
     <AuthProvider>
+      <AuthRedirect />
       <Stack
         screenOptions={{
           animation: "fade",

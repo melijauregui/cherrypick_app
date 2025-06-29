@@ -141,6 +141,8 @@ const GoogleSignInButton: React.FC<{
               "refreshToken",
               response.authentication?.refreshToken ?? ""
             );
+            await SecureStore.setItemAsync("userType", data.userType);
+
             setUser(userInfo);
             console.log("Redirecting to home...");
             router.push("/home");

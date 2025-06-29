@@ -1,8 +1,6 @@
-import fs from "fs";
 import nodemailer from "nodemailer";
 import { randomInt } from "crypto";
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
-import { queryPinecone } from "./app/routeVector";
 import { PaginationSchema } from "./app/allDatabase";
 import {
   VerifyAvailabilitySchema,
@@ -47,34 +45,35 @@ import {
   CatalogUpdateResponseSchemaType,
   CatalogItemArraySchema,
 } from "../schemas/catalog/catalog-schema";
+import { QueryPineconeImage } from "./app/routeVector";
 
 // endpoint que devuelve los 10 resultados mas personalizados del usuario WIP
-// const paginatedRoute = createRoute({
-//   method: "get",
-//   path: "/all",
-//   request: {
-//     query: PaginationSchema,
-//   },
-//   responses: {
-//     200: {
-//       content: {
-//         "application/json": {
-//           schema: CatalogItemArraySchema,
-//         },
-//       },
-//       description: "Devuelve los datos de la base de datos de forma paginada",
-//     },
-//   },
-// });
-// app.openapi(paginatedRoute, async c => {
-//   const { page, limit } = c.req.valid("query");
-//   const topK = 10;
+const paginatedRoute = createRoute({
+  method: "get",
+  path: "/all",
+  request: {
+    query: PaginationSchema,
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: CatalogItemArraySchema,
+        },
+      },
+      description: "Devuelve los datos de la base de datos de forma paginada",
+    },
+  },
+});
+app.openapi(paginatedRoute, async c => {
+  const { page, limit } = c.req.valid("query");
+  const topK = 10;
 
-//   const embedding = Array.from({ length: 768 }, () => Math.random()); // Simulación de un vector de consulta personalizada
+  const embedding = Array.from({ length: 768 }, () => Math.random()); // Simulación de un vector de consulta personalizada
 
-//   const res = await queryPinecone(embedding, topK);
-//   return c.json(res, 200);
-// });
+  const res = await QueryPineconeImage(embedding, topK);
+  return c.json(res, 200);
+});
 
 // endpoint que verifica si un mail esta registrado en la base de datos
 const verifiedEmailRoute = createRoute({
@@ -318,27 +317,41 @@ app.openapi(verifyUserRoute, async c => {
   const { email } = c.req.valid("json");
   let res: VerifyUserResponseSchemaType;
 
-  const [rows]: any[] = await db.query("SELECT * FROM users WHERE email = ?", [
-    email,
-  ]);
-  if (rows.length === 0) {
-    res = {
-      error: true,
-      details: "User not found",
-    };
+  // Buscar primero en users
+  const [userRows]: any[] = await db.query(
+    "SELECT * FROM users WHERE email = ?",
+    [email]
+  );
+
+  // Buscar en brands si no se encuentra en users
+  if (userRows.length === 0) {
+    const [brandRows]: any[] = await db.query(
+      "SELECT * FROM brands WHERE email = ?",
+      [email]
+    );
+
+    if (brandRows.length === 0) {
+      res = {
+        error: true,
+        details: "User not found",
+      };
+    } else {
+      console.log("Brand found:", brandRows);
+      // Usando la estructura correcta de la tabla brands
+      const brand = brandRows[0];
+      res = {
+        error: false,
+        userType: "brand",
+      };
+    }
   } else {
-    console.log("User found:", rows);
-    const parsedRows = queryDbSchemaUser.parse(rows);
+    console.log("User found:", userRows);
+    const parsedRows = queryDbSchemaUser.parse(userRows);
     const { name, email, date_of_birth, preferences } = parsedRows[0];
     const dateString = date_of_birth.toISOString();
     res = {
       error: false,
-      user: {
-        name: name,
-        email: email,
-        dateString: dateString,
-        preferences: preferences,
-      },
+      userType: "client",
     };
   }
   return c.json(res, 200);
