@@ -2,12 +2,7 @@ import fs from "fs";
 import nodemailer from "nodemailer";
 import { randomInt } from "crypto";
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
-import {
-  callVGGNet,
-  ImageParamSchema,
-  queryPinecone,
-  TopMatchesSchema,
-} from "./app/routeVector";
+import { queryPinecone } from "./app/routeVector";
 import { PaginationSchema } from "./app/allDatabase";
 import {
   VerifyAvailabilitySchema,
@@ -29,7 +24,6 @@ import {
 import { db } from "./db";
 const app = new OpenAPIHono();
 export default app;
-import { RowDataPacket } from "mysql2/promise";
 import {
   CreateAccountSchemaRes,
   CreateAccountSchemaResType,
@@ -43,62 +37,44 @@ import {
   VerifyUserResponseSchema,
   VerifyUserResponseSchemaType,
 } from "../schemas/auth/sign-in-schema";
-
-// endpoint que recibe una imagen y devuelve los 10 resultados más similares paginados WIP
-const routeVector = createRoute({
-  method: "get",
-  path: "/images/{image_path}",
-  request: {
-    params: ImageParamSchema,
-  },
-  responses: {
-    200: {
-      content: {
-        "application/json": {
-          schema: TopMatchesSchema,
-        },
-      },
-      description: "Retrieve the user",
-    },
-  },
-});
-app.openapi(routeVector, async (c) => {
-  const topK = 10;
-  const { image_path } = c.req.valid("param");
-  const image_path_complete = `./server/images/${image_path}`;
-  const queryVector = await callVGGNet(image_path_complete);
-  fs.writeFileSync("result.json", JSON.stringify(queryVector));
-  const res = await queryPinecone(queryVector, topK);
-  return c.json(res, 200);
-});
+import {
+  validateCsvFile,
+  insertCatalogItemsToPinecone,
+} from "./app/catalogFunctions";
+import {
+  csvFileUploadSchema,
+  CatalogUpdateResponseSchema,
+  CatalogUpdateResponseSchemaType,
+  CatalogItemArraySchema,
+} from "../schemas/catalog/catalog-schema";
 
 // endpoint que devuelve los 10 resultados mas personalizados del usuario WIP
-const paginatedRoute = createRoute({
-  method: "get",
-  path: "/all",
-  request: {
-    query: PaginationSchema,
-  },
-  responses: {
-    200: {
-      content: {
-        "application/json": {
-          schema: TopMatchesSchema,
-        },
-      },
-      description: "Devuelve los datos de la base de datos de forma paginada",
-    },
-  },
-});
-app.openapi(paginatedRoute, async (c) => {
-  const { page, limit } = c.req.valid("query");
-  const topK = 10;
+// const paginatedRoute = createRoute({
+//   method: "get",
+//   path: "/all",
+//   request: {
+//     query: PaginationSchema,
+//   },
+//   responses: {
+//     200: {
+//       content: {
+//         "application/json": {
+//           schema: CatalogItemArraySchema,
+//         },
+//       },
+//       description: "Devuelve los datos de la base de datos de forma paginada",
+//     },
+//   },
+// });
+// app.openapi(paginatedRoute, async c => {
+//   const { page, limit } = c.req.valid("query");
+//   const topK = 10;
 
-  const embedding = Array.from({ length: 768 }, () => Math.random()); // Simulación de un vector de consulta personalizada
+//   const embedding = Array.from({ length: 768 }, () => Math.random()); // Simulación de un vector de consulta personalizada
 
-  const res = await queryPinecone(embedding, topK);
-  return c.json(res, 200);
-});
+//   const res = await queryPinecone(embedding, topK);
+//   return c.json(res, 200);
+// });
 
 // endpoint que verifica si un mail esta registrado en la base de datos
 const verifiedEmailRoute = createRoute({
@@ -119,7 +95,7 @@ const verifiedEmailRoute = createRoute({
     },
   },
 });
-app.openapi(verifiedEmailRoute, async (c) => {
+app.openapi(verifiedEmailRoute, async c => {
   const { email } = c.req.valid("query");
   let res: VerifyAvailabilitySchemaType;
   console.log("Verifying email availability:", email);
@@ -173,7 +149,7 @@ const codeVerificationRoute = createRoute({
     },
   },
 });
-app.openapi(codeVerificationRoute, async (c) => {
+app.openapi(codeVerificationRoute, async c => {
   const { email } = await c.req.valid("json");
   const code = generateVerificationCode();
   const emailSent = await sendEmail(email, code);
@@ -269,7 +245,7 @@ const verifiedCodeRoute = createRoute({
     },
   },
 });
-app.openapi(verifiedCodeRoute, async (c) => {
+app.openapi(verifiedCodeRoute, async c => {
   const { code, email } = c.req.valid("query");
   let res: VerifyCodeSchemaType;
 
@@ -338,7 +314,7 @@ const verifyUserRoute = createRoute({
     },
   },
 });
-app.openapi(verifyUserRoute, async (c) => {
+app.openapi(verifyUserRoute, async c => {
   const { email } = c.req.valid("json");
   let res: VerifyUserResponseSchemaType;
 
@@ -393,7 +369,7 @@ const createUserRoute = createRoute({
   },
 });
 
-app.openapi(createUserRoute, async (c) => {
+app.openapi(createUserRoute, async c => {
   const { name, email, dateString, preferences } = c.req.valid("json");
   let res: CreateAccountSchemaResType;
   console.log("Creating user:", name, email, dateString, preferences);
@@ -455,7 +431,7 @@ const deleteAccountRoute = createRoute({
   },
 });
 
-app.openapi(deleteAccountRoute, async (c) => {
+app.openapi(deleteAccountRoute, async c => {
   const { email } = c.req.valid("json");
   let res: VerifyAccountDeletedSchemaType;
 
@@ -502,14 +478,15 @@ const getUserRoute = createRoute({
   },
 });
 
-app.openapi(getUserRoute, async (c) => {
+app.openapi(getUserRoute, async c => {
   const { email } = c.req.valid("query");
   let res: UserSchemaResType;
 
   try {
-    const [result]: any = await db.query("SELECT * FROM users WHERE email = ?", [
-      email,
-    ]);
+    const [result]: any = await db.query(
+      "SELECT * FROM users WHERE email = ?",
+      [email]
+    );
 
     if (result.length > 0) {
       const parsedRows = queryDbSchemaUser.parse(result);
@@ -561,7 +538,7 @@ const updateUser = createRoute({
   },
 });
 
-app.openapi(updateUser, async (c) => {
+app.openapi(updateUser, async c => {
   var { name, email, dateString, preferences } = c.req.valid("json");
   let res: CreateAccountSchemaResType;
   console.log("Updating user:", name, email, dateString, preferences);
@@ -605,4 +582,68 @@ app.openapi(updateUser, async (c) => {
     return c.json({ error: true as true, details: "Server error" }, 200);
   }
   return c.json(res, 200);
+});
+
+// endpoint que actualiza el catálogo con datos CSV
+const updateCatalogRoute = createRoute({
+  method: "post",
+  path: "/update-catalog",
+  request: {
+    body: {
+      content: {
+        "multipart/form-data": { schema: csvFileUploadSchema },
+      },
+    },
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: CatalogUpdateResponseSchema,
+        },
+      },
+      description: "Valida y actualiza el catálogo con archivo CSV",
+    },
+  },
+});
+
+app.openapi(updateCatalogRoute, async c => {
+  const { file } = c.req.valid("form");
+  let res: CatalogUpdateResponseSchemaType;
+
+  try {
+    const validationResult = await validateCsvFile(file);
+
+    if (validationResult.error) {
+      res = validationResult;
+      return c.json(res, 200);
+    }
+
+    const pineconeResult = await insertCatalogItemsToPinecone(
+      validationResult.catalogItems
+    );
+
+    if (pineconeResult.success) {
+      res = {
+        error: false,
+      };
+      console.log(
+        `Successfully inserted ${pineconeResult.insertedCount} vectors into Pinecone`
+      );
+    } else {
+      res = {
+        error: true,
+        details: `Error inserting into Pinecone: ${pineconeResult.errors.join(", ")}`,
+      };
+      console.error("Pinecone insertion errors:", pineconeResult.errors);
+    }
+
+    return c.json(res, 200);
+  } catch (error) {
+    res = {
+      error: true,
+      details: `Error interno del servidor ${error}`,
+    };
+    return c.json(res, 200);
+  }
 });

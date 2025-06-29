@@ -23,6 +23,12 @@ CREATE TABLE IF NOT EXISTS registerInProgress (
     verification_code_expiration VARCHAR(30) NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS brands (
+    email VARCHAR(50) PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    catalog VARCHAR(255)
+);
+
 /* CREATE TABLE IF NOT EXISTS clothingItem (
 id INT AUTO_INCREMENT PRIMARY KEY,
 description VARCHAR(255) NOT NULL,

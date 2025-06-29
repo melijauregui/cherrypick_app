@@ -1,0 +1,18 @@
+services:
+
+  cherrypick:
+    container_name: cherrypick_db # Service name of the database
+    build:
+      context: ./
+    ports:
+      - ${DATABASE_PORT}:3306
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    restart: unless-stopped
+    volumes:
+      - ./init:/docker-entrypoint-initdb.d

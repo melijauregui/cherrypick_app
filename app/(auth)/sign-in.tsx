@@ -40,12 +40,12 @@ const SignIn = () => {
   return (
     <SafeAreaView className="bg-brown-strong flex-1 h-full w-full">
       <ScrollView
-        className="flex-1 w-full h-full"
+        className="flex-1 w-full"
         contentContainerStyle={{ flexGrow: 1 }}
       >
         <View className="flex flex-grow flex-col w-full px-14 py-3">
           <LogoCircle classname="w-[60] h-[60] mb-1 self-center" />
-          <View className="w-full mt-40">
+          <View className="w-full mt-40 ">
             <Text className="text-white text-[25px] font-pbold relative">
               Instantly match any outfit to real shopping options.
             </Text>
@@ -68,6 +68,7 @@ const SignIn = () => {
           </View>
         </View>
       </ScrollView>
+      <SignInBrandButton />
     </SafeAreaView>
   );
 };
@@ -218,4 +219,15 @@ const OrLine = () => (
     </Text>
     <View className="w-40 h-px bg-gray-500 opacity-70" />
   </View>
+);
+
+const SignInBrandButton = () => (
+  <TouchableOpacity
+    className="flex flex-row justify-center items-center bottom-6"
+    onPress={() => router.push("/sign-up-brand")}
+  >
+    <Text className="text-white font-pmedium text-[15px]">
+      Are you a brand? Sign up here
+    </Text>
+  </TouchableOpacity>
 );

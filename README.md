@@ -2,7 +2,7 @@
 - front:  npx expo start --clear   
 - server: npx ts-node server/index.ts
 - database: (dentro de database) uvicorn server:app --reload
-- database: docker compose up --build 
+- database: (dentro de database-users) docker compose up --build 
 
 # Ejemplo en endpoint 3000 en server
 http://localhost:3000/images/jean.webp
