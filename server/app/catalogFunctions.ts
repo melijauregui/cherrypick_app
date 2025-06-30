@@ -3,13 +3,13 @@ import {
   CatalogItemSchemaType,
   CatalogUpdateResponseSchemaType,
 } from "../../schemas/catalog/catalog-schema";
-import { Pinecone } from "@pinecone-database/pinecone";
 import { config } from "../config";
 import {
   BrandSchemaResType,
   QueryDbSchemaBrand,
 } from "../../schemas/auth/brand-schema";
 import { db } from "../db";
+import weaviate, { vectorizer } from "weaviate-client";
 
 // Función para extraer características de imagen desde URL
 async function extractImageFeatures(imageUrl: string): Promise<number[]> {
@@ -63,88 +63,6 @@ async function extractTextFeatures(text: string): Promise<number[]> {
   }
 }
 
-// Función para insertar items del catálogo en Pinecone
-export async function insertCatalogItemsToPinecone(
-  catalogItems: CatalogItemSchemaType[]
-): Promise<{
-  success: boolean;
-  insertedCount: number;
-  errors: string[];
-}> {
-  const errors: string[] = [];
-  let insertedCount = 0;
-
-  try {
-    const pc = new Pinecone({ apiKey: config.PINECONE_API_KEY });
-    const index = pc.index(
-      config.PINECONE_INDEX_NAME,
-      config.PINECONE_HOST_NAME
-    );
-    const namespace = index.namespace(config.PINECONE_NAMESPACE);
-
-    for (const item of catalogItems) {
-      try {
-        const imageFeatures = await extractImageFeatures(item.image_url);
-        const textFeatures = await extractTextFeatures(item.description);
-
-        const metadata = {
-          id: item.id,
-          name: item.name,
-          description: item.description,
-          price: item.price,
-          brand: item.brand,
-          image_url: item.image_url,
-          url: item.url,
-        };
-
-        // Insertar en Pinecone con características de imagen y texto
-        await namespace.upsert([
-          {
-            id: `${item.id}_${item.brand}_image`,
-            values: imageFeatures,
-            metadata: {
-              ...metadata,
-              type: "image",
-            },
-          },
-          {
-            id: `${item.id}_${item.brand}_text`,
-            values: textFeatures,
-            metadata: {
-              ...metadata,
-              type: "text",
-            },
-          },
-        ]);
-
-        insertedCount += 2;
-        console.log(`Successfully inserted ${item.id} into Pinecone`);
-      } catch (error) {
-        const errorMsg = `Error processing item ${item.id}: ${error}`;
-        console.error(errorMsg);
-        errors.push(errorMsg);
-      }
-    }
-
-    console.log(
-      `Insertion completed. ${insertedCount} vectors inserted, ${errors.length} errors.`
-    );
-
-    return {
-      success: errors.length === 0,
-      insertedCount,
-      errors,
-    };
-  } catch (error) {
-    console.error("Error in insertCatalogItemsToPinecone:", error);
-    return {
-      success: false,
-      insertedCount: 0,
-      errors: [`General error: ${error}`],
-    };
-  }
-}
-
 // Función para validar CSV
 export async function validateCsvFile(file: File): Promise<
   | {
@@ -170,7 +88,6 @@ export async function validateCsvFile(file: File): Promise<
 
     // Validate headers
     const expectedHeaders = [
-      "id",
       "name",
       "description",
       "price",
@@ -259,23 +176,23 @@ export async function UpdateCatalog(
     return res;
   }
 
-  const pineconeResult = await insertCatalogItemsToPinecone(
+  const weaviateResult = await insertCatalogItemsToWeaviate(
     validationResult.catalogItems
   );
 
-  if (pineconeResult.success) {
+  if (weaviateResult.success) {
     res = {
       error: false,
     };
     console.log(
-      `Successfully inserted ${pineconeResult.insertedCount} vectors into Pinecone`
+      `Successfully inserted ${weaviateResult.insertedCount} vectors into Weaviate`
     );
   } else {
     res = {
       error: true,
-      details: `Error inserting into Pinecone: ${pineconeResult.errors.join(", ")}`,
+      details: `Error inserting into Weaviate: ${weaviateResult.errors.join(", ")}`,
     };
-    console.error("Pinecone insertion errors:", pineconeResult.errors);
+    console.error("Weaviate insertion errors:", weaviateResult.errors);
   }
   return res;
 }
@@ -306,4 +223,114 @@ export async function GetBrand(email: string): Promise<BrandSchemaResType> {
     };
   }
   return res;
+}
+
+// Función para insertar items del catálogo en Pinecone
+export async function insertCatalogItemsToWeaviate(
+  catalogItems: CatalogItemSchemaType[]
+): Promise<{
+  success: boolean;
+  insertedCount: number;
+  errors: string[];
+}> {
+  const errors: string[] = [];
+  let insertedCount = 0;
+
+  try {
+    const client = await weaviate.connectToWeaviateCloud(config.WEAVIATE_URL, {
+      authCredentials: new weaviate.ApiKey(config.WEAVIATE_API_KEY),
+    });
+
+    // Verificar que la conexión esté lista
+    if (!client.isReady()) {
+      throw new Error("No se pudo conectar a Weaviate");
+    }
+
+    // Obtener o crear la colección
+    let collection;
+    try {
+      collection = client.collections.get("FashionItem");
+    } catch (error) {
+      // Si la colección no existe, la creamos
+      collection = await client.collections.create({
+        name: "FashionItem",
+        vectorizers: vectorizer.none(),
+      });
+      console.log("We have a new collection!", collection["name"]);
+    }
+
+    for (const item of catalogItems) {
+      try {
+        const imageFeatures = await extractImageFeatures(item.image_url);
+        const textFeatures = await extractTextFeatures(item.description);
+
+        const itemData = {
+          name: item.name,
+          description: item.description,
+          price: item.price,
+          brand: item.brand,
+          image_url: item.image_url,
+          url: item.url,
+        };
+
+        console.log("imageFeatures", imageFeatures.length);
+        console.log("textFeatures", textFeatures.length);
+        // Insertar embedding de imagen
+        if (imageFeatures) {
+          const result = await collection.data.insert({
+            properties: {
+              name: item.name,
+              description: item.description,
+              price: item.price,
+              brand: item.brand,
+              image_url: item.image_url,
+              url: item.url,
+              embedding_type: "image",
+            },
+            vectors: imageFeatures,
+          });
+          console.log(`Finished importing ${result} objects.`);
+          insertedCount++;
+        }
+
+        // Insertar embedding de texto
+        if (textFeatures) {
+          const result = await collection.data.insert({
+            properties: {
+              name: item.name,
+              description: item.description,
+              price: item.price,
+              brand: item.brand,
+              image_url: item.image_url,
+              url: item.url,
+              embedding_type: "text",
+            },
+            vectors: textFeatures,
+          });
+          insertedCount++;
+        }
+      } catch (error) {
+        const errorMsg = `Error processing item ${item.name}: ${error}`;
+        console.error(errorMsg);
+        errors.push(errorMsg);
+      }
+    }
+
+    console.log(
+      `Insertion completed. ${insertedCount} vectors inserted, ${errors.length} errors.`
+    );
+
+    return {
+      success: errors.length === 0,
+      insertedCount,
+      errors,
+    };
+  } catch (error) {
+    console.error("Error in insertCatalogItemsToWeaviate:", error);
+    return {
+      success: false,
+      insertedCount: 0,
+      errors: [`General error: ${error}`],
+    };
+  }
 }

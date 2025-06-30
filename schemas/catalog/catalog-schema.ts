@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 export const catalogItemSchema = z.object({
-  id: z.string().min(1, "El id es requerido"),
   name: z.string().min(1, "El nombre es requerido"),
   description: z.string().min(1, "La descripción es requerida"),
   price: z.number().positive("El precio debe ser positivo"),

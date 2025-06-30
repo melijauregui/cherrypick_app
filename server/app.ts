@@ -38,7 +38,7 @@ import {
   CatalogItemArraySchema,
   PaginationSchemaBrand,
 } from "../schemas/catalog/catalog-schema";
-import { QueryPineconeImage } from "./app/routeVector";
+import { QueryWeaviateImage } from "./app/routeVector";
 import {
   BrandSchemaRes,
   BrandSchemaResType,
@@ -451,11 +451,9 @@ const paginatedRoute = createRoute({
 });
 app.openapi(paginatedRoute, async c => {
   const { page, limit } = c.req.valid("query");
-  const topK = 10;
-
   const embedding = Array.from({ length: 768 }, () => Math.random()); // Simulación de un vector de consulta personalizada
 
-  const res = await QueryPineconeImage(embedding, topK);
+  const res = await QueryWeaviateImage(embedding, page, limit);
   return c.json(res, 200);
 });
 
@@ -479,10 +477,9 @@ const paginatedRouteBrand = createRoute({
 });
 app.openapi(paginatedRouteBrand, async c => {
   const { page, limit, brand } = c.req.valid("query");
-  const topK = 10;
 
   const embedding = Array.from({ length: 768 }, () => Math.random()); // Simulación de un vector de consulta personalizada
 
-  const res = await QueryPineconeImage(embedding, topK);
+  const res = await QueryWeaviateImage(embedding, page, limit);
   return c.json(res, 200);
 });

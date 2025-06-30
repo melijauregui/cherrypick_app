@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Required variables
-REQUIRED_VARS = ["PINECONE_API_KEY", "PINECONE_INDEX_NAME"]
+REQUIRED_VARS = ["PINECONE_API_KEY", "PINECONE_INDEX_NAME", "WEAVIATE_URL", "WEAVIATE_API_KEY"]
 
 # Check for missing environment variables
 missing_vars = [var for var in REQUIRED_VARS if not os.getenv(var)]
@@ -15,3 +15,5 @@ if missing_vars:
 # Expose environment variables
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
 PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME")
+WEAVIATE_URL = os.getenv("WEAVIATE_URL")
+WEAVIATE_API_KEY = os.getenv("WEAVIATE_API_KEY")

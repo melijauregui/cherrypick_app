@@ -1,71 +1,67 @@
-import { Pinecone } from "@pinecone-database/pinecone";
 import { config } from "../config";
-import { CatalogItemSchemaType } from "@/schemas/catalog/catalog-schema";
-
-// //funcion para llamar a la red neuronal
-// async function callVGGNet(imagePath: string): Promise<number[]> {
-//   const formData = new FormData();
-//   const fs = require("fs");
-//   const fileBuffer = fs.readFileSync(imagePath);
-//   const fileBlob = new Blob([fileBuffer]);
-//   formData.append("file", fileBlob, imagePath);
-
-//   const response = await fetch("http://127.0.0.1:8000/predict/", {
-//     method: "POST",
-//     body: formData,
-//   });
-
-//   const result = await response.json();
-//   return result;
-// }
-// export { callVGGNet };
+import {
+  CatalogItemSchemaType,
+  catalogItemSchema,
+} from "../../schemas/catalog/catalog-schema";
+import weaviate, { vectorizer } from "weaviate-client";
 
 //funcion para hacer query a pinecone
-async function QueryPineconeImage(
+async function QueryWeaviateImage(
   queryVector: number[],
-  topK: number
+  page: number,
+  limit: number
 ): Promise<CatalogItemSchemaType[]> {
   try {
-    const pc = new Pinecone({ apiKey: config.PINECONE_API_KEY });
-    const namespace = pc
-      .index(config.PINECONE_INDEX_NAME, config.PINECONE_HOST_NAME)
-      .namespace(config.PINECONE_NAMESPACE);
-    const queryResponse = await namespace.query({
-      topK: topK,
-      vector: queryVector,
-      includeMetadata: true,
-      filter: { type: "image" },
+    const client = await weaviate.connectToWeaviateCloud(config.WEAVIATE_URL, {
+      authCredentials: new weaviate.ApiKey(config.WEAVIATE_API_KEY),
     });
 
-    if (
-      !queryResponse ||
-      !queryResponse.matches ||
-      queryResponse.matches.length === 0
-    ) {
-      console.log("No results found");
+    // Verificar que la conexión esté lista
+    if (!client.isReady()) {
+      throw new Error("No se pudo conectar a Weaviate");
+    }
+
+    let collection;
+    try {
+      collection = client.collections.get("FashionItem");
+    } catch (error) {
+      console.log("No results found, weaviate FashionItem is inicilized");
       return [];
     }
 
-    const topResults: CatalogItemSchemaType[] = queryResponse.matches
+    const result = await collection.query.nearVector(queryVector, {
+      limit: limit,
+
+      returnProperties: [
+        "name",
+        "description",
+        "image_url",
+        "url",
+        "brand",
+        "price",
+      ],
+    });
+
+    console.log("topResults", result.objects);
+
+    const topResults: CatalogItemSchemaType[] = result.objects
       .map(match => {
-        if (
-          !match.id ||
-          typeof match.score !== "number" ||
-          !Array.isArray(match.values)
-        ) {
-          console.error("Invalid metadata format", match);
+        const item = {
+          name: match.properties?.name || "",
+          description: match.properties?.description || "",
+          image_url: match.properties?.image_url || "",
+          url: match.properties?.url || "",
+          brand: match.properties?.brand || "",
+          price: match.properties?.price || 0,
+        };
+
+        // Validar el item usando Zod schema
+        const validationResult = catalogItemSchema.safeParse(item);
+        if (!validationResult.success) {
+          console.log("Item validation failed:", validationResult.error);
           return null;
         }
-
-        return {
-          id: match.id,
-          name: match.metadata?.name || "",
-          description: match.metadata?.description || "",
-          image_url: match.metadata?.image_url || "",
-          url: match.metadata?.url || "",
-          brand: match.metadata?.brand || "",
-          price: match.metadata?.price || 0,
-        };
+        return validationResult.data;
       })
       .filter((item): item is CatalogItemSchemaType => item !== null);
 
@@ -75,4 +71,4 @@ async function QueryPineconeImage(
     return [];
   }
 }
-export { QueryPineconeImage };
+export { QueryWeaviateImage };
