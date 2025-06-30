@@ -5,10 +5,12 @@ const ClothingItemComponent = ({
   i,
   id,
   url: image_url,
+  numColumns,
 }: {
   i: number;
   id: string;
   url: string;
+  numColumns: number;
 }) => {
   const [imageDimensions, setImageDimensions] = useState({
     width: 0,
@@ -16,7 +18,7 @@ const ClothingItemComponent = ({
   });
 
   const { width, height } = Dimensions.get("window");
-  const widthDetermined = width / 2 - 10; //width hard coded
+  const widthDetermined = width / numColumns - 10; //width hard coded
 
   useEffect(() => {
     Image.getSize(
@@ -24,7 +26,7 @@ const ClothingItemComponent = ({
       (width, height) => {
         setImageDimensions({ width, height });
       },
-      (error) => console.error("Failed to get dimensions for image 1:", error)
+      error => console.error("Failed to get dimensions for image 1:", error)
     );
   }, []);
 
@@ -39,7 +41,7 @@ const ClothingItemComponent = ({
         width: widthDetermined,
         borderRadius: 8,
         overflow: "hidden",
-        marginTop: i < 2 ? 0 : 18,
+        marginTop: i < numColumns ? 0 : 18,
       }}
     >
       <Image

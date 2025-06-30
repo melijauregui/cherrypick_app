@@ -2,7 +2,7 @@ import { ImageSourcePropType } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { SafeAreaView } from "react-native-safe-area-context";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { LOCAL_IP } from "@/config/api";
 import { TouchableOpacity, Text, Image } from "react-native";
 import { safeFetch } from "@/app/utils/safe-fetch";
@@ -29,6 +29,10 @@ import {
 import { ProfileAndLogOut } from "@/app/components/profile/profileAndLogOut";
 import { BrandSchemaRes } from "@/schemas/auth/brand-schema";
 import { LogoCircle } from "@/app/components/LogoCircle";
+import { Linking } from "react-native";
+import { Metadata } from "./home";
+import { ClothingItemComponent } from "@/app/components/ClothingItemComponent";
+import { MasonryFlashList } from "@shopify/flash-list";
 
 const Profile = () => {
   const { user, loading, logout, userType } = useAuth();
@@ -115,6 +119,17 @@ const BrandProfile = ({
     logo_url: "",
   });
 
+  const [clothingItems, setClothingItems] = useState<Metadata[]>([]);
+
+  useEffect(() => {
+    const fetchClothingItems = async () => {
+      const items = await getClothingItems();
+      setClothingItems(items);
+    };
+
+    fetchClothingItems();
+  }, []);
+
   // Estado para mostrar descripción completa o cortada
   const [showFullDescription, setShowFullDescription] = useState(false);
 
@@ -145,9 +160,8 @@ const BrandProfile = ({
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaView className="flex-1 flex-col px-14 pt-3 bg-brown-strong">
-        <View className="flex flex-col w-full">
-          {/* <ProfileAndLogOut openUsernameSheetLogout={openUsernameSheetLogout} /> */}
+      <SafeAreaView className="bg-brown-strong w-full flex-1 ">
+        <View className="flex flex-col w-full px-10 pb-5">
           <View className="flex flex-row  w-full py-4 gap-5">
             <Image
               source={{
@@ -172,9 +186,16 @@ const BrandProfile = ({
               color="#38bdf8"
               style={{ marginRight: 6 }}
             />
-            <Text className="text-lg font-plight text-start text-sky-500">
-              {profileData.url}
-            </Text>
+            <TouchableOpacity
+              onPress={() =>
+                profileData.url && Linking.openURL(profileData.url)
+              }
+              activeOpacity={1}
+            >
+              <Text className="text-lg font-plight text-start text-sky-500">
+                {profileData.url}
+              </Text>
+            </TouchableOpacity>
           </View>
           <View className="pt-2">
             {lines.map((line, idx) => (
@@ -194,6 +215,23 @@ const BrandProfile = ({
             )}
           </View>
         </View>
+        <MasonryFlashList
+          data={clothingItems}
+          numColumns={3}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingVertical: 10 }}
+          renderItem={({ item, index }: { item: Metadata; index: number }) => (
+            <ClothingItemComponent
+              i={index}
+              key={index}
+              id={index.toString()}
+              url={item.image_url}
+              numColumns={3}
+            />
+          )}
+          onEndReachedThreshold={0.1}
+        />
+
         <CustomBottomLogout
           bottomSheetRef={bottomSheetRefLogout}
           logout={logout}
@@ -462,4 +500,34 @@ function splitDescriptionByLinesOrWords(text: string, maxTotalLength: number) {
     return acc ? [acc] : [];
   }
   return lines;
+}
+
+async function getClothingItems(): Promise<Metadata[]> {
+  const page = "2";
+  const limit = "10";
+
+  try {
+    const response: Response = await fetch(
+      `http://${LOCAL_IP}:3000/all?page=${page}&limit=${limit}`,
+      {
+        method: "GET",
+      }
+    );
+    console.log("Status:", response.status);
+    // console.log("Response text:", await response.text());
+
+    if (!response.ok) {
+      throw new Error("Error al obtener los datos");
+    }
+    const clothingItems: Metadata[] = await response.json();
+    //console.log("Clothing items:", clothingItems);
+    return clothingItems;
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Error:", error.message);
+    } else {
+      console.error("Error desconocido");
+    }
+    return [];
+  }
 }

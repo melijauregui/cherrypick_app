@@ -31,6 +31,7 @@ const Home = () => {
               key={index}
               id={index.toString()}
               url={item.image_url}
+              numColumns={2}
             />
           )}
           onEndReachedThreshold={0.1}
