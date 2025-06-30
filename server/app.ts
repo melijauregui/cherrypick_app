@@ -46,6 +46,12 @@ import {
   CatalogItemArraySchema,
 } from "../schemas/catalog/catalog-schema";
 import { QueryPineconeImage } from "./app/routeVector";
+import {
+  BrandSchemaRes,
+  BrandSchemaResType,
+  QueryDbSchemaBrand,
+  QueryGetBrandSchema,
+} from "../schemas/auth/brand-schema";
 
 // endpoint que devuelve los 10 resultados mas personalizados del usuario WIP
 const paginatedRoute = createRoute({
@@ -383,7 +389,7 @@ const createUserRoute = createRoute({
 app.openapi(createUserRoute, async c => {
   const { name, email, dateString, preferences } = c.req.valid("json");
   let res: CreateAccountSchemaResType;
-  console.log("Creating user:", name, email, dateString, preferences);
+  console.log("Creating client:", name, email, dateString, preferences);
 
   try {
     const [existing]: any[] = await db.query(
@@ -471,9 +477,9 @@ app.openapi(deleteAccountRoute, async c => {
   return c.json(res, 200);
 });
 
-const getUserRoute = createRoute({
+const getClientRoute = createRoute({
   method: "get",
-  path: "/get-user",
+  path: "/get-client",
   request: {
     query: QueryGetUserSchema,
   },
@@ -489,7 +495,7 @@ const getUserRoute = createRoute({
   },
 });
 
-app.openapi(getUserRoute, async c => {
+app.openapi(getClientRoute, async c => {
   const { email } = c.req.valid("query");
   let res: UserSchemaResType;
 
@@ -524,9 +530,9 @@ app.openapi(getUserRoute, async c => {
   return c.json(res, 200);
 });
 
-const updateUser = createRoute({
+const updateClientRoute = createRoute({
   method: "post",
-  path: "/update-user",
+  path: "/update-client",
   request: {
     body: {
       content: {
@@ -548,10 +554,9 @@ const updateUser = createRoute({
   },
 });
 
-app.openapi(updateUser, async c => {
+app.openapi(updateClientRoute, async c => {
   var { name, email, dateString, preferences } = c.req.valid("json");
   let res: CreateAccountSchemaResType;
-  console.log("Updating user:", name, email, dateString, preferences);
   try {
     const [existing]: any[] = await db.query(
       "SELECT * FROM users WHERE email = ?",
@@ -656,4 +661,58 @@ app.openapi(updateCatalogRoute, async c => {
     };
     return c.json(res, 200);
   }
+});
+
+// endpoint que obtiene la información de la marca
+const getBrandRoute = createRoute({
+  method: "get",
+  path: "/get-brand",
+  request: {
+    query: QueryGetBrandSchema,
+  },
+  responses: {
+    200: {
+      description: "Obtiene la información de la marca",
+      content: {
+        "application/json": {
+          schema: BrandSchemaRes,
+        },
+      },
+    },
+  },
+});
+
+app.openapi(getBrandRoute, async c => {
+  const { email } = c.req.valid("query");
+  let res: BrandSchemaResType;
+
+  try {
+    const [result]: any = await db.query(
+      "SELECT * FROM brands WHERE email = ?",
+      [email]
+    );
+
+    if (result.length > 0) {
+      const parsedRows = QueryDbSchemaBrand.parse(result);
+      const { name, email, url, logo_url } = parsedRows[0];
+      res = {
+        error: false,
+        brand: {
+          name: name,
+          email: email,
+          url: url,
+          logo_url: logo_url,
+        },
+      };
+    } else {
+      res = {
+        error: true,
+        details: "Brand not found",
+      };
+    }
+  } catch (error) {
+    console.error(error);
+    return c.json({ error: true as true, details: "Server error" }, 200);
+  }
+  return c.json(res, 200);
 });

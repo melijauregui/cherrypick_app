@@ -58,12 +58,12 @@ const UserSchema = z.object({
       required_error: "Email is required",
       invalid_type_error: "Email must be a string",
     })
-    .email("Invalid email format")
+    .email("Invalid email format"),
 });
 
 export { UserSchema };
 
 const QueryGetUserSchema = z.object({
-  email: z.preprocess((val) => val?.toString(), z.string()),
+  email: z.preprocess(val => val?.toString(), z.string()),
 });
 export { QueryGetUserSchema };
