@@ -51,12 +51,12 @@ const fetchClientData = async (
 ) => {
   try {
     const { data } = await safeFetch({
-      url: `http://${LOCAL_IP}:3000/get-user?email=${user.email}`,
+      url: `http://${LOCAL_IP}:3000/get-client?email=${user.email}`,
       method: "GET",
       schema: UserSchemaRes,
     });
     if (data.error) {
-      console.log("Error fetching user data:", data.details);
+      console.log("Error fetching user data1:", data.details);
       return;
     }
     setProfileData({
@@ -66,7 +66,7 @@ const fetchClientData = async (
       dateOfBirth: new Date(data.user.dateOfBirth),
     });
   } catch (error) {
-    console.error("Error fetching user data:", error);
+    console.error("Error fetching user data2:", error);
   }
 };
 

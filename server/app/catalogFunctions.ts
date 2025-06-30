@@ -1,9 +1,15 @@
 import {
   catalogItemSchema,
   CatalogItemSchemaType,
+  CatalogUpdateResponseSchemaType,
 } from "../../schemas/catalog/catalog-schema";
 import { Pinecone } from "@pinecone-database/pinecone";
 import { config } from "../config";
+import {
+  BrandSchemaResType,
+  QueryDbSchemaBrand,
+} from "../../schemas/auth/brand-schema";
+import { db } from "../db";
 
 // Función para extraer características de imagen desde URL
 async function extractImageFeatures(imageUrl: string): Promise<number[]> {
@@ -240,4 +246,64 @@ export async function validateCsvFile(file: File): Promise<
       details: "Error interno del servidor al procesar el CSV",
     };
   }
+}
+
+export async function UpdateCatalog(
+  file: File
+): Promise<CatalogUpdateResponseSchemaType> {
+  let res: CatalogUpdateResponseSchemaType;
+  const validationResult = await validateCsvFile(file);
+
+  if (validationResult.error) {
+    res = validationResult;
+    return res;
+  }
+
+  const pineconeResult = await insertCatalogItemsToPinecone(
+    validationResult.catalogItems
+  );
+
+  if (pineconeResult.success) {
+    res = {
+      error: false,
+    };
+    console.log(
+      `Successfully inserted ${pineconeResult.insertedCount} vectors into Pinecone`
+    );
+  } else {
+    res = {
+      error: true,
+      details: `Error inserting into Pinecone: ${pineconeResult.errors.join(", ")}`,
+    };
+    console.error("Pinecone insertion errors:", pineconeResult.errors);
+  }
+  return res;
+}
+
+export async function GetBrand(email: string): Promise<BrandSchemaResType> {
+  let res: BrandSchemaResType;
+  const [result]: any = await db.query("SELECT * FROM brands WHERE email = ?", [
+    email,
+  ]);
+
+  if (result.length > 0) {
+    const parsedRows = QueryDbSchemaBrand.parse(result);
+    const { name, description, email, url, logo_url } = parsedRows[0];
+    res = {
+      error: false,
+      brand: {
+        name: name,
+        description: description,
+        email: email,
+        url: url,
+        logo_url: logo_url,
+      },
+    };
+  } else {
+    res = {
+      error: true,
+      details: "Brand not found",
+    };
+  }
+  return res;
 }

@@ -1,5 +1,3 @@
-import nodemailer from "nodemailer";
-import { randomInt } from "crypto";
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { PaginationSchema } from "./app/allDatabase";
 import {
@@ -17,9 +15,7 @@ import {
   QueryVerifyCodeSchema,
   VerifyCodeSchema,
   VerifyCodeSchemaType,
-  queryDbSchemaRegisterInProgress,
 } from "../schemas/auth/code-verification-schema";
-import { db } from "./db";
 const app = new OpenAPIHono();
 export default app;
 import {
@@ -31,55 +27,37 @@ import {
   UserSchemaResType,
 } from "../schemas/auth/preferences-schema";
 import {
-  queryDbSchemaUser,
   VerifyUserResponseSchema,
   VerifyUserResponseSchemaType,
 } from "../schemas/auth/sign-in-schema";
-import {
-  validateCsvFile,
-  insertCatalogItemsToPinecone,
-} from "./app/catalogFunctions";
+import { UpdateCatalog, GetBrand } from "./app/catalogFunctions";
 import {
   csvFileUploadSchema,
   CatalogUpdateResponseSchema,
   CatalogUpdateResponseSchemaType,
   CatalogItemArraySchema,
+  PaginationSchemaBrand,
 } from "../schemas/catalog/catalog-schema";
 import { QueryPineconeImage } from "./app/routeVector";
 import {
   BrandSchemaRes,
   BrandSchemaResType,
-  QueryDbSchemaBrand,
   QueryGetBrandSchema,
 } from "../schemas/auth/brand-schema";
-
-// endpoint que devuelve los 10 resultados mas personalizados del usuario WIP
-const paginatedRoute = createRoute({
-  method: "get",
-  path: "/all",
-  request: {
-    query: PaginationSchema,
-  },
-  responses: {
-    200: {
-      content: {
-        "application/json": {
-          schema: CatalogItemArraySchema,
-        },
-      },
-      description: "Devuelve los datos de la base de datos de forma paginada",
-    },
-  },
-});
-app.openapi(paginatedRoute, async c => {
-  const { page, limit } = c.req.valid("query");
-  const topK = 10;
-
-  const embedding = Array.from({ length: 768 }, () => Math.random()); // Simulación de un vector de consulta personalizada
-
-  const res = await QueryPineconeImage(embedding, topK);
-  return c.json(res, 200);
-});
+import {
+  verifyEmail,
+  SendVerificationCode,
+  GenerateVerificationCode,
+  sendEmail,
+  VerifyVerificationCode,
+} from "./app/verifyEmail";
+import {
+  VerifyUserExists,
+  CreateUser,
+  DeleteUser,
+  GetClient,
+  UpdateClient,
+} from "./app/userFunctions";
 
 // endpoint que verifica si un mail esta registrado en la base de datos
 const verifiedEmailRoute = createRoute({
@@ -105,22 +83,7 @@ app.openapi(verifiedEmailRoute, async c => {
   let res: VerifyAvailabilitySchemaType;
   console.log("Verifying email availability:", email);
   try {
-    const [rows]: any[] = await db.query(
-      "SELECT * FROM users WHERE email = ?",
-      [email]
-    );
-    if (rows.length === 0) {
-      // Email no registrado
-      res = {
-        error: false,
-      };
-    } else {
-      // Email ya registrado
-      res = {
-        error: true,
-        details: "Email already registered",
-      };
-    }
+    res = await verifyEmail(email);
   } catch (err) {
     console.error("Error checking email:", err);
     res = {
@@ -156,7 +119,7 @@ const codeVerificationRoute = createRoute({
 });
 app.openapi(codeVerificationRoute, async c => {
   const { email } = await c.req.valid("json");
-  const code = generateVerificationCode();
+  const code = GenerateVerificationCode();
   const emailSent = await sendEmail(email, code);
   let res: ResCodeVerificationPostSchemaType;
 
@@ -171,20 +134,7 @@ app.openapi(codeVerificationRoute, async c => {
 
   // Guardar (o reemplazar) en DB
   try {
-    const expirationTime = new Date();
-    expirationTime.setMinutes(expirationTime.getMinutes() + 3); // Expira en 3 minutos
-    const expirationString = expirationTime.toISOString(); // "2025-05-14T18:30:00.000Z"
-    await db.query(
-      `
-      INSERT INTO registerInProgress (email, verification_code, verification_code_expiration)
-      VALUES (?, ?, ?)
-      ON DUPLICATE KEY UPDATE verification_code = VALUES(verification_code), verification_code_expiration = VALUES(verification_code_expiration)
-      `,
-      [email, code, expirationString]
-    );
-    res = {
-      error: false,
-    };
+    res = await SendVerificationCode(email, code);
   } catch (err) {
     console.error("Error al guardar código:", err);
     res = {
@@ -194,42 +144,6 @@ app.openapi(codeVerificationRoute, async c => {
   }
   return c.json(res, 200);
 });
-
-function generateVerificationCode(): string {
-  return String(randomInt(100000, 999999));
-}
-
-export async function sendEmail(email: string, code: string): Promise<boolean> {
-  try {
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    });
-
-    console.log("Enviando correo a:", email);
-    const info = await transporter.sendMail({
-      from: `"Cherrypick" <${process.env.SMTP_USER}>`,
-      to: email,
-      subject: "Verify your email address",
-      text: `Thank you for signing up for CherryPick!\n\nTo complete your account setup, please enter the following verification code on our app:\n\n${code}\n\nThanks,\nthe CherryPick Team.`,
-      html: `
-        <p>Thank you for signing up for <strong>CherryPick</strong>!</p>
-        <p>To complete your account setup, please enter the following verification code on our app:</p>
-        <p><strong>${code}</strong></p>
-        <p>Thanks,<br>The <strong>CherryPick</strong> Team</p>
-      `,
-    });
-
-    console.log("Correo enviado:", info.messageId);
-    return true;
-  } catch (error) {
-    console.error("Error enviando correo:", error);
-    return false;
-  }
-}
 
 // endpoint que verifica si el code de verificación es correcto
 const verifiedCodeRoute = createRoute({
@@ -255,41 +169,7 @@ app.openapi(verifiedCodeRoute, async c => {
   let res: VerifyCodeSchemaType;
 
   try {
-    const [rows]: any[] = await db.query(
-      `SELECT verification_code, verification_code_expiration FROM registerInProgress WHERE email = ?`,
-      [email]
-    );
-
-    if (rows.length === 0) {
-      res = {
-        error: true,
-        details: "Email not found",
-      };
-      return c.json(res, 200);
-    }
-
-    const parsedRows = queryDbSchemaRegisterInProgress.parse(rows);
-    const { verification_code, verification_code_expiration } = parsedRows[0];
-
-    if (!verification_code || verification_code !== code) {
-      return c.json({ error: false as false, isCorrect: false }, 200);
-    }
-
-    if (new Date() > new Date(verification_code_expiration)) {
-      res = {
-        error: true,
-        details: "Verification code expired",
-      };
-      return c.json(res, 200);
-    }
-
-    await db.query("DELETE FROM registerInProgress WHERE email = ?", [email]);
-
-    console.log("Código de verificación correcto");
-    res = {
-      error: false,
-      isCorrect: true,
-    };
+    res = await VerifyVerificationCode(email, code);
     return c.json(res, 200);
   } catch (err) {
     console.error("Error al verificar código:", err);
@@ -322,43 +202,11 @@ const verifyUserRoute = createRoute({
 app.openapi(verifyUserRoute, async c => {
   const { email } = c.req.valid("json");
   let res: VerifyUserResponseSchemaType;
-  console.log("Verifying user:", email);
+  console.log("Verifying user3:", email);
 
   // Buscar primero en users
-  const [userRows]: any[] = await db.query(
-    "SELECT * FROM users WHERE email = ?",
-    [email]
-  );
-
-  // Buscar en brands si no se encuentra en users
-  if (userRows.length === 0) {
-    const [brandRows]: any[] = await db.query(
-      "SELECT * FROM brands WHERE email = ?",
-      [email]
-    );
-
-    if (brandRows.length === 0) {
-      res = {
-        error: true,
-        details: "User not found",
-      };
-    } else {
-      console.log("Brand found:", brandRows);
-      // Usando la estructura correcta de la tabla brands
-      const brand = brandRows[0];
-      res = {
-        error: false,
-        userType: "brand",
-      };
-    }
-  } else {
-    console.log("User found:", userRows);
-    const parsedRows = queryDbSchemaUser.parse(userRows);
-    res = {
-      error: false,
-      userType: "client",
-    };
-  }
+  res = await VerifyUserExists(email);
+  console.log("Verifying user4:", res);
   return c.json(res, 200);
 });
 
@@ -393,28 +241,7 @@ app.openapi(createUserRoute, async c => {
   console.log("Creating client:", name, email, dateString, preferences);
 
   try {
-    const [existing]: any[] = await db.query(
-      "SELECT * FROM users WHERE email = ?",
-      [email]
-    );
-
-    if (existing.length > 0) {
-      res = {
-        error: true,
-        details: "Email already registered",
-      };
-    }
-
-    const dateBirth = new Date(dateString);
-
-    const [result]: any = await db.query(
-      "INSERT INTO users (name, email, date_of_birth, preferences) VALUES (?, ?, ?, ?)",
-      [name, email, dateBirth, JSON.stringify(preferences)]
-    );
-    console.log("User created:", result);
-    res = {
-      error: false,
-    };
+    res = await CreateUser(email, name, dateString, preferences);
   } catch (err) {
     console.error(err);
     res = {
@@ -425,6 +252,7 @@ app.openapi(createUserRoute, async c => {
   return c.json(res, 200);
 });
 
+// endpoint que elimina un usuario de la base de datos
 const deleteAccountRoute = createRoute({
   method: "post",
   path: "/delete-account",
@@ -454,23 +282,7 @@ app.openapi(deleteAccountRoute, async c => {
   let res: VerifyAccountDeletedSchemaType;
 
   try {
-    const [result]: any = await db.query("DELETE FROM users WHERE email = ?", [
-      email,
-    ]);
-
-    if (result.affectedRows > 0) {
-      // return c.json({ success: true as true, error: false as false }, 200);
-      res = {
-        error: false,
-        success: true,
-      };
-    } else {
-      // return c.json({ error: true as true, details: "User not found" }, 200);
-      res = {
-        error: true,
-        details: "User not found",
-      };
-    }
+    res = await DeleteUser(email);
   } catch (error) {
     console.error(error);
     return c.json({ error: true as true, details: "Server error" }, 200);
@@ -478,6 +290,7 @@ app.openapi(deleteAccountRoute, async c => {
   return c.json(res, 200);
 });
 
+// endpoint que obtiene la información del cliente
 const getClientRoute = createRoute({
   method: "get",
   path: "/get-client",
@@ -501,29 +314,7 @@ app.openapi(getClientRoute, async c => {
   let res: UserSchemaResType;
 
   try {
-    const [result]: any = await db.query(
-      "SELECT * FROM users WHERE email = ?",
-      [email]
-    );
-
-    if (result.length > 0) {
-      const parsedRows = queryDbSchemaUser.parse(result);
-      const { name, email, date_of_birth, preferences } = parsedRows[0];
-      res = {
-        error: false,
-        user: {
-          username: name,
-          email: email,
-          dateOfBirth: date_of_birth,
-          preferences: preferences,
-        },
-      };
-    } else {
-      res = {
-        error: true,
-        details: "User not found",
-      };
-    }
+    res = await GetClient(email);
   } catch (error) {
     console.error(error);
     return c.json({ error: true as true, details: "Server error" }, 200);
@@ -531,6 +322,7 @@ app.openapi(getClientRoute, async c => {
   return c.json(res, 200);
 });
 
+// endpoint que actualiza la información del cliente
 const updateClientRoute = createRoute({
   method: "post",
   path: "/update-client",
@@ -559,40 +351,7 @@ app.openapi(updateClientRoute, async c => {
   var { name, email, dateString, preferences } = c.req.valid("json");
   let res: CreateAccountSchemaResType;
   try {
-    const [existing]: any[] = await db.query(
-      "SELECT * FROM users WHERE email = ?",
-      [email]
-    );
-    if (existing.length === 0) {
-      console.log("User not found");
-      res = {
-        error: true,
-        details: "Email not registered",
-      };
-      return c.json(res, 200);
-    }
-
-    const parsedRows = queryDbSchemaUser.parse(existing);
-    if (name === undefined) {
-      name = parsedRows[0].name;
-    }
-    if (preferences === undefined) {
-      preferences = parsedRows[0].preferences;
-    }
-    if (dateString === undefined) {
-      dateString = parsedRows[0].date_of_birth.toISOString();
-    }
-
-    const dateBirth = new Date(dateString);
-
-    const [result]: any = await db.query(
-      "UPDATE users SET name = ?, date_of_birth = ?, preferences = ? WHERE email = ?",
-      [name, dateBirth, JSON.stringify(preferences), email]
-    );
-    console.log("User updated");
-    res = {
-      error: false,
-    };
+    res = await UpdateClient(email, name, dateString, preferences);
   } catch (error) {
     console.error(error);
     return c.json({ error: true as true, details: "Server error" }, 200);
@@ -628,31 +387,7 @@ app.openapi(updateCatalogRoute, async c => {
   let res: CatalogUpdateResponseSchemaType;
 
   try {
-    const validationResult = await validateCsvFile(file);
-
-    if (validationResult.error) {
-      res = validationResult;
-      return c.json(res, 200);
-    }
-
-    const pineconeResult = await insertCatalogItemsToPinecone(
-      validationResult.catalogItems
-    );
-
-    if (pineconeResult.success) {
-      res = {
-        error: false,
-      };
-      console.log(
-        `Successfully inserted ${pineconeResult.insertedCount} vectors into Pinecone`
-      );
-    } else {
-      res = {
-        error: true,
-        details: `Error inserting into Pinecone: ${pineconeResult.errors.join(", ")}`,
-      };
-      console.error("Pinecone insertion errors:", pineconeResult.errors);
-    }
+    res = await UpdateCatalog(file);
 
     return c.json(res, 200);
   } catch (error) {
@@ -688,33 +423,66 @@ app.openapi(getBrandRoute, async c => {
   let res: BrandSchemaResType;
 
   try {
-    const [result]: any = await db.query(
-      "SELECT * FROM brands WHERE email = ?",
-      [email]
-    );
-
-    if (result.length > 0) {
-      const parsedRows = QueryDbSchemaBrand.parse(result);
-      const { name, description, email, url, logo_url } = parsedRows[0];
-      res = {
-        error: false,
-        brand: {
-          name: name,
-          description: description,
-          email: email,
-          url: url,
-          logo_url: logo_url,
-        },
-      };
-    } else {
-      res = {
-        error: true,
-        details: "Brand not found",
-      };
-    }
+    res = await GetBrand(email);
   } catch (error) {
     console.error(error);
     return c.json({ error: true as true, details: "Server error" }, 200);
   }
+  return c.json(res, 200);
+});
+
+// endpoint que devuelve los 10 resultados mas personalizados del usuario WIP
+const paginatedRoute = createRoute({
+  method: "get",
+  path: "/all",
+  request: {
+    query: PaginationSchema,
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: CatalogItemArraySchema,
+        },
+      },
+      description: "Devuelve los datos de la base de datos de forma paginada",
+    },
+  },
+});
+app.openapi(paginatedRoute, async c => {
+  const { page, limit } = c.req.valid("query");
+  const topK = 10;
+
+  const embedding = Array.from({ length: 768 }, () => Math.random()); // Simulación de un vector de consulta personalizada
+
+  const res = await QueryPineconeImage(embedding, topK);
+  return c.json(res, 200);
+});
+
+// endpoint que devuelve los 10 resultados de los items de una marca
+const paginatedRouteBrand = createRoute({
+  method: "get",
+  path: "/all-brand",
+  request: {
+    query: PaginationSchemaBrand,
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: CatalogItemArraySchema,
+        },
+      },
+      description: "Devuelve los datos de la base de datos de forma paginada",
+    },
+  },
+});
+app.openapi(paginatedRouteBrand, async c => {
+  const { page, limit, brand } = c.req.valid("query");
+  const topK = 10;
+
+  const embedding = Array.from({ length: 768 }, () => Math.random()); // Simulación de un vector de consulta personalizada
+
+  const res = await QueryPineconeImage(embedding, topK);
   return c.json(res, 200);
 });
