@@ -26,9 +26,11 @@ CREATE TABLE IF NOT EXISTS registerInProgress (
 CREATE TABLE IF NOT EXISTS brands (
     email VARCHAR(50) PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
+    description VARCHAR(255) NOT NULL,
     url VARCHAR(255) NOT NULL,
     logo_url VARCHAR(255) NOT NULL
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 
 /* CREATE TABLE IF NOT EXISTS clothingItem (
 id INT AUTO_INCREMENT PRIMARY KEY,

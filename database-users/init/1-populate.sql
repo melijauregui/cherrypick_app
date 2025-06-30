@@ -1,3 +1,5 @@
+SET NAMES utf8mb4;
+
 USE cherrypick_db;
 
 -- Usuario de prueba ya registrado
@@ -10,10 +12,17 @@ VALUES (
     );
 
 INSERT INTO
-    brands (name, email, url, logo_url)
+    brands (email, name, description, url, logo_url)
 VALUES (
-        'Zara',
         'cherrypick.brand.example@gmail.com',
+        'tienda napoli',
+        '10% off abonando con transferencia
+3 cuotas sin interés con tarj bancarias
+Envíos a todo el país
+Malabia 1574 , Palermo Soho
+Lun a sab: 11 a 19 hs',
         'https://www.tiendanapoli.com/',
-        'https://acdn-us.mitiendanube.com/stores/001/126/411/themes/common/logo-370616887-1714614837-ea0cb70511e0a8ae27a0b2d64e56ecad1714614838.png?0'
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRj1uqWFGzt3iIfOyeOcputEeV7OeOgAjFiBkVOtD43PHCqGXdl0ABRrSSVumRY44FbXWw&usqp=CAU'
     );
+
+

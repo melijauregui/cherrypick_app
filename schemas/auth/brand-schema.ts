@@ -3,6 +3,7 @@ import { z } from "zod";
 const brandSchema = z.object({
   name: z.string(),
   email: z.string(),
+  description: z.string(),
   url: z.string(),
   logo_url: z.string(),
 });

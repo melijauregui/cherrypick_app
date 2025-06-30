@@ -4,7 +4,7 @@ import BottomSheet from "@gorhom/bottom-sheet";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useRef } from "react";
 import { LOCAL_IP } from "@/config/api";
-import { TouchableOpacity, Text } from "react-native";
+import { TouchableOpacity, Text, Image } from "react-native";
 import { safeFetch } from "@/app/utils/safe-fetch";
 import { Ionicons } from "@expo/vector-icons";
 import { format } from "date-fns";
@@ -28,6 +28,7 @@ import {
 } from "@/app/components/profile/bottomSheets";
 import { ProfileAndLogOut } from "@/app/components/profile/profileAndLogOut";
 import { BrandSchemaRes } from "@/schemas/auth/brand-schema";
+import { LogoCircle } from "@/app/components/LogoCircle";
 
 const Profile = () => {
   const { user, loading, logout, userType } = useAuth();
@@ -81,6 +82,7 @@ const fetchBrandData = async (
     }
     setProfileData({
       name: data.brand.name,
+      description: data.brand.description,
       email: data.brand.email,
       url: data.brand.url,
       logo_url: data.brand.logo_url,
@@ -101,15 +103,20 @@ const BrandProfile = ({
 }) => {
   const [profileData, setProfileData] = useState<{
     name: string;
+    description: string;
     email: string;
     url: string;
     logo_url: string;
   }>({
     name: "",
+    description: "",
     email: "",
     url: "",
     logo_url: "",
   });
+
+  // Estado para mostrar descripción completa o cortada
+  const [showFullDescription, setShowFullDescription] = useState(false);
 
   React.useEffect(() => {
     if (!user || !user.email) {
@@ -124,23 +131,68 @@ const BrandProfile = ({
     bottomSheetRefLogout.current?.snapToIndex(0);
   };
 
+  const description = profileData.description || "";
+  const isLongDescription = description.length > 80;
+  const maxLineLength = 40;
+  const maxTotalLength = 80;
+  const lines =
+    showFullDescription || !isLongDescription
+      ? description.split("\n")
+      : splitDescriptionByLinesOrWords(description, maxTotalLength);
+  // Mostrar botón si no se muestran todas las líneas
+  const showSeeMore =
+    !showFullDescription && lines.join("\n").length < description.length;
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaView className="flex-1 flex-col px-14 pt-3 bg-brown-strong">
-        <View className="flex  flex-col w-full">
-          <ProfileAndLogOut openUsernameSheetLogout={openUsernameSheetLogout} />
-          <Text className="text-white text-[27px] font-pregular">
-            {profileData.name}
-          </Text>
-          <Text className="text-white text-[27px] font-pregular">
-            {profileData.email}
-          </Text>
-          <Text className="text-white text-[27px] font-pregular">
-            {profileData.url}
-          </Text>
-          <Text className="text-white text-[27px] font-pregular">
-            {profileData.logo_url}
-          </Text>
+        <View className="flex flex-col w-full">
+          {/* <ProfileAndLogOut openUsernameSheetLogout={openUsernameSheetLogout} /> */}
+          <View className="flex flex-row  w-full py-4 gap-5">
+            <Image
+              source={{
+                uri: profileData.logo_url,
+              }}
+              className="w-32 h-32 rounded-full"
+              resizeMode="contain"
+            />
+            <Text className="text-right text-white font-plight text-3xl pt-10">
+              {profileData.name}
+            </Text>
+            <View className="flex flex-row pt-10">
+              <TouchableOpacity onPress={openUsernameSheetLogout}>
+                <Ionicons name="settings-outline" size={25} color="#6b7280" />
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View className="flex flex-row items-center pt-2">
+            <Ionicons
+              name="link-outline"
+              size={20}
+              color="#38bdf8"
+              style={{ marginRight: 6 }}
+            />
+            <Text className="text-lg font-plight text-start text-sky-500">
+              {profileData.url}
+            </Text>
+          </View>
+          <View className="pt-2">
+            {lines.map((line, idx) => (
+              <Text
+                key={idx}
+                className="text-white font-plight text-lg text-start"
+              >
+                {line}
+              </Text>
+            ))}
+            {showSeeMore && (
+              <TouchableOpacity onPress={() => setShowFullDescription(true)}>
+                <Text className="text-gray-400 font-plight text-base pt-1">
+                  Ver más
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
         <CustomBottomLogout
           bottomSheetRef={bottomSheetRefLogout}
@@ -233,16 +285,7 @@ const ClientProfile = ({
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaView className="flex-1 flex-col px-14 pt-3 bg-brown-strong">
         <View className="flex  flex-col w-full justify-between">
-          <View className="flex flex-row w-full items-center relative py-6">
-            <Text className="text-white text-[27px] font-pregular  absolute left-0 right-0 text-center">
-              Profile
-            </Text>
-            <View className="flex flex-row mr-auto">
-              <TouchableOpacity onPress={openUsernameSheetLogout}>
-                <Ionicons name="settings-outline" size={25} color="#6b7280" />
-              </TouchableOpacity>
-            </View>
-          </View>
+          <ProfileAndLogOut openUsernameSheetLogout={openUsernameSheetLogout} />
           <RenderProfileItem
             label="Username"
             value={profileData.username}
@@ -389,4 +432,34 @@ async function updateUser(data: {
     console.error("Failed to update user:", error);
     throw error;
   }
+}
+
+// Lógica para cortar la descripción respetando los saltos de línea originales,
+// pero si ninguna línea cabe, corta por palabras hasta 80 caracteres
+function splitDescriptionByLinesOrWords(text: string, maxTotalLength: number) {
+  const originalLines = text.split("\n");
+  let lines: string[] = [];
+  let totalLength = 0;
+  let foundShortLine = false;
+  for (let line of originalLines) {
+    if (line.length <= maxTotalLength) {
+      foundShortLine = true;
+    }
+    if (totalLength + line.length > maxTotalLength) {
+      break;
+    }
+    lines.push(line);
+    totalLength += line.length + 1; // +1 por el salto de línea
+  }
+  // Si no hay ninguna línea corta, cortar por palabras
+  if (!foundShortLine && originalLines.length > 0) {
+    const words = originalLines[0]?.split(/\s+/);
+    let acc = "";
+    for (let word of words || []) {
+      if ((acc + (acc ? " " : "") + word).length > maxTotalLength) break;
+      acc += (acc ? " " : "") + word;
+    }
+    return acc ? [acc] : [];
+  }
+  return lines;
 }

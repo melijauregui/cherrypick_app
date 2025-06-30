@@ -322,6 +322,7 @@ const verifyUserRoute = createRoute({
 app.openapi(verifyUserRoute, async c => {
   const { email } = c.req.valid("json");
   let res: VerifyUserResponseSchemaType;
+  console.log("Verifying user:", email);
 
   // Buscar primero en users
   const [userRows]: any[] = await db.query(
@@ -694,11 +695,12 @@ app.openapi(getBrandRoute, async c => {
 
     if (result.length > 0) {
       const parsedRows = QueryDbSchemaBrand.parse(result);
-      const { name, email, url, logo_url } = parsedRows[0];
+      const { name, description, email, url, logo_url } = parsedRows[0];
       res = {
         error: false,
         brand: {
           name: name,
+          description: description,
           email: email,
           url: url,
           logo_url: logo_url,
