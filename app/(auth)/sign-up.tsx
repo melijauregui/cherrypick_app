@@ -9,8 +9,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from "react";
-import { LogoCircle } from "@/components/LogoCircle";
-import { safeFetch } from "@/utils/safe-fetch";
+import { LogoCircle } from "@/app/components/LogoCircle";
+import { safeFetch } from "@/app/utils/safe-fetch";
 import {
   FormSchemaSignUp,
   VerifyAvailabilitySchema,
@@ -40,13 +40,13 @@ const SignIn = () => {
     if (!result.success) {
       //console.log("Validation failed:", result.error);
       const nameError = result.error.issues.find(
-        (issue) => issue.path[0] === "name"
+        issue => issue.path[0] === "name"
       );
       const emailError = result.error.issues.find(
-        (issue) => issue.path[0] === "email"
+        issue => issue.path[0] === "email"
       );
       const dateError = result.error.issues.find(
-        (issue) => issue.path[0] === "date"
+        issue => issue.path[0] === "date"
       );
       setNameError(nameError?.message);
       setEmailError(emailError?.message);
@@ -118,7 +118,7 @@ const SignIn = () => {
               <Input
                 placeholder="Name"
                 value={name}
-                onChange={(text) => {
+                onChange={text => {
                   setNameError(undefined);
                   setName(text);
                 }}
@@ -129,7 +129,7 @@ const SignIn = () => {
                 type="email-address"
                 placeholder="Email"
                 value={email}
-                onChange={(text) => {
+                onChange={text => {
                   setEmailError(undefined);
                   setEmail(text.toLowerCase());
                 }}

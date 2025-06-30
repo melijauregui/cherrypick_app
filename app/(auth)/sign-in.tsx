@@ -11,13 +11,13 @@ import * as SecureStore from "expo-secure-store";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useEffect } from "react";
 import React, { useState } from "react";
-import { LogoCircle } from "@/components/LogoCircle";
+import { LogoCircle } from "@/app/components/LogoCircle";
 import * as Google from "expo-auth-session/providers/google";
 import { router, useLocalSearchParams } from "expo-router";
 import { makeRedirectUri } from "expo-auth-session";
 import Constants from "expo-constants";
 import * as WebBrowser from "expo-web-browser";
-import { safeFetch } from "@/utils/safe-fetch";
+import { safeFetch } from "@/app/utils/safe-fetch";
 import { VerifyUserResponseSchema } from "@/schemas/auth/sign-in-schema";
 import { LOCAL_IP } from "@/config/api";
 import { set } from "zod";
@@ -96,7 +96,7 @@ const GoogleSignInButton: React.FC<{
     },
   });
 
-  const { setUser } = useAuth();
+  const { setUser, setUserType } = useAuth();
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -142,6 +142,7 @@ const GoogleSignInButton: React.FC<{
               response.authentication?.refreshToken ?? ""
             );
             await SecureStore.setItemAsync("userType", data.userType);
+            setUserType(data.userType);
 
             setUser(userInfo);
             console.log("Redirecting to home...");

@@ -12,6 +12,7 @@ interface UserInfo {
   email: string;
   name: string;
 }
+export type { UserInfo };
 
 interface AuthContextType {
   user: UserInfo | null;
@@ -19,6 +20,7 @@ interface AuthContextType {
   loading: boolean;
   logout: () => Promise<void>;
   userType: "client" | "brand" | null;
+  setUserType: React.Dispatch<React.SetStateAction<"client" | "brand" | null>>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -158,7 +160,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, setUser, loading, logout, userType }}>
+    <AuthContext.Provider
+      value={{ user, setUser, loading, logout, userType, setUserType }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -1,6 +1,6 @@
 import { Image, Text } from "react-native";
-import images from "../constants/images";
-import { cn } from "../utils/cn";
+import images from "@/constants/images";
+import { cn } from "@/app/utils/cn";
 
 const LogoSmallPink = ({ classname }: { classname: string }) => {
   return (

@@ -347,8 +347,6 @@ app.openapi(verifyUserRoute, async c => {
   } else {
     console.log("User found:", userRows);
     const parsedRows = queryDbSchemaUser.parse(userRows);
-    const { name, email, date_of_birth, preferences } = parsedRows[0];
-    const dateString = date_of_birth.toISOString();
     res = {
       error: false,
       userType: "client",
@@ -504,7 +502,6 @@ app.openapi(getUserRoute, async c => {
     if (result.length > 0) {
       const parsedRows = queryDbSchemaUser.parse(result);
       const { name, email, date_of_birth, preferences } = parsedRows[0];
-      // console.log("User found (get):", parsedRows[0]);
       res = {
         error: false,
         user: {

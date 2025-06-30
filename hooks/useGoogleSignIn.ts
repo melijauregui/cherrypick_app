@@ -3,7 +3,7 @@ import * as SecureStore from "expo-secure-store";
 import Constants from "expo-constants";
 import { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
-import { safeFetch } from "@/utils/safe-fetch";
+import { safeFetch } from "@/app/utils/safe-fetch";
 import { LOCAL_IP } from "@/config/api";
 import { VerifyUserResponseSchema } from "@/schemas/auth/sign-in-schema";
 import { useAuth } from "@/context/AuthContext";
@@ -28,7 +28,7 @@ export function useGoogleSignIn(onSuccess: () => void) {
     },
   });
 
-  const { setUser } = useAuth();
+  const { setUser, setUserType } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -78,6 +78,8 @@ export function useGoogleSignIn(onSuccess: () => void) {
               "refreshToken",
               response.authentication.refreshToken ?? ""
             );
+            await SecureStore.setItemAsync("userType", data.userType);
+            setUserType(data.userType);
             setUser(userInfo);
             console.log("User set in context:", userInfo);
             onSuccess();

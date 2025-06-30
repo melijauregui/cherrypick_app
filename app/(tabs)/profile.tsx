@@ -4,9 +4,8 @@ import BottomSheet from "@gorhom/bottom-sheet";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useRef } from "react";
 import { LOCAL_IP } from "@/config/api";
-import { router } from "expo-router";
 import { TouchableOpacity, Text } from "react-native";
-import { safeFetch } from "@/utils/safe-fetch";
+import { safeFetch } from "@/app/utils/safe-fetch";
 import { Ionicons } from "@expo/vector-icons";
 import { format } from "date-fns";
 import images from "../../constants/images";
@@ -16,16 +15,55 @@ import {
   CreateAccountSchemaRes,
   UserSchemaRes,
 } from "@/schemas/auth/preferences-schema";
-import {
-  RenderProfileItem,
-  RenderProfileItemPreferences,
-} from "@/components/profile/bottomSheets";
+import { UserInfo } from "@/context/AuthContext";
 import {
   CustomBottomSheet,
   CustomBottomSheetDate,
   CustomBottomSheetPreferences,
   CustomBottomLogout,
-} from "@/components/profile/bottomSheets";
+} from "@/app/components/profile/bottomSheets";
+import {
+  RenderProfileItem,
+  RenderProfileItemPreferences,
+} from "@/app/components/profile/bottomSheets";
+import { LogOutButton } from "@/app/components/profile/buttons";
+
+const Profile = () => {
+  const { user, loading, logout, userType } = useAuth();
+
+  console.log("userType2", userType);
+
+  return userType === "client" ? (
+    <ClientProfile user={user} loading={loading} logout={logout} />
+  ) : (
+    <BrandProfile
+      user={user}
+      loading={loading}
+      logout={logout}
+      userType={userType}
+    />
+  );
+};
+export default Profile;
+
+const BrandProfile = ({
+  user,
+  loading,
+  logout,
+  userType,
+}: {
+  user: UserInfo | null;
+  loading: boolean;
+  logout: () => Promise<void>;
+  userType: "client" | "brand" | null;
+}) => {
+  return (
+    <View>
+      <Text>Brand Profile</Text>
+      <LogOutButton logout={logout} />
+    </View>
+  );
+};
 
 const DATA_MAP = new Map<string, ImageSourcePropType>([
   ["Boho-chic", images.bohoChicImage],
@@ -41,17 +79,16 @@ const DATA = Array.from(DATA_MAP.entries()).map(([title, image]) => ({
   image,
 }));
 
-const Profile = () => {
-  const { user, loading, logout, userType } = useAuth();
-
-  // Función helper para verificar el tipo de usuario
-  const isBrand = () => userType === "brand";
-
-  // Verificar que el usuario es tipo client
-  if (userType && isBrand()) {
-    // Si es brand, no debería estar aquí
-    return null;
-  }
+const ClientProfile = ({
+  user,
+  loading,
+  logout,
+}: {
+  user: UserInfo | null;
+  loading: boolean;
+  logout: () => Promise<void>;
+}) => {
+  // const { user, loading, logout } = useAuth();
 
   const [profileData, setProfileData] = useState<{
     username: string;
@@ -68,7 +105,6 @@ const Profile = () => {
   React.useEffect(() => {
     if (!user || !user.email) {
       console.log("No user or email found");
-      router.replace("/sign-in");
       return;
     }
     const fetchUserData = async () => {
@@ -76,10 +112,11 @@ const Profile = () => {
         const { data } = await safeFetch({
           url: `http://${LOCAL_IP}:3000/get-user?email=${user.email}`,
           method: "GET",
+          //headers: { "Content-Type": "application/json" },
           schema: UserSchemaRes,
         });
         if (data.error) {
-          console.log("Error fetching user data1:", data.details);
+          console.log("Error fetching user data:", data.details);
           return;
         }
         setProfileData({
@@ -130,12 +167,13 @@ const Profile = () => {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
+      {/* <View className="bg-brown-strong flex-1"> */}
       <SafeAreaView className="flex-1 flex-col px-14 pt-3 bg-brown-strong">
         <View className="w-full">
-          <View className="flex flex-col w-full justify-between">
+          <View className="flex  flex-col w-full justify-between">
             <View className="flex flex-col w-full">
               <View className="flex flex-row w-full items-center relative py-6">
-                <Text className="text-white text-[27px] font-pregular absolute left-0 right-0 text-center">
+                <Text className="text-white text-[27px] font-pregular  absolute left-0 right-0 text-center">
                   Profile
                 </Text>
                 <View className="flex flex-row mr-auto">
@@ -145,16 +183,10 @@ const Profile = () => {
                       size={25}
                       color="#6b7280"
                     />
+                    {/* <MaterialIcons name="logout" size={25} color="#6b7280" /> */}
                   </TouchableOpacity>
                 </View>
               </View>
-              {userType && (
-                <View className="mb-4 p-3 bg-white/10 rounded-lg">
-                  <Text className="text-white text-sm font-medium">
-                    Tipo de cuenta: {isBrand() ? "Marca" : "Cliente"}
-                  </Text>
-                </View>
-              )}
               <RenderProfileItem
                 label="Username"
                 value={profileData.username}
@@ -175,6 +207,7 @@ const Profile = () => {
             </View>
           </View>
         </View>
+        {/* <View className="flex flex-col w-full"> */}
         <RenderProfileItemPreferences
           label="Preferences"
           value={profileData.preferences.map(item => ({
@@ -182,6 +215,27 @@ const Profile = () => {
             image: DATA_MAP.get(item) ?? images.bohoChicImage, // TODO !!
           }))}
           onPress={openUsernameSheetPreferences}
+        />
+        {/* </View> */}
+        <CustomBottomSheet
+          bottomSheetRef={bottomSheetRef}
+          lastValue={profileData.username}
+          onSubmit={async (editInputValue: string) => {
+            try {
+              await updateUser({
+                username: editInputValue,
+                email: profileData.email,
+                dateOfBirth: profileData.dateOfBirth,
+                preferences: profileData.preferences,
+              });
+              setProfileData(prev => ({
+                ...prev,
+                username: editInputValue,
+              }));
+            } catch (error) {
+              console.error("Error updating username:", error);
+            }
+          }}
         />
         <CustomBottomSheet
           bottomSheetRef={bottomSheetRef}
@@ -251,11 +305,10 @@ const Profile = () => {
           user={user}
         />
       </SafeAreaView>
+      {/* </View> */}
     </GestureHandlerRootView>
   );
 };
-
-export default Profile;
 
 async function updateUser(data: {
   username?: string;

@@ -15,13 +15,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useEffect, useRef } from "react";
 import React, { useState } from "react";
-import { LogoCircle } from "@/components/LogoCircle";
+import { LogoCircle } from "@/app/components/LogoCircle";
 import {
   FormSchemaCodeVerification,
   VerifyCodeSchema,
 } from "@/schemas/auth/code-verification-schema";
 import { useRouter } from "expo-router";
-import { safeFetch } from "@/utils/safe-fetch";
+import { safeFetch } from "@/app/utils/safe-fetch";
 import { useLocalSearchParams } from "expo-router";
 import { ResCodeVerificationPostSchema } from "@/schemas/auth/sign-up-schema";
 import { LOCAL_IP } from "@/config/api";
@@ -121,7 +121,7 @@ const CodeVerification = () => {
     });
     if (!result.success) {
       const codeError = result.error.issues.find(
-        (issue) => issue.path[0] === "code"
+        issue => issue.path[0] === "code"
       );
       setCodeError(codeError?.message);
       return;
@@ -190,7 +190,7 @@ const CodeVerification = () => {
                 <View className="flex flex-col w-full mt-6 gap-3">
                   <CodeInput
                     length={6}
-                    onComplete={(c) => {
+                    onComplete={c => {
                       setCode(c);
                     }}
                     setCodeReady={setCodeReady}
@@ -300,7 +300,6 @@ export const CodeInput: React.FC<CodeInputProps> = ({
     }
   }, [reset]);
 
-
   // al cambiar un dígito
   const handleChange = (
     text: string,
@@ -378,10 +377,10 @@ export const CodeInput: React.FC<CodeInputProps> = ({
             selectTextOnFocus={false}
             key={idx}
             pointerEvents={isFocused ? "auto" : "none"}
-            ref={(ref) => (inputs.current[idx] = ref)}
+            ref={ref => (inputs.current[idx] = ref)}
             value={digit}
-            onChangeText={(text) => handleChange(text, idx, setCodeError)}
-            onKeyPress={(e) => handleKeyPress(e, idx)}
+            onChangeText={text => handleChange(text, idx, setCodeError)}
+            onKeyPress={e => handleKeyPress(e, idx)}
             keyboardType="number-pad"
             maxLength={idx === 0 ? length : 1}
             caretHidden={true}

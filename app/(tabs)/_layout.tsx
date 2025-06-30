@@ -78,16 +78,6 @@ const Page = ({
             focused={focused}
           />
         ),
-        ...(name === "profile" && {
-          tabBarPress: (e: any) => {
-            e.preventDefault();
-            if (userType === "brand") {
-              router.push("/(tabs)/brand-profile" as any);
-            } else {
-              router.push("/(tabs)/profile" as any);
-            }
-          },
-        }),
       }}
     />
   );
