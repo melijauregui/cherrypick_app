@@ -3,7 +3,7 @@ import * as SecureStore from "expo-secure-store";
 import Constants from "expo-constants";
 import { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
-import { safeFetch } from "@/app/utils/safe-fetch";
+import safeFetch from "@/app/utils/safe-fetch";
 import { LOCAL_IP } from "@/config/api";
 import { VerifyUserResponseSchema } from "@/schemas/auth/sign-in-schema";
 import { useAuth } from "@/context/AuthContext";

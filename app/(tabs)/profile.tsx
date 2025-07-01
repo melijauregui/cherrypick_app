@@ -1,7 +1,7 @@
 import { ImageSourcePropType } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet from "@gorhom/bottom-sheet";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import React, { useState, useRef, useEffect } from "react";
 import { LOCAL_IP } from "@/config/api";
 import { TouchableOpacity, Text, Image } from "react-native";
@@ -193,84 +193,92 @@ const BrandProfile = ({
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaView className="bg-brown-strong w-full flex-1 ">
-        <View className="flex flex-col w-full px-10 pb-5">
-          <View className="flex flex-row  w-full py-4 gap-5">
-            <Image
-              source={{
-                uri: profileData.logo_url,
-              }}
-              className="w-32 h-32 rounded-full"
-              resizeMode="contain"
-            />
-            <Text className="text-right text-white font-plight text-3xl pt-10">
-              {profileData.name}
-            </Text>
-            <View className="flex flex-row pt-10">
-              <TouchableOpacity onPress={openUsernameSheetLogout}>
-                <Ionicons name="settings-outline" size={25} color="#6b7280" />
-              </TouchableOpacity>
+      <SafeAreaProvider>
+        <SafeAreaView className="bg-brown-strong w-full flex-1 ">
+          <View className="flex flex-col w-full px-10 pb-5">
+            <View className="flex flex-row  w-full py-4 gap-5">
+              <Image
+                source={{
+                  uri: profileData.logo_url,
+                }}
+                className="w-32 h-32 rounded-full"
+                resizeMode="contain"
+              />
+              <Text className="text-right text-white font-plight text-3xl pt-10">
+                {profileData.name}
+              </Text>
+              <View className="flex flex-row pt-10">
+                <TouchableOpacity onPress={openUsernameSheetLogout}>
+                  <Ionicons name="settings-outline" size={25} color="#6b7280" />
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-          <View className="flex flex-row items-center pt-2">
-            <Ionicons
-              name="link-outline"
-              size={20}
-              color="#38bdf8"
-              style={{ marginRight: 6 }}
-            />
-            <TouchableOpacity
-              onPress={() =>
-                profileData.url && Linking.openURL(profileData.url)
-              }
-              activeOpacity={1}
-            >
-              <Text className="text-lg font-plight text-start text-sky-500">
-                {profileData.url}
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <View className="pt-2">
-            {lines.map((line, idx) => (
-              <Text
-                key={idx}
-                className="text-white font-plight text-lg text-start"
+            <View className="flex flex-row items-center pt-2">
+              <Ionicons
+                name="link-outline"
+                size={20}
+                color="#38bdf8"
+                style={{ marginRight: 6 }}
+              />
+              <TouchableOpacity
+                onPress={() =>
+                  profileData.url && Linking.openURL(profileData.url)
+                }
+                activeOpacity={1}
               >
-                {line}
-              </Text>
-            ))}
-            {showSeeMore && (
-              <TouchableOpacity onPress={() => setShowFullDescription(true)}>
-                <Text className="text-gray-400 font-plight text-base pt-1">
-                  Ver más
+                <Text className="text-lg font-plight text-start text-sky-500">
+                  {profileData.url}
                 </Text>
               </TouchableOpacity>
-            )}
+            </View>
+            <View className="pt-2">
+              {lines.map((line, idx) => (
+                <Text
+                  key={idx}
+                  className="text-white font-plight text-lg text-start"
+                >
+                  {line}
+                </Text>
+              ))}
+              {showSeeMore && (
+                <TouchableOpacity onPress={() => setShowFullDescription(true)}>
+                  <Text className="text-gray-400 font-plight text-base pt-1">
+                    Ver más
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
-        </View>
-        <MasonryFlashList
-          data={clothingItems}
-          numColumns={3}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingVertical: 10 }}
-          renderItem={({ item, index }: { item: Metadata; index: number }) => (
-            <ClothingItemComponent
-              i={index}
-              url={item.image_url}
-              numColumns={3}
-            />
-          )}
-          onEndReached={handleLoadMore}
-          onEndReachedThreshold={0.1}
-        />
+          <MasonryFlashList
+            data={clothingItems}
+            numColumns={3}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingVertical: 10 }}
+            renderItem={({
+              item,
+              index,
+            }: {
+              item: Metadata;
+              index: number;
+            }) => (
+              <ClothingItemComponent
+                i={index}
+                url={item.image_url}
+                numColumns={3}
+              />
+            )}
+            onEndReached={handleLoadMore}
+            onEndReachedThreshold={0.1}
+          />
 
-        <CustomBottomLogout
-          bottomSheetRef={bottomSheetRefLogout}
-          logout={logout}
-          loading={loading}
-          user={user}
-        />
-      </SafeAreaView>
+          <CustomBottomLogout
+            bottomSheetRef={bottomSheetRefLogout}
+            logout={logout}
+            loading={loading}
+            user={user}
+          />
+        </SafeAreaView>
+      </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 };
@@ -353,123 +361,127 @@ const ClientProfile = ({
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaView className="flex-1 flex-col px-14 pt-3 bg-brown-strong">
-        <View className="flex  flex-col w-full justify-between">
-          <ProfileAndLogOut openUsernameSheetLogout={openUsernameSheetLogout} />
-          <RenderProfileItem
-            label="Username"
-            value={profileData.username}
-            canEdit={true}
-            onPress={openUsernameSheet}
+      <SafeAreaProvider>
+        <SafeAreaView className="flex-1 flex-col px-14 pt-3 bg-brown-strong">
+          <View className="flex  flex-col w-full justify-between">
+            <ProfileAndLogOut
+              openUsernameSheetLogout={openUsernameSheetLogout}
+            />
+            <RenderProfileItem
+              label="Username"
+              value={profileData.username}
+              canEdit={true}
+              onPress={openUsernameSheet}
+            />
+            <RenderProfileItem
+              label="Email"
+              value={profileData.email}
+              canEdit={false}
+            />
+            <RenderProfileItem
+              label="Date of Birth"
+              value={format(profileData.dateOfBirth, "dd/MM/yyyy")}
+              canEdit={true}
+              onPress={openUsernameSheetDate}
+            />
+          </View>
+          <RenderProfileItemPreferences
+            label="Preferences"
+            value={profileData.preferences.map(item => ({
+              title: item,
+              image: DATA_MAP.get(item) ?? images.bohoChicImage, // TODO !!
+            }))}
+            onPress={openUsernameSheetPreferences}
           />
-          <RenderProfileItem
-            label="Email"
-            value={profileData.email}
-            canEdit={false}
+          <CustomBottomSheet
+            bottomSheetRef={bottomSheetRef}
+            lastValue={profileData.username}
+            onSubmit={async (editInputValue: string) => {
+              try {
+                await updateUser({
+                  username: editInputValue,
+                  email: profileData.email,
+                  dateOfBirth: profileData.dateOfBirth,
+                  preferences: profileData.preferences,
+                });
+                setProfileData(prev => ({
+                  ...prev,
+                  username: editInputValue,
+                }));
+              } catch (error) {
+                console.error("Error updating username:", error);
+              }
+            }}
           />
-          <RenderProfileItem
-            label="Date of Birth"
-            value={format(profileData.dateOfBirth, "dd/MM/yyyy")}
-            canEdit={true}
-            onPress={openUsernameSheetDate}
+          <CustomBottomSheet
+            bottomSheetRef={bottomSheetRef}
+            lastValue={profileData.username}
+            onSubmit={async (editInputValue: string) => {
+              try {
+                await updateUser({
+                  username: editInputValue,
+                  email: profileData.email,
+                  dateOfBirth: profileData.dateOfBirth,
+                  preferences: profileData.preferences,
+                });
+                setProfileData(prev => ({
+                  ...prev,
+                  username: editInputValue,
+                }));
+              } catch (error) {
+                console.error("Error updating username:", error);
+              }
+            }}
           />
-        </View>
-        <RenderProfileItemPreferences
-          label="Preferences"
-          value={profileData.preferences.map(item => ({
-            title: item,
-            image: DATA_MAP.get(item) ?? images.bohoChicImage, // TODO !!
-          }))}
-          onPress={openUsernameSheetPreferences}
-        />
-        <CustomBottomSheet
-          bottomSheetRef={bottomSheetRef}
-          lastValue={profileData.username}
-          onSubmit={async (editInputValue: string) => {
-            try {
-              await updateUser({
-                username: editInputValue,
-                email: profileData.email,
-                dateOfBirth: profileData.dateOfBirth,
-                preferences: profileData.preferences,
-              });
-              setProfileData(prev => ({
-                ...prev,
-                username: editInputValue,
-              }));
-            } catch (error) {
-              console.error("Error updating username:", error);
-            }
-          }}
-        />
-        <CustomBottomSheet
-          bottomSheetRef={bottomSheetRef}
-          lastValue={profileData.username}
-          onSubmit={async (editInputValue: string) => {
-            try {
-              await updateUser({
-                username: editInputValue,
-                email: profileData.email,
-                dateOfBirth: profileData.dateOfBirth,
-                preferences: profileData.preferences,
-              });
-              setProfileData(prev => ({
-                ...prev,
-                username: editInputValue,
-              }));
-            } catch (error) {
-              console.error("Error updating username:", error);
-            }
-          }}
-        />
-        <CustomBottomSheetDate
-          bottomSheetRef={bottomSheetRefDate}
-          lastValue={profileData.dateOfBirth}
-          onSubmit={async (editInputValue: Date) => {
-            try {
-              await updateUser({
-                dateOfBirth: editInputValue,
-                username: profileData.username,
-                email: profileData.email,
-                preferences: profileData.preferences,
-              });
-              setProfileData(prev => ({
-                ...prev,
-                dateOfBirth: editInputValue,
-              }));
-            } catch (error) {
-              console.error("Error updating date of birth:", error);
-            }
-          }}
-        />
-        <CustomBottomSheetPreferences
-          bottomSheetRef={bottomSheetRefPreferences}
-          lastValue={profileData.preferences}
-          totalItems={DATA}
-          onSubmit={async (val: string[]) => {
-            try {
-              await updateUser({
-                preferences: val,
-                username: profileData.username,
-                email: profileData.email,
-                dateOfBirth: profileData.dateOfBirth,
-              });
-              setProfileData(prev => ({
-                ...prev,
-                preferences: val,
-              }));
-            } catch (error) {
-              console.error("Error updating preferences:", error);
-            }
-          }}
-        />
-        <CustomBottomLogout
-          bottomSheetRef={bottomSheetRefLogout}
-          logout={logout}
-          loading={loading}
-          user={user}
-        />
-      </SafeAreaView>
+          <CustomBottomSheetDate
+            bottomSheetRef={bottomSheetRefDate}
+            lastValue={profileData.dateOfBirth}
+            onSubmit={async (editInputValue: Date) => {
+              try {
+                await updateUser({
+                  dateOfBirth: editInputValue,
+                  username: profileData.username,
+                  email: profileData.email,
+                  preferences: profileData.preferences,
+                });
+                setProfileData(prev => ({
+                  ...prev,
+                  dateOfBirth: editInputValue,
+                }));
+              } catch (error) {
+                console.error("Error updating date of birth:", error);
+              }
+            }}
+          />
+          <CustomBottomSheetPreferences
+            bottomSheetRef={bottomSheetRefPreferences}
+            lastValue={profileData.preferences}
+            totalItems={DATA}
+            onSubmit={async (val: string[]) => {
+              try {
+                await updateUser({
+                  preferences: val,
+                  username: profileData.username,
+                  email: profileData.email,
+                  dateOfBirth: profileData.dateOfBirth,
+                });
+                setProfileData(prev => ({
+                  ...prev,
+                  preferences: val,
+                }));
+              } catch (error) {
+                console.error("Error updating preferences:", error);
+              }
+            }}
+          />
+          <CustomBottomLogout
+            bottomSheetRef={bottomSheetRefLogout}
+            logout={logout}
+            loading={loading}
+            user={user}
+          />
+        </SafeAreaView>
+      </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 };

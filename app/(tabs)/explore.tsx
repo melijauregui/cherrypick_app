@@ -47,8 +47,6 @@ const Explore = () => {
           renderItem={({ item, index }: { item: Metadata; index: number }) => (
             <ClothingItemComponent
               i={index}
-              key={index}
-              id={index.toString()}
               url={item.image_url}
               numColumns={2}
             />

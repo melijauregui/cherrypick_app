@@ -45,7 +45,7 @@ const ClothingItemComponent = ({
       <Image
         source={{ uri: image_url }}
         style={{ width: widthDetermined, height: imageHeight }}
-        resizeMode="contain"
+        resizeMode="cover"
       />
     </View>
   );

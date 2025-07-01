@@ -36,7 +36,6 @@ const TabsLayout = () => {
           title: "Profile",
           icon: icons.profile,
           iconName: "Profile",
-          userType: userType,
         })}
       </Tabs>
     </>
@@ -50,13 +49,11 @@ const Page = ({
   title,
   icon,
   iconName,
-  userType,
 }: {
   name: string;
   title: string;
   icon: ImageSourcePropType;
   iconName: string;
-  userType?: "client" | "brand" | null;
 }) => {
   return (
     <Tabs.Screen
@@ -66,8 +63,10 @@ const Page = ({
         headerShown: false,
         tabBarStyle: {
           backgroundColor: "#301c11",
-          height: 55,
+          height: 60,
           borderColor: "#301c11",
+          paddingBottom: 12,
+          paddingTop: 6,
         },
         tabBarActiveTintColor: "#FFFFFF",
         tabBarIcon: ({ color, focused }) => (
@@ -95,7 +94,7 @@ const TabIcon = ({
   focused: boolean;
 }) => {
   return (
-    <View className="items-center top-[5]">
+    <View className="items-center justify-center">
       <Image
         source={icon}
         resizeMode="contain"

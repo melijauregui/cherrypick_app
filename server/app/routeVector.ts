@@ -32,10 +32,9 @@ async function QueryWeaviateImage(
     let offset = page * limit;
     console.log("offset", offset);
     const queryOptions: any = {
-      filters: client.collections
-        .get("FashionItem")
-        .filter.byProperty("embedding_type")
-        .equal("text"),
+      filters: collection.filter.byProperty("embedding_type").equal("image"),
+      limit: limit,
+      offset: offset,
       returnProperties: [
         "name",
         "description",
@@ -45,8 +44,6 @@ async function QueryWeaviateImage(
         "price",
         "embedding_type",
       ],
-      limit: limit,
-      offset: offset,
     };
 
     const result = await collection.query.nearVector(queryVector, queryOptions);
