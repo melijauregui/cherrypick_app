@@ -3,6 +3,7 @@ import os
 from PIL import Image
 import numpy as np
 from transformers import AutoProcessor, AutoModel
+from rm_bg import remove_background
 import torch
 from fashionClipTestingText import test_text_clasification, find_similarities_matrix2
 
@@ -11,9 +12,14 @@ from fashionClipTestingText import test_text_clasification, find_similarities_ma
 # --- CONFIGURACIÓN ---
 ORIGINAL_MODEL_NAME = "Marqo/marqo-fashionSigLIP"
 MODEL_NAME_TO_FINETUNE = "Marqo/marqo-fashionSigLIP"
-MODEL_NAME_TO_PUSH = "Sofia-gb/fashionSigLIP-roturas23"
+MODEL_NAME_TO_PUSH = "Sofia-gb/preferencias1"
 # CSV_PATH = "datasets/con-sin-roturas.csv"
-FOLDER_IMAGES_TESTING = "images-testing2"
+FOLDER_IMAGES_TESTING = "images-testing-preferences"
+
+input_folder = FOLDER_IMAGES_TESTING
+output_folder = "images-testing-preferences-nob"
+if not os.path.exists(output_folder):
+    remove_background(input_folder, output_folder)
 
 
 BATCH_SIZE = 32
