@@ -9,8 +9,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from "react";
-import { LogoCircle } from "@/app/components/LogoCircle";
-import { safeFetch } from "@/app/utils/safe-fetch";
+import LogoCircle from "@/app/components/LogoCircle";
+import safeFetch from "@/app/utils/safe-fetch";
 import {
   FormSchemaSignUp,
   VerifyAvailabilitySchema,

@@ -7,7 +7,7 @@ import {
   FlatList,
 } from "react-native";
 import React, { useState } from "react";
-import { LogoCircle } from "@/app/components/LogoCircle";
+import LogoCircle from "@/app/components/LogoCircle";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import images from "../../constants/images";
@@ -15,7 +15,7 @@ import {
   CreateAccountSchemaRes,
   CreateAccountSchema,
 } from "@/schemas/auth/preferences-schema";
-import { safeFetch } from "@/app/utils/safe-fetch";
+import safeFetch from "@/app/utils/safe-fetch";
 import { LOCAL_IP } from "@/config/api";
 import { useGoogleSignIn } from "@/hooks/useGoogleSignIn";
 

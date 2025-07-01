@@ -451,7 +451,8 @@ const paginatedRoute = createRoute({
 });
 app.openapi(paginatedRoute, async c => {
   const { page, limit } = c.req.valid("query");
-  const embedding = Array.from({ length: 768 }, () => Math.random()); // Simulación de un vector de consulta personalizada
+  console.log("Received request with pageeee", page, "and limit", limit);
+  const embedding = Array(768).fill(0.5);
 
   const res = await QueryWeaviateImage(embedding, page, limit);
   return c.json(res, 200);

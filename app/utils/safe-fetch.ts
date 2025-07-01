@@ -5,7 +5,7 @@ type SafeFetchOpts<T> = {
   schema: z.ZodType<T>;
 } & RequestInit;
 
-export async function safeFetch<T>(opts: SafeFetchOpts<T>) {
+async function safeFetch<T>(opts: SafeFetchOpts<T>) {
   const { url, schema, ...fetchOpts } = opts;
   const res = await fetch(url, fetchOpts);
 
@@ -19,3 +19,4 @@ export async function safeFetch<T>(opts: SafeFetchOpts<T>) {
 
   return { data: parsedData, res };
 }
+export default safeFetch;

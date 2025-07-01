@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { router, useSegments } from "expo-router";
 
-export const AuthRedirect = () => {
+const AuthRedirect = () => {
   const { user, loading } = useAuth();
   const segments = useSegments();
 
@@ -23,3 +23,5 @@ export const AuthRedirect = () => {
 
   return null; // Este componente no renderiza nada
 };
+
+export default AuthRedirect;

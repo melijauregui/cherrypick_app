@@ -2,14 +2,14 @@ import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { AppName } from "@/app/components/AppName";
-import { LogoSquareBeige } from "@/app/components/LogoSquareBeige";
+import AppName from "@/app/components/AppName";
+import LogoSquareBeige from "@/app/components/LogoSquareBeige";
 import "../global.css";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
 import { useAuth } from "@/context/AuthContext";
-import { safeFetch } from "@/app/utils/safe-fetch";
+import safeFetch from "@/app/utils/safe-fetch";
 import { LOCAL_IP } from "@/config/api";
 import { VerifyUserResponseSchema } from "@/schemas/auth/sign-in-schema";
 

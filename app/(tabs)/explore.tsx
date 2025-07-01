@@ -1,7 +1,7 @@
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import React, { useEffect, useState } from "react";
 import { MasonryFlashList } from "@shopify/flash-list";
-import { ClothingItemComponent } from "@/app/components/ClothingItemComponent";
+import ClothingItemComponent from "@/app/components/ClothingItemComponent";
 import { TextInput, View, Image } from "react-native";
 import icons from "../../constants/icons";
 import { Metadata } from "./home";

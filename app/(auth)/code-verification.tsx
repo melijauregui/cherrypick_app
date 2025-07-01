@@ -15,13 +15,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useEffect, useRef } from "react";
 import React, { useState } from "react";
-import { LogoCircle } from "@/app/components/LogoCircle";
+import LogoCircle from "@/app/components/LogoCircle";
 import {
   FormSchemaCodeVerification,
   VerifyCodeSchema,
 } from "@/schemas/auth/code-verification-schema";
 import { useRouter } from "expo-router";
-import { safeFetch } from "@/app/utils/safe-fetch";
+import safeFetch from "@/app/utils/safe-fetch";
 import { useLocalSearchParams } from "expo-router";
 import { ResCodeVerificationPostSchema } from "@/schemas/auth/sign-up-schema";
 import { LOCAL_IP } from "@/config/api";

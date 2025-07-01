@@ -1,6 +1,6 @@
 import { Image } from "react-native";
 import images from "@/constants/images";
-import { cn } from "@/app/utils/cn";
+import cn from "@/app/utils/cn";
 
 const LogoBig = ({ classname: classname }: { classname: string }) => {
   return (
@@ -12,4 +12,4 @@ const LogoBig = ({ classname: classname }: { classname: string }) => {
   );
 };
 
-export { LogoBig };
+export default LogoBig;

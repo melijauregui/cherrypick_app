@@ -10,6 +10,16 @@ Jean roto celeste,Jean roto celeste recto,49.99,tienda napoli,https://i.pinimg.c
 Jean azul vintage,Jean azul vintage recto,49.99,tienda napoli,https://i.pinimg.com/736x/f3/0f/e6/f30fe65e31f87df82f510f746717ef92.jpg,https://ar.pinterest.com/pin/270708627597606133/
 Jean roto una pierna,Jean roto una pierna recto,49.99,tienda napoli,https://i.pinimg.com/736x/53/d6/cf/53d6cf297516c2e0a611fb8b35cf3d3b.jpg,https://ar.pinterest.com/pin/597782550554822752/
 Jean mom azul,Jean mom azul,19.99,tienda napoli,https://i.pinimg.com/736x/33/67/f6/3367f6f8f0535f41d82248344fd542fb.jpg,https://ar.pinterest.com/pin/69876231726786229/
+Jean cierre,Jean cierre torcido,19.99,tienda napoli,https://i.pinimg.com/736x/95/6b/8a/956b8a9f4a20e4910c876348f5bc0f19.jpg,https://ar.pinterest.com/pin/195484440073043855/
+Jean palazzo,Jean palazzo,19.99,tienda napoli,https://i.pinimg.com/736x/9c/48/a2/9c48a2801ef32cfa700ea4f7fa7477cb.jpg,https://ar.pinterest.com/pin/49610033390820882/
+Jean vintage remangado,Jean vintage remangado,19.99,tienda napoli,https://i.pinimg.com/736x/1b/4c/62/1b4c62854896d31c357673d6058eedcb.jpg,https://ar.pinterest.com/pin/70437489706563/
+Jean gris vintage,Jean gris vintage,19.99,tienda napoli,https://i.pinimg.com/736x/7c/ca/67/7cca67c27bbe6aa2f230b8ee890a41e0.jpg,https://ar.pinterest.com/pin/41165784089945499/
+Jean gris claro,Jean gris claro,19.99,tienda napoli,https://i.pinimg.com/736x/f3/47/ba/f347bac18b038ed56d2cb3f76ad88e9f.jpg,https://ar.pinterest.com/pin/13721973860716908/
+Jean cierre mom,Jean cierre mom,19.99,tienda napoli,https://i.pinimg.com/736x/03/bc/13/03bc1315b8488252f75bdee315b4765a.jpg,https://ar.pinterest.com/pin/1053138694130282090/
+Jean celeste mom,Jean celeste mom,19.99,tienda napoli,https://i.pinimg.com/736x/9b/b7/30/9bb7309937568de6ff0be29750e1c719.jpg,https://ar.pinterest.com/pin/281475045455497409/
+Jean celeste vintage,Jean celeste vintage,19.99,tienda napoli,https://i.pinimg.com/736x/4a/59/a1/4a59a148428d56fffd49eae387978147.jpg,https://ar.pinterest.com/pin/7388786884390779/
+Jean cinturon rosado,Jean cinturon rosado,19.99,tienda napoli,https://i.pinimg.com/736x/15/ed/8b/15ed8ba6709d763a096b9807b616b59a.jpg,https://ar.pinterest.com/pin/282037995423977700/
+Jean wide leg,Jean wide leg celeste,9.99,tienda napoli,https://i.pinimg.com/736x/56/d7/af/56d7af2f0fd819ae72fd050f5027f885.jpg,https://ar.pinterest.com/pin/57139489016966417/
 Remera verde, Remera verde de algodón, 29.99,charo,https://i.pinimg.com/736x/ea/4d/bf/ea4dbf3538415b0ea85f62e1e4ac8482.jpg,https://ar.pinterest.com/pin/99501473012502315/
 Remera Marrón, Remera Larga Marrón de algodón, 29.99,charo,https://i.pinimg.com/736x/cb/b3/08/cbb308be443a379611fac31dd1d6ab6d.jpg,https://ar.pinterest.com/pin/1011128553843906145/
 Remera Beige, Remera Beige sin mangas de algodón, 10.99,charo,https://i.pinimg.com/736x/3c/fa/5b/3cfa5b8d28c35b61b948943657a7e069.jpg,https://ar.pinterest.com/pin/332281278774356667/

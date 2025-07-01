@@ -1,7 +1,7 @@
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import React, { useEffect, useState } from "react";
 import { MasonryFlashList } from "@shopify/flash-list";
-import { ClothingItemComponent } from "@/app/components/ClothingItemComponent";
+import ClothingItemComponent from "@/app/components/ClothingItemComponent";
 import { LOCAL_IP } from "@/config/api";
 
 const Home = () => {
@@ -28,8 +28,6 @@ const Home = () => {
           renderItem={({ item, index }: { item: Metadata; index: number }) => (
             <ClothingItemComponent
               i={index}
-              key={index}
-              id={index.toString()}
               url={item.image_url}
               numColumns={2}
             />

@@ -3,12 +3,10 @@ import React, { useEffect, useState } from "react";
 
 const ClothingItemComponent = ({
   i,
-  id,
   url: image_url,
   numColumns,
 }: {
   i: number;
-  id: string;
   url: string;
   numColumns: number;
 }) => {
@@ -53,4 +51,4 @@ const ClothingItemComponent = ({
   );
 };
 
-export { ClothingItemComponent };
+export default ClothingItemComponent;

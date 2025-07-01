@@ -1,6 +1,6 @@
 import { Image, Text } from "react-native";
 import images from "@/constants/images";
-import { cn } from "@/app/utils/cn";
+import cn from "@/app/utils/cn";
 
 const LogoSmallPink = ({ classname }: { classname: string }) => {
   return (
@@ -12,4 +12,4 @@ const LogoSmallPink = ({ classname }: { classname: string }) => {
   );
 };
 
-export { LogoSmallPink };
+export default LogoSmallPink;

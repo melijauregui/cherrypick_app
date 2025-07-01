@@ -29,9 +29,13 @@ async function QueryWeaviateImage(
       return [];
     }
 
-    const result = await collection.query.nearVector(queryVector, {
-      limit: limit,
-
+    let offset = page * limit;
+    console.log("offset", offset);
+    const queryOptions: any = {
+      filters: client.collections
+        .get("FashionItem")
+        .filter.byProperty("embedding_type")
+        .equal("text"),
       returnProperties: [
         "name",
         "description",
@@ -39,10 +43,20 @@ async function QueryWeaviateImage(
         "url",
         "brand",
         "price",
+        "embedding_type",
       ],
-    });
+      limit: limit,
+      offset: offset,
+    };
 
-    console.log("topResults", result.objects);
+    const result = await collection.query.nearVector(queryVector, queryOptions);
+
+    console.log(
+      "topResults",
+      result.objects.map(
+        match => match.properties?.name + " " + match.properties?.embedding_type
+      )
+    );
 
     const topResults: CatalogItemSchemaType[] = result.objects
       .map(match => {

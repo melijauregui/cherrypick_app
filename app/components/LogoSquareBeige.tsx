@@ -1,6 +1,6 @@
 import { Image } from "react-native";
 import images from "@/constants/images";
-import { cn } from "@/app/utils/cn";
+import cn from "@/app/utils/cn";
 
 const LogoSquareBeige = ({ classname }: { classname: string }) => {
   return (
@@ -12,4 +12,4 @@ const LogoSquareBeige = ({ classname }: { classname: string }) => {
   );
 };
 
-export { LogoSquareBeige };
+export default LogoSquareBeige;

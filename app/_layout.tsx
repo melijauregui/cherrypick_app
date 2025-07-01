@@ -3,7 +3,7 @@ import { SplashScreen } from "expo-router";
 import { useFonts } from "expo-font";
 import { useEffect } from "react";
 import { AuthProvider } from "@/context/AuthContext";
-import { AuthRedirect } from "@/app/components/AuthRedirect";
+import AuthRedirect from "@/app/components/AuthRedirect";
 
 SplashScreen.preventAutoHideAsync();
 

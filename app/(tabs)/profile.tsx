@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useRef, useEffect } from "react";
 import { LOCAL_IP } from "@/config/api";
 import { TouchableOpacity, Text, Image } from "react-native";
-import { safeFetch } from "@/app/utils/safe-fetch";
+import safeFetch from "@/app/utils/safe-fetch";
 import { Ionicons } from "@expo/vector-icons";
 import { format } from "date-fns";
 import images from "../../constants/images";
@@ -28,10 +28,8 @@ import {
 } from "@/app/components/profile/bottomSheets";
 import { ProfileAndLogOut } from "@/app/components/profile/profileAndLogOut";
 import { BrandSchemaRes } from "@/schemas/auth/brand-schema";
-import { LogoCircle } from "@/app/components/LogoCircle";
 import { Linking } from "react-native";
-import { Metadata } from "./home";
-import { ClothingItemComponent } from "@/app/components/ClothingItemComponent";
+import ClothingItemComponent from "@/app/components/ClothingItemComponent";
 import { MasonryFlashList } from "@shopify/flash-list";
 
 const Profile = () => {
@@ -96,6 +94,16 @@ const fetchBrandData = async (
   }
 };
 
+interface Metadata {
+  id: string;
+  description: string;
+  image_url: string;
+  url: string;
+  price: number;
+  name: string;
+}
+export type { Metadata };
+
 const BrandProfile = ({
   user,
   loading,
@@ -120,15 +128,36 @@ const BrandProfile = ({
   });
 
   const [clothingItems, setClothingItems] = useState<Metadata[]>([]);
+  const [page, setPage] = useState(0);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const limit = 10;
+
+  const fetchClothingItems = async (pageToFetch: number) => {
+    console.log("Fetching items for page", pageToFetch);
+    setIsLoadingMore(true);
+    const items = await getClothingItems(pageToFetch, limit);
+
+    if (items.length === 0) {
+      console.log("No more items");
+      setHasMore(false);
+      setIsLoadingMore(false);
+      return;
+    }
+
+    if (pageToFetch === 0) {
+      console.log("Setting items to first page");
+      setClothingItems(items);
+    } else {
+      console.log("Adding items to existing list with page", pageToFetch);
+      setClothingItems(prev => [...prev, ...items]);
+    }
+    setIsLoadingMore(false);
+  };
 
   useEffect(() => {
-    const fetchClothingItems = async () => {
-      const items = await getClothingItems();
-      setClothingItems(items);
-    };
-
-    fetchClothingItems();
-  }, []);
+    fetchClothingItems(page);
+  }, [page]);
 
   // Estado para mostrar descripción completa o cortada
   const [showFullDescription, setShowFullDescription] = useState(false);
@@ -148,7 +177,6 @@ const BrandProfile = ({
 
   const description = profileData.description || "";
   const isLongDescription = description.length > 80;
-  const maxLineLength = 40;
   const maxTotalLength = 80;
   const lines =
     showFullDescription || !isLongDescription
@@ -157,6 +185,11 @@ const BrandProfile = ({
   // Mostrar botón si no se muestran todas las líneas
   const showSeeMore =
     !showFullDescription && lines.join("\n").length < description.length;
+
+  const handleLoadMore = () => {
+    if (isLoadingMore || !hasMore) return;
+    setPage(prev => prev + 1);
+  };
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -223,12 +256,11 @@ const BrandProfile = ({
           renderItem={({ item, index }: { item: Metadata; index: number }) => (
             <ClothingItemComponent
               i={index}
-              key={index}
-              id={index.toString()}
               url={item.image_url}
               numColumns={3}
             />
           )}
+          onEndReached={handleLoadMore}
           onEndReachedThreshold={0.1}
         />
 
@@ -502,32 +534,22 @@ function splitDescriptionByLinesOrWords(text: string, maxTotalLength: number) {
   return lines;
 }
 
-async function getClothingItems(): Promise<Metadata[]> {
-  const page = "2";
-  const limit = "10";
-
+async function getClothingItems(
+  page: number,
+  limit: number
+): Promise<Metadata[]> {
+  console.log(
+    `Fetching from URL: http://${LOCAL_IP}:3000/all?page=${page}&limit=${limit}`
+  );
   try {
     const response: Response = await fetch(
       `http://${LOCAL_IP}:3000/all?page=${page}&limit=${limit}`,
-      {
-        method: "GET",
-      }
+      { method: "GET" }
     );
-    console.log("Status:", response.status);
-    // console.log("Response text:", await response.text());
-
-    if (!response.ok) {
-      throw new Error("Error al obtener los datos");
-    }
-    const clothingItems: Metadata[] = await response.json();
-    //console.log("Clothing items:", clothingItems);
-    return clothingItems;
+    if (!response.ok) throw new Error("Error al obtener los datos");
+    return await response.json();
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error("Error:", error.message);
-    } else {
-      console.error("Error desconocido");
-    }
+    console.error("Error:", error instanceof Error ? error.message : error);
     return [];
   }
 }
