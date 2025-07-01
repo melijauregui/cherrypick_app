@@ -46,10 +46,11 @@ import {
 } from "../schemas/auth/brand-schema";
 import {
   verifyEmail,
-  SendVerificationCode,
+  SaveVerificationCode,
   GenerateVerificationCode,
-  sendEmail,
+  SendEmail,
   VerifyVerificationCode,
+  SendEmailBrand,
 } from "./app/verifyEmail";
 import {
   VerifyUserExists,
@@ -120,7 +121,7 @@ const codeVerificationRoute = createRoute({
 app.openapi(codeVerificationRoute, async c => {
   const { email } = await c.req.valid("json");
   const code = GenerateVerificationCode();
-  const emailSent = await sendEmail(email, code);
+  const emailSent = await SendEmail(email, code);
   let res: ResCodeVerificationPostSchemaType;
 
   if (!emailSent) {
@@ -134,7 +135,7 @@ app.openapi(codeVerificationRoute, async c => {
 
   // Guardar (o reemplazar) en DB
   try {
-    res = await SendVerificationCode(email, code);
+    res = await SaveVerificationCode(email, code);
   } catch (err) {
     console.error("Error al guardar código:", err);
     res = {
@@ -482,5 +483,64 @@ app.openapi(paginatedRouteBrand, async c => {
   const embedding = Array.from({ length: 768 }, () => Math.random()); // Simulación de un vector de consulta personalizada
 
   const res = await QueryWeaviateImage(embedding, page, limit);
+  return c.json(res, 200);
+});
+
+// endpoint que publica un nuevo code-verification
+const sendFormBrandRoute = createRoute({
+  method: "post",
+  path: "/send-form-brand",
+  request: {
+    body: {
+      content: {
+        "application/json": { schema: BodyCodeVerificationPostSchema },
+      },
+    },
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: ResCodeVerificationPostSchema,
+        },
+      },
+      description:
+        "Devuelve un booleano que indica si se pudo enviar el código de verificación",
+    },
+  },
+});
+app.openapi(sendFormBrandRoute, async c => {
+  const { email } = await c.req.valid("json");
+  //verifico que no exista ya en la base de datos con verifyEmail
+  let res: ResCodeVerificationPostSchemaType;
+  const emailExists = await verifyEmail(email);
+  console.log("emailExists", emailExists);
+  if (emailExists.error) {
+    res = {
+      error: true,
+      details: "Email already registered",
+    };
+    return c.json(res, 200);
+  }
+
+  try {
+    const emailSent = await SendEmailBrand(email);
+
+    if (emailSent.error) {
+      res = {
+        error: true,
+        details: "Error al enviar el correo",
+      };
+      return c.json(res, 200);
+    }
+    res = {
+      error: false,
+    };
+  } catch (err) {
+    res = {
+      error: true,
+      details: "Error al enviar el correo",
+    };
+  }
   return c.json(res, 200);
 });

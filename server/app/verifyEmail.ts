@@ -46,7 +46,7 @@ async function verifyEmail(
 
 export { verifyEmail };
 
-async function SendVerificationCode(
+async function SaveVerificationCode(
   email: string,
   code: string
 ): Promise<ResCodeVerificationPostSchemaType> {
@@ -68,9 +68,9 @@ async function SendVerificationCode(
   return res;
 }
 
-export { SendVerificationCode };
+export { SaveVerificationCode };
 
-export async function sendEmail(email: string, code: string): Promise<boolean> {
+export async function SendEmail(email: string, code: string): Promise<boolean> {
   try {
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -84,13 +84,13 @@ export async function sendEmail(email: string, code: string): Promise<boolean> {
     const info = await transporter.sendMail({
       from: `"Cherrypick" <${process.env.SMTP_USER}>`,
       to: email,
-      subject: "Verify your email address",
-      text: `Thank you for signing up for CherryPick!\n\nTo complete your account setup, please enter the following verification code on our app:\n\n${code}\n\nThanks,\nthe CherryPick Team.`,
+      subject: "Verificá tu dirección de correo electrónico",
+      text: `¡Gracias por registrarte en CherryPick!\n\nPara completar la creación de tu cuenta, por favor ingresá el siguiente código de verificación en nuestra app:\n\n${code}\n\n¡Gracias!\nEl equipo de CherryPick.`,
       html: `
-          <p>Thank you for signing up for <strong>CherryPick</strong>!</p>
-          <p>To complete your account setup, please enter the following verification code on our app:</p>
+          <p>¡Gracias por registrarte en <strong>CherryPick</strong>!</p>
+          <p>Para completar la creación de tu cuenta, por favor ingresá el siguiente código de verificación en nuestra app:</p>
           <p><strong>${code}</strong></p>
-          <p>Thanks,<br>The <strong>CherryPick</strong> Team</p>
+          <p>¡Gracias!<br/>Equipo <strong>CherryPick</strong></p>
         `,
     });
 
@@ -153,4 +153,43 @@ export async function VerifyVerificationCode(
     isCorrect: true,
   };
   return res;
+}
+
+export async function SendEmailBrand(
+  email: string
+): Promise<ResCodeVerificationPostSchemaType> {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+
+    console.log("Enviando correo a:", email);
+    const info = await transporter.sendMail({
+      from: `"Cherrypick" <${process.env.SMTP_USER}>`,
+      to: email,
+      subject: "Verificación de marca en CherryPick",
+      text: `¡Gracias por tu interés en registrar tu marca en CherryPick!\n\nPara avanzar con la verificación, por favor completá el siguiente formulario: https://forms.gle/13WA248W6chvGCm7A\n\nEl equipo de CherryPick revisará tu documentación y validará que la marca esté registrada a nombre de la sociedad informada. Nos contactaremos contigo en caso de requerir información adicional o para coordinar la verificación facial.\n\n¡Gracias!\nEl equipo de CherryPick`,
+      html: `
+        <p>¡Gracias por tu interés en registrar tu marca en <strong>CherryPick</strong>!</p>
+        <p>Para avanzar con la verificación, por favor completá el siguiente formulario:<br/>
+        <a href="https://forms.gle/13WA248W6chvGCm7A" target="_blank">https://forms.gle/13WA248W6chvGCm7A</a></p>
+        <p>El equipo de CherryPick revisará tu documentación y validará que la marca esté registrada a nombre de la sociedad informada.<br/>
+        Nos contactaremos contigo en caso de requerir información adicional o para coordinar la verificación facial.</p>
+        <p>¡Gracias!<br/>Equipo <strong>CherryPick</strong></p>
+      `,
+    });
+
+    return {
+      error: false,
+    };
+  } catch (error) {
+    return {
+      error: true,
+      details: "Error al enviar el correo",
+    };
+  }
 }
