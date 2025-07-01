@@ -1,7 +1,8 @@
 import {
   catalogItemSchema,
   CatalogItemSchemaType,
-  CatalogUpdateResponseSchemaType,
+  CatalogResponseSchemaType,
+  CatalogResponseSchemaDeleteType,
 } from "../../schemas/catalog/catalog-schema";
 import { config } from "../config";
 import {
@@ -9,7 +10,12 @@ import {
   QueryDbSchemaBrand,
 } from "../../schemas/auth/brand-schema";
 import { db } from "../db";
-import weaviate, { vectorizer } from "weaviate-client";
+import weaviate, {
+  Collection,
+  vectorizer,
+  generateUuid5,
+  Filters,
+} from "weaviate-client";
 
 // Función para extraer características de imagen desde URL
 async function extractImageFeatures(imageUrl: string): Promise<number[]> {
@@ -63,8 +69,56 @@ async function extractTextFeatures(text: string): Promise<number[]> {
   }
 }
 
+// Función para verificar si ya existe un elemento con el mismo nombre y brand en Weaviate
+async function getCollection(): Promise<{
+  error: boolean;
+  details: string;
+  collection: Collection | null;
+}> {
+  try {
+    const client = await weaviate.connectToWeaviateCloud(config.WEAVIATE_URL, {
+      authCredentials: new weaviate.ApiKey(config.WEAVIATE_API_KEY),
+    });
+
+    // Verificar que la conexión esté lista
+    if (!client.isReady()) {
+      throw new Error("No se pudo conectar a Weaviate");
+    }
+
+    // Obtener la colección
+    let collection;
+    try {
+      collection = client.collections.get("FashionItem");
+    } catch (error) {
+      // Si la colección no existe, no hay duplicados
+      return {
+        error: true,
+        details: "Collection FashionItem not found",
+        collection: null,
+      };
+    }
+
+    return {
+      error: false,
+      details: "",
+      collection: collection,
+    };
+  } catch (error) {
+    console.error("Error getting collection in Weaviate:", error);
+    return {
+      error: true,
+      details: "Error getting collection in Weaviate: " + error,
+      collection: null,
+    };
+  }
+}
+
 // Función para validar CSV
-export async function validateCsvFile(file: File): Promise<
+export async function validateCsvFile(
+  file: File,
+  collection: Collection,
+  brand: string
+): Promise<
   | {
       error: true;
       details: string;
@@ -91,7 +145,6 @@ export async function validateCsvFile(file: File): Promise<
       "name",
       "description",
       "price",
-      "brand",
       "image_url",
       "url",
     ];
@@ -102,11 +155,12 @@ export async function validateCsvFile(file: File): Promise<
     if (!isValidHeaders) {
       return {
         error: true,
-        details: "Header mal formado",
+        details: "Header mal formado o no incluido",
       };
     }
 
     const invalidRows: number[] = [];
+    const duplicateRows: number[] = [];
     const validItems: CatalogItemSchemaType[] = [];
 
     // Process each row (skip header)
@@ -133,10 +187,23 @@ export async function validateCsvFile(file: File): Promise<
         continue;
       }
       item.price = price;
+      item.brand = brand;
 
       // Validate item against schema
       try {
         const validatedItem = catalogItemSchema.parse(item);
+
+        // Check if item already exists in Weaviate with same name and brand
+        const isDuplicate = await checkDuplicateInWeaviate(
+          collection,
+          validatedItem.name,
+          brand
+        );
+        if (isDuplicate) {
+          duplicateRows.push(i + 1);
+          continue;
+        }
+
         validItems.push(validatedItem);
       } catch (error) {
         invalidRows.push(i + 1);
@@ -148,7 +215,7 @@ export async function validateCsvFile(file: File): Promise<
       const rowNumbers = invalidRows.join(",");
       return {
         error: true,
-        details: `línea [${rowNumbers}] mal formadas`,
+        details: `línea [${rowNumbers}] mal formadas y línea [${duplicateRows}] con items duplicados`,
       };
     }
 
@@ -166,10 +233,26 @@ export async function validateCsvFile(file: File): Promise<
 }
 
 export async function UpdateCatalog(
-  file: File
-): Promise<CatalogUpdateResponseSchemaType> {
-  let res: CatalogUpdateResponseSchemaType;
-  const validationResult = await validateCsvFile(file);
+  file: File,
+  brand: string
+): Promise<CatalogResponseSchemaType> {
+  let res: CatalogResponseSchemaType;
+  const collectionRes = await getCollection();
+  if (collectionRes.error) {
+    return {
+      error: true,
+      details: collectionRes.details,
+    };
+  }
+
+  const collection = collectionRes.collection;
+  if (!collection) {
+    return {
+      error: true,
+      details: "Collection not found",
+    };
+  }
+  const validationResult = await validateCsvFile(file, collection, brand);
 
   if (validationResult.error) {
     res = validationResult;
@@ -177,7 +260,8 @@ export async function UpdateCatalog(
   }
 
   const weaviateResult = await insertCatalogItemsToWeaviate(
-    validationResult.catalogItems
+    validationResult.catalogItems,
+    collection
   );
 
   if (weaviateResult.success) {
@@ -225,9 +309,17 @@ export async function GetBrand(email: string): Promise<BrandSchemaResType> {
   return res;
 }
 
+export async function VerifyBrand(brand: string): Promise<boolean> {
+  const [result]: any = await db.query("SELECT * FROM brands WHERE name = ?", [
+    brand,
+  ]);
+  return result.length > 0;
+}
+
 // Función para insertar items del catálogo en Pinecone
 export async function insertCatalogItemsToWeaviate(
-  catalogItems: CatalogItemSchemaType[]
+  catalogItems: CatalogItemSchemaType[],
+  collection: Collection
 ): Promise<{
   success: boolean;
   insertedCount: number;
@@ -237,28 +329,6 @@ export async function insertCatalogItemsToWeaviate(
   let insertedCount = 0;
 
   try {
-    const client = await weaviate.connectToWeaviateCloud(config.WEAVIATE_URL, {
-      authCredentials: new weaviate.ApiKey(config.WEAVIATE_API_KEY),
-    });
-
-    // Verificar que la conexión esté lista
-    if (!client.isReady()) {
-      throw new Error("No se pudo conectar a Weaviate");
-    }
-
-    // Obtener o crear la colección
-    let collection;
-    try {
-      collection = client.collections.get("FashionItem");
-    } catch (error) {
-      // Si la colección no existe, la creamos
-      collection = await client.collections.create({
-        name: "FashionItem",
-        vectorizers: vectorizer.none(),
-      });
-      console.log("We have a new collection!", collection["name"]);
-    }
-
     for (const item of catalogItems) {
       try {
         const imageFeatures = await extractImageFeatures(item.image_url);
@@ -331,6 +401,177 @@ export async function insertCatalogItemsToWeaviate(
       success: false,
       insertedCount: 0,
       errors: [`General error: ${error}`],
+    };
+  }
+}
+
+async function checkDuplicateInWeaviate(
+  collection: Collection,
+  name: string,
+  brand: string
+): Promise<boolean> {
+  const object_uuid = generateUuid5(
+    JSON.stringify({ name: name, brand: brand })
+  );
+
+  const response = await collection.data.exists(object_uuid);
+  console.log("response for", name, brand, "is", response);
+  return response;
+}
+
+export async function DeleteFromCatalog(
+  itemsNames: string[],
+  brand: string
+): Promise<CatalogResponseSchemaDeleteType> {
+  let res: CatalogResponseSchemaDeleteType;
+  const collectionRes = await getCollection();
+  if (collectionRes.error) {
+    return {
+      error: true,
+      details: collectionRes.details,
+      numberDeleted: 0,
+    };
+  }
+
+  const collection = collectionRes.collection;
+  if (!collection) {
+    return {
+      error: true,
+      details: "Collection not found",
+      numberDeleted: 0,
+    };
+  }
+  const validationResult = await validateItemsToDelete(
+    itemsNames,
+    collection,
+    brand
+  );
+
+  if (validationResult.error) {
+    res = {
+      error: true,
+      details: validationResult.details,
+      numberDeleted: 0,
+    };
+    return res;
+  }
+
+  res = await deleteCatalogItemsFromWeaviate(itemsNames, collection, brand);
+
+  return res;
+}
+
+// Función para validar CSV
+export async function validateItemsToDelete(
+  itemsNames: string[],
+  collection: Collection,
+  brand: string
+): Promise<
+  | {
+      error: true;
+      details: string;
+    }
+  | {
+      error: false;
+    }
+> {
+  try {
+    if (!itemsNames || itemsNames.length === 0) {
+      return {
+        error: true,
+        details: "No se han proporcionado nombres de items",
+      };
+    }
+
+    if (!itemsNames) {
+      return {
+        error: true,
+        details: "Header mal formado o no incluido",
+      };
+    }
+
+    const invalidItems: string[] = [];
+
+    for (const itemName of itemsNames) {
+      if (!itemName) continue; // Skip empty lines
+
+      // Validate item against schema
+      try {
+        // Check if item already exists in Weaviate with same name and brand
+        const isDuplicate = await checkDuplicateInWeaviate(
+          collection,
+          itemName,
+          brand
+        );
+        if (!isDuplicate) {
+          invalidItems.push(itemName);
+        }
+      } catch (error) {
+        invalidItems.push(itemName);
+      }
+    }
+
+    // Check if there are any invalid rows
+    if (invalidItems.length > 0) {
+      const itemNames = invalidItems.join(",");
+      return {
+        error: true,
+        details: `items [${itemNames}] no encontrados`,
+      };
+    }
+
+    // All items are valid
+    return {
+      error: false,
+    };
+  } catch (error) {
+    return {
+      error: true,
+      details: "Error interno del servidor al procesar el CSV",
+    };
+  }
+}
+
+async function deleteCatalogItemsFromWeaviate(
+  itemsNames: string[],
+  collection: Collection,
+  brand: string
+): Promise<CatalogResponseSchemaDeleteType> {
+  try {
+    let numberDeleted = 0;
+    const invalidItems: string[] = [];
+    for (const itemName of itemsNames) {
+      const object_uuid = generateUuid5(
+        JSON.stringify({ name: itemName, brand: brand })
+      );
+      const response = await collection.data.deleteMany(
+        Filters.and(
+          collection.filter.byProperty("name").equal(itemName),
+          collection.filter.byProperty("brand").equal(brand)
+        )
+      );
+      if (response) {
+        numberDeleted++;
+      } else {
+        invalidItems.push(itemName);
+      }
+    }
+    if (invalidItems.length > 0) {
+      return {
+        error: true,
+        details: `items [${invalidItems.join(",")}] no encontrados y ${numberDeleted} eliminados correctamente`,
+        numberDeleted: numberDeleted,
+      };
+    }
+    return {
+      error: false,
+      numberDeleted: numberDeleted,
+    };
+  } catch (error) {
+    return {
+      error: true,
+      details: `Error deleting from Weaviate: ${error}`,
+      numberDeleted: 0,
     };
   }
 }

@@ -12,10 +12,16 @@ export const catalogItemSchema = z.object({
 // Schema for CSV file upload
 export const csvFileUploadSchema = z.object({
   file: z.instanceof(File, { message: "Debe ser un archivo CSV válido" }),
+  brand: z.string().min(1, "La marca es requerida"),
+});
+
+export const deleteItemsSchema = z.object({
+  itemsNames: z.array(z.string()).min(1, "Debe tener al menos un nombre"),
+  brand: z.string().min(1, "La marca es requerida"),
 });
 
 // Response schema for catalog update
-export const CatalogUpdateResponseSchema = z.union([
+export const CatalogResponseSchema = z.union([
   z.object({
     error: z.literal(true),
     details: z.string(),
@@ -25,15 +31,29 @@ export const CatalogUpdateResponseSchema = z.union([
   }),
 ]);
 
+export const CatalogResponseSchemaDelete = z.union([
+  z.object({
+    error: z.literal(true),
+    details: z.string(),
+    numberDeleted: z.number().min(0),
+  }),
+  z.object({
+    error: z.literal(false),
+    numberDeleted: z.number().min(0),
+  }),
+]);
+
+export type CatalogResponseSchemaDeleteType = z.infer<
+  typeof CatalogResponseSchemaDelete
+>;
+
 //array de catalogItemSchema
 export const CatalogItemArraySchema = z.array(catalogItemSchema);
 
 export type CatalogItem = z.infer<typeof catalogItemSchema>;
 export type CsvFileUpload = z.infer<typeof csvFileUploadSchema>;
 export type CatalogItemSchemaType = z.infer<typeof catalogItemSchema>;
-export type CatalogUpdateResponseSchemaType = z.infer<
-  typeof CatalogUpdateResponseSchema
->;
+export type CatalogResponseSchemaType = z.infer<typeof CatalogResponseSchema>;
 
 const PaginationSchemaBrand = z.object({
   page: z.preprocess(val => parseInt(val as string) || 0, z.number().min(0)),

@@ -30,13 +30,21 @@ import {
   VerifyUserResponseSchema,
   VerifyUserResponseSchemaType,
 } from "../schemas/auth/sign-in-schema";
-import { UpdateCatalog, GetBrand } from "./app/catalogFunctions";
+import {
+  UpdateCatalog,
+  GetBrand,
+  VerifyBrand,
+  DeleteFromCatalog,
+} from "./app/catalogFunctions";
 import {
   csvFileUploadSchema,
-  CatalogUpdateResponseSchema,
-  CatalogUpdateResponseSchemaType,
+  CatalogResponseSchema,
+  CatalogResponseSchemaType,
   CatalogItemArraySchema,
   PaginationSchemaBrand,
+  deleteItemsSchema,
+  CatalogResponseSchemaDelete,
+  CatalogResponseSchemaDeleteType,
 } from "../schemas/catalog/catalog-schema";
 import { QueryWeaviateImage } from "./app/routeVector";
 import {
@@ -360,46 +368,6 @@ app.openapi(updateClientRoute, async c => {
   return c.json(res, 200);
 });
 
-// endpoint que actualiza el catálogo con datos CSV
-const updateCatalogRoute = createRoute({
-  method: "post",
-  path: "/update-catalog",
-  request: {
-    body: {
-      content: {
-        "multipart/form-data": { schema: csvFileUploadSchema },
-      },
-    },
-  },
-  responses: {
-    200: {
-      content: {
-        "application/json": {
-          schema: CatalogUpdateResponseSchema,
-        },
-      },
-      description: "Valida y actualiza el catálogo con archivo CSV",
-    },
-  },
-});
-
-app.openapi(updateCatalogRoute, async c => {
-  const { file } = c.req.valid("form");
-  let res: CatalogUpdateResponseSchemaType;
-
-  try {
-    res = await UpdateCatalog(file);
-
-    return c.json(res, 200);
-  } catch (error) {
-    res = {
-      error: true,
-      details: `Error interno del servidor ${error}`,
-    };
-    return c.json(res, 200);
-  }
-});
-
 // endpoint que obtiene la información de la marca
 const getBrandRoute = createRoute({
   method: "get",
@@ -544,4 +512,101 @@ app.openapi(sendFormBrandRoute, async c => {
     };
   }
   return c.json(res, 200);
+});
+
+// endpoint que inserta items en el catálogo de una marca con datos CSV
+const updateCatalogRoute = createRoute({
+  method: "post",
+  path: "/insert-catalog-brand",
+  request: {
+    body: {
+      content: {
+        "multipart/form-data": { schema: csvFileUploadSchema },
+      },
+    },
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: CatalogResponseSchema,
+        },
+      },
+      description: "Valida y actualiza el catálogo con archivo CSV",
+    },
+  },
+});
+
+app.openapi(updateCatalogRoute, async c => {
+  const { file, brand } = c.req.valid("form");
+  //verifico que la marca exista en la base de datos
+  let res: CatalogResponseSchemaType;
+  const brandExists = await VerifyBrand(brand);
+  if (!brandExists) {
+    res = {
+      error: true,
+      details: "Marca no encontrada",
+    };
+    return c.json(res, 200);
+  }
+  try {
+    res = await UpdateCatalog(file, brand);
+
+    return c.json(res, 200);
+  } catch (error) {
+    res = {
+      error: true,
+      details: `Error interno del servidor ${error}`,
+    };
+    return c.json(res, 200);
+  }
+});
+
+// endpoint que elimina items en el catálogo de una marca con datos CSV
+const deleteCatalogRoute = createRoute({
+  method: "post",
+  path: "/delete-catalog-brand",
+  request: {
+    body: {
+      content: {
+        "multipart/form-data": { schema: deleteItemsSchema },
+      },
+    },
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: CatalogResponseSchemaDelete,
+        },
+      },
+      description: "Valida y actualiza el catálogo con archivo CSV",
+    },
+  },
+});
+
+app.openapi(deleteCatalogRoute, async c => {
+  const { itemsNames, brand } = c.req.valid("form");
+  //verifico que la marca exista en la base de datos
+  let res: CatalogResponseSchemaDeleteType;
+  const brandExists = await VerifyBrand(brand);
+  if (!brandExists) {
+    res = {
+      error: true,
+      details: "Marca no encontrada",
+      numberDeleted: 0,
+    };
+    return c.json(res, 200);
+  }
+  try {
+    res = await DeleteFromCatalog(itemsNames, brand);
+    return c.json(res, 200);
+  } catch (error) {
+    res = {
+      error: true,
+      details: `Error interno del servidor ${error}`,
+      numberDeleted: 0,
+    };
+    return c.json(res, 200);
+  }
 });
