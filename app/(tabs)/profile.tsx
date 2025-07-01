@@ -27,14 +27,14 @@ import {
   RenderProfileItemPreferences,
 } from "@/app/components/profile/bottomSheets";
 import ProfileAndLogOut from "@/app/components/profile/profileAndLogOut";
-import { BrandSchemaRes } from "@/schemas/auth/brand-schema";
+import { BrandSchemaRes, BrandSchemaType } from "@/schemas/auth/brand-schema";
 import { Linking } from "react-native";
-import ClothingItemComponent from "@/app/components/ClothingItemComponent";
-import { MasonryFlashList } from "@shopify/flash-list";
 import {
   CatalogItemArraySchema,
   CatalogItemSchemaType,
 } from "@/schemas/catalog/catalog-schema";
+import ListItems from "@/app/components/ListClotheItems";
+import splitDescriptionByLinesOrWords from "@/app/components/profile/descriptionBrand";
 
 const Profile = () => {
   const { user, loading, logout, userType } = useAuth();
@@ -98,16 +98,6 @@ const fetchBrandData = async (
   }
 };
 
-interface Metadata {
-  id: string;
-  description: string;
-  image_url: string;
-  url: string;
-  price: number;
-  name: string;
-}
-export type { Metadata };
-
 const BrandProfile = ({
   user,
   loading,
@@ -117,62 +107,13 @@ const BrandProfile = ({
   loading: boolean;
   logout: () => Promise<void>;
 }) => {
-  const [profileData, setProfileData] = useState<{
-    name: string;
-    description: string;
-    email: string;
-    url: string;
-    logo_url: string;
-  }>({
+  const [profileData, setProfileData] = useState<BrandSchemaType | null>({
     name: "",
     description: "",
     email: "",
     url: "",
     logo_url: "",
   });
-
-  const [clothingItems, setClothingItems] = useState<CatalogItemSchemaType[]>(
-    []
-  );
-  const [page, setPage] = useState(0);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const limit = 10;
-
-  const fetchClothingItems = async (pageToFetch: number) => {
-    console.log(
-      "Fetching items for page and brand",
-      pageToFetch,
-      profileData.name
-    );
-    if (!profileData.name) {
-      console.log("No brand name found yet");
-      return;
-    }
-
-    setIsLoadingMore(true);
-    const items = await getClothingItems(pageToFetch, limit, profileData.name);
-
-    if (items.length === 0) {
-      console.log("No more items");
-      setHasMore(false);
-      setIsLoadingMore(false);
-      return;
-    }
-
-    if (pageToFetch === 0) {
-      console.log("Setting items to first page");
-      setClothingItems(items);
-    } else {
-      console.log("Adding items to existing list with page", pageToFetch);
-      setClothingItems(prev => [...prev, ...items]);
-    }
-    setIsLoadingMore(false);
-  };
-
-  useEffect(() => {
-    fetchClothingItems(page);
-  }, [page, profileData.name]);
 
   // Estado para mostrar descripción completa o cortada
   const [showFullDescription, setShowFullDescription] = useState(false);
@@ -190,7 +131,7 @@ const BrandProfile = ({
     bottomSheetRefLogout.current?.snapToIndex(0);
   };
 
-  const description = profileData.description || "";
+  const description = profileData?.description || "";
   const isLongDescription = description.length > 80;
   const maxTotalLength = 80;
   const lines =
@@ -201,29 +142,23 @@ const BrandProfile = ({
   const showSeeMore =
     !showFullDescription && lines.join("\n").length < description.length;
 
-  const handleLoadMore = () => {
-    if (isLoadingMore || !hasMore || !profileData.name) return;
-    console.log("Page", page);
-    setPage(prev => prev + 1);
-  };
-
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <SafeAreaView className="bg-brown-strong w-full flex-1 ">
           <View className="flex flex-col w-full px-10 pb-5">
             <View className="flex flex-row  w-full py-4 gap-5">
-              {profileData.logo_url ? (
+              {profileData?.logo_url ? (
                 <Image
                   source={{
-                    uri: profileData.logo_url,
+                    uri: profileData?.logo_url,
                   }}
                   className="w-32 h-32 rounded-full"
                   resizeMode="contain"
                 />
               ) : null}
               <Text className="text-right text-white font-plight text-3xl pt-10">
-                {profileData.name}
+                {profileData?.name}
               </Text>
               <View className="flex flex-row pt-10">
                 <TouchableOpacity onPress={openUsernameSheetLogout}>
@@ -240,12 +175,12 @@ const BrandProfile = ({
               />
               <TouchableOpacity
                 onPress={() =>
-                  profileData.url && Linking.openURL(profileData.url)
+                  profileData?.url && Linking.openURL(profileData.url)
                 }
                 activeOpacity={1}
               >
                 <Text className="text-lg font-plight text-start text-sky-500">
-                  {profileData.url}
+                  {profileData?.url}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -267,27 +202,11 @@ const BrandProfile = ({
               )}
             </View>
           </View>
-          <MasonryFlashList
-            data={clothingItems}
-            numColumns={3}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingVertical: 10 }}
-            renderItem={({
-              item,
-              index,
-            }: {
-              item: CatalogItemSchemaType;
-              index: number;
-            }) => (
-              <ClothingItemComponent
-                i={index}
-                url={item.image_url}
-                numColumns={3}
-              />
-            )}
-            onEndReached={handleLoadMore}
-            onEndReachedThreshold={0.1}
-            estimatedItemSize={280}
+
+          <ListItems
+            profileData={profileData}
+            getClothingItems={getClothingItems}
+            limit={100}
           />
 
           <CustomBottomLogout
@@ -535,41 +454,16 @@ async function updateUser(data: {
   }
 }
 
-// Lógica para cortar la descripción respetando los saltos de línea originales,
-// pero si ninguna línea cabe, corta por palabras hasta 80 caracteres
-function splitDescriptionByLinesOrWords(text: string, maxTotalLength: number) {
-  const originalLines = text.split("\n");
-  let lines: string[] = [];
-  let totalLength = 0;
-  let foundShortLine = false;
-  for (let line of originalLines) {
-    if (line.length <= maxTotalLength) {
-      foundShortLine = true;
-    }
-    if (totalLength + line.length > maxTotalLength) {
-      break;
-    }
-    lines.push(line);
-    totalLength += line.length + 1; // +1 por el salto de línea
-  }
-  // Si no hay ninguna línea corta, cortar por palabras
-  if (!foundShortLine && originalLines.length > 0) {
-    const words = originalLines[0]?.split(/\s+/);
-    let acc = "";
-    for (let word of words || []) {
-      if ((acc + (acc ? " " : "") + word).length > maxTotalLength) break;
-      acc += (acc ? " " : "") + word;
-    }
-    return acc ? [acc] : [];
-  }
-  return lines;
-}
-
 async function getClothingItems(
   page: number,
   limit: number,
-  brand: string
+  brand: string | undefined
 ): Promise<CatalogItemSchemaType[]> {
+  if (brand === undefined || brand === null) {
+    console.log("No brand name found yet");
+    return [];
+  }
+  console.log("Fetching items for brand3", brand);
   try {
     const { data } = await safeFetch({
       url: `http://${LOCAL_IP}:3000/all-brand?page=${page}&limit=${limit}&brand=${brand}`,

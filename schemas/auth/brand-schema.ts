@@ -1,21 +1,22 @@
 import { z } from "zod";
 
-const brandSchema = z.object({
+const BrandSchema = z.object({
   name: z.string(),
   email: z.string(),
   description: z.string(),
   url: z.string(),
   logo_url: z.string(),
 });
-export { brandSchema };
+export { BrandSchema };
+export type BrandSchemaType = z.infer<typeof BrandSchema>;
 
-const QueryDbSchemaBrand = z.tuple([brandSchema]);
+const QueryDbSchemaBrand = z.tuple([BrandSchema]);
 export { QueryDbSchemaBrand };
 
 const BrandSchemaRes = z.union([
   z.object({
     error: z.literal(false),
-    brand: brandSchema,
+    brand: BrandSchema,
   }),
   z.object({
     error: z.literal(true),

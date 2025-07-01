@@ -3,37 +3,21 @@ import React, { useEffect, useState } from "react";
 import { MasonryFlashList } from "@shopify/flash-list";
 import ClothingItemComponent from "@/app/components/ClothingItemComponent";
 import { LOCAL_IP } from "@/config/api";
+import ListItems from "../components/ListClotheItems";
+import {
+  CatalogItemArraySchema,
+  CatalogItemSchemaType,
+} from "@/schemas/catalog/catalog-schema";
+import safeFetch from "../utils/safe-fetch";
 
 const Home = () => {
-  const [clothingItems, setClothingItems] = useState<Metadata[]>([]);
-
-  useEffect(() => {
-    const fetchClothingItems = async () => {
-      const items = await getClothingItems();
-      setClothingItems(items);
-      //console.log("Datos paginados:", items);
-    };
-
-    fetchClothingItems();
-  }, []);
-
   return (
     <SafeAreaProvider>
       <SafeAreaView className="bg-brown-strong w-full flex-1 ">
-        <MasonryFlashList
-          data={clothingItems}
-          numColumns={2}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingVertical: 10 }}
-          renderItem={({ item, index }: { item: Metadata; index: number }) => (
-            <ClothingItemComponent
-              i={index}
-              url={item.image_url}
-              numColumns={2}
-            />
-          )}
-          onEndReachedThreshold={0.1}
-          estimatedItemSize={280}
+        <ListItems
+          profileData={null}
+          getClothingItems={getClothingItems}
+          limit={100}
         />
       </SafeAreaView>
     </SafeAreaProvider>
@@ -41,40 +25,20 @@ const Home = () => {
 };
 export default Home;
 
-interface Metadata {
-  id: string;
-  description: string;
-  image_url: string;
-  url: string;
-  type: string;
-}
-export type { Metadata };
-async function getClothingItems(): Promise<Metadata[]> {
-  const page = "2";
-  const limit = "10";
-
+async function getClothingItems(
+  page: number,
+  limit: number,
+  brand: string | undefined
+): Promise<CatalogItemSchemaType[]> {
   try {
-    const response: Response = await fetch(
-      `http://${LOCAL_IP}:3000/all?page=${page}&limit=${limit}`,
-      {
-        method: "GET",
-      }
-    );
-    // // console.log("Status:", response.status);
-    // console.log("Response text:", await response.text());
-
-    if (!response.ok) {
-      throw new Error("Error al obtener los datos");
-    }
-    const clothingItems: Metadata[] = await response.json();
-    //console.log("Clothing items:", clothingItems);
-    return clothingItems;
+    const { data } = await safeFetch({
+      url: `http://${LOCAL_IP}:3000/all?page=${page}&limit=${limit}`,
+      method: "GET",
+      schema: CatalogItemArraySchema,
+    });
+    return data;
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error("Error:", error.message);
-    } else {
-      console.error("Error desconocido");
-    }
+    console.error("Error:", error instanceof Error ? error.message : error);
     return [];
   }
 }
