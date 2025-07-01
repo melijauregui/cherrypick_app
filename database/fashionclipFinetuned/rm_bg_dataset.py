@@ -6,9 +6,9 @@ from io import BytesIO
 import requests
 from tqdm import tqdm
 
-INPUT_CSV = "datasets/con-sin-roturas-english.csv"
-OUTPUT_DIR = "processed_images_english"
-OUTPUT_CSV = "datasets/con-sin-roturas-english-v2.csv"
+INPUT_CSV = "datasets/preferencias.csv"
+OUTPUT_DIR = "processed_preferences_images"
+OUTPUT_CSV = "datasets/preferencias-nobg.csv"
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -22,7 +22,8 @@ for idx, row in tqdm(df.iterrows(), total=len(df)):
     try:
         # Nombre de archivo base
         basename = os.path.basename(url).split("?")[0]
-        output_filename = os.path.join(OUTPUT_DIR, basename.replace(".jpg", "_nobg.png").replace(".png", "_nobg.png"))
+        output_filename = os.path.join(OUTPUT_DIR, basename.replace(
+            ".jpg", "_nobg.png").replace(".png", "_nobg.png"))
 
         if not os.path.exists(output_filename):
             # Descargar la imagen
@@ -46,4 +47,5 @@ for idx, row in tqdm(df.iterrows(), total=len(df)):
 processed_df = pd.DataFrame(processed_entries)
 processed_df.to_csv(OUTPUT_CSV, index=False)
 
-print(f"✅ Proceso terminado. Imágenes guardadas en '{OUTPUT_DIR}' y CSV generado en '{OUTPUT_CSV}'.")
+print(
+    f"✅ Proceso terminado. Imágenes guardadas en '{OUTPUT_DIR}' y CSV generado en '{OUTPUT_CSV}'.")
