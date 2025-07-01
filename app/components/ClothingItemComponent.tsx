@@ -42,11 +42,13 @@ const ClothingItemComponent = ({
         marginTop: i < numColumns ? 0 : 18,
       }}
     >
-      <Image
-        source={{ uri: image_url }}
-        style={{ width: widthDetermined, height: imageHeight }}
-        resizeMode="cover"
-      />
+      {image_url ? (
+        <Image
+          source={{ uri: image_url }}
+          style={{ width: widthDetermined, height: imageHeight }}
+          resizeMode="cover"
+        />
+      ) : null}
     </View>
   );
 };

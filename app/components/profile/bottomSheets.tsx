@@ -7,8 +7,8 @@ import { TextInput } from "react-native";
 import DatePicker from "react-native-date-picker";
 import { View, Image } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
-import { CarouselWithFlatList } from "./carousel";
-import { LogOutButton, DeleteAccountButton } from "./buttons";
+import CarouselWithFlatList from "./carousel";
+import LogOutButton, { DeleteAccountButton } from "./buttons";
 
 type ItemData = {
   title: string;
@@ -280,7 +280,7 @@ function BottomSheetSame({
   );
 }
 
-export { BottomSheetSame };
+export default BottomSheetSame;
 
 const RenderProfileItem = ({
   label,
@@ -358,15 +358,17 @@ function setsEqual(a: string[], b: string[]): boolean {
 const renderItem2 = ({ item }: { item: ItemData; index: number }) => {
   return (
     <View className="w-[49%] aspect-[0.85] pb-2 flex flex-col items-center">
-      <Image
-        source={item.image}
-        className={`
+      {item.image ? (
+        <Image
+          source={item.image}
+          className={`
             w-full
             h-[80%]
             rounded-2xl
           `}
-        resizeMode="cover"
-      />
+          resizeMode="cover"
+        />
+      ) : null}
       <Text className="mt-1 text-gray-400 font-pregular">{item.title}</Text>
     </View>
   );

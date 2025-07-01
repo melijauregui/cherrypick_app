@@ -4,7 +4,7 @@ import { Dimensions } from "react-native";
 import { Image } from "react-native";
 import { TouchableOpacity, Text } from "react-native";
 
-export function CarouselWithFlatList({
+function CarouselWithFlatList({
   data,
   itemsSelected,
   setItemsSelected,
@@ -32,6 +32,8 @@ export function CarouselWithFlatList({
   );
 }
 
+export default CarouselWithFlatList;
+
 const renderItem = ({
   item,
   itemsSelected,
@@ -58,16 +60,18 @@ const renderItem = ({
       className="aspect-[0.9] px-1 pt-2 pb-1 flex flex-col items-center"
       style={{ width: width * 0.45 }}
     >
-      <Image
-        source={item.image}
-        className={`
+      {item.image ? (
+        <Image
+          source={item.image}
+          className={`
               w-full
               h-[85%]
               rounded-2xl
               ${isSelected ? "" : "opacity-50"}
             `}
-        resizeMode="cover"
-      />
+          resizeMode="cover"
+        />
+      ) : null}
       <Text
         className={`mt-1 font-pregular ${
           isSelected ? " text-black" : " text-gray-500"

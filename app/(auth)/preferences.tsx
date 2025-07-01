@@ -152,16 +152,18 @@ const Item = ({
       onPress={onPress}
       className="w-[49%] aspect-[1] my-4 flex flex-col items-center justify-center "
     >
-      <Image
-        source={item.image}
-        className={`
+      {item.image ? (
+        <Image
+          source={item.image}
+          className={`
           w-full  
           h-full
           rounded-2xl
           ${isSelected ? "border-2 border-white" : ""}
         `}
-        resizeMode="cover"
-      />
+          resizeMode="cover"
+        />
+      ) : null}
       <Text className="mt-1 text-gray-400 font-pregular">{item.title}</Text>
     </TouchableOpacity>
   );

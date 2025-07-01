@@ -33,6 +33,7 @@ const Home = () => {
             />
           )}
           onEndReachedThreshold={0.1}
+          estimatedItemSize={280}
         />
       </SafeAreaView>
     </SafeAreaProvider>

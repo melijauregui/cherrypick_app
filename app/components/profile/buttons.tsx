@@ -1,11 +1,11 @@
 import { LOCAL_IP } from "@/config/api";
 import { useRouter } from "expo-router";
-import { safeFetch } from "@/app/utils/safe-fetch";
+import safeFetch from "@/app/utils/safe-fetch";
 import { VerifyAccountDeletedSchema } from "@/schemas/auth/sign-up-schema";
 import * as SecureStore from "expo-secure-store";
 import { TouchableOpacity, Text } from "react-native";
 
-export const LogOutButton: React.FC<{ logout: () => Promise<void> }> = ({
+const LogOutButton: React.FC<{ logout: () => Promise<void> }> = ({
   logout,
 }) => {
   const router = useRouter();
@@ -24,8 +24,9 @@ export const LogOutButton: React.FC<{ logout: () => Promise<void> }> = ({
     </TouchableOpacity>
   );
 };
+export default LogOutButton;
 
-export const DeleteAccountButton: React.FC<{
+const DeleteAccountButton: React.FC<{
   user: { email: string } | null;
   loading: boolean;
   logout: () => Promise<void>;
@@ -70,3 +71,4 @@ export const DeleteAccountButton: React.FC<{
     </TouchableOpacity>
   );
 };
+export { DeleteAccountButton };

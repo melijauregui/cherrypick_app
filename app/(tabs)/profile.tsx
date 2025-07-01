@@ -26,7 +26,7 @@ import {
   RenderProfileItem,
   RenderProfileItemPreferences,
 } from "@/app/components/profile/bottomSheets";
-import { ProfileAndLogOut } from "@/app/components/profile/profileAndLogOut";
+import ProfileAndLogOut from "@/app/components/profile/profileAndLogOut";
 import { BrandSchemaRes } from "@/schemas/auth/brand-schema";
 import { Linking } from "react-native";
 import ClothingItemComponent from "@/app/components/ClothingItemComponent";
@@ -197,13 +197,15 @@ const BrandProfile = ({
         <SafeAreaView className="bg-brown-strong w-full flex-1 ">
           <View className="flex flex-col w-full px-10 pb-5">
             <View className="flex flex-row  w-full py-4 gap-5">
-              <Image
-                source={{
-                  uri: profileData.logo_url,
-                }}
-                className="w-32 h-32 rounded-full"
-                resizeMode="contain"
-              />
+              {profileData.logo_url ? (
+                <Image
+                  source={{
+                    uri: profileData.logo_url,
+                  }}
+                  className="w-32 h-32 rounded-full"
+                  resizeMode="contain"
+                />
+              ) : null}
               <Text className="text-right text-white font-plight text-3xl pt-10">
                 {profileData.name}
               </Text>
@@ -269,6 +271,7 @@ const BrandProfile = ({
             )}
             onEndReached={handleLoadMore}
             onEndReachedThreshold={0.1}
+            estimatedItemSize={280}
           />
 
           <CustomBottomLogout
