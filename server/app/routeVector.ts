@@ -3,13 +3,14 @@ import {
   CatalogItemSchemaType,
   catalogItemSchema,
 } from "../../schemas/catalog/catalog-schema";
-import weaviate, { vectorizer } from "weaviate-client";
+import weaviate, { Filters } from "weaviate-client";
 
 //funcion para hacer query a pinecone
 async function QueryWeaviateImage(
   queryVector: number[],
   page: number,
-  limit: number
+  limit: number,
+  brand: string | undefined
 ): Promise<CatalogItemSchemaType[]> {
   try {
     const client = await weaviate.connectToWeaviateCloud(config.WEAVIATE_URL, {
@@ -29,10 +30,17 @@ async function QueryWeaviateImage(
       return [];
     }
 
+    const filters = brand
+      ? Filters.and(
+          collection.filter.byProperty("embedding_type").equal("image"),
+          collection.filter.byProperty("brand").equal(brand)
+        )
+      : collection.filter.byProperty("embedding_type").equal("image");
+
     let offset = page * limit;
     console.log("offset", offset);
     const queryOptions: any = {
-      filters: collection.filter.byProperty("embedding_type").equal("image"),
+      filters: filters,
       limit: limit,
       offset: offset,
       returnProperties: [
@@ -45,7 +53,6 @@ async function QueryWeaviateImage(
         "embedding_type",
       ],
     };
-
     const result = await collection.query.nearVector(queryVector, queryOptions);
 
     console.log(

@@ -36,7 +36,7 @@ export type CatalogUpdateResponseSchemaType = z.infer<
 >;
 
 const PaginationSchemaBrand = z.object({
-  page: z.preprocess(val => parseInt(val as string) || 1, z.number().min(1)),
+  page: z.preprocess(val => parseInt(val as string) || 0, z.number().min(0)),
   limit: z.preprocess(val => parseInt(val as string) || 10, z.number().min(1)),
   brand: z.string().min(1, "La marca es requerida"),
 });

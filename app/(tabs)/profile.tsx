@@ -31,6 +31,10 @@ import { BrandSchemaRes } from "@/schemas/auth/brand-schema";
 import { Linking } from "react-native";
 import ClothingItemComponent from "@/app/components/ClothingItemComponent";
 import { MasonryFlashList } from "@shopify/flash-list";
+import {
+  CatalogItemArraySchema,
+  CatalogItemSchemaType,
+} from "@/schemas/catalog/catalog-schema";
 
 const Profile = () => {
   const { user, loading, logout, userType } = useAuth();
@@ -127,16 +131,27 @@ const BrandProfile = ({
     logo_url: "",
   });
 
-  const [clothingItems, setClothingItems] = useState<Metadata[]>([]);
+  const [clothingItems, setClothingItems] = useState<CatalogItemSchemaType[]>(
+    []
+  );
   const [page, setPage] = useState(0);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const limit = 10;
 
   const fetchClothingItems = async (pageToFetch: number) => {
-    console.log("Fetching items for page", pageToFetch);
+    console.log(
+      "Fetching items for page and brand",
+      pageToFetch,
+      profileData.name
+    );
+    if (!profileData.name) {
+      console.log("No brand name found yet");
+      return;
+    }
+
     setIsLoadingMore(true);
-    const items = await getClothingItems(pageToFetch, limit);
+    const items = await getClothingItems(pageToFetch, limit, profileData.name);
 
     if (items.length === 0) {
       console.log("No more items");
@@ -157,7 +172,7 @@ const BrandProfile = ({
 
   useEffect(() => {
     fetchClothingItems(page);
-  }, [page]);
+  }, [page, profileData.name]);
 
   // Estado para mostrar descripción completa o cortada
   const [showFullDescription, setShowFullDescription] = useState(false);
@@ -187,7 +202,8 @@ const BrandProfile = ({
     !showFullDescription && lines.join("\n").length < description.length;
 
   const handleLoadMore = () => {
-    if (isLoadingMore || !hasMore) return;
+    if (isLoadingMore || !hasMore || !profileData.name) return;
+    console.log("Page", page);
     setPage(prev => prev + 1);
   };
 
@@ -260,7 +276,7 @@ const BrandProfile = ({
               item,
               index,
             }: {
-              item: Metadata;
+              item: CatalogItemSchemaType;
               index: number;
             }) => (
               <ClothingItemComponent
@@ -551,18 +567,16 @@ function splitDescriptionByLinesOrWords(text: string, maxTotalLength: number) {
 
 async function getClothingItems(
   page: number,
-  limit: number
-): Promise<Metadata[]> {
-  console.log(
-    `Fetching from URL: http://${LOCAL_IP}:3000/all?page=${page}&limit=${limit}`
-  );
+  limit: number,
+  brand: string
+): Promise<CatalogItemSchemaType[]> {
   try {
-    const response: Response = await fetch(
-      `http://${LOCAL_IP}:3000/all?page=${page}&limit=${limit}`,
-      { method: "GET" }
-    );
-    if (!response.ok) throw new Error("Error al obtener los datos");
-    return await response.json();
+    const { data } = await safeFetch({
+      url: `http://${LOCAL_IP}:3000/all-brand?page=${page}&limit=${limit}&brand=${brand}`,
+      method: "GET",
+      schema: CatalogItemArraySchema,
+    });
+    return data;
   } catch (error: unknown) {
     console.error("Error:", error instanceof Error ? error.message : error);
     return [];
