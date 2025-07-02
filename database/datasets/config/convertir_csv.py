@@ -1,9 +1,10 @@
 import csv
 import re
+from collections import Counter
 import pandas as pd
 
-input_file = 'con-sin-roturas-english-v5.csv'
-output_file = 'con-sin-roturas-english-v7.csv'
+input_file = 'preferencias-nobg2.csv'
+output_file = 'preferencias-nobg3.csv'
 
 
 def __clean_description(texto):
@@ -47,7 +48,7 @@ def __clean_description(texto):
     return texto
 
 
-def __extract_style(description, ripped):
+def __extract_jean_style(description, ripped):
     if ripped:
         match = re.search(r"\bripped\s+(.+?)\s+jeans\b", description.lower())
     else:
@@ -57,10 +58,10 @@ def __extract_style(description, ripped):
     return None
 
 
-def __extract_tags(description):
+def __extract_tags_ripped_jeans(description):
     desc = description.lower()
     tags = []
-    jeanType = __extract_style(desc, True)
+    jeanType = __extract_jean_style(desc, True)
 
     if desc.startswith("plain"):
         tags.append("plain jeans")
@@ -91,12 +92,39 @@ def transfor_description():
     print(f"Archivo limpio guardado en {output_file}")
 
 
-def transform_tags():
-    df = pd.read_csv(input_file, header=None, names=['url', 'description'])
-    df['tags'] = df['description'].apply(__extract_tags)
-    df.to_csv(output_file, index=False, header=False)
+def transform_tags(func):
+    df = pd.read_csv(input_file, header=0, names=['image', 'description'])
+    df['tags'] = df['description'].apply(func)
+    df.to_csv(output_file, index=False, header=True)
     print(f"Archivo con tags guardado en {output_file}")
 
 
+def extraer_estilos(descripcion):
+    estilos_posibles = [
+        "boho chic", "coquette", "minimalista",
+        "old money", "streetwear", "deportivo"
+    ]
+
+    descripcion = descripcion.lower()
+
+    contador = Counter()
+    primeras_apariciones = {}
+
+    for estilo in estilos_posibles:
+        matches = list(re.finditer(
+            rf'\b{re.escape(estilo)}\b', descripcion))
+        if matches:
+            contador[estilo] = len(matches)
+            primeras_apariciones[estilo] = matches[0].start()
+
+    # Ordenar primero por cantidad (desc), luego por primera aparición (asc)
+    estilos_ordenados = sorted(
+        contador.items(),
+        key=lambda item: (-item[1], primeras_apariciones[item[0]])
+    )
+    return ', '.join(estilo for estilo, _ in estilos_ordenados)
+
+
 if __name__ == "__main__":
-    transform_tags()
+    # transform_tags(__extract_tags_ripped_jeans)
+    transform_tags(extraer_estilos)
