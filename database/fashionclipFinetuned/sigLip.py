@@ -376,7 +376,7 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
 
 if __name__ == "__main__":
     multiprocessing.freeze_support()
-    fine_tune(csv_path="datasets/preferencias-nobg3.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
-              model_name_to_push="Sofia-gb/preferencias3", data_aug=False,
+    fine_tune(csv_path="datasets/preferencias/preferencias-nobg4.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
+              model_name_to_push="Sofia-gb/preferencias4", data_aug=False,
               loss_func=contrastive_loss_InfoNCE, batch_size=8, epochs=32, lr=2e-5,
               n_layers=2)
