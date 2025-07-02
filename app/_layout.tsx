@@ -4,6 +4,8 @@ import { useFonts } from "expo-font";
 import { useEffect } from "react";
 import { AuthProvider } from "@/context/AuthContext";
 import AuthRedirect from "@/app/components/AuthRedirect";
+import Toast from "react-native-toast-message";
+import { toastConfig } from "./components/profile/insertNewItems";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -66,6 +68,7 @@ const RootLayout = () => {
           }}
         />
       </Stack>
+      <Toast config={toastConfig} />
     </AuthProvider>
   );
 };

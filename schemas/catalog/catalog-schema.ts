@@ -1,11 +1,17 @@
 import { z } from "zod";
 
-export const catalogItemSchema = z.object({
+export const catalogJsonItemSchema = z.object({
   name: z.string().min(1, "El nombre es requerido"),
   description: z.string().min(1, "La descripción es requerida"),
   price: z.number().positive("El precio debe ser positivo"),
   image_url: z.string().url("Debe ser una URL válida"),
   url: z.string().url("Debe ser una URL válida"),
+});
+
+export type catalogJsonItemSchemaType = z.infer<typeof catalogJsonItemSchema>;
+
+export const catalogItemSchema = z.object({
+  ...catalogJsonItemSchema.shape,
   brand: z.string().min(1, "La marca es requerida"),
 });
 
@@ -61,3 +67,9 @@ const PaginationSchemaBrand = z.object({
   brand: z.string().min(1, "La marca es requerida"),
 });
 export { PaginationSchemaBrand };
+
+// Schema for JSON catalog upload
+export const jsonCatalogUploadSchema = z.object({
+  items: z.array(catalogJsonItemSchema).min(1, "Debe tener al menos un item"),
+  brand: z.string().min(1, "La marca es requerida"),
+});

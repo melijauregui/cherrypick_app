@@ -67,6 +67,7 @@ import {
   GetClient,
   UpdateClient,
 } from "./app/userFunctions";
+import { jsonCatalogUploadSchema } from "../schemas/catalog/catalog-schema";
 
 // endpoint que verifica si un mail esta registrado en la base de datos
 const verifiedEmailRoute = createRoute({
@@ -514,14 +515,14 @@ app.openapi(sendFormBrandRoute, async c => {
   return c.json(res, 200);
 });
 
-// endpoint que inserta items en el catálogo de una marca con datos CSV
+// endpoint que inserta items en el catálogo de una marca con datos JSON
 const updateCatalogRoute = createRoute({
   method: "post",
   path: "/insert-catalog-brand",
   request: {
     body: {
       content: {
-        "multipart/form-data": { schema: csvFileUploadSchema },
+        "application/json": { schema: jsonCatalogUploadSchema },
       },
     },
   },
@@ -532,13 +533,13 @@ const updateCatalogRoute = createRoute({
           schema: CatalogResponseSchema,
         },
       },
-      description: "Valida y actualiza el catálogo con archivo CSV",
+      description: "Valida y actualiza el catálogo con datos JSON",
     },
   },
 });
 
 app.openapi(updateCatalogRoute, async c => {
-  const { file, brand } = c.req.valid("form");
+  const { items, brand } = await c.req.valid("json");
   //verifico que la marca exista en la base de datos
   let res: CatalogResponseSchemaType;
   const brandExists = await VerifyBrand(brand);
@@ -550,8 +551,7 @@ app.openapi(updateCatalogRoute, async c => {
     return c.json(res, 200);
   }
   try {
-    res = await UpdateCatalog(file, brand);
-
+    res = await UpdateCatalog(items, brand);
     return c.json(res, 200);
   } catch (error) {
     res = {

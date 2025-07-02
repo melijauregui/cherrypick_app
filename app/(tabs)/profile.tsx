@@ -35,6 +35,10 @@ import {
 } from "@/schemas/catalog/catalog-schema";
 import ListItems from "@/app/components/ListClotheItems";
 import splitDescriptionByLinesOrWords from "@/app/components/profile/descriptionBrand";
+import InsertNewItemsModal, {
+  toastConfig,
+} from "../components/profile/insertNewItems";
+import Toast from "react-native-toast-message";
 
 const Profile = () => {
   const { user, loading, logout, userType } = useAuth();
@@ -127,8 +131,14 @@ const BrandProfile = ({
   }, [user]);
 
   const bottomSheetRefLogout = useRef<BottomSheet>(null);
+  const bottomSheetRefAddItem = useRef<BottomSheet>(null);
   const openUsernameSheetLogout = () => {
+    bottomSheetRefAddItem.current?.close();
     bottomSheetRefLogout.current?.snapToIndex(0);
+  };
+  const openUsernameSheetAddItem = () => {
+    bottomSheetRefLogout.current?.close();
+    bottomSheetRefAddItem.current?.snapToIndex(0);
   };
 
   const description = profileData?.description || "";
@@ -203,10 +213,25 @@ const BrandProfile = ({
             </View>
           </View>
 
+          <TouchableOpacity
+            onPress={openUsernameSheetAddItem}
+            className="bg-brown-light px-6 py-3 rounded-3xl"
+          >
+            <Text className="text-white font-psemibold text-[16px]">
+              Add New Item
+            </Text>
+          </TouchableOpacity>
+
           <ListItems
             profileData={profileData}
             getClothingItems={getClothingItems}
             limit={100}
+          />
+
+          <InsertNewItemsModal
+            bottomSheetRef={bottomSheetRefAddItem}
+            onSubmit={handleSubmitAddItem}
+            brand={profileData?.name || ""}
           />
 
           <CustomBottomLogout
@@ -418,6 +443,7 @@ const ClientProfile = ({
             loading={loading}
             user={user}
           />
+          <Toast config={toastConfig} />
         </SafeAreaView>
       </SafeAreaProvider>
     </GestureHandlerRootView>
@@ -476,3 +502,12 @@ async function getClothingItems(
     return [];
   }
 }
+
+const handleSubmitAddItem = (data: {
+  productName: string;
+  price: string;
+  url: string;
+  imageUrl: string;
+}) => {
+  console.log("Form submitted with data:", data);
+};
