@@ -1,5 +1,8 @@
 import { ImageSourcePropType } from "react-native";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import BottomSheet, {
+  BottomSheetView,
+  BottomSheetTextInput,
+} from "@gorhom/bottom-sheet";
 import React, { useState, useEffect, useCallback } from "react";
 import { TouchableOpacity, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -37,7 +40,7 @@ function CustomBottomSheet({
     <View className="flex flex-col justify-center items-center px-5 py-4">
       <View className="flex flex-col  px-[16px] bg-white rounded-2xl border-[2px] border-gray-300 w-full">
         <Text className="text-black font-pregular">username</Text>
-        <TextInput
+        <BottomSheetTextInput
           className=" text-black font-plight text-[16px] p-1"
           value={editInputValue}
           onChangeText={setEditInputValue}
