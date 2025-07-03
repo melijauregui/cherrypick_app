@@ -11,7 +11,11 @@ import {
   ScrollView,
   KeyboardTypeOptions,
 } from "react-native";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import BottomSheet, {
+  BottomSheetView,
+  BottomSheetTextInput,
+  BottomSheetScrollView,
+} from "@gorhom/bottom-sheet";
 import { z } from "zod";
 import BottomSheetSame from "./bottomSheets";
 import safeFetch from "@/app/utils/safe-fetch";
@@ -144,12 +148,8 @@ const FormContent = ({
   handleSubmit: () => Promise<void>;
 }) => {
   return (
-    <ScrollView
-      className="flex-1 px-6 py-4"
-      contentContainerStyle={{ flexGrow: 1 }}
-      keyboardShouldPersistTaps="handled"
-    >
-      <View className="flex-1">
+    <View className="flex-1 px-6 py-4">
+      <BottomSheetScrollView>
         <DataInput
           label="Product Name"
           data={formData.productName}
@@ -199,36 +199,25 @@ const FormContent = ({
           keyboardType="decimal-pad"
           autoCapitalize="none"
         />
-
-        <View className="flex flex-row justify-end mb-4">
-          <TouchableOpacity
-            disabled={!isFormValid || isSubmitting}
-            onPress={handleSubmit}
-            className={`
-                  flex flex-row items-center px-6 py-3 rounded-3xl
-                  ${
-                    !isFormValid || isSubmitting
-                      ? "bg-gray-400 opacity-50"
-                      : "bg-brown-light"
-                  }
-                `}
-          >
-            <Text
-              className={`
-                    text-[16px] font-psemibold
-                    ${
-                      !isFormValid || isSubmitting
-                        ? "text-gray-700"
-                        : "text-white"
-                    }
-                  `}
-            >
-              {isSubmitting ? "Inserting..." : "Insert Item"}
-            </Text>
-          </TouchableOpacity>
-        </View>
+      </BottomSheetScrollView>
+      <View className="flex flex-row justify-end my-2">
+        <TouchableOpacity
+          disabled={!isFormValid || isSubmitting}
+          onPress={handleSubmit}
+          className={`
+            flex flex-row items-center px-6 py-3 rounded-3xl
+            ${!isFormValid || isSubmitting ? "opacity-50" : ""}
+          `}
+          style={{
+            backgroundColor: "rgba(107, 114, 128, 0.5)",
+          }}
+        >
+          <Text className="text-[16px] font-psemibold text-white">
+            {isSubmitting ? "Inserting..." : "Insert Item"}
+          </Text>
+        </TouchableOpacity>
       </View>
-    </ScrollView>
+    </View>
   );
 };
 const DataInput = ({
@@ -251,7 +240,7 @@ const DataInput = ({
   return (
     <View className="my-5 mx-1">
       <Text className="text-black font-pmedium text-lg ">{label}</Text>
-      <TextInput
+      <BottomSheetTextInput
         className="text-lg h-[40px] border-b border-gray-300 text-black  "
         placeholder={`Enter ${label}`}
         placeholderTextColor="#6b7280"

@@ -76,7 +76,6 @@ const fetchClothingItems = async (
     brandName: string | undefined
   ) => Promise<CatalogItemSchemaType[]>
 ) => {
-  console.log("Fetching items for page and brand55", pageToFetch, profileData);
   if (profileData !== null && !profileData.name) {
     console.log("No brand name found yet");
     return;

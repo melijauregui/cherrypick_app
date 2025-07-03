@@ -30,3 +30,22 @@ const QueryGetBrandSchema = z.object({
   email: z.string(),
 });
 export { QueryGetBrandSchema };
+
+const QueryAllBrandItemsSchema = z.object({
+  brand: z.string(),
+});
+export { QueryAllBrandItemsSchema };
+
+const AllBrandItemsSchemaRes = z.union([
+  z.object({
+    error: z.literal(false),
+    data: z.array(z.object({ name: z.string() })),
+  }),
+  z.object({
+    error: z.literal(true),
+    details: z.string(),
+  }),
+]);
+export { AllBrandItemsSchemaRes };
+
+export type AllBrandItemsSchemaResType = z.infer<typeof AllBrandItemsSchemaRes>;

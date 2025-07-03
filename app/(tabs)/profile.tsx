@@ -39,6 +39,7 @@ import InsertNewItemsModal, {
   toastConfig,
 } from "../components/profile/insertNewItems";
 import Toast from "react-native-toast-message";
+import DeleteCatalogItemsModal from "../components/profile/DeleteCatalogItemsModal";
 
 const Profile = () => {
   const { user, loading, logout, userType } = useAuth();
@@ -132,13 +133,22 @@ const BrandProfile = ({
 
   const bottomSheetRefLogout = useRef<BottomSheet>(null);
   const bottomSheetRefAddItem = useRef<BottomSheet>(null);
+  const bottomSheetRefDeleteItem = useRef<BottomSheet>(null);
   const openUsernameSheetLogout = () => {
     bottomSheetRefAddItem.current?.close();
+    bottomSheetRefDeleteItem.current?.close();
     bottomSheetRefLogout.current?.snapToIndex(0);
   };
   const openUsernameSheetAddItem = () => {
     bottomSheetRefLogout.current?.close();
+    bottomSheetRefDeleteItem.current?.close();
     bottomSheetRefAddItem.current?.snapToIndex(0);
+  };
+
+  const openUsernameSheetDeleteItem = () => {
+    bottomSheetRefLogout.current?.close();
+    bottomSheetRefAddItem.current?.close();
+    bottomSheetRefDeleteItem.current?.snapToIndex(0);
   };
 
   const description = profileData?.description || "";
@@ -156,7 +166,7 @@ const BrandProfile = ({
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <SafeAreaView className="bg-brown-strong w-full flex-1 ">
-          <View className="flex flex-col w-full px-10 pb-5">
+          <View className="flex flex-col w-full px-10 ">
             <View className="flex flex-row  w-full py-4 gap-5">
               {profileData?.logo_url ? (
                 <Image
@@ -211,17 +221,32 @@ const BrandProfile = ({
                 </TouchableOpacity>
               )}
             </View>
+
+            <View className="flex flex-row w-full gap-4 py-4">
+              <TouchableOpacity
+                onPress={openUsernameSheetAddItem}
+                style={{
+                  backgroundColor: "rgba(107, 114, 128, 0.5)",
+                }}
+                className="flex-1 px-0 py-2 rounded-xl items-center"
+              >
+                <Text className="text-white text-base font-semibold">
+                  Agregar Item
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={openUsernameSheetDeleteItem}
+                style={{
+                  backgroundColor: "rgba(107, 114, 128, 0.5)",
+                }}
+                className="flex-1 px-0 py-2 rounded-xl items-center"
+              >
+                <Text className="text-white text-base font-semibold">
+                  Eliminar Item
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
-
-          <TouchableOpacity
-            onPress={openUsernameSheetAddItem}
-            className="bg-brown-light px-6 py-3 rounded-3xl"
-          >
-            <Text className="text-white font-psemibold text-[16px]">
-              Add New Item
-            </Text>
-          </TouchableOpacity>
-
           <ListItems
             profileData={profileData}
             getClothingItems={getClothingItems}
@@ -232,6 +257,12 @@ const BrandProfile = ({
             bottomSheetRef={bottomSheetRefAddItem}
             onSubmit={handleSubmitAddItem}
             brand={profileData?.name || ""}
+          />
+
+          <DeleteCatalogItemsModal
+            bottomSheetRef={bottomSheetRefDeleteItem}
+            brand={profileData?.name || ""}
+            onDelete={() => {}}
           />
 
           <CustomBottomLogout

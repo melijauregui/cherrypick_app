@@ -209,6 +209,10 @@ function BottomSheetSame({
       onChange={handleSheetChanges}
       index={-1}
       enableDynamicSizing={true}
+      keyboardBehavior="interactive"
+      keyboardBlurBehavior="restore"
+      android_keyboardInputMode="adjustResize"
+      enableOverDrag={false}
     >
       <BottomSheetView className="flex-1 bg-white w-full">
         <View className="flex flex-row justify-between items-center  relative py-3 border-b border-gray-300 px-6">

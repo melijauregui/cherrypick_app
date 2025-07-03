@@ -46,11 +46,14 @@ import {
   CatalogResponseSchemaDelete,
   CatalogResponseSchemaDeleteType,
 } from "../schemas/catalog/catalog-schema";
-import { QueryWeaviateImage } from "./app/routeVector";
+import { QueryWeaviateImage, QueryWeaviateAllItems } from "./app/routeVector";
 import {
   BrandSchemaRes,
   BrandSchemaResType,
   QueryGetBrandSchema,
+  QueryAllBrandItemsSchema,
+  AllBrandItemsSchemaRes,
+  AllBrandItemsSchemaResType,
 } from "../schemas/auth/brand-schema";
 import {
   verifyEmail,
@@ -67,7 +70,10 @@ import {
   GetClient,
   UpdateClient,
 } from "./app/userFunctions";
-import { jsonCatalogUploadSchema } from "../schemas/catalog/catalog-schema";
+import {
+  jsonCatalogUploadSchema,
+  deleteItemsJsonSchema,
+} from "../schemas/catalog/catalog-schema";
 
 // endpoint que verifica si un mail esta registrado en la base de datos
 const verifiedEmailRoute = createRoute({
@@ -562,14 +568,14 @@ app.openapi(updateCatalogRoute, async c => {
   }
 });
 
-// endpoint que elimina items en el catálogo de una marca con datos CSV
+// endpoint que elimina items en el catálogo de una marca con datos JSON
 const deleteCatalogRoute = createRoute({
   method: "post",
   path: "/delete-catalog-brand",
   request: {
     body: {
       content: {
-        "multipart/form-data": { schema: deleteItemsSchema },
+        "application/json": { schema: deleteItemsJsonSchema },
       },
     },
   },
@@ -580,13 +586,16 @@ const deleteCatalogRoute = createRoute({
           schema: CatalogResponseSchemaDelete,
         },
       },
-      description: "Valida y actualiza el catálogo con archivo CSV",
+      description: "Valida y elimina items del catálogo con datos JSON",
     },
   },
 });
 
 app.openapi(deleteCatalogRoute, async c => {
-  const { itemsNames, brand } = c.req.valid("form");
+  const { items, brand } = c.req.valid("json");
+  // Extraer los nombres de los items del array de objetos
+  const itemsNames = items.map(item => item.name);
+
   //verifico que la marca exista en la base de datos
   let res: CatalogResponseSchemaDeleteType;
   const brandExists = await VerifyBrand(brand);
@@ -609,4 +618,31 @@ app.openapi(deleteCatalogRoute, async c => {
     };
     return c.json(res, 200);
   }
+});
+
+// endpoint que devuelve todos los nombres de los items de una marca
+const allBrandItemsRoute = createRoute({
+  method: "get",
+  path: "/all-brand-items",
+  request: {
+    query: QueryAllBrandItemsSchema,
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: AllBrandItemsSchemaRes,
+        },
+      },
+      description: "Devuelve los nombres de los items de una marca",
+    },
+  },
+});
+app.openapi(allBrandItemsRoute, async c => {
+  const { brand } = c.req.valid("query");
+  console.log("Brand name for all items", brand);
+  let res: AllBrandItemsSchemaResType;
+  res = await QueryWeaviateAllItems(brand);
+  console.log("res", res);
+  return c.json(res, 200);
 });

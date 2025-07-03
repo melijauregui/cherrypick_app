@@ -4,6 +4,8 @@ import {
   catalogItemSchema,
 } from "../../schemas/catalog/catalog-schema";
 import weaviate, { Filters } from "weaviate-client";
+import { getCollection } from "./catalogFunctions";
+import { AllBrandItemsSchemaResType } from "../../schemas/auth/brand-schema";
 
 //funcion para hacer query a pinecone
 async function QueryWeaviateImage(
@@ -13,22 +15,11 @@ async function QueryWeaviateImage(
   brand: string | undefined
 ): Promise<CatalogItemSchemaType[]> {
   try {
-    const client = await weaviate.connectToWeaviateCloud(config.WEAVIATE_URL, {
-      authCredentials: new weaviate.ApiKey(config.WEAVIATE_API_KEY),
-    });
-
-    // Verificar que la conexión esté lista
-    if (!client.isReady()) {
-      throw new Error("No se pudo conectar a Weaviate");
+    const resCollection = await getCollection();
+    if (resCollection.error || !resCollection.collection) {
+      throw new Error(resCollection.details);
     }
-
-    let collection;
-    try {
-      collection = client.collections.get("FashionItem");
-    } catch (error) {
-      console.log("No results found, weaviate FashionItem is inicilized");
-      return [];
-    }
+    const collection = resCollection.collection;
 
     const filters = brand
       ? Filters.and(
@@ -53,7 +44,7 @@ async function QueryWeaviateImage(
         "embedding_type",
       ],
     };
-    const result = await collection.query.nearVector(queryVector, queryOptions);
+    const result = await collection.query.fetchObjects(queryOptions);
 
     console.log(
       "topResults",
@@ -90,3 +81,53 @@ async function QueryWeaviateImage(
   }
 }
 export { QueryWeaviateImage };
+
+//funcion para hacer query a pinecone
+async function QueryWeaviateAllItems(
+  brand: string
+): Promise<AllBrandItemsSchemaResType> {
+  try {
+    const resCollection = await getCollection();
+    if (resCollection.error || !resCollection.collection) {
+      throw new Error(resCollection.details);
+    }
+    const collection = resCollection.collection;
+
+    const filters = Filters.and(
+      collection.filter.byProperty("embedding_type").equal("image"),
+      collection.filter.byProperty("brand").equal(brand)
+    );
+
+    const queryOptions: any = {
+      filters: filters,
+      returnProperties: ["name"],
+    };
+    const result = await collection.query.fetchObjects(queryOptions);
+
+    console.log(
+      "topResults",
+      result.objects.map(match => match.properties?.name)
+    );
+
+    const topResults: { name: string }[] = result.objects
+      .map(match => {
+        if (match.properties?.name) {
+          return { name: match.properties.name };
+        }
+        return null;
+      })
+      .filter((item): item is { name: string } => item !== null);
+
+    return {
+      error: false,
+      data: topResults,
+    };
+  } catch (error) {
+    console.error("Error querying Weaviate:", error);
+    return {
+      error: true,
+      details: "Error querying Weaviate: " + error,
+    };
+  }
+}
+export { QueryWeaviateAllItems };

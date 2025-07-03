@@ -26,6 +26,18 @@ export const deleteItemsSchema = z.object({
   brand: z.string().min(1, "La marca es requerida"),
 });
 
+// Schema for JSON delete items
+export const deleteItemsJsonSchema = z.object({
+  items: z
+    .array(
+      z.object({
+        name: z.string().min(1, "El nombre es requerido"),
+      })
+    )
+    .min(1, "Debe tener al menos un item"),
+  brand: z.string().min(1, "La marca es requerida"),
+});
+
 // Response schema for catalog update
 export const CatalogResponseSchema = z.union([
   z.object({

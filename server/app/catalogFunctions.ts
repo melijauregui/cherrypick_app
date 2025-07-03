@@ -121,6 +121,7 @@ async function getCollection(): Promise<{
     };
   }
 }
+export { getCollection };
 
 // Función para validar CSV
 export async function validateCsvFile(
@@ -544,13 +545,6 @@ export async function validateItemsToDelete(
       return {
         error: true,
         details: "No se han proporcionado nombres de items",
-      };
-    }
-
-    if (!itemsNames) {
-      return {
-        error: true,
-        details: "Header mal formado o no incluido",
       };
     }
 
