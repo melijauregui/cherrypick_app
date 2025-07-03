@@ -8,6 +8,7 @@ const ListItems = ({
   profileData,
   getClothingItems,
   limit,
+  columnCount,
 }: {
   profileData: BrandSchemaType | null;
   getClothingItems: (
@@ -16,6 +17,7 @@ const ListItems = ({
     brandName: string | undefined
   ) => Promise<CatalogItemSchemaType[]>;
   limit: number;
+  columnCount: number;
 }) => {
   const [clothingItems, setClothingItems] = useState<CatalogItemSchemaType[]>(
     []
@@ -38,7 +40,7 @@ const ListItems = ({
   return (
     <MasonryFlashList
       data={clothingItems}
-      numColumns={3}
+      numColumns={columnCount}
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ paddingVertical: 10 }}
       renderItem={({
@@ -48,7 +50,11 @@ const ListItems = ({
         item: CatalogItemSchemaType;
         index: number;
       }) => (
-        <ClothingItemComponent i={index} url={item.image_url} numColumns={3} />
+        <ClothingItemComponent
+          i={index}
+          url={item.image_url}
+          numColumns={columnCount}
+        />
       )}
       onEndReached={() =>
         handleLoadMore(isLoadingMore, hasMore, profileData, page, setPage)

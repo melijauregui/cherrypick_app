@@ -18,6 +18,7 @@ const Home = () => {
           profileData={null}
           getClothingItems={getClothingItems}
           limit={100}
+          columnCount={2}
         />
       </SafeAreaView>
     </SafeAreaProvider>

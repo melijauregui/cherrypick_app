@@ -251,6 +251,7 @@ const BrandProfile = ({
             profileData={profileData}
             getClothingItems={getClothingItems}
             limit={100}
+            columnCount={3}
           />
 
           <InsertNewItemsModal
