@@ -24,7 +24,10 @@ testCatalogUploadJson(
   "tienda napoli",
   "test-endpoints/archivos/catalog-items-tienda-napoli.json"
 );
-testCatalogUploadJson(
-  "charo",
-  "test-endpoints/archivos/catalog-items-charo.json"
-);
+
+setTimeout(() => {
+  testCatalogUploadJson(
+    "charo",
+    "test-endpoints/archivos/catalog-items-charo.json"
+  );
+}, 5 * 1000);
