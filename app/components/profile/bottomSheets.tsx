@@ -302,12 +302,12 @@ const RenderProfileItem = ({
 }) => {
   return (
     <View className="flex flex-row justify-between py-5 border-b-[0.5px] border-b-gray-500">
-      <Text className="text-xl text-white font-pregular">{label}</Text>
+      <Text className="text-xl text-white font-psemibold">{label}</Text>
       <View className="flex flex-row ">
-        <Text className="text-xl text-white font-plight">{value}</Text>
+        <Text className="text-xl text-white font-pmedium">{value}</Text>
         {canEdit && (
           <TouchableOpacity className="ml-4" onPress={onPress}>
-            <Ionicons name="pencil-outline" size={18} color="#6b7280" />
+            <Ionicons name="pencil-outline" size={18} color="#9297a1" />
           </TouchableOpacity>
         )}
       </View>
@@ -334,7 +334,7 @@ const RenderProfileItemPreferences = ({
         </Text>
         <View className="flex flex-row ml-auto">
           <TouchableOpacity className="ml-4" onPress={onPress}>
-            <Ionicons name="pencil-outline" size={18} color="#6b7280" />
+            <Ionicons name="pencil-outline" size={18} color="#9297a1" />
           </TouchableOpacity>
         </View>
       </View>
@@ -376,7 +376,7 @@ const renderItem2 = ({ item }: { item: ItemData; index: number }) => {
           resizeMode="cover"
         />
       ) : null}
-      <Text className="mt-1 text-gray-400 font-pregular">{item.title}</Text>
+      <Text className="mt-1 text-gray-400 font-psemibold">{item.title}</Text>
     </View>
   );
 };
