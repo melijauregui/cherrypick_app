@@ -47,7 +47,7 @@ async function QueryWeaviateImage(
     const result = await collection.query.fetchObjects(queryOptions);
 
     console.log(
-      "topResults",
+      "topResults en catalogoo",
       result.objects.map(
         match => match.properties?.name + " " + match.properties?.embedding_type
       )
@@ -100,6 +100,8 @@ async function QueryWeaviateAllItems(
 
     const queryOptions: any = {
       filters: filters,
+      limit: 100,
+      offset: 0,
       returnProperties: ["name"],
     };
     const result = await collection.query.fetchObjects(queryOptions);

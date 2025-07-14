@@ -3,6 +3,7 @@ import ClothingItemComponent from "@/app/components/ClothingItemComponent";
 import { MasonryFlashList } from "@shopify/flash-list";
 import { useEffect, useState } from "react";
 import { BrandSchemaType } from "@/schemas/auth/brand-schema";
+import { RefreshControl } from "react-native";
 
 const ListItems = ({
   profileData,
@@ -37,6 +38,21 @@ const ListItems = ({
       getClothingItems
     );
   }, [page, profileData]);
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = () => {
+    setRefreshing(true);
+    setPage(0);
+    fetchClothingItems(
+      page,
+      profileData,
+      setClothingItems,
+      setIsLoadingMore,
+      setHasMore,
+      limit,
+      getClothingItems
+    );
+    setRefreshing(false);
+  };
   return (
     <MasonryFlashList
       data={clothingItems}
@@ -61,6 +77,9 @@ const ListItems = ({
       }
       onEndReachedThreshold={0.1}
       estimatedItemSize={280}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
     />
   );
 };

@@ -201,6 +201,7 @@ const fetchItems = async (
       console.log(res.data.details);
       Toast.show({ type: "error", text1: res.data.details });
     } else {
+      console.log("res.data.data DATAA", res.data.data);
       setItems(res.data.data || []);
       setFilteredItems(res.data.data || []);
     }
