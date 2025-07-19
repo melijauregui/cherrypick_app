@@ -40,7 +40,7 @@ const UserSchemaRes = z.union([
     user: z.object({
       username: z.string(),
       email: z.string(),
-      dateOfBirth: z.coerce.date(),
+      dateOfBirth: z.coerce.date().nullable().optional(),
       preferences: z.array(z.string()),
     }),
   }),

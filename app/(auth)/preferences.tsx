@@ -18,6 +18,8 @@ import {
 import safeFetch from "@/app/utils/safe-fetch";
 import { LOCAL_IP } from "@/config/api";
 import { useGoogleSignIn } from "@/hooks/useGoogleSignIn";
+import * as SecureStore from "expo-secure-store";
+import { useAuth } from "@/context/AuthContext";
 
 const Preferences = () => {
   const router = useRouter();
@@ -27,6 +29,7 @@ const Preferences = () => {
     console.log("Google sign-in successful going to home");
     router.replace("/home");
   });
+  const { setIsCreating } = useAuth();
   console.log(
     "Proceeding with name in preferences:",
     name,
@@ -55,13 +58,29 @@ const Preferences = () => {
         preferences
       );
       if (success) {
-        console.log("Account created, now signing in with Google");
-        if (isReady) {
-          await promptGoogleLogin();
-          console.log("Google sign-in successful");
+        console.log(
+          "Account created, checking if we need to sign in with Google"
+        );
+
+        // Clear the creating state since account creation is complete
+        setIsCreating(false);
+
+        // Check if we already have a token
+        const existingToken = await SecureStore.getItemAsync("accessToken");
+
+        if (existingToken) {
+          console.log("Token already exists, redirecting to home");
+
+          router.push("/home");
         } else {
-          console.log("Google sign-in not ready");
-          router.push("/sign-in");
+          console.log("No token found, signing in with Google");
+          if (isReady) {
+            await promptGoogleLogin();
+            console.log("Google sign-in successful");
+          } else {
+            console.log("Google sign-in not ready");
+            router.push("/sign-in");
+          }
         }
       } else {
         console.log("Account creation failed");

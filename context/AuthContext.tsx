@@ -21,6 +21,8 @@ interface AuthContextType {
   logout: () => Promise<void>;
   userType: "client" | "brand" | null;
   setUserType: React.Dispatch<React.SetStateAction<"client" | "brand" | null>>;
+  isCreating: boolean;
+  setIsCreating: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -29,6 +31,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [userType, setUserType] = useState<"client" | "brand" | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
 
   const logout = async () => {
     await SecureStore.deleteItemAsync("accessToken");
@@ -36,6 +39,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     await SecureStore.deleteItemAsync("userType");
     setUser(null);
     setUserType(null);
+    setIsCreating(false);
   };
 
   const refreshAccessToken: () => Promise<string | null> = async () => {
@@ -161,7 +165,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, setUser, loading, logout, userType, setUserType }}
+      value={{
+        user,
+        setUser,
+        loading,
+        logout,
+        userType,
+        setUserType,
+        isCreating,
+        setIsCreating,
+      }}
     >
       {children}
     </AuthContext.Provider>

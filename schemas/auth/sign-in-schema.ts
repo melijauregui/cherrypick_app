@@ -10,10 +10,13 @@ const queryDbSchemaUser = z.tuple([
       required_error: "Email is required",
       invalid_type_error: "Email must be string",
     }),
-    date_of_birth: z.date({
-      required_error: "Date is required",
-      invalid_type_error: "Date must be date",
-    }),
+    date_of_birth: z
+      .date({
+        required_error: "Date is required",
+        invalid_type_error: "Date must be date",
+      })
+      .nullable()
+      .optional(),
     preferences: z
       .array(z.string().min(1), {
         required_error: "Preferences are required",

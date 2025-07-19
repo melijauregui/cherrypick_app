@@ -64,8 +64,12 @@ export async function CreateUser(
     };
     return res;
   }
-
-  const dateBirth = new Date(dateString);
+  let dateBirth: Date | null;
+  if (dateString === undefined || dateString === "") {
+    dateBirth = null;
+  } else {
+    dateBirth = new Date(dateString);
+  }
 
   const [result]: any = await db.query(
     "INSERT INTO users (name, email, date_of_birth, preferences) VALUES (?, ?, ?, ?)",
@@ -122,6 +126,7 @@ export async function GetClient(email: string): Promise<UserSchemaResType> {
   if (result.length > 0) {
     const parsedRows = queryDbSchemaUser.parse(result);
     const { name, email, date_of_birth, preferences } = parsedRows[0];
+
     res = {
       error: false,
       user: {
@@ -168,10 +173,11 @@ export async function UpdateClient(
     preferences = parsedRows[0].preferences;
   }
   if (dateString === undefined) {
-    dateString = parsedRows[0].date_of_birth.toISOString();
+    const existingDate = parsedRows[0].date_of_birth;
+    dateString = existingDate ? existingDate.toISOString() : "";
   }
 
-  const dateBirth = new Date(dateString);
+  const dateBirth = dateString ? new Date(dateString) : null;
 
   const [result]: any = await db.query(
     "UPDATE users SET name = ?, date_of_birth = ?, preferences = ? WHERE email = ?",

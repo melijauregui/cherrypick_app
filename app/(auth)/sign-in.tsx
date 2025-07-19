@@ -1,12 +1,4 @@
-import {
-  ScrollView,
-  Text,
-  View,
-  TouchableOpacity,
-  Image,
-  Platform,
-  ActivityIndicator,
-} from "react-native";
+import { ScrollView, Text, View, TouchableOpacity, Image } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useEffect } from "react";
@@ -29,14 +21,6 @@ const SignIn = () => {
   const params = useLocalSearchParams();
   const [showError, setShowError] = useState(params.error === "not-registered");
   const [loading, setLoading] = useState(params.loading === "true");
-  /* if (loading) {
-    return (
-      <SafeAreaView className="bg-brown-strong flex-1 justify-center items-center">
-        <ActivityIndicator size="large" color="#fff" />
-      </SafeAreaView>
-    );
-  } else {
-     */
   return (
     <SafeAreaView className="bg-brown-strong flex-1 h-full w-full">
       <ScrollView
@@ -96,7 +80,7 @@ const GoogleSignInButton: React.FC<{
     },
   });
 
-  const { setUser, setUserType } = useAuth();
+  const { setUser, setUserType, setIsCreating } = useAuth();
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -132,28 +116,40 @@ const GoogleSignInButton: React.FC<{
             schema: VerifyUserResponseSchema,
           });
 
+          await SecureStore.setItemAsync(
+            "accessToken",
+            response.authentication?.accessToken
+          );
+          await SecureStore.setItemAsync(
+            "refreshToken",
+            response.authentication?.refreshToken ?? ""
+          );
+          setUser(userInfo);
+
           if (!data.error) {
-            await SecureStore.setItemAsync(
-              "accessToken",
-              response.authentication?.accessToken
-            );
-            await SecureStore.setItemAsync(
-              "refreshToken",
-              response.authentication?.refreshToken ?? ""
-            );
             await SecureStore.setItemAsync("userType", data.userType);
             setUserType(data.userType);
-
-            setUser(userInfo);
             console.log("Redirecting to home...");
             router.push("/home");
           } else {
-            setShowError(true);
             setLoading(false);
-            console.log("User not registered, redirecting to sign-in...");
+            setIsCreating(true);
+            await SecureStore.setItemAsync("userType", "client");
+            setUserType("client");
+
+            const userName = userInfo.name || userInfo.given_name || "";
+            console.log("User name:", userName);
+            const userEmail = userInfo.email || "";
+            console.log("User email:", userEmail);
+
+            console.log("User not registered, redirecting to preferences...");
             router.replace({
-              pathname: "/sign-in",
-              params: { error: "not-registered", loading: "false" },
+              pathname: "/preferences",
+              params: {
+                name: userName,
+                email: userEmail,
+                dateBirth: "",
+              },
             });
           }
         } catch (error) {

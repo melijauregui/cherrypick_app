@@ -1,7 +1,5 @@
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import React, { useEffect, useState } from "react";
-import { MasonryFlashList } from "@shopify/flash-list";
-import ClothingItemComponent from "@/app/components/ClothingItemComponent";
 import { LOCAL_IP } from "@/config/api";
 import ListItems from "../components/ListClotheItems";
 import {

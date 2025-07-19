@@ -70,7 +70,9 @@ const fetchClientData = async (
       username: data.user.username,
       email: data.user.email,
       preferences: data.user.preferences,
-      dateOfBirth: new Date(data.user.dateOfBirth),
+      dateOfBirth: data.user.dateOfBirth
+        ? new Date(data.user.dateOfBirth)
+        : null,
     });
   } catch (error) {
     console.error("Error fetching user data2:", error);
@@ -304,12 +306,12 @@ const ClientProfile = ({
   const [profileData, setProfileData] = useState<{
     username: string;
     email: string;
-    dateOfBirth: Date;
+    dateOfBirth: Date | null;
     preferences: string[];
   }>({
     username: "",
     email: "",
-    dateOfBirth: new Date(),
+    dateOfBirth: null,
     preferences: [],
   });
 
@@ -375,7 +377,11 @@ const ClientProfile = ({
             />
             <RenderProfileItem
               label="Date of Birth"
-              value={format(profileData.dateOfBirth, "dd/MM/yyyy")}
+              value={
+                profileData.dateOfBirth
+                  ? format(profileData.dateOfBirth, "dd/MM/yyyy")
+                  : "No date of birth yet"
+              }
               canEdit={true}
               onPress={openUsernameSheetDate}
             />
@@ -396,7 +402,7 @@ const ClientProfile = ({
                 await updateUser({
                   username: editInputValue,
                   email: profileData.email,
-                  dateOfBirth: profileData.dateOfBirth,
+                  dateOfBirth: profileData.dateOfBirth ?? undefined,
                   preferences: profileData.preferences,
                 });
                 setProfileData(prev => ({
@@ -416,7 +422,7 @@ const ClientProfile = ({
                 await updateUser({
                   username: editInputValue,
                   email: profileData.email,
-                  dateOfBirth: profileData.dateOfBirth,
+                  dateOfBirth: profileData.dateOfBirth ?? undefined,
                   preferences: profileData.preferences,
                 });
                 setProfileData(prev => ({
@@ -430,7 +436,7 @@ const ClientProfile = ({
           />
           <CustomBottomSheetDate
             bottomSheetRef={bottomSheetRefDate}
-            lastValue={profileData.dateOfBirth}
+            lastValue={profileData.dateOfBirth ?? new Date()}
             onSubmit={async (editInputValue: Date) => {
               try {
                 await updateUser({
@@ -458,7 +464,7 @@ const ClientProfile = ({
                   preferences: val,
                   username: profileData.username,
                   email: profileData.email,
-                  dateOfBirth: profileData.dateOfBirth,
+                  dateOfBirth: profileData.dateOfBirth ?? undefined,
                 });
                 setProfileData(prev => ({
                   ...prev,
