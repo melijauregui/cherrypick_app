@@ -10,7 +10,7 @@ const CreateAccountSchema = z.object({
       invalid_type_error: "Email must be a string",
     })
     .email("Invalid email format"),
-  dateString: z.string({ required_error: "Valid date is required" }),
+  dateString: z.string().nullable(),
   preferences: z
     .array(z.string().min(1), {
       required_error: "Preferences are required",
@@ -40,7 +40,7 @@ const UserSchemaRes = z.union([
     user: z.object({
       username: z.string(),
       email: z.string(),
-      dateOfBirth: z.coerce.date().nullable().optional(),
+      dateOfBirth: z.coerce.date().nullable(),
       preferences: z.array(z.string()),
     }),
   }),

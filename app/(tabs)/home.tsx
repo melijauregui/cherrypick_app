@@ -29,6 +29,7 @@ async function getClothingItems(
   limit: number,
   brand: string | undefined
 ): Promise<CatalogItemSchemaType[]> {
+  console.log("local ip", LOCAL_IP);
   try {
     const { data } = await safeFetch({
       url: `http://${LOCAL_IP}:3000/all?page=${page}&limit=${limit}`,

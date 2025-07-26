@@ -1,6 +1,7 @@
 import { Stack } from "expo-router";
-import React from "react";
+import React, { useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
+import { Linking } from "react-native";
 
 const AuthLayout = () => {
   return (

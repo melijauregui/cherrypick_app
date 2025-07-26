@@ -3,21 +3,11 @@ import React from "react";
 import { Tabs, router } from "expo-router";
 import { useAuth } from "@/context/AuthContext";
 import icons from "../../constants/icons";
+import { OnlyAuthenticated } from "@/lib/auth-client";
 
 const TabsLayout = () => {
-  const { userType, user, loading } = useAuth();
-
-  // Verificar que hay un usuario autenticado
-  if (loading) {
-    return null; // Mostrar loading o splash screen
-  }
-
-  if (!user) {
-    return null; // El AuthContext ya maneja la redirección
-  }
-
   return (
-    <>
+    <OnlyAuthenticated>
       <Tabs screenOptions={{ tabBarShowLabel: false }}>
         {Page({
           name: "home",
@@ -38,7 +28,7 @@ const TabsLayout = () => {
           iconName: "Profile",
         })}
       </Tabs>
-    </>
+    </OnlyAuthenticated>
   );
 };
 

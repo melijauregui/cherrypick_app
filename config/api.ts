@@ -1,4 +1,3 @@
-import Constants from 'expo-constants';
+import Constants from "expo-constants";
 
-export const LOCAL_IP = Constants.expoConfig?.hostUri?.split(':')[0];
-
+export const LOCAL_IP = "localhost";

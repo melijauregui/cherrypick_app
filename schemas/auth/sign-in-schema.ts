@@ -15,8 +15,7 @@ const queryDbSchemaUser = z.tuple([
         required_error: "Date is required",
         invalid_type_error: "Date must be date",
       })
-      .nullable()
-      .optional(),
+      .nullable(),
     preferences: z
       .array(z.string().min(1), {
         required_error: "Preferences are required",

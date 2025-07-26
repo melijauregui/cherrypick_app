@@ -67,19 +67,17 @@ export { CustomBottomSheet };
 function CustomBottomLogout({
   bottomSheetRef,
   logout,
-  loading,
   user,
 }: {
   bottomSheetRef: React.RefObject<BottomSheet>;
   logout: () => Promise<void>;
-  loading: boolean;
-  user: { email: string } | null;
+  user: { email: string };
 }) {
   const buttonsLogoutDelete = (
     <View className="flex flex-col justify-center items-center flex-1 px-5">
       <View className="flex flex-col px-[16px] bg-white rounded-2xl w-full py-2 gap-2">
         <LogOutButton logout={logout} />
-        <DeleteAccountButton user={user} loading={loading} logout={logout} />
+        <DeleteAccountButton user={user} logout={logout} />
       </View>
     </View>
   );
@@ -301,12 +299,16 @@ const RenderProfileItem = ({
   onPress?: () => void;
 }) => {
   return (
-    <View className="flex flex-row justify-between py-5 border-b-[0.5px] border-b-gray-500">
-      <Text className="text-xl text-white font-psemibold">{label}</Text>
-      <View className="flex flex-row ">
-        <Text className="text-xl text-white font-pmedium">{value}</Text>
+    <View className="flex flex-row py-5 border-b-[0.5px] border-b-gray-500 w-full ">
+      <View className="flex w-5/12">
+        <Text className="text-xl text-white font-pmedium">{label}</Text>
+      </View>
+      <View className="flex flex-row flex-1 justify-between">
+        <Text className="text-xl text-white font-pregular mr-2">
+          {value.length > 20 ? value.slice(0, 17) + "..." : value}
+        </Text>
         {canEdit && (
-          <TouchableOpacity className="ml-4" onPress={onPress}>
+          <TouchableOpacity onPress={onPress}>
             <Ionicons name="pencil-outline" size={18} color="#9297a1" />
           </TouchableOpacity>
         )}
@@ -376,7 +378,7 @@ const renderItem2 = ({ item }: { item: ItemData; index: number }) => {
           resizeMode="cover"
         />
       ) : null}
-      <Text className="mt-1 text-gray-400 font-psemibold">{item.title}</Text>
+      <Text className="mt-1 text-grey-lighter font-pregular">{item.title}</Text>
     </View>
   );
 };

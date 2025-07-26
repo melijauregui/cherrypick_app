@@ -27,19 +27,12 @@ const LogOutButton: React.FC<{ logout: () => Promise<void> }> = ({
 export default LogOutButton;
 
 const DeleteAccountButton: React.FC<{
-  user: { email: string } | null;
-  loading: boolean;
+  user: { email: string };
   logout: () => Promise<void>;
-}> = ({ user, loading, logout }) => {
+}> = ({ user, logout }) => {
   const router = useRouter();
 
   const handleDeleteAccount = async () => {
-    const token = await SecureStore.getItemAsync("accessToken");
-    if (loading || !user?.email) {
-      console.log("Still loading or no user:", { user, loading });
-      return;
-    }
-
     const { data } = await safeFetch({
       url: `http://${LOCAL_IP}:3000/delete-account`,
       method: "POST",

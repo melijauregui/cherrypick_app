@@ -48,6 +48,7 @@ const renderItem = ({
   const { width, height } = Dimensions.get("window");
 
   function handleOnpress(title: string) {
+    console.log("handleOnpress", title, "itemsSelected", itemsSelected);
     const updated = itemsSelected.includes(title)
       ? itemsSelected.filter(item => item !== title)
       : [...itemsSelected, title];
@@ -74,7 +75,7 @@ const renderItem = ({
       ) : null}
       <Text
         className={`mt-1 font-pregular ${
-          isSelected ? " text-black" : " text-gray-500"
+          isSelected ? " text-black" : " text-[#b7b8bb]"
         }`}
       >
         {item.title}

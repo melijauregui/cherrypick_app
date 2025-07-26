@@ -2,7 +2,7 @@ import { ImageSourcePropType } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { LOCAL_IP } from "@/config/api";
 import { TouchableOpacity, Text, Image } from "react-native";
 import safeFetch from "@/app/utils/safe-fetch";
@@ -10,17 +10,14 @@ import { Ionicons } from "@expo/vector-icons";
 import { format } from "date-fns";
 import images from "../../constants/images";
 import { View } from "react-native";
-import { useAuth } from "@/context/AuthContext";
 import {
   CreateAccountSchemaRes,
   UserSchemaRes,
 } from "@/schemas/auth/preferences-schema";
-import { UserInfo } from "@/context/AuthContext";
 import {
   CustomBottomSheet,
   CustomBottomSheetDate,
   CustomBottomSheetPreferences,
-  CustomBottomLogout,
 } from "@/app/components/profile/bottomSheets";
 import {
   RenderProfileItem,
@@ -40,44 +37,46 @@ import InsertNewItemsModal, {
 } from "../components/profile/insertNewItems";
 import Toast from "react-native-toast-message";
 import DeleteCatalogItemsModal from "../components/profile/DeleteCatalogItemsModal";
+import { authClient, useSession } from "@/lib/auth-client";
+import { router } from "expo-router";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { CustomBottomLogout } from "@/app/components/profile/bottomSheets";
+
+interface UserInfo {
+  email: string;
+  name: string;
+}
+export type { UserInfo };
 
 const Profile = () => {
-  const { user, loading, logout, userType } = useAuth();
+  const { user } = useSession();
+  const { signOut } = authClient;
 
-  return userType === "client" ? (
-    <ClientProfile user={user} loading={loading} logout={logout} />
-  ) : (
-    <BrandProfile user={user} loading={loading} logout={logout} />
-  );
-};
-export default Profile;
+  const logout = async () => {
+    signOut().then(() => {
+      router.replace("/sign-in");
+    });
+  };
 
-const fetchClientData = async (
-  setProfileData: (data: any) => void,
-  user: UserInfo
-) => {
-  try {
-    const { data } = await safeFetch({
-      url: `http://${LOCAL_IP}:3000/get-client?email=${user.email}`,
-      method: "GET",
-      schema: UserSchemaRes,
-    });
-    if (data.error) {
-      console.log("Error fetching user data1:", data.details);
-      return;
-    }
-    setProfileData({
-      username: data.user.username,
-      email: data.user.email,
-      preferences: data.user.preferences,
-      dateOfBirth: data.user.dateOfBirth
-        ? new Date(data.user.dateOfBirth)
-        : null,
-    });
-  } catch (error) {
-    console.error("Error fetching user data2:", error);
+  if (!user) {
+    console.log("No user found");
+    //TODO PUSH TOAST
+    return null;
+  }
+
+  const userType = user.userType;
+
+  if (userType === "client") {
+    return <ClientProfile user={user} logout={logout} />;
+  } else if (userType === "brand") {
+    return <BrandProfile user={user} logout={logout} />;
+  } else {
+    //TODO PUSH TOAST
+    console.log("No user type found");
+    return null;
   }
 };
+export default Profile;
 
 const fetchBrandData = async (
   setProfileData: (data: any) => void,
@@ -107,11 +106,9 @@ const fetchBrandData = async (
 
 const BrandProfile = ({
   user,
-  loading,
   logout,
 }: {
-  user: UserInfo | null;
-  loading: boolean;
+  user: UserInfo;
   logout: () => Promise<void>;
 }) => {
   const [profileData, setProfileData] = useState<BrandSchemaType | null>({
@@ -125,13 +122,7 @@ const BrandProfile = ({
   // Estado para mostrar descripción completa o cortada
   const [showFullDescription, setShowFullDescription] = useState(false);
 
-  React.useEffect(() => {
-    if (!user || !user.email) {
-      console.log("No user or email found");
-      return;
-    }
-    fetchBrandData(setProfileData, user);
-  }, [user]);
+  fetchBrandData(setProfileData, user);
 
   const bottomSheetRefLogout = useRef<BottomSheet>(null);
   const bottomSheetRefAddItem = useRef<BottomSheet>(null);
@@ -268,12 +259,11 @@ const BrandProfile = ({
             onDelete={() => {}}
           />
 
-          <CustomBottomLogout
+          {/* <CustomBottomLogout
             bottomSheetRef={bottomSheetRefLogout}
             logout={logout}
-            loading={loading}
             user={user}
-          />
+          /> */}
         </SafeAreaView>
       </SafeAreaProvider>
     </GestureHandlerRootView>
@@ -296,32 +286,13 @@ const DATA = Array.from(DATA_MAP.entries()).map(([title, image]) => ({
 
 const ClientProfile = ({
   user,
-  loading,
   logout,
 }: {
-  user: UserInfo | null;
-  loading: boolean;
+  user: UserInfo;
   logout: () => Promise<void>;
 }) => {
-  const [profileData, setProfileData] = useState<{
-    username: string;
-    email: string;
-    dateOfBirth: Date | null;
-    preferences: string[];
-  }>({
-    username: "",
-    email: "",
-    dateOfBirth: null,
-    preferences: [],
-  });
-
-  React.useEffect(() => {
-    if (!user || !user.email) {
-      console.log("No user or email found");
-      return;
-    }
-    fetchClientData(setProfileData, user);
-  }, [user]);
+  const data = useFetchUserProfile(user);
+  const mutateUser = useUpdateUser();
 
   const bottomSheetRef = useRef<BottomSheet>(null);
   const bottomSheetRefDate = useRef<BottomSheet>(null);
@@ -356,6 +327,12 @@ const ClientProfile = ({
     bottomSheetRefLogout.current?.snapToIndex(0);
   };
 
+  if (!data) {
+    //TODO PUSH TOAST
+    console.log("No data found");
+    return null;
+  }
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
@@ -366,20 +343,20 @@ const ClientProfile = ({
             />
             <RenderProfileItem
               label="Username"
-              value={profileData.username}
+              value={data.user.username}
               canEdit={true}
               onPress={openUsernameSheet}
             />
             <RenderProfileItem
               label="Email"
-              value={profileData.email}
+              value={data.user.email}
               canEdit={false}
             />
             <RenderProfileItem
               label="Date of Birth"
               value={
-                profileData.dateOfBirth
-                  ? format(profileData.dateOfBirth, "dd/MM/yyyy")
+                data.user.dateOfBirth
+                  ? format(data.user.dateOfBirth, "dd/MM/yyyy")
                   : "No date of birth yet"
               }
               canEdit={true}
@@ -388,7 +365,7 @@ const ClientProfile = ({
           </View>
           <RenderProfileItemPreferences
             label="Preferences"
-            value={profileData.preferences.map(item => ({
+            value={data.user.preferences.map(item => ({
               title: item,
               image: DATA_MAP.get(item) ?? images.bohoChicImage, // TODO !!
             }))}
@@ -396,89 +373,44 @@ const ClientProfile = ({
           />
           <CustomBottomSheet
             bottomSheetRef={bottomSheetRef}
-            lastValue={profileData.username}
+            lastValue={data.user.username}
             onSubmit={async (editInputValue: string) => {
-              try {
-                await updateUser({
-                  username: editInputValue,
-                  email: profileData.email,
-                  dateOfBirth: profileData.dateOfBirth ?? undefined,
-                  preferences: profileData.preferences,
-                });
-                setProfileData(prev => ({
-                  ...prev,
-                  username: editInputValue,
-                }));
-              } catch (error) {
-                console.error("Error updating username:", error);
-              }
-            }}
-          />
-          <CustomBottomSheet
-            bottomSheetRef={bottomSheetRef}
-            lastValue={profileData.username}
-            onSubmit={async (editInputValue: string) => {
-              try {
-                await updateUser({
-                  username: editInputValue,
-                  email: profileData.email,
-                  dateOfBirth: profileData.dateOfBirth ?? undefined,
-                  preferences: profileData.preferences,
-                });
-                setProfileData(prev => ({
-                  ...prev,
-                  username: editInputValue,
-                }));
-              } catch (error) {
-                console.error("Error updating username:", error);
-              }
+              mutateUser.mutate({
+                username: editInputValue,
+                email: data.user.email,
+                dateOfBirth: data.user.dateOfBirth,
+                preferences: data.user.preferences,
+              });
             }}
           />
           <CustomBottomSheetDate
             bottomSheetRef={bottomSheetRefDate}
-            lastValue={profileData.dateOfBirth ?? new Date()}
+            lastValue={data.user.dateOfBirth ?? new Date()}
             onSubmit={async (editInputValue: Date) => {
-              try {
-                await updateUser({
-                  dateOfBirth: editInputValue,
-                  username: profileData.username,
-                  email: profileData.email,
-                  preferences: profileData.preferences,
-                });
-                setProfileData(prev => ({
-                  ...prev,
-                  dateOfBirth: editInputValue,
-                }));
-              } catch (error) {
-                console.error("Error updating date of birth:", error);
-              }
+              mutateUser.mutate({
+                username: data.user.username,
+                email: data.user.email,
+                dateOfBirth: editInputValue,
+                preferences: data.user.preferences,
+              });
             }}
           />
           <CustomBottomSheetPreferences
             bottomSheetRef={bottomSheetRefPreferences}
-            lastValue={profileData.preferences}
+            lastValue={data.user.preferences}
             totalItems={DATA}
             onSubmit={async (val: string[]) => {
-              try {
-                await updateUser({
-                  preferences: val,
-                  username: profileData.username,
-                  email: profileData.email,
-                  dateOfBirth: profileData.dateOfBirth ?? undefined,
-                });
-                setProfileData(prev => ({
-                  ...prev,
-                  preferences: val,
-                }));
-              } catch (error) {
-                console.error("Error updating preferences:", error);
-              }
+              mutateUser.mutate({
+                username: data.user.username,
+                email: data.user.email,
+                dateOfBirth: data.user.dateOfBirth,
+                preferences: val,
+              });
             }}
           />
           <CustomBottomLogout
             bottomSheetRef={bottomSheetRefLogout}
             logout={logout}
-            loading={loading}
             user={user}
           />
           <Toast config={toastConfig} />
@@ -488,34 +420,92 @@ const ClientProfile = ({
   );
 };
 
-async function updateUser(data: {
-  username?: string;
-  email?: string;
-  dateOfBirth?: Date;
-  preferences?: string[];
-}) {
-  try {
-    const response = await safeFetch({
-      url: `http://${LOCAL_IP}:3000/update-client`,
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: data.username,
-        email: data.email,
-        dateString: data.dateOfBirth?.toISOString(),
-        preferences: data.preferences,
-      }),
-      schema: CreateAccountSchemaRes,
-    });
+// i will use vanilla react query to get the match events
+function useFetchUserProfile(user: UserInfo): {
+  user: {
+    username: string;
+    email: string;
+    preferences: string[];
+    dateOfBirth: Date | null;
+  };
+} | null {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["fetch-user-profile"],
+    queryFn: async () => {
+      try {
+        const { data } = await safeFetch({
+          url: `http://${LOCAL_IP}:3000/get-client?email=${user.email}`,
+          method: "GET",
+          schema: UserSchemaRes,
+        });
+        if (data.error) {
+          console.log("Error fetching user data1:", data.details);
+          return null;
+        }
+        return data;
+      } catch (error) {
+        console.error("Error fetching user data2:", error);
+        return null;
+      }
+    },
+  });
 
-    if (response.data.error) {
-      console.error("Error updating user:", response.data.details);
-      return;
-    }
-  } catch (error) {
-    console.error("Failed to update user:", error);
-    throw error;
+  if (isLoading) {
+    //TODO PUSH TOAST
+    console.log("Loading...");
+    return null;
   }
+  if (!data) {
+    //TODO PUSH TOAST
+    console.log("No data found", error);
+    return null;
+  }
+  return data;
+}
+
+function useUpdateUser() {
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: async (data: {
+      username: string;
+      email: string;
+      dateOfBirth: Date | null;
+      preferences: string[];
+    }) => {
+      try {
+        const response = await safeFetch({
+          url: `http://${LOCAL_IP}:3000/update-client`,
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: data.username,
+            email: data.email,
+            dateString: data.dateOfBirth?.toISOString() ?? null,
+            preferences: data.preferences,
+          }),
+          schema: CreateAccountSchemaRes,
+        });
+        if (response.data.error) {
+          console.error("Error updating user:", response.data.details);
+          return null;
+        }
+      } catch (error) {
+        console.error("Failed to update user:", error);
+        return null;
+      }
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: ["fetch-user-profile"],
+      });
+    },
+    onError: error => {
+      // TODO PUSH TOAST
+      console.log(`could not update user:`, error);
+    },
+  });
+
+  return mutation;
 }
 
 async function getClothingItems(

@@ -16,8 +16,6 @@ import {
   VerifyCodeSchema,
   VerifyCodeSchemaType,
 } from "../schemas/auth/code-verification-schema";
-const app = new OpenAPIHono();
-export default app;
 import {
   CreateAccountSchemaRes,
   CreateAccountSchemaResType,
@@ -37,12 +35,10 @@ import {
   DeleteFromCatalog,
 } from "./app/catalogFunctions";
 import {
-  csvFileUploadSchema,
   CatalogResponseSchema,
   CatalogResponseSchemaType,
   CatalogItemArraySchema,
   PaginationSchemaBrand,
-  deleteItemsSchema,
   CatalogResponseSchemaDelete,
   CatalogResponseSchemaDeleteType,
 } from "../schemas/catalog/catalog-schema";
@@ -74,6 +70,23 @@ import {
   jsonCatalogUploadSchema,
   deleteItemsJsonSchema,
 } from "../schemas/catalog/catalog-schema";
+import { auth } from "../lib/auth";
+
+const app = new OpenAPIHono();
+export default app;
+
+app.on(["POST", "GET"], "/api/auth/**", async c => {
+  const res = await auth.handler(c.req.raw);
+
+  // Log manual del header Location (si hay redirección)
+  const location = res.headers.get("location");
+  if (location) {
+    console.log("🚀 Redirigiendo a:", location);
+  } else {
+    console.log("✅ No hay redirección en esta request:", c.req.url);
+  }
+  return res;
+});
 
 // endpoint que verifica si un mail esta registrado en la base de datos
 const verifiedEmailRoute = createRoute({
@@ -257,7 +270,11 @@ app.openapi(createUserRoute, async c => {
   console.log("Creating client:", name, email, dateString, preferences);
 
   try {
-    res = await CreateUser(email, name, dateString, preferences);
+    let date = dateString;
+    if (dateString === "") {
+      date = null;
+    }
+    res = await CreateUser(email, name, date, preferences);
   } catch (err) {
     console.error(err);
     res = {
@@ -366,6 +383,7 @@ const updateClientRoute = createRoute({
 app.openapi(updateClientRoute, async c => {
   var { name, email, dateString, preferences } = c.req.valid("json");
   let res: CreateAccountSchemaResType;
+  console.log("Updating client:", name, email, dateString, preferences);
   try {
     res = await UpdateClient(email, name, dateString, preferences);
   } catch (error) {

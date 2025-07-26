@@ -51,7 +51,7 @@ export async function VerifyUserExists(
 export async function CreateUser(
   email: string,
   name: string,
-  dateString: string,
+  dateString: string | null,
   preferences: string[]
 ): Promise<CreateAccountSchemaResType> {
   let res: CreateAccountSchemaResType;
@@ -65,9 +65,11 @@ export async function CreateUser(
     return res;
   }
   let dateBirth: Date | null;
-  if (dateString === undefined || dateString === "") {
+  if (dateString === null) {
+    console.log("dateString is null");
     dateBirth = null;
   } else {
+    console.log("dateString is not null");
     dateBirth = new Date(dateString);
   }
 
@@ -148,7 +150,7 @@ export async function GetClient(email: string): Promise<UserSchemaResType> {
 export async function UpdateClient(
   email: string,
   name: string,
-  dateString: string,
+  dateString: string | null,
   preferences: string[]
 ): Promise<CreateAccountSchemaResType> {
   let res: CreateAccountSchemaResType;

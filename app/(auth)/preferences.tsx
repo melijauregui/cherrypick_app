@@ -17,19 +17,14 @@ import {
 } from "@/schemas/auth/preferences-schema";
 import safeFetch from "@/app/utils/safe-fetch";
 import { LOCAL_IP } from "@/config/api";
-import { useGoogleSignIn } from "@/hooks/useGoogleSignIn";
-import * as SecureStore from "expo-secure-store";
-import { useAuth } from "@/context/AuthContext";
+import { authClient } from "@/lib/auth-client";
 
 const Preferences = () => {
   const router = useRouter();
   const [preferences, setPreferences] = useState<string[]>([]);
   const { name, email, dateBirth } = useLocalSearchParams();
-  const { promptGoogleLogin, isReady } = useGoogleSignIn(() => {
-    console.log("Google sign-in successful going to home");
-    router.replace("/home");
-  });
-  const { setIsCreating } = useAuth();
+  const [selectedOne, setSelectedOne] = useState<boolean>(false);
+
   console.log(
     "Proceeding with name in preferences:",
     name,
@@ -61,38 +56,16 @@ const Preferences = () => {
         console.log(
           "Account created, checking if we need to sign in with Google"
         );
-
-        // Clear the creating state since account creation is complete
-        setIsCreating(false);
-
-        // Check if we already have a token
-        const existingToken = await SecureStore.getItemAsync("accessToken");
-
-        if (existingToken) {
-          console.log("Token already exists, redirecting to home");
-
-          router.push("/home");
-        } else {
-          console.log("No token found, signing in with Google");
-          if (isReady) {
-            await promptGoogleLogin();
-            console.log("Google sign-in successful");
-          } else {
-            console.log("Google sign-in not ready");
-            router.push("/sign-in");
-          }
-        }
-      } else {
-        console.log("Account creation failed");
-        router.push("/sign-in");
+        router.replace("/home");
       }
     } catch (error) {
       console.error("Error creating account:", error);
-      router.push("/sign-in");
+      //TODO PONER ALERT
+      router.replace("/sign-in");
     }
     console.log("Redirecting to home...");
   }
-  const [selectedOne, setSelectedOne] = useState<boolean>(false);
+
   return (
     <SafeAreaView className="bg-brown-strong flex-1 h-full w-full">
       <View className="flex flex-grow flex-col w-full justify-between px-14 pt-3">
@@ -101,7 +74,7 @@ const Preferences = () => {
           <Text className="text-white text-[27px] font-pbold pt-6">
             How would you describe your fashion style?
           </Text>
-          <Text className="text-gray-400 text-[15px] font-pregular pt-3">
+          <Text className="text-grey-lighter text-[15px] font-pregular pt-3">
             Pick at least 1 to customize your home feed.
           </Text>
           <SelectionList
@@ -183,7 +156,7 @@ const Item = ({
           resizeMode="cover"
         />
       ) : null}
-      <Text className="mt-1 text-gray-400 font-pregular">{item.title}</Text>
+      <Text className="mt-1 text-[#d7d7d7] font-pregular">{item.title}</Text>
     </TouchableOpacity>
   );
 };
@@ -198,6 +171,7 @@ const SelectionList = ({
   const [selectedIdxs, setSelectedIdxs] = useState<string[]>([]);
 
   function handleOnpress(title: string) {
+    console.log("handleOnpress", title);
     const updated = selectedIdxs.includes(title)
       ? selectedIdxs.filter(item => item !== title)
       : [...selectedIdxs, title];
@@ -286,14 +260,12 @@ async function createAccount(
     preferences
   );
   try {
-    console.log("Parsing request with Zod schema");
     const parsedReq = CreateAccountSchema.parse({
       name,
       email,
       dateString,
       preferences,
     });
-    console.log("Parsed request:", parsedReq);
     const { data } = await safeFetch({
       url: `http://${LOCAL_IP}:3000/create-account`,
       headers: {
@@ -313,6 +285,9 @@ async function createAccount(
       console.log("Error:", data.details);
       throw new Error(data.details);
     }
+    const dataClient = await authClient.updateUser({
+      new: false,
+    });
     console.log("Account created successfully:", data);
     return {
       success: true,

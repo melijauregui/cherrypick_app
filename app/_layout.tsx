@@ -2,13 +2,15 @@ import { Stack } from "expo-router";
 import { SplashScreen } from "expo-router";
 import { useFonts } from "expo-font";
 import { useEffect } from "react";
-import { AuthProvider } from "@/context/AuthContext";
-import AuthRedirect from "@/app/components/AuthRedirect";
 import Toast from "react-native-toast-message";
 import { toastConfig } from "./components/profile/insertNewItems";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 SplashScreen.preventAutoHideAsync();
 
+const queryClient = new QueryClient();
+
+// const queryClient = new QueryClient();
 const RootLayout = () => {
   const [fontsLoaded, error] = useFonts({
     "Poppins-Black": require("../assets/fonts/poppins/Poppins-Black.ttf"),
@@ -42,8 +44,7 @@ const RootLayout = () => {
   }
 
   return (
-    <AuthProvider>
-      <AuthRedirect />
+    <QueryClientProvider client={queryClient}>
       <Stack
         screenOptions={{
           animation: "fade",
@@ -69,7 +70,7 @@ const RootLayout = () => {
         />
       </Stack>
       <Toast config={toastConfig} />
-    </AuthProvider>
+    </QueryClientProvider>
   );
 };
 
