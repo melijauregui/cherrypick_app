@@ -1,18 +1,15 @@
 import { LOCAL_IP } from "@/config/api";
-import { useRouter } from "expo-router";
 import safeFetch from "@/app/utils/safe-fetch";
 import { VerifyAccountDeletedSchema } from "@/schemas/auth/sign-up-schema";
-import * as SecureStore from "expo-secure-store";
 import { TouchableOpacity, Text } from "react-native";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { authClient } from "@/lib/auth-client";
 
 const LogOutButton: React.FC<{ logout: () => Promise<void> }> = ({
   logout,
 }) => {
-  const router = useRouter();
-
   const handleLogout = async () => {
     await logout();
-    router.replace("/sign-in");
   };
 
   return (
@@ -30,33 +27,11 @@ const DeleteAccountButton: React.FC<{
   user: { email: string };
   logout: () => Promise<void>;
 }> = ({ user, logout }) => {
-  const router = useRouter();
-
-  const handleDeleteAccount = async () => {
-    const { data } = await safeFetch({
-      url: `http://${LOCAL_IP}:3000/delete-account`,
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email: user.email }),
-      schema: VerifyAccountDeletedSchema,
-    });
-
-    if ("success" in data && data.success) {
-      console.log("Account deleted successfully");
-      await logout();
-
-      router.replace("/sign-in");
-    } else if ("details" in data && data.details) {
-      console.log("Error:", data.details);
-    }
-  };
-
+  const mutateDeleteAccount = useDeleteAccount(logout);
   return (
     <TouchableOpacity
       className="flex flex-row bg-red-600 h-[50px] justify-center items-center rounded-full"
-      onPress={handleDeleteAccount}
+      onPress={() => mutateDeleteAccount.mutate(user.email)}
     >
       <Text className="text-white font-psemibold text-[15px]">
         Delete Account
@@ -65,3 +40,34 @@ const DeleteAccountButton: React.FC<{
   );
 };
 export { DeleteAccountButton };
+
+function useDeleteAccount(logout: () => Promise<void>) {
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: async (email: string) => {
+      const { data } = await safeFetch({
+        url: `http://${LOCAL_IP}:3000/delete-account`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: email }),
+        schema: VerifyAccountDeletedSchema,
+      });
+      if (data.error) {
+        throw new Error(data.details);
+      }
+    },
+    onSuccess: async () => {
+      await authClient.deleteUser();
+      console.log("Account deleted successfully");
+      await logout();
+    },
+    onError: error => {
+      // TODO PUSH TOAST
+      console.log(`could not update user:`, error);
+    },
+  });
+
+  return mutation;
+}

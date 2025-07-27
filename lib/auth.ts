@@ -35,12 +35,6 @@ export const auth = betterAuth({
     },
     deleteUser: {
       enabled: true,
-      sendDeleteAccountVerification: async ({ user, url, token }) => {
-        // Send delete account verification
-      },
-      afterDelete: async user => {
-        // Perform cleanup after user deletion
-      },
     },
   },
 });

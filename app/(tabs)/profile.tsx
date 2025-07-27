@@ -38,7 +38,6 @@ import InsertNewItemsModal, {
 import Toast from "react-native-toast-message";
 import DeleteCatalogItemsModal from "../components/profile/DeleteCatalogItemsModal";
 import { authClient, useSession } from "@/lib/auth-client";
-import { router } from "expo-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CustomBottomLogout } from "@/app/components/profile/bottomSheets";
 
@@ -53,9 +52,7 @@ const Profile = () => {
   const { signOut } = authClient;
 
   const logout = async () => {
-    signOut().then(() => {
-      router.replace("/sign-in");
-    });
+    signOut();
   };
 
   if (!user) {
@@ -472,27 +469,22 @@ function useUpdateUser() {
       dateOfBirth: Date | null;
       preferences: string[];
     }) => {
-      try {
-        const response = await safeFetch({
-          url: `http://${LOCAL_IP}:3000/update-client`,
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: data.username,
-            email: data.email,
-            dateString: data.dateOfBirth?.toISOString() ?? null,
-            preferences: data.preferences,
-          }),
-          schema: CreateAccountSchemaRes,
-        });
-        if (response.data.error) {
-          console.error("Error updating user:", response.data.details);
-          return null;
-        }
-      } catch (error) {
-        console.error("Failed to update user:", error);
-        return null;
+      const response = await safeFetch({
+        url: `http://${LOCAL_IP}:3000/update-client`,
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: data.username,
+          email: data.email,
+          dateString: data.dateOfBirth?.toISOString() ?? null,
+          preferences: data.preferences,
+        }),
+        schema: CreateAccountSchemaRes,
+      });
+      if (response.data.error) {
+        throw new Error(response.data.details);
       }
+      return response.data;
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({
