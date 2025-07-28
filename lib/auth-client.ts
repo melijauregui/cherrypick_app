@@ -50,7 +50,6 @@ export { useSession, signIn, signUp };
 
 export function OnlyAuthenticated({ children }: { children: React.ReactNode }) {
   const { status } = useSession();
-  console.log("status", status);
 
   if (status === "loading") return null;
 

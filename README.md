@@ -1,5 +1,5 @@
 # Run 
-- front:  npx expo start --clear   
+- front:  npx expo run:ios   
 - server: npx ts-node server/index.ts
 - database: (dentro de database) uvicorn server:app --reload
 - database: (dentro de database-users) docker compose up --build 

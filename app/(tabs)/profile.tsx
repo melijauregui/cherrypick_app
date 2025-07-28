@@ -414,7 +414,6 @@ function useFetchClientProfile(user: UserInfo): {
   });
 
   if (isLoading) {
-    console.log("Loading...");
     return null;
   }
   if (!data) {
@@ -520,7 +519,6 @@ function useFetchBrandProfile(user: UserInfo): {
   });
 
   if (isLoading) {
-    console.log("Loading...");
     return null;
   }
   if (!data) {

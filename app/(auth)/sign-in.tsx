@@ -11,7 +11,6 @@ const SignIn = () => {
   useEffect(() => {
     if (user && status === "authenticated") {
       if (user.new) {
-        console.log("User not found, creating client");
         const name = user?.name || "";
         const email = user?.email || "";
         if (!name || !email) {
@@ -122,8 +121,6 @@ const handlePress = async () => {
       errorCallbackURL: "cherrypick:///error",
       newUserCallbackURL: "cherrypick:///preferences",
     });
-
-    console.log("Google sign-in result:", result);
   } catch (error) {
     console.error("Error in Google sign-in:", error);
   }
