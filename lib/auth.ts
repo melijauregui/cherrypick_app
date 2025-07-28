@@ -1,6 +1,8 @@
 import { betterAuth } from "better-auth";
 import { createPool } from "mysql2/promise";
 import { expo } from "@better-auth/expo";
+import { createAuthMiddleware } from "better-auth/api";
+import { verifyEmail } from "../server/app/verifyEmail";
 
 console.log("BETTER_AUTH_URL", process.env.BETTER_AUTH_URL);
 export const auth = betterAuth({
@@ -30,11 +32,27 @@ export const auth = betterAuth({
       },
       userType: {
         type: "string",
-        values: ["client", "brand"],
       },
     },
     deleteUser: {
       enabled: true,
+    },
+  },
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user: {
+          email: string;
+          new?: boolean;
+          userType?: string;
+        }) => {
+          const res = await verifyEmail(user.email);
+          if (!res.error) {
+            return;
+          }
+          return { data: { ...user, new: false, userType: res.userType } };
+        },
+      },
     },
   },
 });

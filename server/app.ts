@@ -77,14 +77,6 @@ export default app;
 
 app.on(["POST", "GET"], "/api/auth/**", async c => {
   const res = await auth.handler(c.req.raw);
-
-  // Log manual del header Location (si hay redirección)
-  const location = res.headers.get("location");
-  if (location) {
-    console.log("🚀 Redirigiendo a:", location);
-  } else {
-    console.log("✅ No hay redirección en esta request:", c.req.url);
-  }
   return res;
 });
 
