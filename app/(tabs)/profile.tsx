@@ -463,32 +463,6 @@ function useUpdateClient() {
   return mutation;
 }
 
-// const fetchBrandData = async (
-//   setProfileData: (data: any) => void,
-//   user: UserInfo
-// ) => {
-//   try {
-//     const { data } = await safeFetch({
-//       url: `http://${LOCAL_IP}:3000/get-brand?email=${user.email}`,
-//       method: "GET",
-//       schema: BrandSchemaRes,
-//     });
-//     if (data.error) {
-//       console.log("Error fetching user data:", data.details);
-//       return;
-//     }
-//     setProfileData({
-//       name: data.brand.name,
-//       description: data.brand.description,
-//       email: data.brand.email,
-//       url: data.brand.url,
-//       logo_url: data.brand.logo_url,
-//     });
-//   } catch (error) {
-//     console.error("Error fetching user data:", error);
-//   }
-// };
-
 function useFetchBrandProfile(user: UserInfo): {
   brand: {
     name: string;

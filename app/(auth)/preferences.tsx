@@ -19,10 +19,10 @@ import safeFetch from "@/app/utils/safe-fetch";
 import { LOCAL_IP } from "@/config/api";
 import { authClient, useSession } from "@/lib/auth-client";
 import Toast from "react-native-toast-message";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const Preferences = () => {
-  const router = useRouter();
-  const { status } = useSession();
+  const createAccount = useCreateAccount();
   const [preferences, setPreferences] = useState<string[]>([]);
   const { name, email, dateBirth } = useLocalSearchParams();
   const [selectedOne, setSelectedOne] = useState<boolean>(false);
@@ -36,38 +36,12 @@ const Preferences = () => {
       console.log("Invalid parameters");
       return;
     }
-    try {
-      const { success } = await createAccount(
-        name,
-        email,
-        dateBirth,
-        preferences
-      );
-      if (success) {
-        if (status === "authenticated") {
-          console.log("User is authenticated, redirecting to home");
-          router.replace("/home");
-        } else {
-          console.log("User is not authenticated, redirecting to sign-in");
-          Toast.show({
-            type: "success",
-            text1:
-              "Account created successfully!\nPlease sign in with Google to continue.",
-            visibilityTime: 4000,
-          });
-          router.replace("/sign-in");
-        }
-      }
-    } catch (error) {
-      console.error("Error creating account:", error);
-      Toast.show({
-        type: "error",
-        text1: "Error creating account",
-        text2: "Please try again later.",
-        visibilityTime: 4000,
-      });
-      router.replace("/sign-in");
-    }
+    createAccount.mutate({
+      username: name,
+      email,
+      dateOfBirth: dateBirth,
+      preferences,
+    });
   }
 
   return (
@@ -247,57 +221,133 @@ const NextButton = ({
   );
 };
 
-async function createAccount(
-  name: string,
-  email: string,
-  dateString: string,
-  preferences: string[]
-): Promise<{ success: boolean }> {
-  console.log(
-    "Creating account with name:",
-    name,
-    "email:",
-    email,
-    "date:",
-    dateString,
-    "preferences:",
-    preferences
-  );
-  try {
-    CreateAccountSchema.parse({
-      name,
-      email,
-      dateString,
-      preferences,
-    });
-    const { data } = await safeFetch({
-      url: `http://${LOCAL_IP}:3000/create-account`,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name,
-        email,
-        dateString: dateString,
-        preferences,
-      }),
-      schema: CreateAccountSchemaRes,
-      method: "POST",
-    });
+function useCreateAccount() {
+  const router = useRouter();
+  const { status } = useSession();
+  const mutation = useMutation({
+    mutationFn: async (user: {
+      username: string;
+      email: string;
+      dateOfBirth: string;
+      preferences: string[];
+    }) => {
+      console.log(
+        "Creating account with name:",
+        user.username,
+        "email:",
+        user.email,
+        "date:",
+        user.dateOfBirth,
+        "preferences:",
+        user.preferences
+      );
+      CreateAccountSchema.parse({
+        name: user.username,
+        email: user.email,
+        dateString: user.dateOfBirth,
+        preferences: user.preferences,
+      });
+      const { data } = await safeFetch({
+        url: `http://${LOCAL_IP}:3000/create-account`,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: user.username,
+          email: user.email,
+          dateString: user.dateOfBirth,
+          preferences: user.preferences,
+        }),
+        schema: CreateAccountSchemaRes,
+        method: "POST",
+      });
+      if (data.error) {
+        throw new Error(data.details);
+      }
+    },
+    onSuccess: async () => {
+      await authClient.updateUser({
+        new: false,
+      });
+      if (status === "authenticated") {
+        router.replace("/home");
+      } else {
+        Toast.show({
+          type: "success",
+          text1:
+            "Account created successfully!\nPlease sign in with Google to continue.",
+          visibilityTime: 4000,
+        });
+        router.replace("/sign-in");
+      }
+    },
+    onError: error => {
+      // TODO PUSH TOAST
+      console.error("Error creating account:", error);
+      Toast.show({
+        type: "error",
+        text1: "Error creating account",
+        text2: "Please try again later.",
+        visibilityTime: 4000,
+      });
+      router.replace("/sign-in");
+    },
+  });
 
-    if (data.error) {
-      throw new Error(data.details);
-    }
-    await authClient.updateUser({
-      new: false,
-    });
-    return {
-      success: true,
-    };
-  } catch (error: unknown) {
-    console.error("Error creating account:", error);
-    return {
-      success: false,
-    };
-  }
+  return mutation;
 }
+
+// async function createAccount(
+//   name: string,
+//   email: string,
+//   dateString: string,
+//   preferences: string[]
+// ): Promise<{ success: boolean }> {
+//   console.log(
+//     "Creating account with name:",
+//     name,
+//     "email:",
+//     email,
+//     "date:",
+//     dateString,
+//     "preferences:",
+//     preferences
+//   );
+//   try {
+//     CreateAccountSchema.parse({
+//       name,
+//       email,
+//       dateString,
+//       preferences,
+//     });
+//     const { data } = await safeFetch({
+//       url: `http://${LOCAL_IP}:3000/create-account`,
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify({
+//         name,
+//         email,
+//         dateString: dateString,
+//         preferences,
+//       }),
+//       schema: CreateAccountSchemaRes,
+//       method: "POST",
+//     });
+
+//     if (data.error) {
+//       throw new Error(data.details);
+//     }
+//     await authClient.updateUser({
+//       new: false,
+//     });
+//     return {
+//       success: true,
+//     };
+//   } catch (error: unknown) {
+//     console.error("Error creating account:", error);
+//     return {
+//       success: false,
+//     };
+//   }
+// }
