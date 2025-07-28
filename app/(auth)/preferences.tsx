@@ -282,7 +282,6 @@ function useCreateAccount() {
       }
     },
     onError: error => {
-      // TODO PUSH TOAST
       console.error("Error creating account:", error);
       Toast.show({
         type: "error",
@@ -296,58 +295,3 @@ function useCreateAccount() {
 
   return mutation;
 }
-
-// async function createAccount(
-//   name: string,
-//   email: string,
-//   dateString: string,
-//   preferences: string[]
-// ): Promise<{ success: boolean }> {
-//   console.log(
-//     "Creating account with name:",
-//     name,
-//     "email:",
-//     email,
-//     "date:",
-//     dateString,
-//     "preferences:",
-//     preferences
-//   );
-//   try {
-//     CreateAccountSchema.parse({
-//       name,
-//       email,
-//       dateString,
-//       preferences,
-//     });
-//     const { data } = await safeFetch({
-//       url: `http://${LOCAL_IP}:3000/create-account`,
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//       body: JSON.stringify({
-//         name,
-//         email,
-//         dateString: dateString,
-//         preferences,
-//       }),
-//       schema: CreateAccountSchemaRes,
-//       method: "POST",
-//     });
-
-//     if (data.error) {
-//       throw new Error(data.details);
-//     }
-//     await authClient.updateUser({
-//       new: false,
-//     });
-//     return {
-//       success: true,
-//     };
-//   } catch (error: unknown) {
-//     console.error("Error creating account:", error);
-//     return {
-//       success: false,
-//     };
-//   }
-// }

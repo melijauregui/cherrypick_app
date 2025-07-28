@@ -12,30 +12,17 @@ import safeFetch from "@/app/utils/safe-fetch";
 import { ResCodeVerificationPostSchema } from "@/schemas/auth/sign-up-schema";
 import { useRouter } from "expo-router";
 import { LOCAL_IP } from "../../config/api";
+import { useMutation } from "@tanstack/react-query";
+import Toast from "react-native-toast-message";
 
 const SignUpBrand = () => {
-  const router = useRouter();
   const [email, setEmail] = useState<string>("");
   const [emailError, setEmailError] = useState<string | undefined>(undefined);
-  const [success, setSuccess] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const codeVerification = useCodeVerification(setEmailError, setLoading);
 
   async function handleSend() {
-    setEmailError(undefined);
-    setLoading(true);
-    try {
-      await postCodeVerification({ email: email.toLowerCase() });
-      setSuccess(true);
-      router.replace("/sign-in");
-    } catch (error) {
-      if (error instanceof Error) {
-        setEmailError(error.message);
-      } else {
-        setEmailError("Unexpected error occurred");
-      }
-    } finally {
-      setLoading(false);
-    }
+    codeVerification.mutate({ email: email.toLowerCase() });
   }
 
   return (
@@ -50,9 +37,9 @@ const SignUpBrand = () => {
             <Text className="text-white text-[27px] font-pbold pt-6 text-center">
               Brand Verification
             </Text>
-            <Text className="text-white text-[16px] pt-4 pb-8 text-center">
-              Ingresá tu email. Te enviaremos un formulario para que puedas
-              verificar tu identidad tanto jurídica como física.
+            <Text className="text-white text-xl pt-10 pb-8 text-center">
+              Ingresá el email de tu marca. Te enviaremos un formulario para que
+              puedas verificar tu identidad tanto jurídica como física.
             </Text>
             <Input
               type="email-address"
@@ -123,7 +110,7 @@ const Input = ({
 }) => (
   <View className="flex flex-col">
     <TextInput
-      className="text-[16px] h-[50px] border-b border-gray-500 text-white"
+      className="text-xl h-[50px] border-b border-gray-500 text-white"
       placeholder={placeholder}
       placeholderTextColor="#6b7280"
       value={value}
@@ -136,25 +123,45 @@ const Input = ({
   </View>
 );
 
-async function postCodeVerification({ email }: { email: string }) {
-  try {
-    const { data } = await safeFetch({
-      url: `http://${LOCAL_IP}:3000/send-form-brand`,
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email }),
-      schema: ResCodeVerificationPostSchema,
-    });
-    if (data.error) {
-      throw new Error(data.details);
-    }
-  } catch (error) {
-    if (error instanceof Error) {
-      throw error;
-    } else {
-      throw new Error("Unexpected error");
-    }
-  }
+function useCodeVerification(
+  setEmailError: (error: string | undefined) => void,
+  setLoading: (loading: boolean) => void
+) {
+  const router = useRouter();
+  const mutation = useMutation({
+    mutationFn: async (user: { email: string }) => {
+      setEmailError(undefined);
+      setLoading(true);
+      const { data } = await safeFetch({
+        url: `http://${LOCAL_IP}:3000/send-form-brand`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: user.email }),
+        schema: ResCodeVerificationPostSchema,
+      });
+      if (data.error) {
+        throw new Error(data.details);
+      }
+    },
+    onSuccess: async () => {
+      Toast.show({
+        type: "success",
+        text1: "Email sent successfully!\nPlease check your email to continue.",
+        visibilityTime: 4000,
+      });
+      router.replace("/sign-in");
+    },
+    onError: error => {
+      setEmailError(
+        error instanceof Error ? error.message : "Unexpected error"
+      );
+    },
+    onSettled: () => {
+      setLoading(false);
+    },
+  });
+
+  return mutation;
 }
