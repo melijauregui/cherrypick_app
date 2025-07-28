@@ -118,6 +118,7 @@ app.openapi(verifiedEmailRoute, async c => {
     res = {
       error: true,
       details: "Error querying the database",
+      userType: null,
     };
   }
   return c.json(res, 200);

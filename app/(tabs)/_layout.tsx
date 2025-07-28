@@ -1,7 +1,6 @@
 import { View, Image, ImageSourcePropType } from "react-native";
 import React from "react";
 import { Tabs, router } from "expo-router";
-import { useAuth } from "@/context/AuthContext";
 import icons from "../../constants/icons";
 import { OnlyAuthenticated } from "@/lib/auth-client";
 

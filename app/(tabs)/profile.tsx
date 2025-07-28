@@ -417,7 +417,6 @@ const ClientProfile = ({
   );
 };
 
-// i will use vanilla react query to get the match events
 function useFetchUserProfile(user: UserInfo): {
   user: {
     username: string;
@@ -448,12 +447,10 @@ function useFetchUserProfile(user: UserInfo): {
   });
 
   if (isLoading) {
-    //TODO PUSH TOAST
     console.log("Loading...");
     return null;
   }
   if (!data) {
-    //TODO PUSH TOAST
     console.log("No data found", error);
     return null;
   }

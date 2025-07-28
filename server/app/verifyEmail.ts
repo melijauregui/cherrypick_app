@@ -31,14 +31,16 @@ async function verifyEmail(
     } else {
       res = {
         error: true,
-        details: "Email already registered as brand",
+        details: null,
+        userType: "brand",
       };
     }
   } else {
     // Email ya registrado
     res = {
       error: true,
-      details: "Email already registered as client",
+      details: null,
+      userType: "client",
     };
   }
   return res;
