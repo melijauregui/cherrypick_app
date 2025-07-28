@@ -17,26 +17,17 @@ import {
 } from "@/schemas/auth/preferences-schema";
 import safeFetch from "@/app/utils/safe-fetch";
 import { LOCAL_IP } from "@/config/api";
-import { authClient } from "@/lib/auth-client";
+import { authClient, useSession } from "@/lib/auth-client";
+import Toast from "react-native-toast-message";
 
 const Preferences = () => {
   const router = useRouter();
+  const { status } = useSession();
   const [preferences, setPreferences] = useState<string[]>([]);
   const { name, email, dateBirth } = useLocalSearchParams();
   const [selectedOne, setSelectedOne] = useState<boolean>(false);
 
-  console.log(
-    "Proceeding with name in preferences:",
-    name,
-    "and email:",
-    email,
-    "and date:",
-    dateBirth,
-    "and preferences:",
-    preferences
-  );
   async function handleSubmit() {
-    console.log("Creating an account");
     if (
       typeof name !== "string" ||
       typeof email !== "string" ||
@@ -53,17 +44,30 @@ const Preferences = () => {
         preferences
       );
       if (success) {
-        console.log(
-          "Account created, checking if we need to sign in with Google"
-        );
-        router.replace("/home");
+        if (status === "authenticated") {
+          console.log("User is authenticated, redirecting to home");
+          router.replace("/home");
+        } else {
+          console.log("User is not authenticated, redirecting to sign-in");
+          Toast.show({
+            type: "success",
+            text1:
+              "Account created successfully!\nPlease sign in with Google to continue.",
+            visibilityTime: 4000,
+          });
+          router.replace("/sign-in");
+        }
       }
     } catch (error) {
       console.error("Error creating account:", error);
-      //TODO PONER ALERT
+      Toast.show({
+        type: "error",
+        text1: "Error creating account",
+        text2: "Please try again later.",
+        visibilityTime: 4000,
+      });
       router.replace("/sign-in");
     }
-    console.log("Redirecting to home...");
   }
 
   return (
@@ -260,7 +264,7 @@ async function createAccount(
     preferences
   );
   try {
-    const parsedReq = CreateAccountSchema.parse({
+    CreateAccountSchema.parse({
       name,
       email,
       dateString,
@@ -282,23 +286,18 @@ async function createAccount(
     });
 
     if (data.error) {
-      console.log("Error:", data.details);
       throw new Error(data.details);
     }
-    const dataClient = await authClient.updateUser({
+    await authClient.updateUser({
       new: false,
     });
-    console.log("Account created successfully:", data);
     return {
       success: true,
     };
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error("Error:", error.message);
-      throw error;
-    } else {
-      console.error("Unexpected error:", error);
-      throw new Error("Unexpected error");
-    }
+    console.error("Error creating account:", error);
+    return {
+      success: false,
+    };
   }
 }
