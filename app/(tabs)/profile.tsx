@@ -75,32 +75,6 @@ const Profile = () => {
 };
 export default Profile;
 
-const fetchBrandData = async (
-  setProfileData: (data: any) => void,
-  user: UserInfo
-) => {
-  try {
-    const { data } = await safeFetch({
-      url: `http://${LOCAL_IP}:3000/get-brand?email=${user.email}`,
-      method: "GET",
-      schema: BrandSchemaRes,
-    });
-    if (data.error) {
-      console.log("Error fetching user data:", data.details);
-      return;
-    }
-    setProfileData({
-      name: data.brand.name,
-      description: data.brand.description,
-      email: data.brand.email,
-      url: data.brand.url,
-      logo_url: data.brand.logo_url,
-    });
-  } catch (error) {
-    console.error("Error fetching user data:", error);
-  }
-};
-
 const BrandProfile = ({
   user,
   logout,
@@ -108,18 +82,8 @@ const BrandProfile = ({
   user: UserInfo;
   logout: () => Promise<void>;
 }) => {
-  const [profileData, setProfileData] = useState<BrandSchemaType | null>({
-    name: "",
-    description: "",
-    email: "",
-    url: "",
-    logo_url: "",
-  });
-
-  // Estado para mostrar descripción completa o cortada
   const [showFullDescription, setShowFullDescription] = useState(false);
-
-  fetchBrandData(setProfileData, user);
+  const data = useFetchBrandProfile(user);
 
   const bottomSheetRefLogout = useRef<BottomSheet>(null);
   const bottomSheetRefAddItem = useRef<BottomSheet>(null);
@@ -140,8 +104,12 @@ const BrandProfile = ({
     bottomSheetRefAddItem.current?.close();
     bottomSheetRefDeleteItem.current?.snapToIndex(0);
   };
+  if (!data) {
+    console.log("No data found");
+    return null;
+  }
 
-  const description = profileData?.description || "";
+  const description = data.brand.description || "";
   const isLongDescription = description.length > 80;
   const maxTotalLength = 80;
   const lines =
@@ -158,17 +126,17 @@ const BrandProfile = ({
         <SafeAreaView className="bg-brown-strong w-full flex-1 ">
           <View className="flex flex-col w-full px-10 ">
             <View className="flex flex-row  w-full py-4 gap-5">
-              {profileData?.logo_url ? (
+              {data.brand.logo_url ? (
                 <Image
                   source={{
-                    uri: profileData?.logo_url,
+                    uri: data.brand.logo_url,
                   }}
                   className="w-32 h-32 rounded-full"
                   resizeMode="contain"
                 />
               ) : null}
               <Text className="text-right text-white font-plight text-3xl pt-10">
-                {profileData?.name}
+                {data.brand.name}
               </Text>
               <View className="flex flex-row pt-10">
                 <TouchableOpacity onPress={openUsernameSheetLogout}>
@@ -185,12 +153,12 @@ const BrandProfile = ({
               />
               <TouchableOpacity
                 onPress={() =>
-                  profileData?.url && Linking.openURL(profileData.url)
+                  data.brand.url && Linking.openURL(data.brand.url)
                 }
                 activeOpacity={1}
               >
                 <Text className="text-lg font-plight text-start text-sky-500">
-                  {profileData?.url}
+                  {data.brand.url}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -238,7 +206,7 @@ const BrandProfile = ({
             </View>
           </View>
           <ListItems
-            profileData={profileData}
+            profileData={data.brand}
             getClothingItems={getClothingItems}
             limit={100}
             columnCount={3}
@@ -247,20 +215,20 @@ const BrandProfile = ({
           <InsertNewItemsModal
             bottomSheetRef={bottomSheetRefAddItem}
             onSubmit={handleSubmitAddItem}
-            brand={profileData?.name || ""}
+            brand={data.brand.name}
           />
 
           <DeleteCatalogItemsModal
             bottomSheetRef={bottomSheetRefDeleteItem}
-            brand={profileData?.name || ""}
+            brand={data.brand.name}
             onDelete={() => {}}
           />
 
-          {/* <CustomBottomLogout
+          <CustomBottomLogout
             bottomSheetRef={bottomSheetRefLogout}
             logout={logout}
             user={user}
-          /> */}
+          />
         </SafeAreaView>
       </SafeAreaProvider>
     </GestureHandlerRootView>
@@ -288,8 +256,8 @@ const ClientProfile = ({
   user: UserInfo;
   logout: () => Promise<void>;
 }) => {
-  const data = useFetchUserProfile(user);
-  const mutateUser = useUpdateUser();
+  const data = useFetchClientProfile(user);
+  const mutateUser = useUpdateClient();
 
   const bottomSheetRef = useRef<BottomSheet>(null);
   const bottomSheetRefDate = useRef<BottomSheet>(null);
@@ -417,7 +385,7 @@ const ClientProfile = ({
   );
 };
 
-function useFetchUserProfile(user: UserInfo): {
+function useFetchClientProfile(user: UserInfo): {
   user: {
     username: string;
     email: string;
@@ -426,7 +394,7 @@ function useFetchUserProfile(user: UserInfo): {
   };
 } | null {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["fetch-user-profile"],
+    queryKey: ["fetch-client-profile"],
     queryFn: async () => {
       try {
         const { data } = await safeFetch({
@@ -435,8 +403,7 @@ function useFetchUserProfile(user: UserInfo): {
           schema: UserSchemaRes,
         });
         if (data.error) {
-          console.log("Error fetching user data1:", data.details);
-          return null;
+          throw new Error(data.details);
         }
         return data;
       } catch (error) {
@@ -457,7 +424,7 @@ function useFetchUserProfile(user: UserInfo): {
   return data;
 }
 
-function useUpdateUser() {
+function useUpdateClient() {
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: async (data: {
@@ -485,7 +452,7 @@ function useUpdateUser() {
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({
-        queryKey: ["fetch-user-profile"],
+        queryKey: ["fetch-client-profile"],
       });
     },
     onError: error => {
@@ -495,6 +462,72 @@ function useUpdateUser() {
   });
 
   return mutation;
+}
+
+// const fetchBrandData = async (
+//   setProfileData: (data: any) => void,
+//   user: UserInfo
+// ) => {
+//   try {
+//     const { data } = await safeFetch({
+//       url: `http://${LOCAL_IP}:3000/get-brand?email=${user.email}`,
+//       method: "GET",
+//       schema: BrandSchemaRes,
+//     });
+//     if (data.error) {
+//       console.log("Error fetching user data:", data.details);
+//       return;
+//     }
+//     setProfileData({
+//       name: data.brand.name,
+//       description: data.brand.description,
+//       email: data.brand.email,
+//       url: data.brand.url,
+//       logo_url: data.brand.logo_url,
+//     });
+//   } catch (error) {
+//     console.error("Error fetching user data:", error);
+//   }
+// };
+
+function useFetchBrandProfile(user: UserInfo): {
+  brand: {
+    name: string;
+    description: string;
+    email: string;
+    url: string;
+    logo_url: string;
+  };
+} | null {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["fetch-brand-profile"],
+    queryFn: async () => {
+      try {
+        const { data } = await safeFetch({
+          url: `http://${LOCAL_IP}:3000/get-brand?email=${user.email}`,
+          method: "GET",
+          schema: BrandSchemaRes,
+        });
+        if (data.error) {
+          throw new Error(data.details);
+        }
+        return data;
+      } catch (error) {
+        console.error("Error fetching user data2:", error);
+        return null;
+      }
+    },
+  });
+
+  if (isLoading) {
+    console.log("Loading...");
+    return null;
+  }
+  if (!data) {
+    console.log("No data found", error);
+    return null;
+  }
+  return data;
 }
 
 async function getClothingItems(
