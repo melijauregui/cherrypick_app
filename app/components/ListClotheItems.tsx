@@ -1,9 +1,10 @@
 import { CatalogItemSchemaType } from "@/schemas/catalog/catalog-schema";
 import ClothingItemComponent from "@/app/components/ClothingItemComponent";
 import { MasonryFlashList } from "@shopify/flash-list";
-import { useEffect, useState } from "react";
 import { BrandSchemaType } from "@/schemas/auth/brand-schema";
 import { RefreshControl } from "react-native";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 
 const ListItems = ({
   profileData,
@@ -20,42 +21,48 @@ const ListItems = ({
   limit: number;
   columnCount: number;
 }) => {
-  const [clothingItems, setClothingItems] = useState<CatalogItemSchemaType[]>(
-    []
-  );
-  const [page, setPage] = useState(0);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  useEffect(() => {
-    fetchClothingItems(
-      page,
-      profileData,
-      setClothingItems,
-      setIsLoadingMore,
-      setHasMore,
-      limit,
-      getClothingItems
+  const { data, fetchNextPage, refetch, isRefetching } = useInfiniteQuery({
+    queryKey: ["clothing-items", profileData],
+    queryFn: ({ pageParam }) =>
+      getClothingItems(pageParam, limit, profileData?.name),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
+      if (lastPage.length === 0) {
+        return undefined;
+      }
+      return lastPageParam + 1;
+    },
+  });
+  const queryClient = useQueryClient();
+  const resetInfiniteQueryPagination = () => {
+    return queryClient.setQueryData(
+      ["clothing-items", profileData],
+      (oldData: any) => {
+        if (!oldData) return undefined;
+
+        return {
+          ...oldData,
+          pages: [],
+          pageParams: [],
+        };
+      }
     );
-  }, [page, profileData]);
-  const [refreshing, setRefreshing] = useState(false);
-  const onRefresh = () => {
-    setRefreshing(true);
-    setPage(0);
-    fetchClothingItems(
-      page,
-      profileData,
-      setClothingItems,
-      setIsLoadingMore,
-      setHasMore,
-      limit,
-      getClothingItems
-    );
-    setRefreshing(false);
   };
+
+  const onRefresh = async () => {
+    await resetInfiniteQueryPagination();
+    await refetch();
+    setRefreshKey(k => k + 1); // 🔁 fuerza re-layout
+  };
+
+  if (!data) return null;
+
   return (
     <MasonryFlashList
-      data={clothingItems}
+      extraData={refreshKey} // 👈 fuerza que el layout se recalibre
+      data={data.pages.flat()}
       numColumns={columnCount}
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ paddingVertical: 10 }}
@@ -72,69 +79,19 @@ const ListItems = ({
           numColumns={columnCount}
         />
       )}
-      onEndReached={() =>
-        handleLoadMore(isLoadingMore, hasMore, profileData, page, setPage)
-      }
+      onEndReached={() => fetchNextPage()}
       onEndReachedThreshold={0.1}
       estimatedItemSize={280}
       refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        <RefreshControl
+          refreshing={isRefetching}
+          onRefresh={onRefresh}
+          tintColor="#ffffff"
+          colors={["#ffffff"]}
+        />
       }
     />
   );
 };
 
 export default ListItems;
-
-const fetchClothingItems = async (
-  pageToFetch: number,
-  profileData: BrandSchemaType | null,
-  setClothingItems: React.Dispatch<
-    React.SetStateAction<CatalogItemSchemaType[]>
-  >,
-  setIsLoadingMore: (isLoading: boolean) => void,
-  setHasMore: (hasMore: boolean) => void,
-  limit: number,
-  getClothingItems: (
-    page: number,
-    limit: number,
-    brandName: string | undefined
-  ) => Promise<CatalogItemSchemaType[]>
-) => {
-  if (profileData !== null && !profileData.name) {
-    console.log("No brand name found yet");
-    return;
-  }
-
-  setIsLoadingMore(true);
-  const items = await getClothingItems(pageToFetch, limit, profileData?.name);
-
-  if (items.length === 0) {
-    console.log("No more items");
-    setHasMore(false);
-    setIsLoadingMore(false);
-    return;
-  }
-
-  if (pageToFetch === 0) {
-    console.log("Setting items to first page");
-    setClothingItems(items);
-  } else {
-    console.log("Adding items to existing list with page", pageToFetch);
-    setClothingItems((prev: CatalogItemSchemaType[]) => [...prev, ...items]);
-  }
-  setIsLoadingMore(false);
-};
-
-const handleLoadMore = (
-  isLoadingMore: boolean,
-  hasMore: boolean,
-  profileData: BrandSchemaType | null,
-  page: number,
-  setPage: React.Dispatch<React.SetStateAction<number>>
-) => {
-  if ((profileData !== null && !profileData.name) || isLoadingMore || !hasMore)
-    return;
-  console.log("Page", page);
-  setPage(prev => prev + 1);
-};

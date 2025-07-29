@@ -35,16 +35,12 @@ const CodeVerification = () => {
   }>();
 
   const { name, email, dateBirth } = params;
-
-  // const name = "meli";
-  // const email = "m@fi.uba.ar";
-  // const dateBirth = "2023-10-10";
   if (
     typeof name !== "string" ||
     typeof email !== "string" ||
     typeof dateBirth !== "string"
   ) {
-    // console.error("Missing or invalid parameters in CodeVerification:", params);
+    console.error("Missing or invalid parameters in CodeVerification:", params);
     router.replace("/sign-up");
     return null;
   }
