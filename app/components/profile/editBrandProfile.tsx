@@ -143,3 +143,4 @@ const InputBoxWithName = ({
     </View>
   );
 };
+export { InputBoxWithName };

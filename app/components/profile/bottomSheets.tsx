@@ -12,6 +12,7 @@ import { View, Image } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import CarouselWithFlatList from "./carousel";
 import LogOutButton, { DeleteAccountButton } from "./buttons";
+import { InputBoxWithName } from "./editBrandProfile";
 
 type ItemData = {
   title: string;
@@ -38,17 +39,15 @@ function CustomBottomSheet({
 
   const userNameInput = (
     <View className="flex flex-col justify-center items-center px-5 py-4">
-      <View className="flex flex-col  px-[16px] bg-white rounded-2xl border-[2px] border-gray-300 w-full">
-        <Text className="text-black font-pregular">username</Text>
-        <BottomSheetTextInput
-          className=" text-black font-plight text-[16px] p-1"
-          value={editInputValue}
-          onChangeText={setEditInputValue}
-          placeholder={lastValue}
-          placeholderTextColor="#666"
-          selectionColor="#3478F6"
-        />
-      </View>
+      <InputBoxWithName
+        name="username"
+        value={editInputValue}
+        setValue={setEditInputValue}
+        lastValue={editInputValue}
+        isScrollable={false}
+        placeholder="Escribe tu username"
+        length={25}
+      />
     </View>
   );
   return (
