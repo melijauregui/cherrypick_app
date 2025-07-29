@@ -31,15 +31,15 @@ import {
   CatalogItemSchemaType,
 } from "@/schemas/catalog/catalog-schema";
 import ListItems from "@/app/components/ListClotheItems";
-import splitDescriptionByLinesOrWords from "@/app/components/profile/descriptionBrand";
-import InsertNewItemsModal, {
-  toastConfig,
-} from "../components/profile/insertNewItems";
-import Toast from "react-native-toast-message";
+import splitDescriptionByLinesOrWords, {
+  AddAndDeleteItems,
+} from "@/app/components/profile/brandComponents";
+import InsertNewItemsModal from "../components/profile/insertNewItems";
 import DeleteCatalogItemsModal from "../components/profile/DeleteCatalogItemsModal";
 import { authClient, useSession } from "@/lib/auth-client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CustomBottomLogout } from "@/app/components/profile/bottomSheets";
+import EditBrandProfile from "../components/profile/editBrandProfile";
 
 interface UserInfo {
   email: string;
@@ -83,27 +83,40 @@ const BrandProfile = ({
   logout: () => Promise<void>;
 }) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const mutateBrand = useUpdateBrand(user.email);
   const data = useFetchBrandProfile(user);
 
   const bottomSheetRefLogout = useRef<BottomSheet>(null);
   const bottomSheetRefAddItem = useRef<BottomSheet>(null);
   const bottomSheetRefDeleteItem = useRef<BottomSheet>(null);
+  const bottomSheetRefEdit = useRef<BottomSheet>(null);
   const openUsernameSheetLogout = () => {
     bottomSheetRefAddItem.current?.close();
     bottomSheetRefDeleteItem.current?.close();
+    bottomSheetRefEdit.current?.close();
     bottomSheetRefLogout.current?.snapToIndex(0);
   };
   const openUsernameSheetAddItem = () => {
     bottomSheetRefLogout.current?.close();
     bottomSheetRefDeleteItem.current?.close();
+    bottomSheetRefEdit.current?.close();
     bottomSheetRefAddItem.current?.snapToIndex(0);
   };
 
   const openUsernameSheetDeleteItem = () => {
     bottomSheetRefLogout.current?.close();
     bottomSheetRefAddItem.current?.close();
+    bottomSheetRefEdit.current?.close();
     bottomSheetRefDeleteItem.current?.snapToIndex(0);
   };
+
+  const openUsernameSheetEdit = () => {
+    bottomSheetRefLogout.current?.close();
+    bottomSheetRefAddItem.current?.close();
+    bottomSheetRefDeleteItem.current?.close();
+    bottomSheetRefEdit.current?.snapToIndex(0);
+  };
+
   if (!data) {
     console.log("No data found");
     return null;
@@ -180,30 +193,11 @@ const BrandProfile = ({
               )}
             </View>
 
-            <View className="flex flex-row w-full gap-4 py-4">
-              <TouchableOpacity
-                onPress={openUsernameSheetAddItem}
-                style={{
-                  backgroundColor: "rgba(107, 114, 128, 0.5)",
-                }}
-                className="flex-1 px-0 py-2 rounded-xl items-center"
-              >
-                <Text className="text-white text-base font-semibold">
-                  Agregar Item
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={openUsernameSheetDeleteItem}
-                style={{
-                  backgroundColor: "rgba(107, 114, 128, 0.5)",
-                }}
-                className="flex-1 px-0 py-2 rounded-xl items-center"
-              >
-                <Text className="text-white text-base font-semibold">
-                  Eliminar Item
-                </Text>
-              </TouchableOpacity>
-            </View>
+            <AddAndDeleteItems
+              openUsernameSheetAddItem={openUsernameSheetAddItem}
+              openUsernameSheetDeleteItem={openUsernameSheetDeleteItem}
+              openUsernameSheetEdit={openUsernameSheetEdit}
+            />
           </View>
           <ListItems
             profileData={data.brand}
@@ -222,6 +216,18 @@ const BrandProfile = ({
             bottomSheetRef={bottomSheetRefDeleteItem}
             brand={data.brand.name}
             onDelete={() => {}}
+          />
+
+          <EditBrandProfile
+            bottomSheetRef={bottomSheetRefEdit}
+            onSubmit={(editLinkValue, editDescriptionValue) => {
+              mutateBrand.mutate({
+                description: editDescriptionValue,
+                url: editLinkValue,
+              });
+            }}
+            lastValueLink={data.brand.url}
+            lastValueDescription={data.brand.description}
           />
 
           <CustomBottomLogout
@@ -378,7 +384,6 @@ const ClientProfile = ({
             logout={logout}
             user={user}
           />
-          <Toast config={toastConfig} />
         </SafeAreaView>
       </SafeAreaProvider>
     </GestureHandlerRootView>
@@ -473,7 +478,7 @@ function useFetchBrandProfile(user: UserInfo): {
   };
 } | null {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["fetch-brand-profile"],
+    queryKey: ["fetch-brand-profile", user.email],
     queryFn: async () => {
       try {
         const { data } = await safeFetch({
@@ -500,6 +505,40 @@ function useFetchBrandProfile(user: UserInfo): {
     return null;
   }
   return data;
+}
+
+function useUpdateBrand(brandEmail: string) {
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: async (data: { description: string; url: string }) => {
+      const response = await safeFetch({
+        url: `http://${LOCAL_IP}:3000/update-brand`,
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: brandEmail,
+          description: data.description,
+          url: data.url,
+        }),
+        schema: CreateAccountSchemaRes,
+      });
+      if (response.data.error) {
+        throw new Error(response.data.details);
+      }
+      return response.data;
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: ["fetch-brand-profile", brandEmail],
+      });
+    },
+    onError: error => {
+      // TODO PUSH TOAST
+      console.log(`could not update user:`, error);
+    },
+  });
+
+  return mutation;
 }
 
 async function getClothingItems(

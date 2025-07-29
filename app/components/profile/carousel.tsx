@@ -47,6 +47,18 @@ const renderItem = ({
   const isSelected = itemsSelected.includes(item.title);
   const { width, height } = Dimensions.get("window");
 
+  // Si el ancho es inválido, no renderizar nada
+  if (!width || isNaN(width) || !isFinite(width) || width <= 0) {
+    return null;
+  }
+
+  const itemWidth = width * 0.45;
+
+  // Si el cálculo resulta en NaN o valores inválidos, no renderizar nada
+  if (isNaN(itemWidth) || !isFinite(itemWidth) || itemWidth <= 0) {
+    return null;
+  }
+
   function handleOnpress(title: string) {
     console.log("handleOnpress", title, "itemsSelected", itemsSelected);
     const updated = itemsSelected.includes(title)
@@ -59,7 +71,7 @@ const renderItem = ({
     <TouchableOpacity
       onPress={() => handleOnpress(item.title)}
       className="aspect-[0.9] px-1 pt-2 pb-1 flex flex-col items-center"
-      style={{ width: width * 0.45 }}
+      style={{ width: itemWidth }}
     >
       {item.image ? (
         <Image

@@ -50,6 +50,7 @@ import {
   QueryAllBrandItemsSchema,
   AllBrandItemsSchemaRes,
   AllBrandItemsSchemaResType,
+  UpdateBrandSchema,
 } from "../schemas/auth/brand-schema";
 import {
   verifyEmail,
@@ -65,6 +66,7 @@ import {
   DeleteUser,
   GetClient,
   UpdateClient,
+  UpdateBrand,
 } from "./app/userFunctions";
 import {
   jsonCatalogUploadSchema,
@@ -411,6 +413,44 @@ app.openapi(getBrandRoute, async c => {
 
   try {
     res = await GetBrand(email);
+  } catch (error) {
+    console.error(error);
+    return c.json({ error: true as true, details: "Server error" }, 200);
+  }
+  return c.json(res, 200);
+});
+
+// endpoint que actualiza la información de la marca
+const updateBrandRoute = createRoute({
+  method: "post",
+  path: "/update-brand",
+  request: {
+    body: {
+      content: {
+        "application/json": {
+          schema: UpdateBrandSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: "Actualiza la información del usuario",
+      content: {
+        "application/json": {
+          schema: CreateAccountSchemaRes,
+        },
+      },
+    },
+  },
+});
+
+app.openapi(updateBrandRoute, async c => {
+  var { description, url, email } = c.req.valid("json");
+  let res: CreateAccountSchemaResType;
+  console.log("Updating brand:", description, url);
+  try {
+    res = await UpdateBrand(email, description, url);
   } catch (error) {
     console.error(error);
     return c.json({ error: true as true, details: "Server error" }, 200);

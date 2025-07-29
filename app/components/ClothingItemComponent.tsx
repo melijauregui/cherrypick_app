@@ -28,9 +28,22 @@ const ClothingItemComponent = ({
     );
   }, []);
 
-  const imageHeight = imageDimensions.width
-    ? (widthDetermined * imageDimensions.height) / imageDimensions.width
-    : widthDetermined;
+  // Si los valores son inválidos, no renderizar nada
+  if (
+    !imageDimensions.width ||
+    !imageDimensions.height ||
+    imageDimensions.width <= 0
+  ) {
+    return null;
+  }
+
+  const imageHeight =
+    (widthDetermined * imageDimensions.height) / imageDimensions.width;
+
+  // Si el cálculo resulta en NaN o valores inválidos, no renderizar nada
+  if (isNaN(imageHeight) || !isFinite(imageHeight) || imageHeight <= 0) {
+    return null;
+  }
 
   return (
     <View

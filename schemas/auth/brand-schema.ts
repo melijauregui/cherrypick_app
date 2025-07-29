@@ -1,5 +1,13 @@
 import { z } from "zod";
 
+const UpdateBrandSchema = z.object({
+  email: z.string(),
+  description: z.string(),
+  url: z.string(),
+});
+export { UpdateBrandSchema };
+export type UpdateBrandSchemaType = z.infer<typeof UpdateBrandSchema>;
+
 const BrandSchema = z.object({
   name: z.string(),
   email: z.string(),
@@ -47,5 +55,14 @@ const AllBrandItemsSchemaRes = z.union([
   }),
 ]);
 export { AllBrandItemsSchemaRes };
-
 export type AllBrandItemsSchemaResType = z.infer<typeof AllBrandItemsSchemaRes>;
+
+const QueryDbSchemaBrandUpdate = z.object({
+  email: z.string(),
+  description: z.string(),
+  url: z.string().url(),
+});
+export { QueryDbSchemaBrandUpdate };
+export type QueryDbSchemaBrandUpdateType = z.infer<
+  typeof QueryDbSchemaBrandUpdate
+>;

@@ -3,25 +3,23 @@ import {
   View,
   Text,
   TouchableOpacity,
-  TextInput,
   KeyboardAvoidingView,
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
-  ScrollView,
   KeyboardTypeOptions,
 } from "react-native";
 import BottomSheet, {
-  BottomSheetView,
   BottomSheetTextInput,
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
-import { z } from "zod";
+import { z, ZodError } from "zod";
 import BottomSheetSame from "./bottomSheets";
-import safeFetch from "@/app/utils/safe-fetch";
 import { LOCAL_IP } from "@/config/api";
-import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
-import { Ionicons } from "@expo/vector-icons";
+import Toast from "react-native-toast-message";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import safeFetch from "@/app/utils/safe-fetch";
+import { CatalogResponseSchema } from "@/schemas/catalog/catalog-schema";
 
 const InsertItemSchema = z.object({
   productName: z
@@ -76,9 +74,16 @@ const InsertNewItemsModal: React.FC<{
     url: "",
     imageUrl: "",
   });
-
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const mutation = useInsertItem(
+    setFormData,
+    setIsSubmitting,
+    setErrors,
+    onSubmit,
+    bottomSheetRef
+  );
 
   const handleFieldChange = (field: keyof FormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -103,17 +108,7 @@ const InsertNewItemsModal: React.FC<{
           errors={errors}
           isFormValid={isFormValid}
           isSubmitting={isSubmitting}
-          handleSubmit={() =>
-            handleSubmit(
-              brand,
-              formData,
-              setFormData,
-              setIsSubmitting,
-              setErrors,
-              onSubmit,
-              bottomSheetRef
-            )
-          }
+          handleSubmit={() => mutation.mutate({ brand, formData })}
         />
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
@@ -145,7 +140,7 @@ const FormContent = ({
   errors: FormErrors;
   isFormValid: string;
   isSubmitting: boolean;
-  handleSubmit: () => Promise<void>;
+  handleSubmit: () => void;
 }) => {
   return (
     <View className="flex-1 px-6 py-4">
@@ -258,160 +253,224 @@ const DataInput = ({
   );
 };
 
-const handleSubmit = async (
-  brand: string,
-  formData: FormData,
+function useInsertItem(
   setFormData: (formData: FormData) => void,
   setIsSubmitting: (isSubmitting: boolean) => void,
   setErrors: (errors: FormErrors) => void,
   onSubmit: (data: FormData) => void,
   bottomSheetRef: React.RefObject<BottomSheet>
-): Promise<void> => {
-  setIsSubmitting(true);
+) {
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: async (data: { brand: string; formData: FormData }) => {
+      const result = InsertItemSchema.safeParse(data.formData);
+      if (!result.success) {
+        throw new ZodError(result.error.errors);
+      }
+      setErrors({});
 
-  const nameProduct = formData.productName;
+      const item = {
+        name: result.data.productName,
+        description: result.data.description,
+        price: Number(result.data.price),
+        image_url: result.data.imageUrl,
+        url: result.data.url,
+      };
 
-  try {
-    const result = InsertItemSchema.safeParse(formData);
+      const body = {
+        brand: data.brand,
+        items: [item],
+      };
 
-    if (!result.success) {
-      const newErrors: FormErrors = {};
-      result.error.errors.forEach(error => {
-        const field = error.path[0] as keyof FormData;
-        newErrors[field] = error.message;
+      // Cerrar el modal y limpiar el formulario inmediatamente
+      setFormData({
+        productName: "",
+        description: "",
+        price: "",
+        url: "",
+        imageUrl: "",
       });
-      setErrors(newErrors);
-      setIsSubmitting(false);
-      return;
-    }
+      bottomSheetRef.current?.close();
 
-    setErrors({});
-
-    const item = {
-      name: result.data.productName,
-      description: result.data.description,
-      price: Number(result.data.price),
-      image_url: result.data.imageUrl,
-      url: result.data.url,
-    };
-
-    const body = {
-      brand: brand,
-      items: [item],
-    };
-
-    // Cerrar el modal y limpiar el formulario inmediatamente
-    setFormData({
-      productName: "",
-      description: "",
-      price: "",
-      url: "",
-      imageUrl: "",
-    });
-    bottomSheetRef.current?.close();
-
-    // Hacer la petición al endpoint y mostrar el alert cuando termine
-    try {
-      const response = await fetch(
-        `http://${LOCAL_IP}:3000/insert-catalog-brand`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(body),
-        }
-      );
-      const responseData = await response.json();
-
-      if (responseData.error) {
-        if (responseData.details.includes("[1] duplicados")) {
+      const response = await safeFetch({
+        url: `http://${LOCAL_IP}:3000/insert-catalog-brand`,
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ brand: data.brand, items: [item] }),
+        schema: CatalogResponseSchema,
+      });
+      if (response.data.error) {
+        throw new Error(response.data.details);
+      }
+      return response.data;
+    },
+    onSuccess: (data, variables) => {
+      onSubmit(variables.formData);
+      Toast.show({
+        type: "success",
+        text1: `The item ${variables.formData.productName} has been successfully added to the catalog.`,
+        visibilityTime: 2000,
+      });
+    },
+    onError: (responseError, data) => {
+      const newErrors: FormErrors = {};
+      if (responseError instanceof ZodError) {
+        responseError.errors.forEach(error => {
+          console.log("error", error);
+          const field = error.path[0] as keyof FormData;
+          newErrors[field] = error.message;
+        });
+        setErrors(newErrors);
+        setIsSubmitting(false);
+        return;
+      }
+      if (responseError instanceof Error) {
+        if (responseError.message.includes("[1] duplicados")) {
           Toast.show({
             type: "error",
-            text1: `The item ${nameProduct} already exists in the catalog.`,
+            text1: `The item ${data.formData.productName} already exists in the catalog.`,
             visibilityTime: 6000,
           });
-
-          // alert("The item already exists in the catalog.");
-        } else if (responseData.details.includes("[1] mal formados")) {
+        } else if (responseError.message.includes("[1] mal formados")) {
           Toast.show({
             type: "error",
-            text1: `The item ${nameProduct} is not valid.`,
+            text1: `The item ${data.formData.productName} is not valid.`,
             visibilityTime: 6000,
           });
         } else {
           Toast.show({
             type: "error",
-            text1: `Error inserting item ${nameProduct}: ${responseData.details}`,
+            text1: `Error inserting item ${data.formData.productName}: ${responseError.message}`,
             visibilityTime: 6000,
           });
         }
         setIsSubmitting(false);
-        return;
       }
-
-      // Success - call the onSubmit callback
-      onSubmit(result.data);
-      Toast.show({
-        type: "success",
-        text1: `The item ${nameProduct} has been successfully added to the catalog.`,
-        visibilityTime: 2000,
-      });
-    } catch (error) {
-      console.error("Error submitting form:", error);
-      Toast.show({
-        type: "error",
-        text1: `Error submitting item ${nameProduct}: ${error}`,
-        visibilityTime: 6000,
-      });
-    } finally {
+    },
+    onSettled: () => {
       setIsSubmitting(false);
-    }
-  } catch (error) {
-    console.error("Error submitting form:", error);
-    Toast.show({
-      type: "error",
-      text1: `Error submitting item ${nameProduct}: ${error}`,
-      visibilityTime: 6000,
-    });
-    setIsSubmitting(false);
-  }
-};
+    },
+  });
 
-const CustomToast = ({ type, text1, text2, onHide }: any) => {
-  if (type === "error") {
-    console.log("error: ", text1);
-  }
-  const isSuccess = type === "success";
-  return (
-    <View
-      className="flex-row items-center bg-white rounded-2xl py-4 px-[18px] mx-2 min-h-[70px] border-l-brown-light"
-      style={{
-        borderLeftWidth: 6,
-      }}
-    >
-      <View style={{ flex: 1 }}>
-        <Text
-          className={`${isSuccess ? "text-green-600" : "text-red-500"} font-semibold text-xl mb-0.5`}
-        >
-          {isSuccess ? "Success" : "Error"}
-        </Text>
-        {text1 ? (
-          <Text className="text-black font-pregular text-lg">{text1}</Text>
-        ) : null}
-      </View>
-      <TouchableOpacity onPress={onHide} style={{ marginLeft: 10 }}>
-        <Ionicons name="close" size={22} color="#888" />
-      </TouchableOpacity>
-    </View>
-  );
-};
+  return mutation;
+}
 
-export const toastConfig = {
-  success: (props: any) => (
-    <CustomToast {...props} type="success" onHide={() => Toast.hide()} />
-  ),
-  error: (props: any) => (
-    <CustomToast {...props} type="error" onHide={() => Toast.hide()} />
-  ),
-};
+// const handleSubmit = async (
+//   brand: string,
+//   formData: FormData,
+//   setFormData: (formData: FormData) => void,
+//   setIsSubmitting: (isSubmitting: boolean) => void,
+//   setErrors: (errors: FormErrors) => void,
+//   onSubmit: (data: FormData) => void,
+//   bottomSheetRef: React.RefObject<BottomSheet>
+// ): Promise<void> => {
+//   setIsSubmitting(true);
+
+//   const nameProduct = formData.productName;
+
+//   try {
+//     const result = InsertItemSchema.safeParse(formData);
+
+//     if (!result.success) {
+//       const newErrors: FormErrors = {};
+//       result.error.errors.forEach(error => {
+//         const field = error.path[0] as keyof FormData;
+//         newErrors[field] = error.message;
+//       });
+//       setErrors(newErrors);
+//       setIsSubmitting(false);
+//       return;
+//     }
+
+//     setErrors({});
+
+//     const item = {
+//       name: result.data.productName,
+//       description: result.data.description,
+//       price: Number(result.data.price),
+//       image_url: result.data.imageUrl,
+//       url: result.data.url,
+//     };
+
+//     const body = {
+//       brand: brand,
+//       items: [item],
+//     };
+
+//     // Cerrar el modal y limpiar el formulario inmediatamente
+//     setFormData({
+//       productName: "",
+//       description: "",
+//       price: "",
+//       url: "",
+//       imageUrl: "",
+//     });
+//     bottomSheetRef.current?.close();
+
+//     // Hacer la petición al endpoint y mostrar el alert cuando termine
+//     try {
+//       const response = await fetch(
+//         `http://${LOCAL_IP}:3000/insert-catalog-brand`,
+//         {
+//           method: "POST",
+//           headers: {
+//             "Content-Type": "application/json",
+//           },
+//           body: JSON.stringify(body),
+//         }
+//       );
+//       const responseData = await response.json();
+
+//       if (responseData.error) {
+//         if (responseData.details.includes("[1] duplicados")) {
+//           Toast.show({
+//             type: "error",
+//             text1: `The item ${nameProduct} already exists in the catalog.`,
+//             visibilityTime: 6000,
+//           });
+
+//           // alert("The item already exists in the catalog.");
+//         } else if (responseData.details.includes("[1] mal formados")) {
+//           Toast.show({
+//             type: "error",
+//             text1: `The item ${nameProduct} is not valid.`,
+//             visibilityTime: 6000,
+//           });
+//         } else {
+//           Toast.show({
+//             type: "error",
+//             text1: `Error inserting item ${nameProduct}: ${responseData.details}`,
+//             visibilityTime: 6000,
+//           });
+//         }
+//         setIsSubmitting(false);
+//         return;
+//       }
+
+//       // Success - call the onSubmit callback
+//       onSubmit(result.data);
+//       Toast.show({
+//         type: "success",
+//         text1: `The item ${nameProduct} has been successfully added to the catalog.`,
+//         visibilityTime: 2000,
+//       });
+//     } catch (error) {
+//       console.error("Error submitting form:", error);
+//       Toast.show({
+//         type: "error",
+//         text1: `Error submitting item ${nameProduct}: ${error}`,
+//         visibilityTime: 6000,
+//       });
+//     } finally {
+//       setIsSubmitting(false);
+//     }
+//   } catch (error) {
+//     console.error("Error submitting form:", error);
+//     Toast.show({
+//       type: "error",
+//       text1: `Error submitting item ${nameProduct}: ${error}`,
+//       visibilityTime: 6000,
+//     });
+//     setIsSubmitting(false);
+//   }
+// };

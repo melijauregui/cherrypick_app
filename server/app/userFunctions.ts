@@ -4,8 +4,12 @@ import { queryDbSchemaUser } from "../../schemas/auth/sign-in-schema";
 import {
   CreateAccountSchemaResType,
   UserSchemaResType,
-} from "@/schemas/auth/preferences-schema";
-import { VerifyAccountDeletedSchemaType } from "@/schemas/auth/sign-up-schema";
+} from "../../schemas/auth/preferences-schema";
+import { VerifyAccountDeletedSchemaType } from "../../schemas/auth/sign-up-schema";
+import {
+  QueryDbSchemaBrandUpdate,
+  QueryDbSchemaBrand,
+} from "../../schemas/auth/brand-schema";
 
 export async function VerifyUserExists(
   email: string
@@ -186,6 +190,44 @@ export async function UpdateClient(
     [name, dateBirth, JSON.stringify(preferences), email]
   );
   console.log("client updated");
+  res = {
+    error: false,
+  };
+  return res;
+}
+
+export async function UpdateBrand(
+  email: string,
+  description: string,
+  url: string
+): Promise<CreateAccountSchemaResType> {
+  let res: CreateAccountSchemaResType;
+  const [existing]: any[] = await db.query(
+    "SELECT * FROM brands WHERE email = ?",
+    [email]
+  );
+  if (existing.length === 0) {
+    console.log("brand not found");
+    res = {
+      error: true,
+      details: "Email not registered",
+    };
+    return res;
+  }
+
+  const parsedFormUpdate = QueryDbSchemaBrand.parse(existing);
+  if (description === undefined) {
+    description = parsedFormUpdate[0].description;
+  }
+  if (url === undefined) {
+    url = parsedFormUpdate[0].url;
+  }
+
+  const [result]: any = await db.query(
+    "UPDATE brands SET description = ?, url = ? WHERE email = ?",
+    [description, url, email]
+  );
+  console.log("brand updated");
   res = {
     error: false,
   };
