@@ -24,7 +24,7 @@ const ListItems = ({
   const [refreshKey, setRefreshKey] = useState(0);
 
   const { data, fetchNextPage, refetch, isRefetching } = useInfiniteQuery({
-    queryKey: ["clothing-items", profileData],
+    queryKey: ["clothing-items", profileData?.email],
     queryFn: ({ pageParam }) =>
       getClothingItems(pageParam, limit, profileData?.name),
     initialPageParam: 0,
@@ -38,7 +38,7 @@ const ListItems = ({
   const queryClient = useQueryClient();
   const resetInfiniteQueryPagination = () => {
     return queryClient.setQueryData(
-      ["clothing-items", profileData],
+      ["clothing-items", profileData?.email],
       (oldData: any) => {
         if (!oldData) return undefined;
 

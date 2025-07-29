@@ -550,7 +550,6 @@ async function getClothingItems(
     console.log("No brand name found yet");
     return [];
   }
-  console.log("Fetching items for brand3", brand);
   try {
     const { data } = await safeFetch({
       url: `http://${LOCAL_IP}:3000/all-brand?page=${page}&limit=${limit}&brand=${brand}`,
