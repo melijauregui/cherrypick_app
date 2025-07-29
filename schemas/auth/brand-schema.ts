@@ -41,6 +41,13 @@ export { QueryGetBrandSchema };
 
 const QueryAllBrandItemsSchema = z.object({
   brand: z.string(),
+  filter: z.string().optional(),
+  page: z
+    .preprocess(val => parseInt(val as string) || 0, z.number().min(0))
+    .optional(),
+  limit: z
+    .preprocess(val => parseInt(val as string) || 10, z.number().min(1))
+    .optional(),
 });
 export { QueryAllBrandItemsSchema };
 

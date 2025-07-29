@@ -84,7 +84,10 @@ export { QueryWeaviateImage };
 
 //funcion para hacer query a pinecone
 async function QueryWeaviateAllItems(
-  brand: string
+  brand: string,
+  filter?: string,
+  page: number = 0,
+  limit: number = 10
 ): Promise<AllBrandItemsSchemaResType> {
   try {
     const resCollection = await getCollection();
@@ -93,15 +96,24 @@ async function QueryWeaviateAllItems(
     }
     const collection = resCollection.collection;
 
-    const filters = Filters.and(
+    let filters = Filters.and(
       collection.filter.byProperty("embedding_type").equal("image"),
       collection.filter.byProperty("brand").equal(brand)
     );
 
+    // Add filter for name search if provided
+    if (filter && filter.trim() !== "") {
+      filters = Filters.and(
+        filters,
+        collection.filter.byProperty("name").like(`*${filter}*`)
+      );
+    }
+
+    const offset = page * limit;
     const queryOptions: any = {
       filters: filters,
-      limit: 100,
-      offset: 0,
+      limit: limit,
+      offset: offset,
       returnProperties: ["name"],
     };
     const result = await collection.query.fetchObjects(queryOptions);

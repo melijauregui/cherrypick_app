@@ -54,14 +54,14 @@ const ListItems = ({
   const onRefresh = async () => {
     await resetInfiniteQueryPagination();
     await refetch();
-    setRefreshKey(k => k + 1); // 🔁 fuerza re-layout
+    setRefreshKey(k => k + 1);
   };
 
   if (!data) return null;
 
   return (
     <MasonryFlashList
-      extraData={refreshKey} // 👈 fuerza que el layout se recalibre
+      extraData={refreshKey}
       data={data.pages.flat()}
       numColumns={columnCount}
       showsVerticalScrollIndicator={false}

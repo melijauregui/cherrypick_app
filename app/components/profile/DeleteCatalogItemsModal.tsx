@@ -4,18 +4,16 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
   Dimensions,
 } from "react-native";
 import BottomSheet from "@gorhom/bottom-sheet";
 import Toast from "react-native-toast-message";
 import { LOCAL_IP } from "@/config/api";
-import BottomSheetSame from "./bottomSheets";
 import safeFetch from "@/app/utils/safe-fetch";
 import { AllBrandItemsSchemaRes } from "@/schemas/auth/brand-schema";
-import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
-import { z } from "zod";
 import { CatalogResponseSchemaDelete } from "@/schemas/catalog/catalog-schema";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import { FlashList } from "@shopify/flash-list";
 
 const screenHeight = Dimensions.get("window").height;
 
@@ -28,33 +26,46 @@ const DeleteCatalogItemsModal = ({
   brand: string;
   onDelete: () => void;
 }) => {
-  const [items, setItems] = useState<{ name: string }[]>([]);
-  const [filteredItems, setFilteredItems] = useState<{ name: string }[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  useEffect(() => {
-    if (bottomSheetRef.current && brand) {
-      fetchItems(brand, setItems, setFilteredItems, setLoading);
-    }
-    // eslint-disable-next-line
-  }, [bottomSheetRef, brand]);
+  const { data, fetchNextPage, isLoading, error } = useInfiniteQuery({
+    queryKey: ["delete-catalog-items", brand, search],
+    queryFn: ({ pageParam }) => fetchItems(brand, search, pageParam),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
+      if (lastPage.length === 0) {
+        return undefined;
+      }
+      return lastPageParam + 1;
+    },
+  });
+
+  const queryClient = useQueryClient();
+  const resetInfiniteQueryPagination = () => {
+    return queryClient.setQueryData(
+      ["delete-catalog-items", brand, search],
+      (oldData: any) => {
+        if (!oldData) return undefined;
+
+        return {
+          ...oldData,
+          pages: [],
+          pageParams: [],
+        };
+      }
+    );
+  };
 
   useEffect(() => {
-    if (!search) {
-      setFilteredItems(items);
-    } else {
-      console.log("search", search);
-      setFilteredItems(
-        items.filter(item =>
-          item.name.toLowerCase().includes(search.toLowerCase())
-        )
-      );
-      console.log("filteredItems", filteredItems);
+    if (error) {
+      Toast.show({
+        type: "error",
+        text1: "Error al cargar productos: " + error?.message,
+      });
     }
-  }, [search, items]);
+  }, [error]);
 
   const toggleSelect = (name: string) => {
     setSelected(prev => {
@@ -94,8 +105,9 @@ const DeleteCatalogItemsModal = ({
       <FormContent
         search={search}
         setSearch={setSearch}
-        loading={loading}
-        filteredItems={filteredItems}
+        resetInfiniteQueryPagination={resetInfiniteQueryPagination}
+        loading={isLoading}
+        filteredItems={data?.pages.flat() || []}
         selected={selected}
         toggleSelect={toggleSelect}
         handleDelete={() => {
@@ -105,13 +117,11 @@ const DeleteCatalogItemsModal = ({
             onDelete,
             bottomSheetRef,
             brand,
-            setDeleting,
-            setItems,
-            setFilteredItems,
-            setLoading
+            setDeleting
           );
         }}
         deleting={deleting}
+        fetchNextPage={fetchNextPage}
       />
     </BottomSheet>
   );
@@ -126,6 +136,8 @@ const FormContent = ({
   toggleSelect,
   handleDelete,
   deleting,
+  fetchNextPage,
+  resetInfiniteQueryPagination,
 }: {
   search: string;
   setSearch: (text: string) => void;
@@ -135,6 +147,8 @@ const FormContent = ({
   toggleSelect: (name: string) => void;
   handleDelete: () => void;
   deleting: boolean;
+  fetchNextPage: () => void;
+  resetInfiniteQueryPagination: () => void;
 }) => {
   return (
     <View className="bg-white px-6 pt-4 flex flex-col justify-between flex-1">
@@ -143,7 +157,10 @@ const FormContent = ({
           className="border border-gray-300 rounded-3xl px-3 py-3 mb-3 text-lg font-pregular"
           placeholder="Buscar producto..."
           value={search}
-          onChangeText={setSearch}
+          onChangeText={text => {
+            setSearch(text);
+            resetInfiniteQueryPagination();
+          }}
         />
         {loading ? (
           <View className="justify-center items-center">
@@ -158,20 +175,20 @@ const FormContent = ({
             </Text>
           </View>
         ) : (
-          <BottomSheetScrollView
-            keyboardShouldPersistTaps="handled"
-            className="flex-1"
-            removeClippedSubviews={false}
-          >
-            {filteredItems.map(item => (
+          <FlashList
+            data={filteredItems}
+            renderItem={({ item }) => (
               <ItemStyle
                 key={item.name}
                 item={item}
                 toggleSelect={toggleSelect}
                 selected={selected}
               />
-            ))}
-          </BottomSheetScrollView>
+            )}
+            onEndReached={() => fetchNextPage()}
+            onEndReachedThreshold={0.1}
+            estimatedItemSize={30}
+          />
         )}
       </View>
       <ButtonDelete
@@ -185,33 +202,19 @@ const FormContent = ({
 
 export default DeleteCatalogItemsModal;
 
-const fetchItems = async (
-  brand: string,
-  setItems: (items: { name: string }[]) => void,
-  setFilteredItems: (items: { name: string }[]) => void,
-  setLoading: (loading: boolean) => void
-) => {
-  setLoading(true);
-  try {
-    const res = await safeFetch({
-      url: `http://${LOCAL_IP}:3000/all-brand-items?brand=${brand}`,
-      schema: AllBrandItemsSchemaRes,
-    });
-    if (res.data.error) {
-      console.log(res.data.details);
-      Toast.show({ type: "error", text1: res.data.details });
-    } else {
-      console.log("res.data.data DATAA", res.data.data);
-      setItems(res.data.data || []);
-      setFilteredItems(res.data.data || []);
-    }
-  } catch (e: any) {
-    Toast.show({
-      type: "error",
-      text1: "Error al cargar productos: " + e.message,
-    });
-  } finally {
-    setLoading(false);
+const fetchItems = async (brand: string, search: string, page: number) => {
+  const limit = 10;
+  console.log("fetching items", brand, search, page, limit);
+  const res = await safeFetch({
+    url: `http://${LOCAL_IP}:3000/all-brand-items?brand=${brand}&filter=${search}&page=${page}&limit=${limit}`,
+    schema: AllBrandItemsSchemaRes,
+  });
+  if (res.data.error) {
+    console.log("error fetching items", res.data.details);
+    throw new Error(res.data.details);
+  } else {
+    console.log("items fetched", res.data.data);
+    return res.data.data || [];
   }
 };
 
@@ -221,10 +224,7 @@ const handleDelete = async (
   onDelete: () => void,
   bottomSheetRef: React.RefObject<BottomSheet>,
   brand: string,
-  setDeleting: (deleting: boolean) => void,
-  setItems: (items: { name: string }[]) => void,
-  setFilteredItems: (items: { name: string }[]) => void,
-  setLoading: (loading: boolean) => void
+  setDeleting: (deleting: boolean) => void
 ) => {
   if (selected.size === 0) return;
   setDeleting(true);
@@ -252,7 +252,6 @@ const handleDelete = async (
       });
       setSelected(new Set());
       onDelete();
-      fetchItems(brand, setItems, setFilteredItems, setLoading);
     }
   } catch (e) {
     Toast.show({ type: "error", text1: "Error al eliminar" });

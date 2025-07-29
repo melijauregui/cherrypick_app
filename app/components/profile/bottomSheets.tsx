@@ -1,18 +1,14 @@
 import { ImageSourcePropType } from "react-native";
-import BottomSheet, {
-  BottomSheetView,
-  BottomSheetTextInput,
-} from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import React, { useState, useEffect, useCallback } from "react";
 import { TouchableOpacity, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { TextInput } from "react-native";
 import DatePicker from "react-native-date-picker";
 import { View, Image } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import CarouselWithFlatList from "./carousel";
 import LogOutButton, { DeleteAccountButton } from "./buttons";
-import { InputBoxWithName } from "./editBrandProfile";
+import InputBoxWithName from "./inputBox";
 
 type ItemData = {
   title: string;

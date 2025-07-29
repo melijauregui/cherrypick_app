@@ -690,10 +690,19 @@ const allBrandItemsRoute = createRoute({
   },
 });
 app.openapi(allBrandItemsRoute, async c => {
-  const { brand } = c.req.valid("query");
-  console.log("Brand name for all items", brand);
+  const { brand, filter, page = 0, limit = 10 } = c.req.valid("query");
+  console.log(
+    "Brand name for all items",
+    brand,
+    "filter:",
+    filter,
+    "page:",
+    page,
+    "limit:",
+    limit
+  );
   let res: AllBrandItemsSchemaResType;
-  res = await QueryWeaviateAllItems(brand);
+  res = await QueryWeaviateAllItems(brand, filter, page, limit);
   console.log("res", res);
   return c.json(res, 200);
 });
