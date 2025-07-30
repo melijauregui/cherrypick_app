@@ -118,6 +118,16 @@ const InsertNewItemsModal: React.FC<{
     <BottomSheetSame
       bottomSheetRef={bottomSheetRef}
       onSubmit={() => {}}
+      onCancel={() => {
+        setFormData({
+          productName: "",
+          description: "",
+          price: "",
+          url: "",
+          imageUrl: "",
+        });
+        setErrors({});
+      }}
       isReady={false}
       hasDone={false}
       componentView={formContent}

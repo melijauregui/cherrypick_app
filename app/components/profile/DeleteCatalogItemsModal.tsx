@@ -70,6 +70,11 @@ const DeleteCatalogItemsModal = ({
     );
   };
 
+  const handleCancel = () => {
+    setSelected(new Set());
+    setSearch("");
+  };
+
   useEffect(() => {
     if (error) {
       Toast.show({
@@ -109,6 +114,7 @@ const DeleteCatalogItemsModal = ({
           className="flex flex-row ml-auto"
           onPress={() => {
             bottomSheetRef.current?.close();
+            handleCancel();
           }}
         >
           <Text className="text-xl  font-plight">Cancel</Text>
@@ -210,7 +216,8 @@ const FormContent = ({
 export default DeleteCatalogItemsModal;
 
 const fetchItems = async (brand: string, search: string, page: number) => {
-  const limit = 10;
+  const limit = 20;
+  console.log("fetching items", brand, search, page, limit);
   const res = await safeFetch({
     url: `http://${LOCAL_IP}:3000/all-brand-items?brand=${brand}&filter=${search}&page=${page}&limit=${limit}`,
     schema: AllBrandItemsSchemaRes,

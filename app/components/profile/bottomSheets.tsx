@@ -50,6 +50,9 @@ function CustomBottomSheet({
     <BottomSheetSame
       bottomSheetRef={bottomSheetRef}
       onSubmit={onSubmit ? () => onSubmit(editInputValue) : undefined}
+      onCancel={() => {
+        setEditInputValue(lastValue);
+      }}
       isReady={isReady}
       hasDone={true}
       componentView={userNameInput}
@@ -122,6 +125,9 @@ function CustomBottomSheetPreferences({
     <BottomSheetSame
       bottomSheetRef={bottomSheetRef}
       onSubmit={onSubmit ? () => onSubmit(editInputValue) : undefined}
+      onCancel={() => {
+        setEditInputValue(lastValue);
+      }}
       isReady={isReady}
       hasDone={true}
       componentView={carouselPreferences}
@@ -171,6 +177,9 @@ function CustomBottomSheetDate({
     <BottomSheetSame
       bottomSheetRef={bottomSheetRef}
       onSubmit={onSubmit ? () => onSubmit(editInputValue) : undefined}
+      onCancel={() => {
+        setEditInputValue(lastValue);
+      }}
       isReady={isReady}
       hasDone={true}
       componentView={datePicker}
@@ -221,8 +230,8 @@ function BottomSheetSame({
             <TouchableOpacity
               className={`flex flex-row  mr-auto`}
               onPress={() => {
-                onCancel?.();
                 bottomSheetRef.current?.close();
+                onCancel?.();
               }}
             >
               <Text
@@ -274,6 +283,7 @@ function BottomSheetSame({
               className={`flex flex-row ${hasDone ? "mr-auto" : "ml-auto"}`}
               onPress={() => {
                 bottomSheetRef.current?.close();
+                onCancel?.();
               }}
             >
               <Text
