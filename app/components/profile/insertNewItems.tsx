@@ -199,6 +199,8 @@ const FormContent = ({
         isSubmitting={isSubmitting}
         isFormValid={isFormValid !== ""}
         handleSubmit={handleSubmit}
+        text="Insertar Item"
+        loadingText="Insertando..."
       />
     </View>
   );
@@ -257,6 +259,10 @@ function useInsertItem(
       }
       setErrors({});
 
+      setIsSubmitting(true);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      bottomSheetRef.current?.close();
+
       const item = {
         name: result.data.productName,
         description: result.data.description,
@@ -278,7 +284,6 @@ function useInsertItem(
         url: "",
         imageUrl: "",
       });
-      bottomSheetRef.current?.close();
 
       const response = await safeFetch({
         url: `http://${LOCAL_IP}:3000/insert-catalog-brand`,
@@ -347,10 +352,14 @@ export const ButtonSubmit = ({
   isSubmitting,
   isFormValid,
   handleSubmit,
+  text,
+  loadingText,
 }: {
   isSubmitting: boolean;
   isFormValid: boolean;
   handleSubmit: () => void;
+  text: string;
+  loadingText: string;
 }) => {
   return (
     <View className="flex flex-row justify-end my-2 py-3">
@@ -366,7 +375,7 @@ export const ButtonSubmit = ({
         }}
       >
         <Text className="text-[16px] font-psemibold text-white">
-          {isSubmitting ? "Inserting..." : "Insert Item"}
+          {isSubmitting ? loadingText : text}
         </Text>
       </TouchableOpacity>
     </View>

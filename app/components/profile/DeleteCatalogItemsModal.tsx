@@ -12,7 +12,11 @@ import { LOCAL_IP } from "@/config/api";
 import safeFetch from "@/app/utils/safe-fetch";
 import { AllBrandItemsSchemaRes } from "@/schemas/auth/brand-schema";
 import { CatalogResponseSchemaDelete } from "@/schemas/catalog/catalog-schema";
-import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { FlashList } from "@shopify/flash-list";
 import { ButtonSubmit } from "./insertNewItems";
 
@@ -30,6 +34,13 @@ const DeleteCatalogItemsModal = ({
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState("");
   const [deleting, setDeleting] = useState(false);
+  const deleteMutation = useDelete(
+    setSelected,
+    onDelete,
+    bottomSheetRef,
+    brand,
+    setDeleting
+  );
 
   const { data, fetchNextPage, isLoading, error } = useInfiniteQuery({
     queryKey: ["delete-catalog-items", brand, search],
@@ -112,14 +123,7 @@ const DeleteCatalogItemsModal = ({
         selected={selected}
         toggleSelect={toggleSelect}
         handleDelete={() => {
-          handleDelete(
-            selected,
-            setSelected,
-            onDelete,
-            bottomSheetRef,
-            brand,
-            setDeleting
-          );
+          deleteMutation.mutate(selected);
         }}
         deleting={deleting}
         fetchNextPage={fetchNextPage}
@@ -192,15 +196,12 @@ const FormContent = ({
           />
         )}
       </View>
-      {/* <ButtonDelete
-        selected={selected}
-        deleting={deleting}
-        handleDelete={handleDelete}
-      /> */}
       <ButtonSubmit
         isSubmitting={deleting}
         isFormValid={selected.size > 0}
         handleSubmit={handleDelete}
+        text="Eliminar Items"
+        loadingText="Eliminando..."
       />
     </View>
   );
@@ -210,61 +211,69 @@ export default DeleteCatalogItemsModal;
 
 const fetchItems = async (brand: string, search: string, page: number) => {
   const limit = 10;
-  console.log("fetching items", brand, search, page, limit);
   const res = await safeFetch({
     url: `http://${LOCAL_IP}:3000/all-brand-items?brand=${brand}&filter=${search}&page=${page}&limit=${limit}`,
     schema: AllBrandItemsSchemaRes,
   });
   if (res.data.error) {
-    console.log("error fetching items", res.data.details);
     throw new Error(res.data.details);
   } else {
-    console.log("items fetched", res.data.data);
     return res.data.data || [];
   }
 };
 
-const handleDelete = async (
-  selected: Set<string>,
+function useDelete(
   setSelected: (selected: Set<string>) => void,
   onDelete: () => void,
   bottomSheetRef: React.RefObject<BottomSheet>,
   brand: string,
   setDeleting: (deleting: boolean) => void
-) => {
-  if (selected.size === 0) return;
-  setDeleting(true);
-  bottomSheetRef.current?.close();
-  try {
-    const { data } = await safeFetch({
-      url: `http://${LOCAL_IP}:3000/delete-catalog-brand`,
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        items: Array.from(selected).map(name => ({ name })),
-        brand,
-      }),
-      schema: CatalogResponseSchemaDelete,
-    });
+) {
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: async (selected: Set<string>) => {
+      setDeleting(true);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      bottomSheetRef.current?.close();
+      const { data } = await safeFetch({
+        url: `http://${LOCAL_IP}:3000/delete-catalog-brand`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          items: Array.from(selected).map(name => ({ name })),
+          brand,
+        }),
+        schema: CatalogResponseSchemaDelete,
+      });
+      if (data.error) {
+        throw new Error(data.details);
+      }
+      return data;
+    },
+    onSuccess: data => {
+      void queryClient.invalidateQueries({
+        queryKey: ["delete-catalog-items", brand],
+      });
 
-    if (data.error) {
-      Toast.show({ type: "error", text1: data.details });
-    } else {
       Toast.show({
         type: "success",
         text1: `${data.numberDeleted} productos eliminados correctamente`,
       });
       setSelected(new Set());
       onDelete();
-    }
-  } catch (e) {
-    Toast.show({ type: "error", text1: "Error al eliminar" });
-  } finally {
-    setDeleting(false);
-  }
-};
+    },
+    onError: error => {
+      Toast.show({ type: "error", text1: error.message });
+    },
+    onSettled: () => {
+      setDeleting(false);
+    },
+  });
+
+  return mutation;
+}
 
 const ItemStyle = ({
   item,
@@ -285,30 +294,6 @@ const ItemStyle = ({
         className={`w-7 h-7 rounded border border-gray-400  ${selected.has(item.name) ? "bg-brown-light opacity-70" : "bg-white"}`}
       ></View>
       <Text className="text-lg text-black font-pregular">{item.name}</Text>
-    </TouchableOpacity>
-  );
-};
-const ButtonDelete = ({
-  selected,
-  deleting,
-  handleDelete,
-}: {
-  selected: Set<string>;
-  deleting: boolean;
-  handleDelete: () => void;
-}) => {
-  return (
-    <TouchableOpacity
-      className={`py-3 rounded-3xl items-center my-3 ${selected.size === 0 || deleting ? "opacity-50" : ""}`}
-      style={{
-        backgroundColor: "rgba(107, 114, 128, 0.5)",
-      }}
-      disabled={selected.size === 0 || deleting}
-      onPress={() => {
-        handleDelete();
-      }}
-    >
-      <Text className="text-white text-lg font-psemibold">Eliminar Items</Text>
     </TouchableOpacity>
   );
 };
