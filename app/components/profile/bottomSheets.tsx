@@ -205,6 +205,7 @@ function BottomSheetSame({
       onChange={handleSheetChanges}
       index={-1}
       enableDynamicSizing={true}
+      maxDynamicContentSize={600}
       keyboardBehavior="interactive"
       keyboardBlurBehavior="restore"
       android_keyboardInputMode="adjustResize"

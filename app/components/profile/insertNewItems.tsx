@@ -143,7 +143,7 @@ const FormContent = ({
   handleSubmit: () => void;
 }) => {
   return (
-    <View className="flex-1 px-6 py-4">
+    <View className="flex-1 px-6 pt-4">
       <BottomSheetScrollView>
         <DataInput
           label="Product Name"
@@ -195,23 +195,11 @@ const FormContent = ({
           autoCapitalize="none"
         />
       </BottomSheetScrollView>
-      <View className="flex flex-row justify-end my-2">
-        <TouchableOpacity
-          disabled={!isFormValid || isSubmitting}
-          onPress={handleSubmit}
-          className={`
-            flex flex-row items-center px-6 py-3 rounded-3xl
-            ${!isFormValid || isSubmitting ? "opacity-50" : ""}
-          `}
-          style={{
-            backgroundColor: "rgba(107, 114, 128, 0.5)",
-          }}
-        >
-          <Text className="text-[16px] font-psemibold text-white">
-            {isSubmitting ? "Inserting..." : "Insert Item"}
-          </Text>
-        </TouchableOpacity>
-      </View>
+      <ButtonSubmit
+        isSubmitting={isSubmitting}
+        isFormValid={isFormValid !== ""}
+        handleSubmit={handleSubmit}
+      />
     </View>
   );
 };
@@ -355,122 +343,32 @@ function useInsertItem(
   return mutation;
 }
 
-// const handleSubmit = async (
-//   brand: string,
-//   formData: FormData,
-//   setFormData: (formData: FormData) => void,
-//   setIsSubmitting: (isSubmitting: boolean) => void,
-//   setErrors: (errors: FormErrors) => void,
-//   onSubmit: (data: FormData) => void,
-//   bottomSheetRef: React.RefObject<BottomSheet>
-// ): Promise<void> => {
-//   setIsSubmitting(true);
-
-//   const nameProduct = formData.productName;
-
-//   try {
-//     const result = InsertItemSchema.safeParse(formData);
-
-//     if (!result.success) {
-//       const newErrors: FormErrors = {};
-//       result.error.errors.forEach(error => {
-//         const field = error.path[0] as keyof FormData;
-//         newErrors[field] = error.message;
-//       });
-//       setErrors(newErrors);
-//       setIsSubmitting(false);
-//       return;
-//     }
-
-//     setErrors({});
-
-//     const item = {
-//       name: result.data.productName,
-//       description: result.data.description,
-//       price: Number(result.data.price),
-//       image_url: result.data.imageUrl,
-//       url: result.data.url,
-//     };
-
-//     const body = {
-//       brand: brand,
-//       items: [item],
-//     };
-
-//     // Cerrar el modal y limpiar el formulario inmediatamente
-//     setFormData({
-//       productName: "",
-//       description: "",
-//       price: "",
-//       url: "",
-//       imageUrl: "",
-//     });
-//     bottomSheetRef.current?.close();
-
-//     // Hacer la petición al endpoint y mostrar el alert cuando termine
-//     try {
-//       const response = await fetch(
-//         `http://${LOCAL_IP}:3000/insert-catalog-brand`,
-//         {
-//           method: "POST",
-//           headers: {
-//             "Content-Type": "application/json",
-//           },
-//           body: JSON.stringify(body),
-//         }
-//       );
-//       const responseData = await response.json();
-
-//       if (responseData.error) {
-//         if (responseData.details.includes("[1] duplicados")) {
-//           Toast.show({
-//             type: "error",
-//             text1: `The item ${nameProduct} already exists in the catalog.`,
-//             visibilityTime: 6000,
-//           });
-
-//           // alert("The item already exists in the catalog.");
-//         } else if (responseData.details.includes("[1] mal formados")) {
-//           Toast.show({
-//             type: "error",
-//             text1: `The item ${nameProduct} is not valid.`,
-//             visibilityTime: 6000,
-//           });
-//         } else {
-//           Toast.show({
-//             type: "error",
-//             text1: `Error inserting item ${nameProduct}: ${responseData.details}`,
-//             visibilityTime: 6000,
-//           });
-//         }
-//         setIsSubmitting(false);
-//         return;
-//       }
-
-//       // Success - call the onSubmit callback
-//       onSubmit(result.data);
-//       Toast.show({
-//         type: "success",
-//         text1: `The item ${nameProduct} has been successfully added to the catalog.`,
-//         visibilityTime: 2000,
-//       });
-//     } catch (error) {
-//       console.error("Error submitting form:", error);
-//       Toast.show({
-//         type: "error",
-//         text1: `Error submitting item ${nameProduct}: ${error}`,
-//         visibilityTime: 6000,
-//       });
-//     } finally {
-//       setIsSubmitting(false);
-//     }
-//   } catch (error) {
-//     console.error("Error submitting form:", error);
-//     Toast.show({
-//       type: "error",
-//       text1: `Error submitting item ${nameProduct}: ${error}`,
-//       visibilityTime: 6000,
-//     });
-//     setIsSubmitting(false);
-//   }
-// };
+export const ButtonSubmit = ({
+  isSubmitting,
+  isFormValid,
+  handleSubmit,
+}: {
+  isSubmitting: boolean;
+  isFormValid: boolean;
+  handleSubmit: () => void;
+}) => {
+  return (
+    <View className="flex flex-row justify-end my-2 py-3">
+      <TouchableOpacity
+        disabled={!isFormValid || isSubmitting}
+        onPress={handleSubmit}
+        className={`
+        flex flex-row items-center px-6 py-3 rounded-3xl
+        ${!isFormValid || isSubmitting ? "opacity-50" : ""}
+      `}
+        style={{
+          backgroundColor: "rgba(107, 114, 128, 0.5)",
+        }}
+      >
+        <Text className="text-[16px] font-psemibold text-white">
+          {isSubmitting ? "Inserting..." : "Insert Item"}
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+};

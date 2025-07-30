@@ -14,6 +14,7 @@ import { AllBrandItemsSchemaRes } from "@/schemas/auth/brand-schema";
 import { CatalogResponseSchemaDelete } from "@/schemas/catalog/catalog-schema";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { FlashList } from "@shopify/flash-list";
+import { ButtonSubmit } from "./insertNewItems";
 
 const screenHeight = Dimensions.get("window").height;
 
@@ -82,7 +83,7 @@ const DeleteCatalogItemsModal = ({
       onChange={() => {}}
       index={-1}
       enableDynamicSizing={false}
-      snapPoints={["53%"]}
+      snapPoints={[520]}
       keyboardBehavior="interactive"
       keyboardBlurBehavior="restore"
       android_keyboardInputMode="adjustResize"
@@ -163,14 +164,14 @@ const FormContent = ({
           }}
         />
         {loading ? (
-          <View className="justify-center items-center">
-            <Text className="text-lg text-black font-pregular">
+          <View className="justify-center items-center flex-1">
+            <Text className="text-lg text-black font-pregular opacity-50">
               Cargando productos...
             </Text>
           </View>
         ) : filteredItems.length === 0 ? (
           <View className="justify-center items-center flex-1">
-            <Text className="text-lg text-black font-pregular">
+            <Text className="text-lg text-black font-pregular opacity-50">
               No hay productos
             </Text>
           </View>
@@ -191,10 +192,15 @@ const FormContent = ({
           />
         )}
       </View>
-      <ButtonDelete
+      {/* <ButtonDelete
         selected={selected}
         deleting={deleting}
         handleDelete={handleDelete}
+      /> */}
+      <ButtonSubmit
+        isSubmitting={deleting}
+        isFormValid={selected.size > 0}
+        handleSubmit={handleDelete}
       />
     </View>
   );

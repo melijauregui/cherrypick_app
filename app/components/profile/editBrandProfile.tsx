@@ -24,7 +24,7 @@ export default function EditBrandProfile({
     editDescriptionValue !== lastValueDescription;
 
   const userNameInput = (
-    <View className="flex flex-col justify-center items-center px-5 py-4 gap-4">
+    <View className="flex flex-col justify-center items-center px-5 py-6 gap-5">
       <InputBoxWithName
         name="página oficial url"
         value={editLinkValue}
