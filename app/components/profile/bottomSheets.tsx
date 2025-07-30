@@ -183,6 +183,8 @@ export { CustomBottomSheetDate };
 function BottomSheetSame({
   bottomSheetRef,
   onSubmit,
+  onSubmit2,
+  onCancel,
   isReady,
   hasDone = true,
   componentView,
@@ -190,6 +192,8 @@ function BottomSheetSame({
 }: {
   bottomSheetRef: React.RefObject<BottomSheet>;
   onSubmit?: () => void;
+  onSubmit2?: () => boolean;
+  onCancel?: () => void;
   isReady?: boolean;
   hasDone?: boolean;
   componentView: React.ReactNode;
@@ -217,6 +221,7 @@ function BottomSheetSame({
             <TouchableOpacity
               className={`flex flex-row  mr-auto`}
               onPress={() => {
+                onCancel?.();
                 bottomSheetRef.current?.close();
               }}
             >
@@ -243,6 +248,12 @@ function BottomSheetSame({
               className="flex flex-row ml-auto"
               onPress={() => {
                 onSubmit?.();
+                if (onSubmit2) {
+                  const canSubmit = onSubmit2();
+                  if (!canSubmit) {
+                    return;
+                  }
+                }
                 bottomSheetRef.current?.close();
               }}
               disabled={!isReady}

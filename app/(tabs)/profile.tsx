@@ -84,12 +84,12 @@ const BrandProfile = ({
 }) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const mutateBrand = useUpdateBrand(user.email);
-  const data = useFetchBrandProfile(user);
 
   const bottomSheetRefLogout = useRef<BottomSheet>(null);
   const bottomSheetRefAddItem = useRef<BottomSheet>(null);
   const bottomSheetRefDeleteItem = useRef<BottomSheet>(null);
   const bottomSheetRefEdit = useRef<BottomSheet>(null);
+  const data = useFetchBrandProfile(user, bottomSheetRefEdit);
   const openUsernameSheetLogout = () => {
     bottomSheetRefAddItem.current?.close();
     bottomSheetRefDeleteItem.current?.close();
@@ -468,7 +468,10 @@ function useUpdateClient() {
   return mutation;
 }
 
-function useFetchBrandProfile(user: UserInfo): {
+function useFetchBrandProfile(
+  user: UserInfo,
+  bottomSheetRef: React.RefObject<BottomSheet>
+): {
   brand: {
     name: string;
     description: string;
@@ -480,6 +483,7 @@ function useFetchBrandProfile(user: UserInfo): {
   const { data, isLoading, error } = useQuery({
     queryKey: ["fetch-brand-profile", user.email],
     queryFn: async () => {
+      console.log("fetching brand profile");
       try {
         const { data } = await safeFetch({
           url: `http://${LOCAL_IP}:3000/get-brand?email=${user.email}`,
