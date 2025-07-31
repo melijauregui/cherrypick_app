@@ -10,6 +10,8 @@ const {
   EXPO_PUBLIC_IOS_CLIENT_ID,
   SMTP_USER,
   SMTP_PASS,
+  WEAVIATE_URL,
+  WEAVIATE_API_KEY,
 } = process.env;
 const REQUIRED_VARS = {
   PINECONE_API_KEY,
@@ -20,6 +22,8 @@ const REQUIRED_VARS = {
   EXPO_PUBLIC_IOS_CLIENT_ID,
   SMTP_USER,
   SMTP_PASS,
+  WEAVIATE_URL,
+  WEAVIATE_API_KEY,
 };
 
 // Check if any required variable is missing
@@ -46,4 +50,6 @@ export const config = {
   EXPO_PUBLIC_IP: process.env.EXPO_PUBLIC_IP as string,
   SMTP_USER: process.env.SMTP_USER as string,
   SMTP_PASS: process.env.SMTP_PASS as string,
+  WEAVIATE_URL: process.env.WEAVIATE_URL as string,
+  WEAVIATE_API_KEY: process.env.WEAVIATE_API_KEY as string,
 };

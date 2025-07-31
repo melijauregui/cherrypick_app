@@ -20,7 +20,8 @@ const VerifyAvailabilitySchema = z.union([
   }),
   z.object({
     error: z.literal(true),
-    details: z.string(),
+    userType: z.enum(["client", "brand"]).nullable(),
+    details: z.string().nullable(),
   }),
 ]);
 export { VerifyAvailabilitySchema };
@@ -29,7 +30,7 @@ export type VerifyAvailabilitySchemaType = z.infer<
 >;
 
 const QueryVerifyAvalabilitySchema = z.object({
-  email: z.preprocess((val) => val?.toString(), z.string()),
+  email: z.preprocess(val => val?.toString(), z.string()),
 });
 export { QueryVerifyAvalabilitySchema };
 

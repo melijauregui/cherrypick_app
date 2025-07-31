@@ -9,11 +9,7 @@
     "scheme": "cherrypick",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "platforms": [
-      "ios",
-      "android",
-      "web"
-    ],
+    "platforms": ["ios", "android", "web"],
     "ios": {
       "bundleIdentifier": "com.cherrypickapp.googleauthern",
       "supportsTablet": true,
@@ -25,9 +21,7 @@
             ]
           },
           {
-            "CFBundleURLSchemes": [
-              "com.googleusercontent.apps.321366117154-gq34d2c6r30i8tl8r45dpte4i0ba8nk9"
-            ]
+            "CFBundleURLSchemes": ["cherrypick"]
           }
         ],
         "ITSAppUsesNonExemptEncryption": false
@@ -35,8 +29,8 @@
       "build": {
         "production": {
           "ios": { "buildType": "archive" }
-    }
-  }
+        }
+      }
     },
     "android": {
       "package": "com.cherrypickapp.googleauthern",
@@ -68,7 +62,7 @@
     },
     "extra": {
       "router": {
-        "origin": false
+        "origin": "cherrypick://"
       },
       "eas": {
         "projectId": "e0d221a6-6b38-4601-8549-ca222a510406"

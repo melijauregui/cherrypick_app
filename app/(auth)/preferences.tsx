@@ -7,7 +7,7 @@ import {
   FlatList,
 } from "react-native";
 import React, { useState } from "react";
-import { LogoCircle } from "@/components/LogoCircle";
+import LogoCircle from "@/app/components/LogoCircle";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import images from "../../constants/images";
@@ -15,65 +15,37 @@ import {
   CreateAccountSchemaRes,
   CreateAccountSchema,
 } from "@/schemas/auth/preferences-schema";
-import { safeFetch } from "@/utils/safe-fetch";
+import safeFetch from "@/app/utils/safe-fetch";
 import { LOCAL_IP } from "@/config/api";
-import { useGoogleSignIn } from "@/hooks/useGoogleSignIn";
+import { authClient, useSession } from "@/lib/auth-client";
+import Toast from "react-native-toast-message";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const Preferences = () => {
   const router = useRouter();
+  const createAccount = useCreateAccount();
   const [preferences, setPreferences] = useState<string[]>([]);
   const { name, email, dateBirth } = useLocalSearchParams();
-  const { promptGoogleLogin, isReady } = useGoogleSignIn(() => {
-    console.log("Google sign-in successful going to home");
-    router.replace("/home");
-  });
-  console.log(
-    "Proceeding with name in preferences:",
-    name,
-    "and email:",
-    email,
-    "and date:",
-    dateBirth,
-    "and preferences:",
-    preferences
-  );
+  const [selectedOne, setSelectedOne] = useState<boolean>(false);
+
   async function handleSubmit() {
-    console.log("Creating an account");
     if (
       typeof name !== "string" ||
       typeof email !== "string" ||
       typeof dateBirth !== "string"
     ) {
       console.log("Invalid parameters");
+      router.replace("/sign-up");
       return;
     }
-    try {
-      const { success } = await createAccount(
-        name,
-        email,
-        dateBirth,
-        preferences
-      );
-      if (success) {
-        console.log("Account created, now signing in with Google");
-        if (isReady) {
-          await promptGoogleLogin();
-          console.log("Google sign-in successful");
-        } else {
-          console.log("Google sign-in not ready");
-          router.push("/sign-in");
-        }
-      } else {
-        console.log("Account creation failed");
-        router.push("/sign-in");
-      }
-    } catch (error) {
-      console.error("Error creating account:", error);
-      router.push("/sign-in");
-    }
-    console.log("Redirecting to home...");
+    createAccount.mutate({
+      username: name,
+      email,
+      dateOfBirth: dateBirth,
+      preferences,
+    });
   }
-  const [selectedOne, setSelectedOne] = useState<boolean>(false);
+
   return (
     <SafeAreaView className="bg-brown-strong flex-1 h-full w-full">
       <View className="flex flex-grow flex-col w-full justify-between px-14 pt-3">
@@ -82,7 +54,7 @@ const Preferences = () => {
           <Text className="text-white text-[27px] font-pbold pt-6">
             How would you describe your fashion style?
           </Text>
-          <Text className="text-gray-400 text-[15px] font-pregular pt-3">
+          <Text className="text-grey-lighter text-[15px] font-pregular pt-3">
             Pick at least 1 to customize your home feed.
           </Text>
           <SelectionList
@@ -152,17 +124,19 @@ const Item = ({
       onPress={onPress}
       className="w-[49%] aspect-[1] my-4 flex flex-col items-center justify-center "
     >
-      <Image
-        source={item.image}
-        className={`
+      {item.image ? (
+        <Image
+          source={item.image}
+          className={`
           w-full  
           h-full
           rounded-2xl
           ${isSelected ? "border-2 border-white" : ""}
         `}
-        resizeMode="cover"
-      />
-      <Text className="mt-1 text-gray-400 font-pregular">{item.title}</Text>
+          resizeMode="cover"
+        />
+      ) : null}
+      <Text className="mt-1 text-[#d7d7d7] font-pregular">{item.title}</Text>
     </TouchableOpacity>
   );
 };
@@ -177,8 +151,9 @@ const SelectionList = ({
   const [selectedIdxs, setSelectedIdxs] = useState<string[]>([]);
 
   function handleOnpress(title: string) {
+    console.log("handleOnpress", title);
     const updated = selectedIdxs.includes(title)
-      ? selectedIdxs.filter((item) => item !== title)
+      ? selectedIdxs.filter(item => item !== title)
       : [...selectedIdxs, title];
 
     setSelectedIdxs(updated);
@@ -205,7 +180,7 @@ const SelectionList = ({
       <FlatList
         data={DATA}
         renderItem={renderItem}
-        keyExtractor={(item) => item.title}
+        keyExtractor={item => item.title}
         extraData={selectedIdxs}
         numColumns={2}
         columnWrapperStyle={{
@@ -248,61 +223,78 @@ const NextButton = ({
   );
 };
 
-async function createAccount(
-  name: string,
-  email: string,
-  dateString: string,
-  preferences: string[]
-): Promise<{ success: boolean }> {
-  console.log(
-    "Creating account with name:",
-    name,
-    "email:",
-    email,
-    "date:",
-    dateString,
-    "preferences:",
-    preferences
-  );
-  try {
-    console.log("Parsing request with Zod schema");
-    const parsedReq = CreateAccountSchema.parse({
-      name,
-      email,
-      dateString,
-      preferences,
-    });
-    console.log("Parsed request:", parsedReq);
-    const { data } = await safeFetch({
-      url: `http://${LOCAL_IP}:3000/create-account`,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name,
-        email,
-        dateString: dateString,
-        preferences,
-      }),
-      schema: CreateAccountSchemaRes,
-      method: "POST",
-    });
+function useCreateAccount() {
+  const router = useRouter();
+  const { status } = useSession();
+  const mutation = useMutation({
+    mutationFn: async (user: {
+      username: string;
+      email: string;
+      dateOfBirth: string;
+      preferences: string[];
+    }) => {
+      console.log(
+        "Creating account with name:",
+        user.username,
+        "email:",
+        user.email,
+        "date:",
+        user.dateOfBirth,
+        "preferences:",
+        user.preferences
+      );
+      CreateAccountSchema.parse({
+        name: user.username,
+        email: user.email,
+        dateString: user.dateOfBirth,
+        preferences: user.preferences,
+      });
+      const { data } = await safeFetch({
+        url: `http://${LOCAL_IP}:3000/create-account`,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: user.username,
+          email: user.email,
+          dateString: user.dateOfBirth,
+          preferences: user.preferences,
+        }),
+        schema: CreateAccountSchemaRes,
+        method: "POST",
+      });
+      if (data.error) {
+        throw new Error(data.details);
+      }
+    },
+    onSuccess: async () => {
+      await authClient.updateUser({
+        new: false,
+      });
+      const session = await authClient.getSession();
+      if (session.data?.user.id) {
+        router.replace("/home");
+      } else {
+        Toast.show({
+          type: "success",
+          text1:
+            "Account created successfully!\nPlease sign in with Google to continue.",
+          visibilityTime: 4000,
+        });
+        router.replace("/sign-in");
+      }
+    },
+    onError: error => {
+      console.error("Error creating account:", error);
+      Toast.show({
+        type: "error",
+        text1: "Error creating account",
+        text2: "Please try again later.",
+        visibilityTime: 4000,
+      });
+      router.replace("/sign-in");
+    },
+  });
 
-    if (data.error) {
-      console.log("Error:", data.details);
-      throw new Error(data.details);
-    }
-    console.log("Account created successfully:", data);
-    return {
-      success: true,
-    };
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error("Error:", error.message);
-      throw error;
-    } else {
-      console.error("Unexpected error:", error);
-      throw new Error("Unexpected error");
-    }
-  }
+  return mutation;
 }

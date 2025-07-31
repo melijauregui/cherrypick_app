@@ -1,6 +1,7 @@
 import { Stack } from "expo-router";
-import React from "react";
+import React, { useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
+import { Linking } from "react-native";
 
 const AuthLayout = () => {
   return (
@@ -8,6 +9,12 @@ const AuthLayout = () => {
       <Stack>
         <Stack.Screen
           name="sign-up"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="sign-up-brand"
           options={{
             headerShown: false,
           }}
@@ -26,6 +33,12 @@ const AuthLayout = () => {
         />
         <Stack.Screen
           name="preferences"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="error"
           options={{
             headerShown: false,
           }}

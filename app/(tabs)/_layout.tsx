@@ -1,12 +1,12 @@
-import { View, Text, Image, ImageSourcePropType } from "react-native";
+import { View, Image, ImageSourcePropType } from "react-native";
 import React from "react";
-import { Tabs, Redirect } from "expo-router";
+import { Tabs, router } from "expo-router";
 import icons from "../../constants/icons";
-
+import { OnlyAuthenticated } from "@/lib/auth-client";
 
 const TabsLayout = () => {
   return (
-    <>
+    <OnlyAuthenticated>
       <Tabs screenOptions={{ tabBarShowLabel: false }}>
         {Page({
           name: "home",
@@ -27,7 +27,7 @@ const TabsLayout = () => {
           iconName: "Profile",
         })}
       </Tabs>
-    </>
+    </OnlyAuthenticated>
   );
 };
 
@@ -52,8 +52,10 @@ const Page = ({
         headerShown: false,
         tabBarStyle: {
           backgroundColor: "#301c11",
-          height: 55,
+          height: 60,
           borderColor: "#301c11",
+          paddingBottom: 12,
+          paddingTop: 6,
         },
         tabBarActiveTintColor: "#FFFFFF",
         tabBarIcon: ({ color, focused }) => (
@@ -81,7 +83,7 @@ const TabIcon = ({
   focused: boolean;
 }) => {
   return (
-    <View className="items-center top-[5]">
+    <View className="items-center justify-center">
       <Image
         source={icon}
         resizeMode="contain"

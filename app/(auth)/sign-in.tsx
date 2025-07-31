@@ -1,187 +1,66 @@
-import {
-  ScrollView,
-  Text,
-  View,
-  TouchableOpacity,
-  Image,
-  Platform,
-  ActivityIndicator,
-} from "react-native";
-import * as SecureStore from "expo-secure-store";
+import { ScrollView, Text, View, TouchableOpacity, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useEffect } from "react";
-import React, { useState } from "react";
-import { LogoCircle } from "@/components/LogoCircle";
-import * as Google from "expo-auth-session/providers/google";
-import { router, useLocalSearchParams } from "expo-router";
-import { makeRedirectUri } from "expo-auth-session";
-import Constants from "expo-constants";
-import * as WebBrowser from "expo-web-browser";
-import { safeFetch } from "@/utils/safe-fetch";
-import { VerifyUserResponseSchema } from "@/schemas/auth/sign-in-schema";
-import { LOCAL_IP } from "@/config/api";
-import { set } from "zod";
-import { useAuth } from "@/context/AuthContext";
-
-WebBrowser.maybeCompleteAuthSession();
+import React, { useEffect, useState } from "react";
+import LogoCircle from "@/app/components/LogoCircle";
+import { router } from "expo-router";
+import { authClient, useSession } from "@/lib/auth-client";
 
 const SignIn = () => {
-  const params = useLocalSearchParams();
-  const [showError, setShowError] = useState(params.error === "not-registered");
-  const [loading, setLoading] = useState(params.loading === "true");
-  /* if (loading) {
-    return (
-      <SafeAreaView className="bg-brown-strong flex-1 justify-center items-center">
-        <ActivityIndicator size="large" color="#fff" />
-      </SafeAreaView>
-    );
-  } else {
-     */
+  const { user, status } = useSession();
+
+  useEffect(() => {
+    if (user && status === "authenticated") {
+      if (user.new) {
+        const name = user?.name || "";
+        const email = user?.email || "";
+        if (!name || !email) {
+          //TODO PUSH TOAST
+          console.log("Missing user data for creation, redirecting to sign-in");
+          router.replace("/sign-in");
+          return;
+        }
+        router.replace({
+          pathname: "cherrypick:///preferences",
+          params: {
+            name,
+            email,
+            dateBirth: "",
+          },
+        });
+      } else {
+        router.replace("cherrypick:///home");
+      }
+    }
+  }, [status, user]);
+
   return (
     <SafeAreaView className="bg-brown-strong flex-1 h-full w-full">
       <ScrollView
-        className="flex-1 w-full h-full"
+        className="flex-1 w-full"
         contentContainerStyle={{ flexGrow: 1 }}
       >
         <View className="flex flex-grow flex-col w-full px-14 py-3">
           <LogoCircle classname="w-[60] h-[60] mb-1 self-center" />
-          <View className="w-full mt-40">
+          <View className="w-full mt-40 ">
             <Text className="text-white text-[25px] font-pbold relative">
               Instantly match any outfit to real shopping options.
             </Text>
             <View className="w-full mt-40 flex flex-col gap-4">
-              <GoogleSignInButton
-                setShowError={setShowError}
-                setLoading={setLoading}
-              />
+              <GoogleSignInButton />
               <OrLine />
               <SignUpButton />
             </View>
-
-            {showError && (
-              <View className="rounded-md p-3 mt-4">
-                <Text className="text-red-500 text-center font-psemibold">
-                  Invalid account. Try signing up first.
-                </Text>
-              </View>
-            )}
           </View>
         </View>
       </ScrollView>
+      <SignInBrandButton />
     </SafeAreaView>
   );
 };
 
 export default SignIn;
 
-const GoogleSignInButton: React.FC<{
-  setShowError: React.Dispatch<React.SetStateAction<boolean>>;
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-}> = ({ setShowError, setLoading }) => {
-  const isExpoGo = Constants.executionEnvironment === "storeClient";
-  const googleRedirectUri = isExpoGo
-    ? "https://auth.expo.io/@cherrypickapp/cherrypick"
-    : undefined;
-
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    androidClientId: isExpoGo
-      ? undefined
-      : process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
-    iosClientId: process.env.EXPO_PUBLIC_IOS_CLIENT_ID,
-    responseType: "code",
-    extraParams: {
-      access_type: "offline",
-      prompt: "consent",
-    },
-  });
-
-  const { setUser } = useAuth();
-
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      if (
-        response?.type === "error" ||
-        response?.type === "dismiss" ||
-        response?.type === "cancel"
-      ) {
-        router.replace({ pathname: "/sign-in", params: { loading: "false" } });
-        return;
-      }
-      if (
-        response?.type === "success" &&
-        response.authentication?.accessToken
-      ) {
-        try {
-          const userInfoResponse = await fetch(
-            "https://www.googleapis.com/oauth2/v3/userinfo",
-            {
-              headers: {
-                Authorization: `Bearer ${response.authentication?.accessToken}`,
-              },
-            }
-          );
-
-          const userInfo = await userInfoResponse.json();
-
-          const { data } = await safeFetch({
-            url: `http://${LOCAL_IP}:3000/verify-user`,
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email: userInfo.email }),
-            schema: VerifyUserResponseSchema,
-          });
-
-          if (!data.error) {
-            await SecureStore.setItemAsync(
-              "accessToken",
-              response.authentication?.accessToken
-            );
-            await SecureStore.setItemAsync(
-              "refreshToken",
-              response.authentication?.refreshToken ?? ""
-            );
-            setUser(userInfo);
-            console.log("Redirecting to home...");
-            router.push("/home");
-          } else {
-            setShowError(true);
-            setLoading(false);
-            console.log("User not registered, redirecting to sign-in...");
-            router.replace({
-              pathname: "/sign-in",
-              params: { error: "not-registered", loading: "false" },
-            });
-          }
-        } catch (error) {
-          console.error("Error fetching user info or verifying:", error);
-          setShowError(true);
-          setLoading(false);
-          router.replace({
-            pathname: "/sign-in",
-            params: { error: "not-registered", loading: "false" },
-          });
-        }
-      }
-    };
-
-    fetchUserInfo();
-  }, [response]);
-
-  const handlePress = async () => {
-    try {
-      setLoading(true);
-      await promptAsync();
-    } catch (e) {
-      console.error("Error al iniciar sesión:", e);
-      setShowError(true);
-      setLoading(false);
-      router.replace({
-        pathname: "/sign-in",
-        params: { error: "not-registered", loading: "false" },
-      });
-    }
-  };
-
+const GoogleSignInButton: React.FC<{}> = () => {
   return (
     <TouchableOpacity
       className="flex flex-row bg-white h-[50px] justify-center items-center rounded-full"
@@ -219,3 +98,30 @@ const OrLine = () => (
     <View className="w-40 h-px bg-gray-500 opacity-70" />
   </View>
 );
+
+const SignInBrandButton = () => (
+  <TouchableOpacity
+    className="flex flex-row justify-center items-center bottom-6"
+    onPress={() => router.push("/sign-up-brand")}
+  >
+    <Text className="text-white font-pmedium text-[15px]">
+      Are you a brand? Sign up here
+    </Text>
+  </TouchableOpacity>
+);
+
+const handlePress = async () => {
+  console.log("handlePress - iniciando Google sign-in");
+  try {
+    console.log("signing in with google");
+
+    const result = await authClient.signIn.social({
+      provider: "google",
+      callbackURL: "cherrypick:///home",
+      errorCallbackURL: "cherrypick:///error",
+      //newUserCallbackURL: "cherrypick:///preferences",
+    });
+  } catch (error) {
+    console.error("Error in Google sign-in:", error);
+  }
+};
