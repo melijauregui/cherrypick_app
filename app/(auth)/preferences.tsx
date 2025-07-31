@@ -22,6 +22,7 @@ import Toast from "react-native-toast-message";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const Preferences = () => {
+  const router = useRouter();
   const createAccount = useCreateAccount();
   const [preferences, setPreferences] = useState<string[]>([]);
   const { name, email, dateBirth } = useLocalSearchParams();
@@ -34,6 +35,7 @@ const Preferences = () => {
       typeof dateBirth !== "string"
     ) {
       console.log("Invalid parameters");
+      router.replace("/sign-up");
       return;
     }
     createAccount.mutate({
@@ -269,7 +271,8 @@ function useCreateAccount() {
       await authClient.updateUser({
         new: false,
       });
-      if (status === "authenticated") {
+      const session = await authClient.getSession();
+      if (session.data?.user.id) {
         router.replace("/home");
       } else {
         Toast.show({
