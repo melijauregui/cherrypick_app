@@ -12,8 +12,8 @@ from fashionClipTestingText import test_text_clasification, find_similarities_ma
 
 # --- CONFIGURACIÓN ---
 ORIGINAL_MODEL_NAME = "Marqo/marqo-fashionSigLIP"
-MODEL_NAME_TO_FINETUNE = "Marqo/marqo-fashionSigLIP"
-MODEL_NAME_TO_PUSH = "Sofia-gb/fashionSigLIP-roturas26"
+# MODEL_NAME_TO_FINETUNE = "Marqo/marqo-fashionSigLIP"
+MODEL_NAME_TO_PUSH = "Sofia-gb/fashionSigLIP-roturas23"
 # CSV_PATH = "datasets/con-sin-roturas.csv"
 FOLDER_IMAGES_TESTING = "images-testing"
 

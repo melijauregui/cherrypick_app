@@ -29,7 +29,7 @@ Resultados TRAIN:
 - MRR: 0.5712
 - Precision@5: 0.822
 
-Resultados TEST:
+Resultados TEST (validación):
 - recall@1: 0.4627
 - recall@5: 0.8955
 - recall@10: 0.9851
