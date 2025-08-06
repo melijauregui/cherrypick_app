@@ -6,9 +6,9 @@ from io import BytesIO
 import requests
 from tqdm import tqdm
 
-INPUT_CSV = "datasets/preferencias/preferencias-nobg4.csv"
-OUTPUT_DIR = "processed_preferences_images"
-OUTPUT_CSV = "datasets/preferencias/preferencias-nobg4.csv"
+INPUT_CSV = "datasets/roturas-español/con-sin-roturas-v4.csv"
+OUTPUT_DIR = "processed_images_roturas"
+OUTPUT_CSV = "datasets/roturas-español/con-sin-roturas-v4-nbg.csv"
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -18,7 +18,7 @@ processed_entries = []
 for idx, row in tqdm(df.iterrows(), total=len(df)):
     url = row["image"]
     description = row["description"]
-    tags = row["tags"]
+    # tags = row["tags"]
 
     try:
         # Nombre de archivo base
@@ -51,7 +51,7 @@ for idx, row in tqdm(df.iterrows(), total=len(df)):
         processed_entries.append({
             "image": output_filename,
             "description": description,
-            "tags": tags
+            # "tags": tags
         })
 
     except Exception as e:

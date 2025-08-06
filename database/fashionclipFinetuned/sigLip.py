@@ -101,7 +101,7 @@ class FashionDataset(Dataset):
             return None
 
         text = row["description"]
-        if row["tags"] != "":
+        if row.get("tags", "") != "":
             if not text.endswith("."):
                 text += "."
             text += f" Estilos: {row['tags']}"
