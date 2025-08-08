@@ -32,7 +32,6 @@ const ItemDetail = () => {
 
   return (
     <View className="flex-1 bg-brown-strong">
-      {/* Fixed back button - always visible */}
       <TouchableOpacity
         onPress={() => router.back()}
         onPressIn={() => setIsPressed(true)}

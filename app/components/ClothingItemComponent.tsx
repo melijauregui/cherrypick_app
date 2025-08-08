@@ -31,7 +31,6 @@ const ClothingItemComponent = ({
   const { width, height } = Dimensions.get("window");
   const widthDetermined = width / numColumns - 10; //width hard coded
 
-  // Ref for measuring the image position
   const imageRef = useRef<View>(null);
 
   useEffect(() => {
@@ -63,7 +62,7 @@ const ClothingItemComponent = ({
 
   const handlePress = () => {
     const itemId = generateItemId(item.name, item.brand);
-    router.navigate({
+    router.push({
       pathname: "/(items)/[id]/item-detail",
       params: {
         id: itemId,
