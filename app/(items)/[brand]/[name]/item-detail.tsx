@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { Entypo, Ionicons, FontAwesome } from "@expo/vector-icons";
+import * as Clipboard from "expo-clipboard";
 import {
   CatalogItemSchemaType,
   GetItemResponseSchema,
@@ -21,9 +22,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const ItemDetail = () => {
   const params = useLocalSearchParams();
+
+  // Decodificar los parámetros en caso de que vengan de un link compartido
+  const decodedName = decodeURIComponent(params.name as string);
+  const decodedBrand = decodeURIComponent(params.brand as string);
+
   const item = useFetchItem(
-    params.name as string,
-    params.brand as string,
+    decodedName,
+    decodedBrand,
     params.imageUrl as string | undefined,
     params.description as string | undefined,
     parseFloat(params.price as string),
@@ -55,24 +61,7 @@ const ItemDetail = () => {
           <ImageComponent imageUrl={item.item.image_url} />
         </View>
 
-        <View className="px-4 pb-6 pt-4 flex-row items-center gap-8">
-          {/* <View className="flex-row items-center space-x-4"> */}
-          <TouchableOpacity className="w-8 h-8 items-center justify-center">
-            <Ionicons name="heart-outline" size={24} color="white" />
-          </TouchableOpacity>
-          <TouchableOpacity className="w-8 h-8 items-center justify-center">
-            <FontAwesome name="bookmark-o" size={24} color="white" />
-          </TouchableOpacity>
-
-          <TouchableOpacity className="w-8 h-8 items-center justify-center">
-            <Ionicons name="arrow-up-outline" size={24} color="white" />
-          </TouchableOpacity>
-          {/* </View> */}
-
-          <TouchableOpacity className="w-8 h-8 items-center justify-center">
-            <Ionicons name="ellipsis-horizontal" size={24} color="white" />
-          </TouchableOpacity>
-        </View>
+        <IconComponent name={item.item.name} brand={item.item.brand} />
 
         <ListItems
           profileData={null}
@@ -121,6 +110,59 @@ const ImageComponent = ({ imageUrl }: { imageUrl: string }) => {
       style={{ width: screenWidth, height: imageHeight }}
       resizeMode="cover"
     />
+  );
+};
+
+const IconComponent = ({ name, brand }: { name: string; brand: string }) => {
+  const handleShareItem = async () => {
+    try {
+      // Luego encodear los parámetros para manejar caracteres especiales y espacios
+      const encodedBrand = encodeURIComponent(brand);
+      const encodedName = encodeURIComponent(name);
+
+      // Crear el link con solo los parámetros brand y name encodeados
+      const itemLink = `cherrypick://item/${encodedBrand}/${encodedName}`;
+
+      // Copiar al clipboard
+      await Clipboard.setStringAsync(itemLink);
+
+      // Mostrar toast de confirmación
+      Toast.show({
+        type: "normal",
+        text1: "Link copiado!",
+        visibilityTime: 3000,
+      });
+    } catch (error) {
+      console.error("Error copying to clipboard:", error);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "No se pudo copiar el link",
+        visibilityTime: 3000,
+      });
+    }
+  };
+
+  return (
+    <View className="px-4 pb-6 pt-4 flex-row items-center gap-8">
+      <TouchableOpacity className="w-8 h-8 items-center justify-center">
+        <Ionicons name="heart-outline" size={24} color="white" />
+      </TouchableOpacity>
+      <TouchableOpacity className="w-8 h-8 items-center justify-center">
+        <FontAwesome name="bookmark-o" size={24} color="white" />
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        className="w-8 h-8 items-center justify-center"
+        onPress={handleShareItem}
+      >
+        <Ionicons name="arrow-up-outline" size={24} color="white" />
+      </TouchableOpacity>
+
+      <TouchableOpacity className="w-8 h-8 items-center justify-center">
+        <Ionicons name="ellipsis-horizontal" size={24} color="white" />
+      </TouchableOpacity>
+    </View>
   );
 };
 

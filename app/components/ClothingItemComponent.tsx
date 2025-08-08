@@ -65,8 +65,8 @@ const ClothingItemComponent = ({
     router.push({
       pathname: "/(items)/[brand]/[name]/item-detail",
       params: {
-        brand: item.brand,
-        name: item.name,
+        brand: encodeURIComponent(item.brand),
+        name: encodeURIComponent(item.name),
         imageUrl: item.image_url,
         description: item.description,
         price: item.price.toString(),

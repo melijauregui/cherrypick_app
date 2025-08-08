@@ -113,11 +113,27 @@ const CustomToast = ({ type, text1, text2, onHide }: any) => {
   );
 };
 
+const NormalToast = ({ text1, onHide }: any) => {
+  return (
+    <View className="flex-row items-center bg-white rounded-2xl py-4 px-[18px] mx-2 min-h-[70px]">
+      <View style={{ flex: 1 }}>
+        <Text className={`text-black font-plight text-xl mb-0.5`}>{text1}</Text>
+      </View>
+      <TouchableOpacity onPress={onHide} style={{ marginLeft: 10 }}>
+        <Ionicons name="close" size={22} color="#888" />
+      </TouchableOpacity>
+    </View>
+  );
+};
+
 export const toastConfig = {
   success: (props: any) => (
     <CustomToast {...props} type="success" onHide={() => Toast.hide()} />
   ),
   error: (props: any) => (
     <CustomToast {...props} type="error" onHide={() => Toast.hide()} />
+  ),
+  normal: (props: any) => (
+    <NormalToast {...props} type="normal" onHide={() => Toast.hide()} />
   ),
 };
