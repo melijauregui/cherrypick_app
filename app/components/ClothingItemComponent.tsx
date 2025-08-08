@@ -1,15 +1,28 @@
-import { View, Image, Dimensions } from "react-native";
-import React, { useEffect, useState } from "react";
+import { View, Image, Dimensions, TouchableOpacity } from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import { router } from "expo-router";
+import { CatalogItemSchemaType } from "@/schemas/catalog/catalog-schema";
+
+// Función para generar un ID único basado en nombre y marca
+const generateItemId = (name: string, brand: string): string => {
+  const combined = `${name}-${brand}`;
+  return combined
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+};
 
 const ClothingItemComponent = ({
   i,
-  url: image_url,
+  item,
   numColumns,
 }: {
   i: number;
-  url: string;
+  item: CatalogItemSchemaType;
   numColumns: number;
 }) => {
+  const { image_url } = item;
   const [imageDimensions, setImageDimensions] = useState({
     width: 0,
     height: 0,
@@ -17,6 +30,9 @@ const ClothingItemComponent = ({
 
   const { width, height } = Dimensions.get("window");
   const widthDetermined = width / numColumns - 10; //width hard coded
+
+  // Ref for measuring the image position
+  const imageRef = useRef<View>(null);
 
   useEffect(() => {
     Image.getSize(
@@ -45,8 +61,25 @@ const ClothingItemComponent = ({
     return null;
   }
 
+  const handlePress = () => {
+    const itemId = generateItemId(item.name, item.brand);
+    router.navigate({
+      pathname: "/(items)/[id]/item-detail",
+      params: {
+        id: itemId,
+        itemName: item.name,
+        itemBrand: item.brand,
+        itemImageUrl: item.image_url,
+        itemDescription: item.description,
+        itemPrice: item.price.toString(),
+        itemUrl: item.url,
+      },
+    });
+  };
+
   return (
     <View
+      ref={imageRef}
       className="mx-auto"
       style={{
         width: widthDetermined,
@@ -55,13 +88,15 @@ const ClothingItemComponent = ({
         marginTop: i < numColumns ? 0 : 18,
       }}
     >
-      {image_url ? (
-        <Image
-          source={{ uri: image_url }}
-          style={{ width: widthDetermined, height: imageHeight }}
-          resizeMode="cover"
-        />
-      ) : null}
+      <TouchableOpacity onPress={handlePress} activeOpacity={0.9}>
+        {image_url ? (
+          <Image
+            source={{ uri: image_url }}
+            style={{ width: widthDetermined, height: imageHeight }}
+            resizeMode="cover"
+          />
+        ) : null}
+      </TouchableOpacity>
     </View>
   );
 };

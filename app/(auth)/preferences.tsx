@@ -35,7 +35,13 @@ const Preferences = () => {
       typeof dateBirth !== "string"
     ) {
       console.log("Invalid parameters");
-      router.replace("/sign-up");
+      //toast
+      Toast.show({
+        type: "error",
+        text1: "Invalid parameters",
+        text2: "Please try again later.",
+        visibilityTime: 4000,
+      });
       return;
     }
     createAccount.mutate({

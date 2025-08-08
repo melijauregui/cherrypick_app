@@ -209,9 +209,7 @@ function BottomSheetSame({
   value?: string;
 }) {
   // callbacks
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log("handleSheetChanges", index);
-  }, []);
+  const handleSheetChanges = useCallback((index: number) => {}, []);
   return (
     <BottomSheet
       ref={bottomSheetRef}

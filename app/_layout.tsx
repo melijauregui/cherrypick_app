@@ -69,6 +69,13 @@ const RootLayout = () => {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name="(items)"
+          options={{
+            headerShown: false,
+            presentation: "modal",
+          }}
+        />
       </Stack>
       <Toast config={toastConfig} />
     </QueryClientProvider>

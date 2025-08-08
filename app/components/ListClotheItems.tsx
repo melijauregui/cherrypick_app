@@ -73,11 +73,7 @@ const ListItems = ({
         item: CatalogItemSchemaType;
         index: number;
       }) => (
-        <ClothingItemComponent
-          i={index}
-          url={item.image_url}
-          numColumns={columnCount}
-        />
+        <ClothingItemComponent i={index} item={item} numColumns={columnCount} />
       )}
       onEndReached={() => fetchNextPage()}
       onEndReachedThreshold={0.1}

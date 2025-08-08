@@ -7,7 +7,6 @@ import { auth } from "@/lib/auth";
 import { router } from "expo-router";
 import { BETTER_AUTH_URL } from "@/config/api";
 
-
 const authClient = createAuthClient({
   /** The base URL of the server (optional if you're using the same domain) */
   baseURL: BETTER_AUTH_URL,
@@ -61,7 +60,6 @@ export function OnlyAuthenticated({ children }: { children: React.ReactNode }) {
   }
 
   if (status === "unauthenticated") {
-    console.log("unauthenticated, redirecting to login...");
     router.replace("cherrypick:///sign-in");
     return null;
   }

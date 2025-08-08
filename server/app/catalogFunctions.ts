@@ -87,10 +87,10 @@ async function getCollection(): Promise<{
       throw new Error("No se pudo conectar a Weaviate");
     }
 
-    let collection: Collection<any, any, any>;
+    let collection: Collection;
     const exists = await client.collections.exists("FashionItem");
     if (!exists) {
-      collection = await client.collections.create({
+      collection = (await client.collections.create({
         name: "FashionItem",
         properties: [
           { name: "name", dataType: "text" },
@@ -102,9 +102,9 @@ async function getCollection(): Promise<{
           { name: "embedding_type", dataType: "text" },
         ],
         vectorizers: weaviate.configure.vectorizer.none(),
-      }) as Collection<any, any, any>;
+      })) as Collection;
     } else {
-      collection = client.collections.get("FashionItem") as Collection<any, any, any>;
+      collection = client.collections.get("FashionItem") as Collection;
     }
 
     return {
@@ -130,13 +130,13 @@ export async function validateCsvFile(
   brand: string
 ): Promise<
   | {
-    error: true;
-    details: string;
-  }
+      error: true;
+      details: string;
+    }
   | {
-    error: false;
-    catalogItems: CatalogItemSchemaType[];
-  }
+      error: false;
+      catalogItems: CatalogItemSchemaType[];
+    }
 > {
   try {
     const csvText = await file.text();
@@ -249,13 +249,13 @@ export async function validateJsonItems(
   brand: string
 ): Promise<
   | {
-    error: true;
-    details: string;
-  }
+      error: true;
+      details: string;
+    }
   | {
-    error: false;
-    catalogItems: catalogJsonItemSchemaType[];
-  }
+      error: false;
+      catalogItems: catalogJsonItemSchemaType[];
+    }
 > {
   try {
     if (!Array.isArray(items) || items.length === 0) {
@@ -533,12 +533,12 @@ export async function validateItemsToDelete(
   brand: string
 ): Promise<
   | {
-    error: true;
-    details: string;
-  }
+      error: true;
+      details: string;
+    }
   | {
-    error: false;
-  }
+      error: false;
+    }
 > {
   try {
     if (!itemsNames || itemsNames.length === 0) {
