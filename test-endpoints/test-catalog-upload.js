@@ -1,9 +1,10 @@
+import { LOCAL_IP } from "@/config/api";
 const fs = require("fs/promises");
 
 async function testCatalogUploadJson(brand, filePath) {
   const items = JSON.parse(await fs.readFile(filePath, "utf-8"));
   try {
-    const response = await fetch("http://localhost:3000/insert-catalog-brand", {
+    const response = await fetch(`http://${LOCAL_IP}:3000/insert-catalog-brand`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ brand, items }),

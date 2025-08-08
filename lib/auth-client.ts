@@ -5,10 +5,12 @@ import { useEffect, useState } from "react";
 import { adminClient, inferAdditionalFields } from "better-auth/client/plugins";
 import { auth } from "@/lib/auth";
 import { router } from "expo-router";
+import { BETTER_AUTH_URL } from "@/config/api";
+
 
 const authClient = createAuthClient({
   /** The base URL of the server (optional if you're using the same domain) */
-  baseURL: "http://localhost:3000",
+  baseURL: BETTER_AUTH_URL,
   plugins: [
     inferAdditionalFields<typeof auth>(),
     expoClient({
@@ -20,7 +22,7 @@ const authClient = createAuthClient({
 });
 
 export { authClient };
-const { signIn, signUp, useSession: _useSession } = authClient;
+const { signIn, signUp, signOut, useSession: _useSession } = authClient;
 
 function useSession() {
   const [first, setFirst] = useState(true);
@@ -46,7 +48,7 @@ function useSession() {
   };
 }
 
-export { useSession, signIn, signUp };
+export { useSession, signIn, signUp, signOut };
 
 export function OnlyAuthenticated({ children }: { children: React.ReactNode }) {
   const { status } = useSession();

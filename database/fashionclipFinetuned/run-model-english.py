@@ -13,7 +13,7 @@ from fashionClipTestingText import test_text_clasification, find_similarities_ma
 # --- CONFIGURACIÓN ---
 ORIGINAL_MODEL_NAME = "Marqo/marqo-fashionSigLIP"
 MODEL_NAME_TO_FINETUNE = "Marqo/marqo-fashionSigLIP"
-MODEL_NAME_TO_PUSH = "melijauregui/fashionSigLIP-roturas34"
+MODEL_NAME_TO_PUSH = "Sofia-gb/fashionSigLIP-roturas30"
 FOLDER_IMAGES_TESTING = "images-testing"
 
 

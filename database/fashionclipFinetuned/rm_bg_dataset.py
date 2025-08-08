@@ -6,9 +6,9 @@ from io import BytesIO
 import requests
 from tqdm import tqdm
 
-INPUT_CSV = "datasets/con-sin-roturas-english.csv"
-OUTPUT_DIR = "processed_images_english"
-OUTPUT_CSV = "datasets/con-sin-roturas-english-v2.csv"
+INPUT_CSV = "datasets/roturas-español/con-sin-roturas-v4.csv"
+OUTPUT_DIR = "processed_images_roturas"
+OUTPUT_CSV = "datasets/roturas-español/con-sin-roturas-v4-nbg.csv"
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -18,13 +18,27 @@ processed_entries = []
 for idx, row in tqdm(df.iterrows(), total=len(df)):
     url = row["image"]
     description = row["description"]
+    # tags = row["tags"]
 
     try:
         # Nombre de archivo base
         basename = os.path.basename(url).split("?")[0]
-        output_filename = os.path.join(OUTPUT_DIR, basename.replace(".jpg", "_nobg.png").replace(".png", "_nobg.png"))
+        rm = False
+        if not url.endswith('nobg.png'):
+            if url.endswith('.jpg'):
+                basename = basename.replace(
+                    ".jpg", "_nobg.png")
+            else:
+                basename = basename.replace(".png", "_nobg.png")
+            rm = True
 
-        if not os.path.exists(output_filename):
+        output_filename = os.path.join(OUTPUT_DIR, basename)
+        if url.endswith('_nobg_nobg.png'):
+            output_filename = output_filename.replace(
+                "_nobg_nobg.png", "_nobg.png")
+            os.rename(os.path.join(OUTPUT_DIR, basename), output_filename)
+
+        if rm and not os.path.exists(output_filename):
             # Descargar la imagen
             response = requests.get(url, timeout=10)
             response.raise_for_status()
@@ -36,7 +50,8 @@ for idx, row in tqdm(df.iterrows(), total=len(df)):
 
         processed_entries.append({
             "image": output_filename,
-            "description": description
+            "description": description,
+            # "tags": tags
         })
 
     except Exception as e:
@@ -46,4 +61,5 @@ for idx, row in tqdm(df.iterrows(), total=len(df)):
 processed_df = pd.DataFrame(processed_entries)
 processed_df.to_csv(OUTPUT_CSV, index=False)
 
-print(f"✅ Proceso terminado. Imágenes guardadas en '{OUTPUT_DIR}' y CSV generado en '{OUTPUT_CSV}'.")
+print(
+    f"✅ Proceso terminado. Imágenes guardadas en '{OUTPUT_DIR}' y CSV generado en '{OUTPUT_CSV}'.")

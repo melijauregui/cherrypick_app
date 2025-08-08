@@ -1,8 +1,5 @@
 from sklearn.metrics import confusion_matrix
 from torch.nn.functional import cosine_similarity
-import random
-from huggingface_hub import HfApi, HfFolder, Repository
-from io import BytesIO
 import os
 from rembg import remove
 import pandas as pd
@@ -12,15 +9,21 @@ from tqdm import tqdm
 from torch.utils.data import Dataset, DataLoader
 from transformers import AutoProcessor, AutoModel
 import torch
-import torch.nn as nn
 from torchvision import transforms
 import torch.optim as optim
-from huggingface_hub import create_repo, upload_file
 # pip install nlpaug transformers sentencepiece
-import random
 from sklearn.model_selection import train_test_split
 import torch.nn.functional as F
 import multiprocessing
+# import nltk
+from nltk.corpus import stopwords
+import re
+# import spacy
+# nlp = spacy.load("en_core_web_sm")  # python -m spacy download en_core_web_sm
+
+# nltk.download('stopwords')
+# stop_words_en = set(stopwords.words('english'))
+# stop_words_es = set(stopwords.words('spanish'))
 
 # --- CONFIGURACIÓN ---
 BATCH_SIZE = 30
@@ -39,6 +42,19 @@ data_transforms = transforms.Compose([
     transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1),
     transforms.RandomAffine(degrees=5, translate=(0.02, 0.02))
 ])
+
+
+# def clean_text(text):
+#    tokens = re.findall(r'\b\w+\b', text.lower())
+#    filtered = [word for word in tokens if word not in stop_words_en]
+#    return " ".join(filtered)
+
+# def clean_text2(text):
+#    doc = nlp(text.lower())
+#    lemmatized = [
+#        token.lemma_ for token in doc if not token.is_stop and not token.is_punct]
+#    return " ".join(lemmatized)
+
 
 # --- DATASET PERSONALIZADO ---
 
@@ -85,6 +101,10 @@ class FashionDataset(Dataset):
             return None
 
         text = row["description"]
+        if row.get("tags", "") != "":
+            if not text.endswith("."):
+                text += "."
+            text += f" Estilos: {row['tags']}"
         return image, text
 
 
@@ -137,6 +157,23 @@ def contrastive_loss(image_embeds, text_embeds, margin=0.5):
     return loss
 
 
+def contrastive_loss_InfoNCE_hard_negatives(text_embeds, image_embeds, temperature=TEMPERATURE):
+    text_embeds = F.normalize(text_embeds, dim=-1)
+    image_embeds = F.normalize(image_embeds, dim=-1)
+
+    logits = torch.matmul(text_embeds, image_embeds.T) / temperature
+    labels = torch.arange(len(text_embeds)).to(logits.device)
+
+    # Seleccionar hard negatives
+    hard_negatives = logits.topk(k=1, dim=1, largest=True).indices.squeeze()
+
+    loss_hard_negatives = F.cross_entropy(logits, hard_negatives)
+    loss_i2t = F.cross_entropy(logits, labels)
+    loss_t2i = F.cross_entropy(logits.T, labels)
+
+    return (loss_i2t + loss_t2i + loss_hard_negatives) / 3
+
+
 def contrastive_loss_InfoNCE(text_embeds, image_embeds, temperature=TEMPERATURE):
     text_embeds = F.normalize(text_embeds, dim=-1)
     image_embeds = F.normalize(image_embeds, dim=-1)
@@ -157,13 +194,14 @@ def contrastive_loss_InfoNCE(text_embeds, image_embeds, temperature=TEMPERATURE)
 #     correct = topk.eq(targets.unsqueeze(1)).any(dim=1).float()
 #     return correct.mean().item()
 
-def compute_recall_at_ks(image_embeds, text_embeds, ks=[1,5,10]):
+def compute_recall_at_ks(image_embeds, text_embeds, ks=[1, 5, 10]):
     sims = image_embeds @ text_embeds.T
     targets = torch.arange(len(image_embeds), device=sims.device)
     recalls = {}
     for k in ks:
         _, topk = sims.topk(k, dim=1)
-        correct = topk.eq(targets.unsqueeze(1)).any(dim=1).float().mean().item()
+        correct = topk.eq(targets.unsqueeze(1)).any(
+            dim=1).float().mean().item()
         recalls[f"recall@{k}"] = correct
     return recalls
 
@@ -224,17 +262,17 @@ def validate(model, val_loader, processor, epoch, epochs, loss_func):
     recalls = compute_recall_at_ks(image_embeds, text_embeds)
     mrr = compute_mrr(image_embeds, text_embeds)
     print(f"🧪 Epoch {epoch+1} - Validation Loss: {avg_val_loss:.4f}")
-    for k,v in recalls.items():
+    for k, v in recalls.items():
         print(f"Recall 🔍 {k}: {v:.4f}")
     print(f"🔍 MRR: {mrr:.4f}")
     return avg_val_loss, image_embeds, text_embeds, all_texts
 
 
-def evaluate_by_class(image_embeds, text_embeds, df_val, ks=[1,5,10]):
+def evaluate_by_class(image_embeds, text_embeds, df_val, ks=[1, 5, 10]):
     # df_val debe tener columnas 'cut_type' y 'has_rips'
     results = {}
     labels = df_val["has_rips"].values  # 0 o 1
-    for cls in [0,1]:
+    for cls in [0, 1]:
         idxs = (labels == cls).nonzero()[0]
         sub_img_emb = image_embeds[idxs]
         sub_txt_emb = text_embeds[idxs]
@@ -249,13 +287,15 @@ def confusion_plain_vs_ripped(image_embeds, df_val, model, processor):
     queries = ["plain jeans", "ripped jeans"]
     q_embeds = []
     for q in queries:
-        inp = processor(text=[q], return_tensors="pt", padding=True, truncation=True).to(DEVICE)
+        inp = processor(text=[q], return_tensors="pt",
+                        padding=True, truncation=True).to(DEVICE)
         q_emb = model.get_text_features(**inp, normalize=True)
         q_embeds.append(F.normalize(q_emb, dim=-1)[0])
 
     # para cada query obtenemos top-1
     sims = torch.stack(q_embeds) @ image_embeds.T  # (2, N_images)
-    preds = sims.argmax(dim=1).cpu().numpy()        # índices top1 para cada query
+    # índices top1 para cada query
+    preds = sims.argmax(dim=1).cpu().numpy()
 
     # extraemos ground‐truth has_rips
     truths = [
@@ -264,7 +304,7 @@ def confusion_plain_vs_ripped(image_embeds, df_val, model, processor):
     ]
     pred_labels = df_val.iloc[preds]["has_rips"].values
     # Matriz de confusión
-    cm = confusion_matrix(truths, pred_labels, labels=[0,1])
+    cm = confusion_matrix(truths, pred_labels, labels=[0, 1])
     print("Confusion matrix (plain=0, ripped=1):\n", cm)
 
 
@@ -360,11 +400,11 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
         avg_val_loss, img_emb, txt_emb, val_texts = validate(
             model, val_loader, processor, epoch, epochs, loss_func
         )
-        
+
         df_val = val_df.reset_index(drop=True)
-        class_res = evaluate_by_class(img_emb, txt_emb, df_val, ks=[1,5,10])
+        class_res = evaluate_by_class(img_emb, txt_emb, df_val, ks=[1, 5, 10])
         print("=== Recall por has_rips ===")
-        for k,v in class_res.items():
+        for k, v in class_res.items():
             print(k, v)
 
         # confusion analysis plain vs ripped
@@ -401,14 +441,7 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
 
 if __name__ == "__main__":
     multiprocessing.freeze_support()
-    fine_tune(csv_path="datasets/con-sin-roturas-english-v4.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
-              model_name_to_push="melijauregui/fashionSigLIP-roturas34", data_aug=False,
-              loss_func=contrastive_loss_InfoNCE, batch_size=64, epochs=32, lr=2e-5,
-              n_layers=10)
-    #levanto mi modelo melijauregui/fashionSigLIP-roturas33
-    # model = AutoModel.from_pretrained(
-    #     pretrained_model_name_or_path="melijauregui/fashionSigLIP-roturas33", trust_remote_code=True)
-    # processor = AutoProcessor.from_pretrained(
-    #     pretrained_model_name_or_path="Marqo/marqo-fashionSigLIP", trust_remote_code=True)
-    # model.push_to_hub("melijauregui/fashionSigLIP-roturas33")
-    # processor.push_to_hub("melijauregui/fashionSigLIP-roturas33")
+    fine_tune(csv_path="datasets/preferencias/preferencias-nobg4.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
+              model_name_to_push="Sofia-gb/preferencias4", data_aug=False,
+              loss_func=contrastive_loss_InfoNCE, batch_size=8, epochs=32, lr=2e-5,
+              n_layers=2)

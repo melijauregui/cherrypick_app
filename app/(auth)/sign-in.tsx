@@ -119,7 +119,7 @@ const handlePress = async () => {
       provider: "google",
       callbackURL: "cherrypick:///home",
       errorCallbackURL: "cherrypick:///error",
-      newUserCallbackURL: "cherrypick:///preferences",
+      //newUserCallbackURL: "cherrypick:///preferences",
     });
   } catch (error) {
     console.error("Error in Google sign-in:", error);

@@ -3,6 +3,7 @@ import torch
 from PIL import Image
 from transformers import AutoModel, AutoProcessor
 import numpy as np
+from sklearn.metrics import precision_score, recall_score, f1_score
 
 # Configurar dispositivo
 device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
@@ -110,7 +111,7 @@ def find_similarities_matrix2(model, processor, description, image_paths, images
     return probabilities
 
 
-def test_text_clasification(probabilities, image_paths, has, clasification_img, yellow_flags=[], imprimir_mayores_al_minimo = False):
+def test_text_clasification(probabilities, image_paths, has, clasification_img, yellow_flags=[], imprimir_mayores_al_minimo=False):
     # Extraer nombres de archivo
     image_names = [os.path.basename(path) for path in image_paths]
 
@@ -180,9 +181,42 @@ def test_text_clasification(probabilities, image_paths, has, clasification_img, 
 
         print(
             f"\n🎯 Porcentaje de acierto incluyendo 🟨: {accuracy:.2f}% ({correct_aprox}/{total})")
-        
-    #imprimo todos los que estan arriba del minimo rotura
-    
+
+    # --- NUEVAS METRICAS ---
+
+    # Definir umbral para clasificar predicción positiva
+    threshold = max_no_rotura
+
+    # Predicciones binarias: si probabilidad > threshold -> pred positive
+    predicted_positive = set(i for i, p in enumerate(
+        probabilities) if p > threshold)
+    true_positive = set(rotura_imgs)
+    true_negative = set(no_rotura_imgs)
+
+    # Precision = TP / (TP + FP)
+    TP = len(predicted_positive.intersection(true_positive))
+    FP = len(predicted_positive.difference(true_positive))
+    precision = TP / (TP + FP) if (TP + FP) > 0 else 0
+
+    # Recall = TP / (TP + FN)
+    FN = len(true_positive.difference(predicted_positive))
+    recall = TP / (TP + FN) if (TP + FN) > 0 else 0
+
+    print(f"\n📊 Precision: {precision:.3f}")
+    print(f"📊 Recall: {recall:.3f}")
+
+    # MRR - buscar el primer ranking con imagen real positiva
+    sorted_indices = np.argsort(probabilities.cpu().numpy())[::-1]
+    mrr = 0
+    for rank, idx in enumerate(sorted_indices, start=1):
+        if idx in true_positive:
+            mrr = 1 / rank
+            break
+
+    print(f"📊 MRR (Mean Reciprocal Rank): {mrr:.3f}")
+
+    # imprimo todos los que estan arriba del minimo rotura
+
     if imprimir_mayores_al_minimo:
         # imprimo la probabilidad mas chica de roturas
         if rotura_imgs:
@@ -192,5 +226,5 @@ def test_text_clasification(probabilities, image_paths, has, clasification_img, 
         print("\nImágenes con probabilidad mayor al mínimo:")
         for i, value in enumerate(probabilities):
             if value > min_rotura and i not in rotura_imgs:
-                print(f"Esta imagen sobrepaso al minimo: {image_names[i]}: {value:.3f}") 
-
+                print(
+                    f"Esta imagen sobrepaso al minimo: {image_names[i]}: {value:.3f}")
