@@ -41,8 +41,15 @@ import {
   PaginationSchemaBrand,
   CatalogResponseSchemaDelete,
   CatalogResponseSchemaDeleteType,
+  GetItemQuerySchema,
+  GetItemResponseSchema,
+  GetItemResponseSchemaType,
 } from "../schemas/catalog/catalog-schema";
-import { QueryWeaviateImage, QueryWeaviateAllItems } from "./app/routeVector";
+import {
+  QueryWeaviateImage,
+  QueryWeaviateAllItems,
+  QueryWeaviateItem,
+} from "./app/routeVector";
 import {
   BrandSchemaRes,
   BrandSchemaResType,
@@ -704,5 +711,43 @@ app.openapi(allBrandItemsRoute, async c => {
   let res: AllBrandItemsSchemaResType;
   res = await QueryWeaviateAllItems(brand, filter, page, limit);
   console.log("res", res);
+  return c.json(res, 200);
+});
+
+// endpoint que busca un item específico por name y brand
+const getItemRoute = createRoute({
+  method: "get",
+  path: "/get-item",
+  request: {
+    query: GetItemQuerySchema,
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: GetItemResponseSchema,
+        },
+      },
+      description: "Devuelve un item específico por nombre y marca",
+    },
+  },
+});
+
+app.openapi(getItemRoute, async c => {
+  const { name, brand } = c.req.valid("query");
+  console.log("Getting item:", name, "from brand:", brand);
+
+  let res: GetItemResponseSchemaType;
+
+  try {
+    res = await QueryWeaviateItem(name, brand);
+  } catch (error) {
+    console.error("Error getting item:", error);
+    res = {
+      error: true,
+      details: "Error interno del servidor",
+    };
+  }
+
   return c.json(res, 200);
 });

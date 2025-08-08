@@ -10,7 +10,7 @@ export const catalogJsonItemSchema = z.object({
 
 export type catalogJsonItemSchemaType = z.infer<typeof catalogJsonItemSchema>;
 
-export const catalogItemSchema = z.object({
+export const CatalogItemSchema = z.object({
   ...catalogJsonItemSchema.shape,
   brand: z.string().min(1, "La marca es requerida"),
 });
@@ -66,11 +66,11 @@ export type CatalogResponseSchemaDeleteType = z.infer<
 >;
 
 //array de catalogItemSchema
-export const CatalogItemArraySchema = z.array(catalogItemSchema);
+export const CatalogItemArraySchema = z.array(CatalogItemSchema);
 
-export type CatalogItem = z.infer<typeof catalogItemSchema>;
+export type CatalogItem = z.infer<typeof CatalogItemSchema>;
 export type CsvFileUpload = z.infer<typeof csvFileUploadSchema>;
-export type CatalogItemSchemaType = z.infer<typeof catalogItemSchema>;
+export type CatalogItemSchemaType = z.infer<typeof CatalogItemSchema>;
 export type CatalogResponseSchemaType = z.infer<typeof CatalogResponseSchema>;
 
 const PaginationSchemaBrand = z.object({
@@ -85,3 +85,24 @@ export const jsonCatalogUploadSchema = z.object({
   items: z.array(catalogJsonItemSchema).min(1, "Debe tener al menos un item"),
   brand: z.string().min(1, "La marca es requerida"),
 });
+
+// Schema for get-item query parameters
+export const GetItemQuerySchema = z.object({
+  name: z.string().min(1, "El nombre es requerido"),
+  brand: z.string().min(1, "La marca es requerida"),
+});
+
+// Response schema for get-item
+export const GetItemResponseSchema = z.union([
+  z.object({
+    error: z.literal(true),
+    details: z.string(),
+  }),
+  z.object({
+    error: z.literal(false),
+    item: CatalogItemSchema,
+  }),
+]);
+
+export type GetItemQuerySchemaType = z.infer<typeof GetItemQuerySchema>;
+export type GetItemResponseSchemaType = z.infer<typeof GetItemResponseSchema>;

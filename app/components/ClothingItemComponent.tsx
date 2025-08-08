@@ -63,15 +63,14 @@ const ClothingItemComponent = ({
   const handlePress = () => {
     const itemId = generateItemId(item.name, item.brand);
     router.push({
-      pathname: "/(items)/[id]/item-detail",
+      pathname: "/(items)/[brand]/[name]/item-detail",
       params: {
-        id: itemId,
-        itemName: item.name,
-        itemBrand: item.brand,
-        itemImageUrl: item.image_url,
-        itemDescription: item.description,
-        itemPrice: item.price.toString(),
-        itemUrl: item.url,
+        brand: item.brand,
+        name: item.name,
+        imageUrl: item.image_url,
+        description: item.description,
+        price: item.price.toString(),
+        url: item.url,
       },
     });
   };

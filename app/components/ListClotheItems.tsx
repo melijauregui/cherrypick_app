@@ -23,7 +23,7 @@ const ListItems = ({
 }) => {
   const [refreshKey, setRefreshKey] = useState(0);
 
-  const { data, fetchNextPage, refetch, isRefetching } = useInfiniteQuery({
+  const { data, fetchNextPage, refetch } = useInfiniteQuery({
     queryKey: ["clothing-items", profileData?.email],
     queryFn: ({ pageParam }) =>
       getClothingItems(pageParam, limit, profileData?.name),
@@ -80,7 +80,7 @@ const ListItems = ({
       estimatedItemSize={280}
       refreshControl={
         <RefreshControl
-          refreshing={isRefetching}
+          refreshing={false}
           onRefresh={onRefresh}
           tintColor="#ffffff"
           colors={["#ffffff"]}

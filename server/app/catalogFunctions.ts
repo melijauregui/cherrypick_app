@@ -1,6 +1,6 @@
 import {
   catalogJsonItemSchema,
-  catalogItemSchema,
+  CatalogItemSchema,
   CatalogItemSchemaType,
   CatalogResponseSchemaType,
   CatalogResponseSchemaDeleteType,
@@ -201,7 +201,7 @@ export async function validateCsvFile(
 
       // Validate item against schema
       try {
-        const validatedItem = catalogItemSchema.parse(item);
+        const validatedItem = CatalogItemSchema.parse(item);
 
         // Check if item already exists in Weaviate with same name and brand
         const isDuplicate = await checkDuplicateInWeaviate(
@@ -270,7 +270,7 @@ export async function validateJsonItems(
     for (let i = 0; i < items.length; i++) {
       const item = { ...items[i], brand };
       try {
-        const validatedItem = catalogItemSchema.parse(item);
+        const validatedItem = CatalogItemSchema.parse(item);
         // Check if item already exists in Weaviate with same name and brand
         const isDuplicate = await checkDuplicateInWeaviate(
           collection,
