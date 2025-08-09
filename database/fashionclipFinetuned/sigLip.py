@@ -104,7 +104,7 @@ class FashionDataset(Dataset):
         if row.get("tags", "") != "":
             if not text.endswith("."):
                 text += "."
-            text += f" Estilos: {row['tags']}"
+            text += f" {row['tags']}"
         return image, text
 
 
@@ -215,57 +215,15 @@ def compute_mrr(image_embeds, text_embeds):
     return reciprocal_ranks.mean().item()
 
 
-def validate(model, val_loader, processor, epoch, epochs, loss_func):
-    model.eval()
-    val_loss = 0.0
-    all_image_embeds = []
-    all_text_embeds = []
-    all_texts = []
-    with torch.no_grad():
-        for images, texts in tqdm(val_loader, desc=f"Epoch {epoch+1}/{epochs} [Validation]"):
-            if not images:
-                continue
+def compute_precision(image_embeds, text_embeds, k=5):
+    image_embeds = torch.nn.functional.normalize(image_embeds, dim=-1)
+    text_embeds = torch.nn.functional.normalize(text_embeds, dim=-1)
 
-            inputs = processor(
-                images=images, text=texts, return_tensors="pt",
-                padding=True,
-                truncation=True,
-            ).to(DEVICE)
-
-            pixel_values = inputs["pixel_values"]
-            input_ids = inputs["input_ids"]
-            attention_mask = inputs["attention_mask"]
-
-            image_embeds = model.model.encode_image(pixel_values)
-            text_embeds = model.get_text_features(
-                input_ids=input_ids,
-                attention_mask=attention_mask,
-                normalize=True
-            )
-
-            image_embeds = image_embeds / \
-                image_embeds.norm(p=2, dim=-1, keepdim=True)
-            text_embeds = text_embeds / \
-                text_embeds.norm(p=2, dim=-1, keepdim=True)
-
-            all_image_embeds.append(image_embeds)
-            all_text_embeds.append(text_embeds)
-            all_texts.extend(texts)
-
-            loss = loss_func(image_embeds, text_embeds)
-            val_loss += loss.item()
-
-    avg_val_loss = val_loss / len(val_loader)
-    image_embeds = torch.cat(all_image_embeds)
-    text_embeds = torch.cat(all_text_embeds)
-
-    recalls = compute_recall_at_ks(image_embeds, text_embeds)
-    mrr = compute_mrr(image_embeds, text_embeds)
-    print(f"🧪 Epoch {epoch+1} - Validation Loss: {avg_val_loss:.4f}")
-    for k, v in recalls.items():
-        print(f"Recall 🔍 {k}: {v:.4f}")
-    print(f"🔍 MRR: {mrr:.4f}")
-    return avg_val_loss, image_embeds, text_embeds, all_texts
+    similarity = image_embeds @ text_embeds.T
+    topk = similarity.topk(k, dim=-1).indices
+    matches = torch.arange(len(image_embeds)).unsqueeze(1).to(topk.device)
+    precision = (topk == matches).any(dim=1).float().mean().item()
+    return precision
 
 
 def evaluate_by_class(image_embeds, text_embeds, df_val, ks=[1, 5, 10]):
@@ -395,20 +353,23 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
             running_loss += loss.item()
 
         avg_loss = running_loss / len(train_loader)
-        print(f"✅ Epoch {epoch+1} - Loss: {avg_loss:.4f}")
+        print(f"✅ Epoch {epoch+1} - Train Loss: {avg_loss:.4f}")
 
-        avg_val_loss, img_emb, txt_emb, val_texts = validate(
-            model, val_loader, processor, epoch, epochs, loss_func
+        evaluate(model, train_loader, processor, loss_func,
+                 desc=f"Epoch {epoch+1}/{epochs} [Train]")
+
+        avg_val_loss = evaluate(
+            model, val_loader, processor, loss_func, desc=f"Epoch {epoch+1}/{epochs} [Validation]"
         )
 
-        df_val = val_df.reset_index(drop=True)
+        """  df_val = val_df.reset_index(drop=True)
         class_res = evaluate_by_class(img_emb, txt_emb, df_val, ks=[1, 5, 10])
         print("=== Recall por has_rips ===")
         for k, v in class_res.items():
             print(k, v)
 
         # confusion analysis plain vs ripped
-        confusion_plain_vs_ripped(img_emb, df_val, model, processor)
+        confusion_plain_vs_ripped(img_emb, df_val, model, processor) """
 
         if avg_val_loss < best_loss:
             best_loss = avg_val_loss
@@ -439,9 +400,64 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
         processor.push_to_hub(model_name_to_push)
 
 
+def evaluate(model, loader, processor, loss_func, desc):
+    model.eval()
+    val_loss = 0.0
+    all_image_embeds = []
+    all_text_embeds = []
+    all_texts = []
+    with torch.no_grad():
+        for images, texts in tqdm(loader, desc=desc):
+            if not images:
+                continue
+
+            inputs = processor(
+                images=images, text=texts, return_tensors="pt",
+                padding=True,
+                truncation=True,
+            ).to(DEVICE)
+
+            pixel_values = inputs["pixel_values"]
+            input_ids = inputs["input_ids"]
+            attention_mask = inputs["attention_mask"]
+
+            image_embeds = model.model.encode_image(pixel_values)
+            text_embeds = model.get_text_features(
+                input_ids=input_ids,
+                attention_mask=attention_mask,
+                normalize=True
+            )
+
+            image_embeds = image_embeds / \
+                image_embeds.norm(p=2, dim=-1, keepdim=True)
+            text_embeds = text_embeds / \
+                text_embeds.norm(p=2, dim=-1, keepdim=True)
+
+            all_image_embeds.append(image_embeds)
+            all_text_embeds.append(text_embeds)
+            all_texts.extend(texts)
+
+            loss = loss_func(image_embeds, text_embeds)
+            val_loss += loss.item()
+
+    avg_loss = val_loss / len(loader)
+    image_embeds = torch.cat(all_image_embeds)
+    text_embeds = torch.cat(all_text_embeds)
+
+    recalls = compute_recall_at_ks(image_embeds, text_embeds)
+    mrr = compute_mrr(image_embeds, text_embeds)
+    precision = compute_precision(image_embeds, text_embeds)
+    print(f"🧪 Loss: {avg_loss:.4f}")
+    for k, v in recalls.items():
+        print(f"Recall 🔍 {k}: {v:.4f}")
+    print(f"🔍 MRR: {mrr:.4f}")
+    print(f"🔍 Precision@{5}: {precision:.4f}")
+    return avg_loss
+
+
 if __name__ == "__main__":
     multiprocessing.freeze_support()
-    fine_tune(csv_path="datasets/preferencias/preferencias-nobg4.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
-              model_name_to_push="Sofia-gb/preferencias4", data_aug=False,
+    fine_tune(csv_path="datasets/roturas-preferencias.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
+              model_name_to_push="Sofia-gb/cherrypick-sigLip", data_aug=False,
               loss_func=contrastive_loss_InfoNCE, batch_size=8, epochs=32, lr=2e-5,
               n_layers=2)

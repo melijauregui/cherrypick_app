@@ -17,17 +17,6 @@ CSV_PATH = "datasets/roturas-español/con-sin-roturas-v4-nbg.csv"
 # CHECKPOINT_PATH = "checkpoints/best_model.pt"
 
 
-def compute_precision(image_embeds, text_embeds, k=5):
-    image_embeds = torch.nn.functional.normalize(image_embeds, dim=-1)
-    text_embeds = torch.nn.functional.normalize(text_embeds, dim=-1)
-
-    similarity = image_embeds @ text_embeds.T
-    topk = similarity.topk(k, dim=-1).indices
-    matches = torch.arange(len(image_embeds)).unsqueeze(1).to(topk.device)
-    precision = (topk == matches).any(dim=1).float().mean().item()
-    return precision
-
-
 def print_results(model_name, csv_path):
 
     # --- CARGA DEL DATASET ---
@@ -55,32 +44,12 @@ def print_results(model_name, csv_path):
 
     # --- EVALUACIÓN ---
     print("🔎 Evaluando sobre el conjunto de ENTRENAMIENTO...")
-    _, train_image_embeds, train_text_embeds, _ = validate(
-        model, train_loader, processor, epoch=0, epochs=1, loss_func=contrastive_loss_InfoNCE)
-    train_recalls = compute_recall_at_ks(train_image_embeds, train_text_embeds)
-    train_mrr = compute_mrr(train_image_embeds, train_text_embeds)
-    precision_train = compute_precision(
-        train_image_embeds, train_text_embeds, k=5)
-
-    print("\n📊 Resultados TRAIN:")
-    for k, v in train_recalls.items():
-        print(f"{k}: {v:.4f}")
-    print(f"MRR: {train_mrr:.4f}")
-    print(f"Precision@5: {precision_train:.4f}")
+    evaluate(
+        model, train_loader, processor, loss_func=contrastive_loss_InfoNCE, desc="Evaluando TRAIN")
 
     print("\n🔎 Evaluando sobre el conjunto de TESTEO...")
-    _, test_image_embeds, test_text_embeds, _ = validate(
-        model, test_loader, processor, epoch=0, epochs=1, loss_func=contrastive_loss_InfoNCE)
-    test_recalls = compute_recall_at_ks(test_image_embeds, test_text_embeds)
-    test_mrr = compute_mrr(test_image_embeds, test_text_embeds)
-    precision_test = compute_precision(
-        test_image_embeds, test_text_embeds, k=5)
-
-    print("\n📊 Resultados TEST:")
-    for k, v in test_recalls.items():
-        print(f"{k}: {v:.4f}")
-    print(f"MRR: {test_mrr:.4f}")
-    print(f"Precision@5: {precision_test:.4f}")
+    evaluate(
+        model, test_loader, processor, loss_func=contrastive_loss_InfoNCE, desc="Evaluando TEST")
 
 
 if __name__ == "__main__":

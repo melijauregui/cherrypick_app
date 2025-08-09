@@ -6,7 +6,7 @@ from io import BytesIO
 import requests
 from tqdm import tqdm
 
-INPUT_CSV = "datasets/roturas-español/con-sin-roturas-v4.csv"
+INPUT_CSV = "datasets/roturas-español/con-sin-roturas-v4-nbg.csv"
 OUTPUT_DIR = "processed_images_roturas"
 OUTPUT_CSV = "datasets/roturas-español/con-sin-roturas-v4-nbg.csv"
 

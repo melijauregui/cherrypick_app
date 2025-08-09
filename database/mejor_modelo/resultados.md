@@ -20,7 +20,7 @@ Parámetros ajustados durante el fine-tunning:
 
 ### Roturas
 
-Modelo: Sofia-gb/fashionSigLIP-roturas23
+#### Modelo: Sofia-gb/fashionSigLIP-roturas23
 
 Resultados TRAIN:
 - recall@1: 0.3962
@@ -35,3 +35,19 @@ Resultados TEST (validación):
 - recall@10: 0.9851
 - MRR: 0.6303
 - Precision@5: 0.8955
+
+#### Modelo: Sofia-gb/cherrypick-sigLip
+
+Resultados TRAIN:
+- recall@1: 0.5881
+- recall@5: 0.8958
+- recall@10: 0.9529
+- MRR: 0.7131
+- Precision@5: 0.8983
+
+Resultados TEST:
+- recall@1: 0.6733
+- recall@5: 0.9406
+- recall@10: 0.9901
+- MRR: 0.7895
+- Precision@5: 0.9406
