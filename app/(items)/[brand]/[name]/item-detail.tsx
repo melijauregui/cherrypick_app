@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   Text,
+  Linking,
 } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { Feather, Entypo, Ionicons, FontAwesome } from "@expo/vector-icons";
@@ -61,7 +62,7 @@ const ItemDetail = () => {
 
       <ScrollView className="flex-1">
         <View className="relative">
-          <ImageComponent imageUrl={item.item.image_url} />
+          <ImageComponent imageUrl={item.item.image_url} url={item.item.url} />
         </View>
 
         <View className="px-5 flex flex-col gap-6">
@@ -72,8 +73,8 @@ const ItemDetail = () => {
 
           <ItemDetailComponent item={item.item} brand={brand?.brand} />
 
-          <Text className="text-white text-2xl font-psemibold">
-            More to explore
+          <Text className="pt-3 text-white text-xl font-psemibold">
+            Más para explorar
           </Text>
         </View>
 
@@ -90,7 +91,13 @@ const ItemDetail = () => {
 
 export default ItemDetail;
 
-const ImageComponent = ({ imageUrl }: { imageUrl: string }) => {
+const ImageComponent = ({
+  imageUrl,
+  url,
+}: {
+  imageUrl: string;
+  url: string;
+}) => {
   const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
   const [imageHeight, setImageHeight] = useState(0);
 
@@ -119,12 +126,20 @@ const ImageComponent = ({ imageUrl }: { imageUrl: string }) => {
   }, [imageUrl]);
 
   return (
-    <Image
-      className="rounded-3xl"
-      source={{ uri: imageUrl }}
-      style={{ width: screenWidth, height: imageHeight }}
-      resizeMode="cover"
-    />
+    <TouchableOpacity
+      onPress={() => {
+        if (url) {
+          Linking.openURL(url);
+        }
+      }}
+    >
+      <Image
+        className="rounded-3xl"
+        source={{ uri: imageUrl }}
+        style={{ width: screenWidth, height: imageHeight }}
+        resizeMode="cover"
+      />
+    </TouchableOpacity>
   );
 };
 
@@ -158,13 +173,19 @@ const ItemDetailComponent = ({
 
   return (
     <View className="gap-2">
-      <View className="flex-row items-center gap-2">
+      <TouchableOpacity
+        className="flex-row items-center gap-2"
+        onPress={() => {
+          //todo
+        }}
+        activeOpacity={0.7}
+      >
         <Image
           source={{ uri: brand?.logo_url }}
           className="w-6 h-6 rounded-full"
         />
         <Text className="text-white text-xl font-plight">{brand?.name}</Text>
-      </View>
+      </TouchableOpacity>
       <Text className="text-white text-3xl font-pmedium">{item.name}</Text>
       <View className="">
         <Text className="text-white text-xl font-pregular">

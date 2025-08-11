@@ -61,7 +61,6 @@ const ClothingItemComponent = ({
   }
 
   const handlePress = () => {
-    console.log("Item brandEmail", item.brandEmail);
     const itemId = generateItemId(item.name, item.brandEmail);
     router.push({
       pathname: "/(items)/[brand]/[name]/item-detail",
