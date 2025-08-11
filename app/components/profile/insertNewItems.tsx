@@ -22,6 +22,7 @@ import Toast from "react-native-toast-message";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import safeFetch from "@/app/utils/safe-fetch";
 import { CatalogResponseSchema } from "@/schemas/catalog/catalog-schema";
+import InputBoxWithName from "./inputBox";
 
 const InsertItemSchema = z.object({
   productName: z
@@ -191,56 +192,67 @@ const FormContent = ({
 }) => {
   return (
     <View className="flex-1 px-6 pt-4">
-      <ScrollView>
-        <DataInput
-          label="Product Name"
-          data={formData.productName}
-          handleFieldChange={handleFieldChange}
-          error={errors.productName}
-          field="productName"
-          keyboardType="default"
-          autoCapitalize="words"
-        />
+      <ScrollView className="">
+        <View className="flex flex-col gap-6">
+          <InputBoxWithName
+            name="Product Name"
+            value={formData.productName}
+            setValue={text => handleFieldChange("productName", text)}
+            error={errors.productName}
+            lastValue={formData.productName}
+            isScrollable={false}
+            keyboardType="default"
+            autoCapitalize="words"
+            placeholder="Escribe el nombre del nuevo item"
+          />
 
-        <DataInput
-          label="Product Description"
-          data={formData.description}
-          handleFieldChange={handleFieldChange}
-          error={errors.description}
-          field="description"
-          keyboardType="default"
-          autoCapitalize="none"
-        />
+          <InputBoxWithName
+            name="Description"
+            value={formData.description}
+            error={errors.description}
+            setValue={text => handleFieldChange("description", text)}
+            lastValue={formData.description}
+            isScrollable={true}
+            placeholder="Escribe una descripción del nuevo item"
+            height={120}
+          />
 
-        <DataInput
-          label="Product URL"
-          data={formData.url}
-          handleFieldChange={handleFieldChange}
-          error={errors.url}
-          field="url"
-          keyboardType="url"
-          autoCapitalize="none"
-        />
+          <InputBoxWithName
+            name="Product URL"
+            value={formData.url}
+            setValue={text => handleFieldChange("url", text)}
+            error={errors.url}
+            lastValue={formData.url}
+            keyboardType="url"
+            autoCapitalize="none"
+            placeholder="Escribe la url del nuevo item"
+            isScrollable={false}
+          />
 
-        <DataInput
-          label="Image URL"
-          data={formData.imageUrl}
-          handleFieldChange={handleFieldChange}
-          error={errors.imageUrl}
-          field="imageUrl"
-          keyboardType="url"
-          autoCapitalize="none"
-        />
+          <InputBoxWithName
+            name="Image URL"
+            value={formData.imageUrl}
+            setValue={text => handleFieldChange("imageUrl", text)}
+            error={errors.imageUrl}
+            lastValue={formData.imageUrl}
+            isScrollable={false}
+            keyboardType="url"
+            autoCapitalize="none"
+            placeholder="Escribe la url de la imagen del nuevo item"
+          />
 
-        <DataInput
-          label="Price"
-          data={formData.price}
-          handleFieldChange={handleFieldChange}
-          error={errors.price}
-          field="price"
-          keyboardType="decimal-pad"
-          autoCapitalize="none"
-        />
+          <InputBoxWithName
+            name="Price"
+            value={formData.price}
+            setValue={text => handleFieldChange("price", text)}
+            error={errors.price}
+            lastValue={formData.price}
+            isScrollable={false}
+            placeholder="Escribe el precio del nuevo item"
+            keyboardType="decimal-pad"
+            autoCapitalize="none"
+          />
+        </View>
       </ScrollView>
       <ButtonSubmit
         isSubmitting={isSubmitting}
@@ -253,6 +265,46 @@ const FormContent = ({
   );
 };
 const DataInput = ({
+  label,
+  data,
+  handleFieldChange,
+  error,
+  field,
+  keyboardType,
+  autoCapitalize,
+}: {
+  label: string;
+  data: string;
+  handleFieldChange: (field: keyof FormData, value: string) => void;
+  error: string | undefined;
+  field: keyof FormData;
+  keyboardType: KeyboardTypeOptions;
+  autoCapitalize: "none" | "sentences" | "words" | "characters";
+}) => {
+  return (
+    <View className="my-5 mx-1">
+      <Text className="text-black font-pmedium text-lg ">{label}</Text>
+      <TextInput
+        className="text-lg h-[40px] border-b border-gray-300 text-black  "
+        placeholder={`Enter ${label}`}
+        placeholderTextColor="#6b7280"
+        value={data}
+        onChangeText={text => handleFieldChange(field, text)}
+        autoCapitalize={autoCapitalize}
+        keyboardType={keyboardType}
+        textContentType="none"
+        autoCorrect={false}
+      />
+      {error && (
+        <Text className="text-red-500 text-[14px] mt-1 font-plight">
+          {error}
+        </Text>
+      )}
+    </View>
+  );
+};
+
+const DataInputLarge = ({
   label,
   data,
   handleFieldChange,
@@ -361,7 +413,6 @@ function useInsertItem(
       const newErrors: FormErrors = {};
       if (responseError instanceof ZodError) {
         responseError.errors.forEach(error => {
-          console.log("error", error);
           const field = error.path[0] as keyof FormData;
           newErrors[field] = error.message;
         });

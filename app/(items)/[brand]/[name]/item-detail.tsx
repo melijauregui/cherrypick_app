@@ -260,10 +260,6 @@ const IconComponent = ({ name, brand }: { name: string; brand: string }) => {
       >
         <Feather name="link" size={24} color="white" />
       </TouchableOpacity>
-
-      <TouchableOpacity className="w-8 h-8 items-center justify-center">
-        <Ionicons name="ellipsis-horizontal" size={24} color="white" />
-      </TouchableOpacity>
     </View>
   );
 };

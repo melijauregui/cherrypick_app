@@ -1,5 +1,5 @@
 import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
-import { View, Text, ScrollView } from "react-native";
+import { View, Text, ScrollView, KeyboardTypeOptions } from "react-native";
 
 const InputBox = ({
   value,
@@ -7,12 +7,16 @@ const InputBox = ({
   placeholder,
   length,
   height,
+  autoCapitalize,
+  keyboardType,
 }: {
   value: string;
   setValue: (text: string) => void;
   placeholder: string;
   length?: number;
   height?: number;
+  autoCapitalize?: "none" | "sentences" | "words" | "characters";
+  keyboardType?: KeyboardTypeOptions;
 }) => {
   return (
     <BottomSheetTextInput
@@ -33,6 +37,10 @@ const InputBox = ({
       selectionColor="#3478F6"
       multiline={true}
       textAlignVertical="top"
+      autoCapitalize={autoCapitalize}
+      keyboardType={keyboardType}
+      textContentType="none"
+      autoCorrect={false}
     />
   );
 };
@@ -46,6 +54,9 @@ const InputBoxWithName = ({
   length,
   placeholder,
   height,
+  error,
+  autoCapitalize,
+  keyboardType,
 }: {
   name: string;
   value: string;
@@ -55,6 +66,9 @@ const InputBoxWithName = ({
   length?: number;
   placeholder: string;
   height?: number;
+  error?: string | undefined;
+  autoCapitalize?: "none" | "sentences" | "words" | "characters";
+  keyboardType?: KeyboardTypeOptions;
 }) => {
   return (
     <View className="flex flex-col px-[16px] bg-white rounded-2xl border-[2px] border-gray-300 w-full py-2">
@@ -84,6 +98,11 @@ const InputBoxWithName = ({
           length={length}
           height={height}
         />
+      )}
+      {error && (
+        <Text className="text-red-500 text-[14px] mt-1 font-plight">
+          {error}
+        </Text>
       )}
     </View>
   );
