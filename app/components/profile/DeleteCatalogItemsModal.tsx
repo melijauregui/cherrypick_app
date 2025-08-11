@@ -24,11 +24,11 @@ const screenHeight = Dimensions.get("window").height;
 
 const DeleteCatalogItemsModal = ({
   bottomSheetRef,
-  brand,
+  brandEmail,
   onDelete,
 }: {
   bottomSheetRef: React.RefObject<BottomSheet>;
-  brand: string;
+  brandEmail: string;
   onDelete: () => void;
 }) => {
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -38,13 +38,13 @@ const DeleteCatalogItemsModal = ({
     setSelected,
     onDelete,
     bottomSheetRef,
-    brand,
+    brandEmail,
     setDeleting
   );
 
   const { data, fetchNextPage, isLoading, error } = useInfiniteQuery({
-    queryKey: ["delete-catalog-items", brand, search],
-    queryFn: ({ pageParam }) => fetchItems(brand, search, pageParam),
+    queryKey: ["delete-catalog-items", brandEmail, search],
+    queryFn: ({ pageParam }) => fetchItems(brandEmail, search, pageParam),
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
       if (lastPage.length === 0) {
@@ -57,7 +57,7 @@ const DeleteCatalogItemsModal = ({
   const queryClient = useQueryClient();
   const resetInfiniteQueryPagination = () => {
     return queryClient.setQueryData(
-      ["delete-catalog-items", brand, search],
+      ["delete-catalog-items", brandEmail, search],
       (oldData: any) => {
         if (!oldData) return undefined;
 
@@ -215,11 +215,10 @@ const FormContent = ({
 
 export default DeleteCatalogItemsModal;
 
-const fetchItems = async (brand: string, search: string, page: number) => {
+const fetchItems = async (brandEmail: string, search: string, page: number) => {
   const limit = 20;
-  console.log("fetching items", brand, search, page, limit);
   const res = await safeFetch({
-    url: `http://${LOCAL_IP}:3000/all-brand-items?brand=${brand}&filter=${search}&page=${page}&limit=${limit}`,
+    url: `http://${LOCAL_IP}:3000/all-brand-items?brandEmail=${brandEmail}&filter=${search}&page=${page}&limit=${limit}`,
     schema: AllBrandItemsSchemaRes,
   });
   if (res.data.error) {
@@ -233,7 +232,7 @@ function useDelete(
   setSelected: (selected: Set<string>) => void,
   onDelete: () => void,
   bottomSheetRef: React.RefObject<BottomSheet>,
-  brand: string,
+  brandEmail: string,
   setDeleting: (deleting: boolean) => void
 ) {
   const queryClient = useQueryClient();
@@ -250,7 +249,7 @@ function useDelete(
         },
         body: JSON.stringify({
           items: Array.from(selected).map(name => ({ name })),
-          brand,
+          brandEmail,
         }),
         schema: CatalogResponseSchemaDelete,
       });
@@ -261,7 +260,7 @@ function useDelete(
     },
     onSuccess: data => {
       void queryClient.invalidateQueries({
-        queryKey: ["delete-catalog-items", brand],
+        queryKey: ["delete-catalog-items", brandEmail],
       });
 
       Toast.show({

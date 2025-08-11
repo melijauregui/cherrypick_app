@@ -12,7 +12,7 @@ export type catalogJsonItemSchemaType = z.infer<typeof catalogJsonItemSchema>;
 
 export const CatalogItemSchema = z.object({
   ...catalogJsonItemSchema.shape,
-  brand: z.string().min(1, "La marca es requerida"),
+  brandEmail: z.string().min(1, "El email de la marca es requerido"),
 });
 
 // Schema for CSV file upload
@@ -35,7 +35,7 @@ export const deleteItemsJsonSchema = z.object({
       })
     )
     .min(1, "Debe tener al menos un item"),
-  brand: z.string().min(1, "La marca es requerida"),
+  brandEmail: z.string().min(1, "El email de la marca es requerido"),
 });
 
 // Response schema for catalog update
@@ -76,20 +76,20 @@ export type CatalogResponseSchemaType = z.infer<typeof CatalogResponseSchema>;
 const PaginationSchemaBrand = z.object({
   page: z.preprocess(val => parseInt(val as string) || 0, z.number().min(0)),
   limit: z.preprocess(val => parseInt(val as string) || 10, z.number().min(1)),
-  brand: z.string().min(1, "La marca es requerida"),
+  brandEmail: z.string().min(1, "La marca es requerida"),
 });
 export { PaginationSchemaBrand };
 
 // Schema for JSON catalog upload
 export const jsonCatalogUploadSchema = z.object({
   items: z.array(catalogJsonItemSchema).min(1, "Debe tener al menos un item"),
-  brand: z.string().min(1, "La marca es requerida"),
+  brandEmail: z.string().min(1, "El email de la marca es requerido"),
 });
 
 // Schema for get-item query parameters
 export const GetItemQuerySchema = z.object({
   name: z.string().min(1, "El nombre es requerido"),
-  brand: z.string().min(1, "La marca es requerida"),
+  brandEmail: z.string().min(1, "El email de la marca es requerido"),
 });
 
 // Response schema for get-item

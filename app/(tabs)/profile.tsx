@@ -89,7 +89,7 @@ const BrandProfile = ({
   const bottomSheetRefAddItem = useRef<BottomSheet>(null);
   const bottomSheetRefDeleteItem = useRef<BottomSheet>(null);
   const bottomSheetRefEdit = useRef<BottomSheet>(null);
-  const data = useFetchBrandProfile(user, bottomSheetRefEdit);
+  const data = useFetchBrandProfile(user.email);
   const openUsernameSheetLogout = () => {
     bottomSheetRefAddItem.current?.close();
     bottomSheetRefDeleteItem.current?.close();
@@ -118,7 +118,6 @@ const BrandProfile = ({
   };
 
   if (!data) {
-    console.log("No data found");
     return null;
   }
 
@@ -209,12 +208,12 @@ const BrandProfile = ({
           <InsertNewItemsModal
             bottomSheetRef={bottomSheetRefAddItem}
             onSubmit={handleSubmitAddItem}
-            brand={data.brand.name}
+            brandEmail={data.brand.email}
           />
 
           <DeleteCatalogItemsModal
             bottomSheetRef={bottomSheetRefDeleteItem}
-            brand={data.brand.name}
+            brandEmail={data.brand.email}
             onDelete={() => {}}
           />
 
@@ -299,8 +298,6 @@ const ClientProfile = ({
   };
 
   if (!data) {
-    //TODO PUSH TOAST
-    console.log("No data found");
     return null;
   }
 
@@ -468,10 +465,7 @@ function useUpdateClient() {
   return mutation;
 }
 
-function useFetchBrandProfile(
-  user: UserInfo,
-  bottomSheetRef: React.RefObject<BottomSheet>
-): {
+export function useFetchBrandProfile(email: string): {
   brand: {
     name: string;
     description: string;
@@ -481,12 +475,11 @@ function useFetchBrandProfile(
   };
 } | null {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["fetch-brand-profile", user.email],
+    queryKey: ["fetch-brand-profile", email],
     queryFn: async () => {
-      console.log("fetching brand profile");
       try {
         const { data } = await safeFetch({
-          url: `http://${LOCAL_IP}:3000/get-brand?email=${user.email}`,
+          url: `http://${LOCAL_IP}:3000/get-brand?email=${email}`,
           method: "GET",
           schema: BrandSchemaRes,
         });
@@ -548,15 +541,15 @@ function useUpdateBrand(brandEmail: string) {
 async function getClothingItems(
   page: number,
   limit: number,
-  brand: string | undefined
+  brandEmail: string | undefined
 ): Promise<CatalogItemSchemaType[]> {
-  if (brand === undefined || brand === null) {
-    console.log("No brand name found yet");
+  if (brandEmail === undefined || brandEmail === null) {
+    console.log("No brand email found yet");
     return [];
   }
   try {
     const { data } = await safeFetch({
-      url: `http://${LOCAL_IP}:3000/all-brand?page=${page}&limit=${limit}&brand=${brand}`,
+      url: `http://${LOCAL_IP}:3000/all-brand?page=${page}&limit=${limit}&brandEmail=${brandEmail}`,
       method: "GET",
       schema: CatalogItemArraySchema,
     });

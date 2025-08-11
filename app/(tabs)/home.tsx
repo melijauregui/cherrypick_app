@@ -27,7 +27,7 @@ export default Home;
 async function getClothingItems(
   page: number,
   limit: number,
-  brand: string | undefined
+  brandEmail: string | undefined
 ): Promise<CatalogItemSchemaType[]> {
   try {
     const { data } = await safeFetch({

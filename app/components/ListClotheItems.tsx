@@ -16,7 +16,7 @@ const ListItems = ({
   getClothingItems: (
     page: number,
     limit: number,
-    brandName: string | undefined
+    brandEmail: string | undefined
   ) => Promise<CatalogItemSchemaType[]>;
   limit: number;
   columnCount: number;
@@ -26,7 +26,7 @@ const ListItems = ({
   const { data, fetchNextPage, refetch } = useInfiniteQuery({
     queryKey: ["clothing-items", profileData?.email],
     queryFn: ({ pageParam }) =>
-      getClothingItems(pageParam, limit, profileData?.name),
+      getClothingItems(pageParam, limit, profileData?.email),
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
       if (lastPage.length === 0) {

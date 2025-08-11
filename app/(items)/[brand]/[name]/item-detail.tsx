@@ -5,9 +5,10 @@ import {
   Dimensions,
   TouchableOpacity,
   Image,
+  Text,
 } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
-import { Entypo, Ionicons, FontAwesome } from "@expo/vector-icons";
+import { Feather, Entypo, Ionicons, FontAwesome } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import {
   CatalogItemSchemaType,
@@ -19,20 +20,22 @@ import { LOCAL_IP } from "@/config/api";
 import { CatalogItemArraySchema } from "@/schemas/catalog/catalog-schema";
 import ListItems from "../../../components/ListClotheItems";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useFetchBrandProfile } from "@/app/(tabs)/profile";
 
 const ItemDetail = () => {
   const params = useLocalSearchParams();
 
   // Decodificar los parámetros en caso de que vengan de un link compartido
   const decodedName = decodeURIComponent(params.name as string);
-  const decodedBrand = decodeURIComponent(params.brand as string);
+  const decodedBrandEmail = decodeURIComponent(params.brand as string);
+  const brand = useFetchBrandProfile(decodedBrandEmail);
 
   const item = useFetchItem(
     decodedName,
-    decodedBrand,
+    decodedBrandEmail,
     params.imageUrl as string | undefined,
     params.description as string | undefined,
-    parseFloat(params.price as string),
+    parseFloat(params.price as string) || undefined,
     params.url as string | undefined
   );
 
@@ -61,7 +64,18 @@ const ItemDetail = () => {
           <ImageComponent imageUrl={item.item.image_url} />
         </View>
 
-        <IconComponent name={item.item.name} brand={item.item.brand} />
+        <View className="px-5 flex flex-col gap-6">
+          <IconComponent
+            name={item.item.name}
+            brand={brand?.brand?.name || ""}
+          />
+
+          <ItemDetailComponent item={item.item} brand={brand?.brand} />
+
+          <Text className="text-white text-2xl font-psemibold">
+            More to explore
+          </Text>
+        </View>
 
         <ListItems
           profileData={null}
@@ -106,10 +120,77 @@ const ImageComponent = ({ imageUrl }: { imageUrl: string }) => {
 
   return (
     <Image
+      className="rounded-3xl"
       source={{ uri: imageUrl }}
       style={{ width: screenWidth, height: imageHeight }}
       resizeMode="cover"
     />
+  );
+};
+
+const ItemDetailComponent = ({
+  item,
+  brand,
+}: {
+  item: CatalogItemSchemaType;
+  brand:
+    | {
+        email: string;
+        name: string;
+        url: string;
+        logo_url: string;
+      }
+    | undefined;
+}) => {
+  const [measured, setMeasured] = React.useState(false); // ya medí?
+  const [overflows, setOverflows] = React.useState(false); // tiene >1 línea?
+  const [expanded, setExpanded] = React.useState(false);
+
+  const handleTextLayout = React.useCallback(
+    (e: any) => {
+      if (measured) return; // medir solo una vez
+      const lines = e?.nativeEvent?.lines ?? [];
+      setOverflows(lines.length > 1);
+      setMeasured(true);
+    },
+    [measured]
+  );
+
+  return (
+    <View className="gap-2">
+      <View className="flex-row items-center gap-2">
+        <Image
+          source={{ uri: brand?.logo_url }}
+          className="w-6 h-6 rounded-full"
+        />
+        <Text className="text-white text-xl font-plight">{brand?.name}</Text>
+      </View>
+      <Text className="text-white text-3xl font-pmedium">{item.name}</Text>
+      <View className="">
+        <Text className="text-white text-xl font-pregular">
+          {"ARS $" + item.price}
+        </Text>
+        <View>
+          <View className="flex-row flex-wrap">
+            <Text
+              className="text-white text-xl font-pregular flex-1"
+              numberOfLines={measured && !expanded ? 1 : undefined}
+              ellipsizeMode="tail"
+              onTextLayout={handleTextLayout}
+            >
+              {item.description}
+            </Text>
+            {overflows && (
+              <TouchableOpacity onPress={() => setExpanded(v => !v)}>
+                <Text className="text-gray-400 font-plight text-lg ml-1">
+                  {expanded ? "" : "Ver más"}
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
+      </View>
+    </View>
   );
 };
 
@@ -144,7 +225,7 @@ const IconComponent = ({ name, brand }: { name: string; brand: string }) => {
   };
 
   return (
-    <View className="px-4 pb-6 pt-4 flex-row items-center gap-8">
+    <View className="pt-4 flex-row items-center gap-8">
       <TouchableOpacity className="w-8 h-8 items-center justify-center">
         <Ionicons name="heart-outline" size={24} color="white" />
       </TouchableOpacity>
@@ -156,7 +237,7 @@ const IconComponent = ({ name, brand }: { name: string; brand: string }) => {
         className="w-8 h-8 items-center justify-center"
         onPress={handleShareItem}
       >
-        <Ionicons name="arrow-up-outline" size={24} color="white" />
+        <Feather name="link" size={24} color="white" />
       </TouchableOpacity>
 
       <TouchableOpacity className="w-8 h-8 items-center justify-center">
@@ -169,7 +250,7 @@ const IconComponent = ({ name, brand }: { name: string; brand: string }) => {
 async function getClothingItems(
   page: number,
   limit: number,
-  brand: string | undefined
+  brandEmail: string | undefined
 ): Promise<CatalogItemSchemaType[]> {
   try {
     const { data } = await safeFetch({
@@ -186,7 +267,7 @@ async function getClothingItems(
 
 function useFetchItem(
   itemName: string,
-  itemBrand: string,
+  brandEmail: string,
   imageUrl: string | undefined,
   description: string | undefined,
   price: number | undefined,
@@ -194,7 +275,7 @@ function useFetchItem(
 ): {
   item: {
     name: string;
-    brand: string;
+    brandEmail: string;
     image_url: string;
     description: string;
     price: number;
@@ -202,12 +283,12 @@ function useFetchItem(
   };
 } | null {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["item-detail", itemName, itemBrand],
+    queryKey: ["item-detail", itemName, brandEmail],
     queryFn: async () => {
       if (!imageUrl || !description || !price || !url) {
         try {
           const { data } = await safeFetch({
-            url: `http://${LOCAL_IP}:3000/get-item?brand=${itemBrand}&name=${itemName}`,
+            url: `http://${LOCAL_IP}:3000/get-item?brandEmail=${brandEmail}&name=${itemName}`,
             method: "GET",
             schema: GetItemResponseSchema,
           });
@@ -223,7 +304,7 @@ function useFetchItem(
         return {
           item: {
             name: itemName,
-            brand: itemBrand,
+            brandEmail: brandEmail,
             image_url: imageUrl,
             description: description,
             price: price,
@@ -238,7 +319,6 @@ function useFetchItem(
     return null;
   }
   if (!data) {
-    console.log("No data found", error);
     return null;
   }
   return data;

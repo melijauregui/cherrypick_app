@@ -94,7 +94,7 @@ async function getCollection(): Promise<{
         name: "FashionItem",
         properties: [
           { name: "name", dataType: "text" },
-          { name: "brand", dataType: "text" },
+          { name: "brandEmail", dataType: "text" },
           { name: "description", dataType: "text" },
           { name: "price", dataType: "number" },
           { name: "image_url", dataType: "text" },
@@ -246,7 +246,7 @@ export async function validateCsvFile(
 export async function validateJsonItems(
   items: catalogJsonItemSchemaType[],
   collection: Collection,
-  brand: string
+  brandEmail: string
 ): Promise<
   | {
       error: true;
@@ -268,14 +268,14 @@ export async function validateJsonItems(
     const duplicateRows: number[] = [];
     const validItems: CatalogItemSchemaType[] = [];
     for (let i = 0; i < items.length; i++) {
-      const item = { ...items[i], brand };
+      const item = { ...items[i], brandEmail };
       try {
         const validatedItem = CatalogItemSchema.parse(item);
         // Check if item already exists in Weaviate with same name and brand
         const isDuplicate = await checkDuplicateInWeaviate(
           collection,
           validatedItem.name,
-          brand
+          brandEmail
         );
         if (isDuplicate) {
           duplicateRows.push(i + 1);
@@ -309,7 +309,7 @@ export async function validateJsonItems(
 // Cambiado para aceptar items JSON
 export async function UpdateCatalog(
   items: catalogJsonItemSchemaType[],
-  brand: string
+  brandEmail: string
 ): Promise<CatalogResponseSchemaType> {
   let res: CatalogResponseSchemaType;
   const collectionRes = await getCollection();
@@ -326,14 +326,18 @@ export async function UpdateCatalog(
       details: "Collection not found",
     };
   }
-  const validationResult = await validateJsonItems(items, collection, brand);
+  const validationResult = await validateJsonItems(
+    items,
+    collection,
+    brandEmail
+  );
   if (validationResult.error) {
     res = validationResult;
     return res;
   }
   const weaviateResult = await insertCatalogItemsToWeaviate(
     validationResult.catalogItems,
-    brand,
+    brandEmail,
     collection
   );
   if (weaviateResult.success) {
@@ -382,7 +386,7 @@ export async function GetBrand(email: string): Promise<BrandSchemaResType> {
 }
 
 export async function VerifyBrand(brand: string): Promise<boolean> {
-  const [result]: any = await db.query("SELECT * FROM brands WHERE name = ?", [
+  const [result]: any = await db.query("SELECT * FROM brands WHERE email = ?", [
     brand,
   ]);
   return result.length > 0;
@@ -391,7 +395,7 @@ export async function VerifyBrand(brand: string): Promise<boolean> {
 // Función para insertar items del catálogo en Pinecone
 export async function insertCatalogItemsToWeaviate(
   catalogItems: catalogJsonItemSchemaType[],
-  brand: string,
+  brandEmail: string,
   collection: Collection
 ): Promise<{
   success: boolean;
@@ -411,7 +415,7 @@ export async function insertCatalogItemsToWeaviate(
           name: item.name,
           description: item.description,
           price: item.price,
-          brand: brand,
+          brandEmail: brandEmail,
           image_url: item.image_url,
           url: item.url,
         };
@@ -468,25 +472,31 @@ export async function insertCatalogItemsToWeaviate(
 async function checkDuplicateInWeaviate(
   collection: Collection,
   name: string,
-  brand: string
+  brandEmail: string
 ): Promise<boolean> {
   const result = await collection.query.fetchObjects({
     filters: Filters.and(
       collection.filter.byProperty("name").equal(name),
-      collection.filter.byProperty("brand").equal(brand)
+      collection.filter.byProperty("brandEmail").equal(brandEmail)
     ),
     limit: 1,
   });
 
   const exists = result.objects.length > 0;
-  console.log("check duplicate in weaviate for", name, brand, "is", exists);
+  console.log(
+    "check duplicate in weaviate for",
+    name,
+    brandEmail,
+    "is",
+    exists
+  );
 
   return exists;
 }
 
 export async function DeleteFromCatalog(
   itemsNames: string[],
-  brand: string
+  brandEmail: string
 ): Promise<CatalogResponseSchemaDeleteType> {
   let res: CatalogResponseSchemaDeleteType;
   const collectionRes = await getCollection();
@@ -509,7 +519,7 @@ export async function DeleteFromCatalog(
   const validationResult = await validateItemsToDelete(
     itemsNames,
     collection,
-    brand
+    brandEmail
   );
 
   if (validationResult.error) {
@@ -521,7 +531,11 @@ export async function DeleteFromCatalog(
     return res;
   }
 
-  res = await deleteCatalogItemsFromWeaviate(itemsNames, collection, brand);
+  res = await deleteCatalogItemsFromWeaviate(
+    itemsNames,
+    collection,
+    brandEmail
+  );
 
   return res;
 }
@@ -530,7 +544,7 @@ export async function DeleteFromCatalog(
 export async function validateItemsToDelete(
   itemsNames: string[],
   collection: Collection,
-  brand: string
+  brandEmail: string
 ): Promise<
   | {
       error: true;
@@ -559,7 +573,7 @@ export async function validateItemsToDelete(
         const isDuplicate = await checkDuplicateInWeaviate(
           collection,
           itemName,
-          brand
+          brandEmail
         );
         if (!isDuplicate) {
           invalidItems.push(itemName);
@@ -593,19 +607,19 @@ export async function validateItemsToDelete(
 async function deleteCatalogItemsFromWeaviate(
   itemsNames: string[],
   collection: Collection,
-  brand: string
+  brandEmail: string
 ): Promise<CatalogResponseSchemaDeleteType> {
   try {
     let numberDeleted = 0;
     const invalidItems: string[] = [];
     for (const itemName of itemsNames) {
       const object_uuid = generateUuid5(
-        JSON.stringify({ name: itemName, brand: brand })
+        JSON.stringify({ name: itemName, brandEmail: brandEmail })
       );
       const response = await collection.data.deleteMany(
         Filters.and(
           collection.filter.byProperty("name").equal(itemName),
-          collection.filter.byProperty("brand").equal(brand)
+          collection.filter.byProperty("brandEmail").equal(brandEmail)
         )
       );
       if (response) {

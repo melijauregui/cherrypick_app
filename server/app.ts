@@ -511,12 +511,12 @@ const paginatedRouteBrand = createRoute({
   },
 });
 app.openapi(paginatedRouteBrand, async c => {
-  const { page, limit, brand } = c.req.valid("query");
-  console.log("Brand name and page and limit", brand, page, limit);
+  const { page, limit, brandEmail } = c.req.valid("query");
+  console.log("Brand email and page and limit", brandEmail, page, limit);
 
   const embedding = Array(768).fill(0.5);
 
-  const res = await QueryWeaviateImage(embedding, page, limit, brand);
+  const res = await QueryWeaviateImage(embedding, page, limit, brandEmail);
   return c.json(res, 200);
 });
 
@@ -603,10 +603,10 @@ const updateCatalogRoute = createRoute({
 });
 
 app.openapi(updateCatalogRoute, async c => {
-  const { items, brand } = await c.req.valid("json");
+  const { items, brandEmail } = await c.req.valid("json");
   //verifico que la marca exista en la base de datos
   let res: CatalogResponseSchemaType;
-  const brandExists = await VerifyBrand(brand);
+  const brandExists = await VerifyBrand(brandEmail);
   if (!brandExists) {
     res = {
       error: true,
@@ -615,7 +615,7 @@ app.openapi(updateCatalogRoute, async c => {
     return c.json(res, 200);
   }
   try {
-    res = await UpdateCatalog(items, brand);
+    res = await UpdateCatalog(items, brandEmail);
     return c.json(res, 200);
   } catch (error) {
     res = {
@@ -650,13 +650,13 @@ const deleteCatalogRoute = createRoute({
 });
 
 app.openapi(deleteCatalogRoute, async c => {
-  const { items, brand } = c.req.valid("json");
+  const { items, brandEmail } = c.req.valid("json");
   // Extraer los nombres de los items del array de objetos
   const itemsNames = items.map(item => item.name);
 
   //verifico que la marca exista en la base de datos
   let res: CatalogResponseSchemaDeleteType;
-  const brandExists = await VerifyBrand(brand);
+  const brandExists = await VerifyBrand(brandEmail);
   if (!brandExists) {
     res = {
       error: true,
@@ -666,7 +666,7 @@ app.openapi(deleteCatalogRoute, async c => {
     return c.json(res, 200);
   }
   try {
-    res = await DeleteFromCatalog(itemsNames, brand);
+    res = await DeleteFromCatalog(itemsNames, brandEmail);
     return c.json(res, 200);
   } catch (error) {
     res = {
@@ -697,10 +697,10 @@ const allBrandItemsRoute = createRoute({
   },
 });
 app.openapi(allBrandItemsRoute, async c => {
-  const { brand, filter, page = 0, limit = 10 } = c.req.valid("query");
+  const { brandEmail, filter, page = 0, limit = 10 } = c.req.valid("query");
   console.log(
-    "Brand name for all items",
-    brand,
+    "Brand email for all items",
+    brandEmail,
     "filter:",
     filter,
     "page:",
@@ -709,7 +709,7 @@ app.openapi(allBrandItemsRoute, async c => {
     limit
   );
   let res: AllBrandItemsSchemaResType;
-  res = await QueryWeaviateAllItems(brand, filter, page, limit);
+  res = await QueryWeaviateAllItems(brandEmail, filter, page, limit);
   console.log("res", res);
   return c.json(res, 200);
 });
@@ -734,13 +734,13 @@ const getItemRoute = createRoute({
 });
 
 app.openapi(getItemRoute, async c => {
-  const { name, brand } = c.req.valid("query");
-  console.log("Getting item:", name, "from brand:", brand);
+  const { name, brandEmail } = c.req.valid("query");
+  console.log("Getting item:", name, "from brandEmail:", brandEmail);
 
   let res: GetItemResponseSchemaType;
 
   try {
-    res = await QueryWeaviateItem(name, brand);
+    res = await QueryWeaviateItem(name, brandEmail);
   } catch (error) {
     console.error("Error getting item:", error);
     res = {

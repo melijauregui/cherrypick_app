@@ -13,7 +13,7 @@ async function QueryWeaviateImage(
   queryVector: number[],
   page: number,
   limit: number,
-  brand: string | undefined
+  brandEmail: string | undefined
 ): Promise<CatalogItemSchemaType[]> {
   try {
     const resCollection = await getCollection();
@@ -22,10 +22,10 @@ async function QueryWeaviateImage(
     }
     const collection = resCollection.collection;
 
-    const filters = brand
+    const filters = brandEmail
       ? Filters.and(
           collection.filter.byProperty("embedding_type").equal("image"),
-          collection.filter.byProperty("brand").equal(brand)
+          collection.filter.byProperty("brandEmail").equal(brandEmail)
         )
       : collection.filter.byProperty("embedding_type").equal("image");
 
@@ -40,7 +40,7 @@ async function QueryWeaviateImage(
         "description",
         "image_url",
         "url",
-        "brand",
+        "brandEmail",
         "price",
         "embedding_type",
       ],
@@ -61,7 +61,7 @@ async function QueryWeaviateImage(
           description: match.properties?.description || "",
           image_url: match.properties?.image_url || "",
           url: match.properties?.url || "",
-          brand: match.properties?.brand || "",
+          brandEmail: match.properties?.brandEmail || "",
           price: match.properties?.price || 0,
         };
 
@@ -85,7 +85,7 @@ export { QueryWeaviateImage };
 
 //funcion para hacer query a pinecone
 async function QueryWeaviateAllItems(
-  brand: string,
+  brandEmail: string,
   filter?: string,
   page: number = 0,
   limit: number = 10
@@ -99,7 +99,7 @@ async function QueryWeaviateAllItems(
 
     let filters = Filters.and(
       collection.filter.byProperty("embedding_type").equal("image"),
-      collection.filter.byProperty("brand").equal(brand)
+      collection.filter.byProperty("brandEmail").equal(brandEmail)
     );
 
     // Add filter for name search if provided
@@ -150,7 +150,7 @@ export { QueryWeaviateAllItems };
 // Function to query specific item by name and brand in Weaviate
 async function QueryWeaviateItem(
   name: string,
-  brand: string
+  brandEmail: string
 ): Promise<GetItemResponseSchemaType> {
   try {
     const resCollection = await getCollection();
@@ -165,7 +165,7 @@ async function QueryWeaviateItem(
     // Filter by name, brand, and image embedding type to get unique item
     const filters = Filters.and(
       collection.filter.byProperty("name").equal(name),
-      collection.filter.byProperty("brand").equal(brand),
+      collection.filter.byProperty("brandEmail").equal(brandEmail),
       collection.filter.byProperty("embedding_type").equal("image")
     );
 
@@ -177,7 +177,7 @@ async function QueryWeaviateItem(
         "description",
         "image_url",
         "url",
-        "brand",
+        "brandEmail",
         "price",
       ],
     };
@@ -187,7 +187,7 @@ async function QueryWeaviateItem(
     console.log(
       "QueryWeaviateItem result for",
       name,
-      brand,
+      brandEmail,
       "found:",
       result.objects.length
     );
@@ -211,7 +211,7 @@ async function QueryWeaviateItem(
       description: match.properties?.description || "",
       image_url: match.properties?.image_url || "",
       url: match.properties?.url || "",
-      brand: match.properties?.brand || "",
+      brandEmail: match.properties?.brandEmail || "",
       price: match.properties?.price || 0,
     };
 

@@ -40,7 +40,7 @@ const QueryGetBrandSchema = z.object({
 export { QueryGetBrandSchema };
 
 const QueryAllBrandItemsSchema = z.object({
-  brand: z.string(),
+  brandEmail: z.string(),
   filter: z.string().optional(),
   page: z
     .preprocess(val => parseInt(val as string) || 0, z.number().min(0))

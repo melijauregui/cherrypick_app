@@ -8,6 +8,8 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   KeyboardTypeOptions,
+  ScrollView,
+  TextInput,
 } from "react-native";
 import BottomSheet, {
   BottomSheetTextInput,
@@ -65,8 +67,8 @@ type FormErrors = {
 const InsertNewItemsModal: React.FC<{
   bottomSheetRef: React.RefObject<BottomSheet>;
   onSubmit: (data: FormData) => void;
-  brand: string;
-}> = ({ bottomSheetRef, onSubmit, brand }) => {
+  brandEmail: string;
+}> = ({ bottomSheetRef, onSubmit, brandEmail }) => {
   const [formData, setFormData] = useState<FormData>({
     productName: "",
     description: "",
@@ -86,15 +88,19 @@ const InsertNewItemsModal: React.FC<{
   );
 
   const handleFieldChange = (field: keyof FormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    // Validar que el valor no sea undefined o null para evitar NaN
+    const safeValue = value || "";
 
-    if (errors[field]) {
+    setFormData(prev => ({ ...prev, [field]: safeValue }));
+
+    if (errors[field as keyof FormErrors]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
     }
   };
 
-  const isFormValid =
-    formData.productName && formData.price && formData.url && formData.imageUrl;
+  const isFormValid = Boolean(
+    formData.productName && formData.price && formData.url && formData.imageUrl
+  );
 
   const formContent = (
     <KeyboardAvoidingView
@@ -108,31 +114,62 @@ const InsertNewItemsModal: React.FC<{
           errors={errors}
           isFormValid={isFormValid}
           isSubmitting={isSubmitting}
-          handleSubmit={() => mutation.mutate({ brand, formData })}
+          handleSubmit={() => mutation.mutate({ brandEmail, formData })}
         />
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
 
   return (
-    <BottomSheetSame
-      bottomSheetRef={bottomSheetRef}
-      onSubmit={() => {}}
-      onCancel={() => {
-        setFormData({
-          productName: "",
-          description: "",
-          price: "",
-          url: "",
-          imageUrl: "",
-        });
-        setErrors({});
-      }}
-      isReady={false}
-      hasDone={false}
-      componentView={formContent}
-      value="Add New Item"
-    />
+    <BottomSheet
+      ref={bottomSheetRef}
+      onChange={() => {}}
+      index={-1}
+      enableDynamicSizing={false}
+      snapPoints={[520]}
+      keyboardBehavior="interactive"
+      keyboardBlurBehavior="restore"
+      android_keyboardInputMode="adjustResize"
+      enableOverDrag={false}
+    >
+      <View className="flex flex-row justify-between items-center  relative py-3 border-b border-gray-300 px-6">
+        <Text className="text-black font-pmedium text-xl absolute right-0 left-0 text-center">
+          {"Add New Item"}
+        </Text>
+
+        <TouchableOpacity
+          className="flex flex-row ml-auto"
+          onPress={() => {
+            bottomSheetRef.current?.close();
+            setFormData({
+              productName: "",
+              description: "",
+              price: "",
+              url: "",
+              imageUrl: "",
+            });
+            setErrors({});
+          }}
+        >
+          <Text className="text-xl  font-plight">Cancel</Text>
+        </TouchableOpacity>
+      </View>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        className="flex-1"
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <FormContent
+            formData={formData}
+            handleFieldChange={handleFieldChange}
+            errors={errors}
+            isFormValid={isFormValid}
+            isSubmitting={isSubmitting}
+            handleSubmit={() => mutation.mutate({ brandEmail, formData })}
+          />
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
+    </BottomSheet>
   );
 };
 
@@ -148,13 +185,13 @@ const FormContent = ({
   formData: FormData;
   handleFieldChange: (field: keyof FormData, value: string) => void;
   errors: FormErrors;
-  isFormValid: string;
+  isFormValid: boolean;
   isSubmitting: boolean;
   handleSubmit: () => void;
 }) => {
   return (
     <View className="flex-1 px-6 pt-4">
-      <BottomSheetScrollView>
+      <ScrollView>
         <DataInput
           label="Product Name"
           data={formData.productName}
@@ -204,10 +241,10 @@ const FormContent = ({
           keyboardType="decimal-pad"
           autoCapitalize="none"
         />
-      </BottomSheetScrollView>
+      </ScrollView>
       <ButtonSubmit
         isSubmitting={isSubmitting}
-        isFormValid={isFormValid !== ""}
+        isFormValid={isFormValid}
         handleSubmit={handleSubmit}
         text="Insertar Item"
         loadingText="Insertando..."
@@ -235,7 +272,7 @@ const DataInput = ({
   return (
     <View className="my-5 mx-1">
       <Text className="text-black font-pmedium text-lg ">{label}</Text>
-      <BottomSheetTextInput
+      <TextInput
         className="text-lg h-[40px] border-b border-gray-300 text-black  "
         placeholder={`Enter ${label}`}
         placeholderTextColor="#6b7280"
@@ -243,6 +280,8 @@ const DataInput = ({
         onChangeText={text => handleFieldChange(field, text)}
         autoCapitalize={autoCapitalize}
         keyboardType={keyboardType}
+        textContentType="none"
+        autoCorrect={false}
       />
       {error && (
         <Text className="text-red-500 text-[14px] mt-1 font-plight">
@@ -262,7 +301,7 @@ function useInsertItem(
 ) {
   const queryClient = useQueryClient();
   const mutation = useMutation({
-    mutationFn: async (data: { brand: string; formData: FormData }) => {
+    mutationFn: async (data: { brandEmail: string; formData: FormData }) => {
       const result = InsertItemSchema.safeParse(data.formData);
       if (!result.success) {
         throw new ZodError(result.error.errors);
@@ -282,7 +321,7 @@ function useInsertItem(
       };
 
       const body = {
-        brand: data.brand,
+        brandEmail: data.brandEmail,
         items: [item],
       };
 
@@ -299,7 +338,10 @@ function useInsertItem(
         url: `http://${LOCAL_IP}:3000/insert-catalog-brand`,
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ brand: data.brand, items: [item] }),
+        body: JSON.stringify({
+          brandEmail: data.brandEmail,
+          items: [item],
+        }),
         schema: CatalogResponseSchema,
       });
       if (response.data.error) {

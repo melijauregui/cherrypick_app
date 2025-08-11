@@ -1,14 +1,18 @@
-import { LOCAL_IP } from "@/config/api";
 const fs = require("fs/promises");
 
-async function testCatalogUploadJson(brand, filePath) {
+LOCAL_IP = "localhost";
+
+async function testCatalogUploadJson(brandEmail, filePath) {
   const items = JSON.parse(await fs.readFile(filePath, "utf-8"));
   try {
-    const response = await fetch(`http://${LOCAL_IP}:3000/insert-catalog-brand`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ brand, items }),
-    });
+    const response = await fetch(
+      `http://${LOCAL_IP}:3000/insert-catalog-brand`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ brandEmail, items }),
+      }
+    );
     const result = await response.json();
     console.log("Response:", result);
     if (!result.error) {
@@ -22,13 +26,13 @@ async function testCatalogUploadJson(brand, filePath) {
 }
 
 testCatalogUploadJson(
-  "tienda napoli",
+  "cherrypick.brand.example@gmail.com",
   "test-endpoints/archivos/catalog-items-tienda-napoli.json"
 );
 
 setTimeout(() => {
   testCatalogUploadJson(
-    "charo",
+    "charostoreok@gmail.com",
     "test-endpoints/archivos/catalog-items-charo.json"
   );
 }, 5 * 1000);

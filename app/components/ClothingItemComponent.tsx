@@ -4,8 +4,8 @@ import { router } from "expo-router";
 import { CatalogItemSchemaType } from "@/schemas/catalog/catalog-schema";
 
 // Función para generar un ID único basado en nombre y marca
-const generateItemId = (name: string, brand: string): string => {
-  const combined = `${name}-${brand}`;
+const generateItemId = (name: string, brandEmail: string): string => {
+  const combined = `${name}-${brandEmail}`;
   return combined
     .toLowerCase()
     .replace(/[^a-z0-9]/g, "-")
@@ -61,11 +61,12 @@ const ClothingItemComponent = ({
   }
 
   const handlePress = () => {
-    const itemId = generateItemId(item.name, item.brand);
+    console.log("Item brandEmail", item.brandEmail);
+    const itemId = generateItemId(item.name, item.brandEmail);
     router.push({
       pathname: "/(items)/[brand]/[name]/item-detail",
       params: {
-        brand: encodeURIComponent(item.brand),
+        brand: encodeURIComponent(item.brandEmail),
         name: encodeURIComponent(item.name),
         imageUrl: item.image_url,
         description: item.description,
