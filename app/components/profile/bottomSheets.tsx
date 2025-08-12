@@ -1,4 +1,4 @@
-import { ImageSourcePropType } from "react-native";
+import { ImageSourcePropType, Keyboard } from "react-native";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import React, { useState, useEffect, useCallback } from "react";
 import { TouchableOpacity, Text } from "react-native";
@@ -281,6 +281,7 @@ function BottomSheetSame({
               className={`flex flex-row ${hasDone ? "mr-auto" : "ml-auto"}`}
               onPress={() => {
                 bottomSheetRef.current?.close();
+                Keyboard.dismiss();
                 onCancel?.();
               }}
             >

@@ -34,12 +34,13 @@ import ListItems from "@/app/components/ListClotheItems";
 import splitDescriptionByLinesOrWords, {
   AddAndDeleteItems,
 } from "@/app/components/profile/brandComponents";
-import InsertNewItemsModal from "../components/profile/insertNewItems";
+import { InsertNewItemsModal } from "../components/profile/insertNewItems";
 import DeleteCatalogItemsModal from "../components/profile/DeleteCatalogItemsModal";
 import { authClient, useSession } from "@/lib/auth-client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CustomBottomLogout } from "@/app/components/profile/bottomSheets";
 import EditBrandProfile from "../components/profile/editBrandProfile";
+import { FormData } from "../components/profile/insertNewItems";
 
 interface UserInfo {
   email: string;
@@ -89,6 +90,7 @@ const BrandProfile = ({
   const bottomSheetRefAddItem = useRef<BottomSheet>(null);
   const bottomSheetRefDeleteItem = useRef<BottomSheet>(null);
   const bottomSheetRefEdit = useRef<BottomSheet>(null);
+
   const data = useFetchBrandProfile(user.email);
   const openUsernameSheetLogout = () => {
     bottomSheetRefAddItem.current?.close();
@@ -209,6 +211,13 @@ const BrandProfile = ({
             bottomSheetRef={bottomSheetRefAddItem}
             onSubmit={handleSubmitAddItem}
             brandEmail={data.brand.email}
+            formDataLastValue={{
+              name: "",
+              price: "",
+              url: "",
+              image_url: "",
+              description: "",
+            }}
           />
 
           <DeleteCatalogItemsModal
@@ -560,11 +569,6 @@ async function getClothingItems(
   }
 }
 
-const handleSubmitAddItem = (data: {
-  productName: string;
-  price: string;
-  url: string;
-  imageUrl: string;
-}) => {
+const handleSubmitAddItem = (data: FormData) => {
   console.log("Form submitted with data:", data);
 };

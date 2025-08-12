@@ -21,61 +21,37 @@ import { LOCAL_IP } from "@/config/api";
 import Toast from "react-native-toast-message";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import safeFetch from "@/app/utils/safe-fetch";
-import { CatalogResponseSchema } from "@/schemas/catalog/catalog-schema";
+import {
+  CatalogResponseSchema,
+  UpdateItemResponseSchema,
+  InsertItemSchema,
+} from "@/schemas/catalog/catalog-schema";
 import InputBoxWithName from "./inputBox";
 
-const InsertItemSchema = z.object({
-  productName: z
-    .string()
-    .min(1, { message: "Product name is required" })
-    .refine(val => /[a-zA-Z0-9]/.test(val), {
-      message: "Product name must contain at least one letter or number",
-    }),
-  description: z.string().min(1, { message: "Description is required" }),
-  price: z
-    .string()
-    .min(1, { message: "Price is required" })
-    .transform(val => val.replace(",", "."))
-    .refine(val => !isNaN(Number(val)) && Number(val) > 0, {
-      message: "Price must be a positive number",
-    }),
-  url: z
-    .string()
-    .min(1, { message: "URL is required" })
-    .url({ message: "Please enter a valid URL" }),
-  imageUrl: z
-    .string()
-    .min(1, { message: "Image URL is required" })
-    .url({ message: "Please enter a valid image URL" }),
-});
-
-type FormData = {
-  productName: string;
+export type FormData = {
+  name: string;
   description: string;
   price: string;
   url: string;
-  imageUrl: string;
+  image_url: string;
 };
 
 type FormErrors = {
-  productName?: string;
+  name?: string;
   description?: string;
   price?: string;
   url?: string;
-  imageUrl?: string;
+  image_url?: string;
 };
 
-const InsertNewItemsModal: React.FC<{
+export const InsertNewItemsModal: React.FC<{
   bottomSheetRef: React.RefObject<BottomSheet>;
   onSubmit: (data: FormData) => void;
   brandEmail: string;
-}> = ({ bottomSheetRef, onSubmit, brandEmail }) => {
+  formDataLastValue: FormData;
+}> = ({ bottomSheetRef, onSubmit, brandEmail, formDataLastValue }) => {
   const [formData, setFormData] = useState<FormData>({
-    productName: "",
-    description: "",
-    price: "",
-    url: "",
-    imageUrl: "",
+    ...formDataLastValue,
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -87,38 +63,130 @@ const InsertNewItemsModal: React.FC<{
     onSubmit,
     bottomSheetRef
   );
+  return (
+    <ItemsModalDetails
+      bottomSheetRef={bottomSheetRef}
+      onSubmit={onSubmit}
+      brandEmail={brandEmail}
+      formDataLastValue={formDataLastValue}
+      submitMutate={(brandEmail, formData) =>
+        mutation.mutate({ brandEmail, formData })
+      }
+      setFormData={setFormData}
+      formData={formData}
+      setIsSubmitting={setIsSubmitting}
+      setErrors={setErrors}
+      errors={errors}
+      isSubmitting={isSubmitting}
+      isNewItem={true}
+    />
+  );
+};
 
+export const UpdateItemModal: React.FC<{
+  bottomSheetRef: React.RefObject<BottomSheet>;
+  onSubmit: (data: FormData) => void;
+  brandEmail: string;
+  formDataLastValue: FormData;
+  itemUuid: string;
+}> = ({
+  bottomSheetRef,
+  onSubmit,
+  brandEmail,
+  formDataLastValue,
+  itemUuid,
+}) => {
+  const [formData, setFormData] = useState<FormData>({
+    ...formDataLastValue,
+  });
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const mutation = useUpdateItem(
+    setFormData,
+    setIsSubmitting,
+    setErrors,
+    onSubmit,
+    bottomSheetRef,
+    formDataLastValue,
+    itemUuid
+  );
+  return (
+    <ItemsModalDetails
+      bottomSheetRef={bottomSheetRef}
+      onSubmit={onSubmit}
+      brandEmail={brandEmail}
+      formDataLastValue={formDataLastValue}
+      submitMutate={(brandEmail, formData) =>
+        mutation.mutate({ brandEmail, formData })
+      }
+      setFormData={setFormData}
+      formData={formData}
+      setIsSubmitting={setIsSubmitting}
+      setErrors={setErrors}
+      errors={errors}
+      isSubmitting={isSubmitting}
+      isNewItem={false}
+    />
+  );
+};
+
+const ItemsModalDetails: React.FC<{
+  bottomSheetRef: React.RefObject<BottomSheet>;
+  onSubmit: (data: FormData) => void;
+  brandEmail: string;
+  formDataLastValue: FormData;
+  submitMutate: (brandEmail: string, formData: FormData) => void;
+  setFormData: React.Dispatch<React.SetStateAction<FormData>>;
+  formData: FormData;
+  setIsSubmitting: (isSubmitting: boolean) => void;
+  setErrors: React.Dispatch<React.SetStateAction<FormErrors>>;
+  errors: FormErrors;
+  isSubmitting: boolean;
+  isNewItem: boolean;
+}> = ({
+  bottomSheetRef,
+  onSubmit,
+  brandEmail,
+  formDataLastValue,
+  submitMutate,
+  setFormData,
+  setIsSubmitting,
+  setErrors,
+  formData,
+  errors,
+  isSubmitting,
+  isNewItem,
+}) => {
   const handleFieldChange = (field: keyof FormData, value: string) => {
     // Validar que el valor no sea undefined o null para evitar NaN
     const safeValue = value || "";
 
-    setFormData(prev => ({ ...prev, [field]: safeValue }));
+    // Solo para el campo price, convertir comas a puntos
+    if (field === "price") {
+      const priceValue = safeValue.replace(",", ".");
+      setFormData((prev: FormData) => ({ ...prev, [field]: priceValue }));
+    } else {
+      setFormData((prev: FormData) => ({ ...prev, [field]: safeValue }));
+    }
 
     if (errors[field as keyof FormErrors]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }));
+      setErrors((prev: FormErrors) => ({ ...prev, [field]: undefined }));
     }
   };
 
   const isFormValid = Boolean(
-    formData.productName && formData.price && formData.url && formData.imageUrl
-  );
-
-  const formContent = (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      className="flex-1"
-    >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <FormContent
-          formData={formData}
-          handleFieldChange={handleFieldChange}
-          errors={errors}
-          isFormValid={isFormValid}
-          isSubmitting={isSubmitting}
-          handleSubmit={() => mutation.mutate({ brandEmail, formData })}
-        />
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+    formData.name &&
+      formData.price &&
+      formData.url &&
+      formData.image_url &&
+      formData.description &&
+      formData.price &&
+      (formData.name !== formDataLastValue.name ||
+        formData.description !== formDataLastValue.description ||
+        formData.price !== formDataLastValue.price ||
+        formData.url !== formDataLastValue.url ||
+        formData.image_url !== formDataLastValue.image_url)
   );
 
   return (
@@ -143,13 +211,10 @@ const InsertNewItemsModal: React.FC<{
           onPress={() => {
             bottomSheetRef.current?.close();
             setFormData({
-              productName: "",
-              description: "",
-              price: "",
-              url: "",
-              imageUrl: "",
+              ...formDataLastValue,
             });
             setErrors({});
+            Keyboard.dismiss();
           }}
         >
           <Text className="text-xl  font-plight">Cancel</Text>
@@ -166,7 +231,8 @@ const InsertNewItemsModal: React.FC<{
             errors={errors}
             isFormValid={isFormValid}
             isSubmitting={isSubmitting}
-            handleSubmit={() => mutation.mutate({ brandEmail, formData })}
+            handleSubmit={() => submitMutate(brandEmail, formData)}
+            isNewItem={isNewItem}
           />
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
@@ -174,7 +240,7 @@ const InsertNewItemsModal: React.FC<{
   );
 };
 
-export default InsertNewItemsModal;
+export default ItemsModalDetails;
 const FormContent = ({
   formData,
   handleFieldChange,
@@ -182,6 +248,7 @@ const FormContent = ({
   isFormValid,
   isSubmitting,
   handleSubmit,
+  isNewItem,
 }: {
   formData: FormData;
   handleFieldChange: (field: keyof FormData, value: string) => void;
@@ -189,6 +256,7 @@ const FormContent = ({
   isFormValid: boolean;
   isSubmitting: boolean;
   handleSubmit: () => void;
+  isNewItem: boolean;
 }) => {
   return (
     <View className="flex-1 px-6 pt-4">
@@ -196,10 +264,10 @@ const FormContent = ({
         <View className="flex flex-col gap-6">
           <InputBoxWithName
             name="Product Name"
-            value={formData.productName}
-            setValue={text => handleFieldChange("productName", text)}
-            error={errors.productName}
-            lastValue={formData.productName}
+            value={formData.name}
+            setValue={text => handleFieldChange("name", text)}
+            error={errors.name}
+            lastValue={formData.name}
             isScrollable={false}
             keyboardType="default"
             autoCapitalize="words"
@@ -231,10 +299,10 @@ const FormContent = ({
 
           <InputBoxWithName
             name="Image URL"
-            value={formData.imageUrl}
-            setValue={text => handleFieldChange("imageUrl", text)}
-            error={errors.imageUrl}
-            lastValue={formData.imageUrl}
+            value={formData.image_url}
+            setValue={text => handleFieldChange("image_url", text)}
+            error={errors.image_url}
+            lastValue={formData.image_url}
             isScrollable={false}
             keyboardType="url"
             autoCapitalize="none"
@@ -246,7 +314,7 @@ const FormContent = ({
             value={formData.price}
             setValue={text => handleFieldChange("price", text)}
             error={errors.price}
-            lastValue={formData.price}
+            lastValue={formData.price.toString()}
             isScrollable={false}
             placeholder="Escribe el precio del nuevo item"
             keyboardType="decimal-pad"
@@ -258,94 +326,15 @@ const FormContent = ({
         isSubmitting={isSubmitting}
         isFormValid={isFormValid}
         handleSubmit={handleSubmit}
-        text="Insertar Item"
-        loadingText="Insertando..."
+        text={isNewItem ? "Insertar Item" : "Actualizar Item"}
+        loadingText={isNewItem ? "Insertando..." : "Actualizando..."}
       />
-    </View>
-  );
-};
-const DataInput = ({
-  label,
-  data,
-  handleFieldChange,
-  error,
-  field,
-  keyboardType,
-  autoCapitalize,
-}: {
-  label: string;
-  data: string;
-  handleFieldChange: (field: keyof FormData, value: string) => void;
-  error: string | undefined;
-  field: keyof FormData;
-  keyboardType: KeyboardTypeOptions;
-  autoCapitalize: "none" | "sentences" | "words" | "characters";
-}) => {
-  return (
-    <View className="my-5 mx-1">
-      <Text className="text-black font-pmedium text-lg ">{label}</Text>
-      <TextInput
-        className="text-lg h-[40px] border-b border-gray-300 text-black  "
-        placeholder={`Enter ${label}`}
-        placeholderTextColor="#6b7280"
-        value={data}
-        onChangeText={text => handleFieldChange(field, text)}
-        autoCapitalize={autoCapitalize}
-        keyboardType={keyboardType}
-        textContentType="none"
-        autoCorrect={false}
-      />
-      {error && (
-        <Text className="text-red-500 text-[14px] mt-1 font-plight">
-          {error}
-        </Text>
-      )}
-    </View>
-  );
-};
-
-const DataInputLarge = ({
-  label,
-  data,
-  handleFieldChange,
-  error,
-  field,
-  keyboardType,
-  autoCapitalize,
-}: {
-  label: string;
-  data: string;
-  handleFieldChange: (field: keyof FormData, value: string) => void;
-  error: string | undefined;
-  field: keyof FormData;
-  keyboardType: KeyboardTypeOptions;
-  autoCapitalize: "none" | "sentences" | "words" | "characters";
-}) => {
-  return (
-    <View className="my-5 mx-1">
-      <Text className="text-black font-pmedium text-lg ">{label}</Text>
-      <TextInput
-        className="text-lg h-[40px] border-b border-gray-300 text-black  "
-        placeholder={`Enter ${label}`}
-        placeholderTextColor="#6b7280"
-        value={data}
-        onChangeText={text => handleFieldChange(field, text)}
-        autoCapitalize={autoCapitalize}
-        keyboardType={keyboardType}
-        textContentType="none"
-        autoCorrect={false}
-      />
-      {error && (
-        <Text className="text-red-500 text-[14px] mt-1 font-plight">
-          {error}
-        </Text>
-      )}
     </View>
   );
 };
 
 function useInsertItem(
-  setFormData: (formData: FormData) => void,
+  setFormData: React.Dispatch<React.SetStateAction<FormData>>,
   setIsSubmitting: (isSubmitting: boolean) => void,
   setErrors: (errors: FormErrors) => void,
   onSubmit: (data: FormData) => void,
@@ -365,25 +354,20 @@ function useInsertItem(
       bottomSheetRef.current?.close();
 
       const item = {
-        name: result.data.productName,
+        name: result.data.name,
         description: result.data.description,
-        price: Number(result.data.price),
-        image_url: result.data.imageUrl,
+        price: result.data.price,
+        image_url: result.data.image_url,
         url: result.data.url,
-      };
-
-      const body = {
-        brandEmail: data.brandEmail,
-        items: [item],
       };
 
       // Cerrar el modal y limpiar el formulario inmediatamente
       setFormData({
-        productName: "",
+        name: "",
         description: "",
         price: "",
         url: "",
-        imageUrl: "",
+        image_url: "",
       });
 
       const response = await safeFetch({
@@ -405,7 +389,7 @@ function useInsertItem(
       onSubmit(variables.formData);
       Toast.show({
         type: "success",
-        text1: `The item ${variables.formData.productName} has been successfully added to the catalog.`,
+        text1: `The item ${variables.formData.name} has been successfully added to the catalog.`,
         visibilityTime: 2000,
       });
     },
@@ -424,19 +408,19 @@ function useInsertItem(
         if (responseError.message.includes("[1] duplicados")) {
           Toast.show({
             type: "error",
-            text1: `The item ${data.formData.productName} already exists in the catalog.`,
+            text1: `The item ${data.formData.name} already exists in the catalog.`,
             visibilityTime: 6000,
           });
         } else if (responseError.message.includes("[1] mal formados")) {
           Toast.show({
             type: "error",
-            text1: `The item ${data.formData.productName} is not valid.`,
+            text1: `The item ${data.formData.name} is not valid.`,
             visibilityTime: 6000,
           });
         } else {
           Toast.show({
             type: "error",
-            text1: `Error inserting item ${data.formData.productName}: ${responseError.message}`,
+            text1: `Error inserting item ${data.formData.name}: ${responseError.message}`,
             visibilityTime: 6000,
           });
         }
@@ -445,6 +429,124 @@ function useInsertItem(
     },
     onSettled: () => {
       setIsSubmitting(false);
+      Keyboard.dismiss();
+    },
+  });
+
+  return mutation;
+}
+
+function useUpdateItem(
+  setFormData: React.Dispatch<React.SetStateAction<FormData>>,
+  setIsSubmitting: (isSubmitting: boolean) => void,
+  setErrors: (errors: FormErrors) => void,
+  onSubmit: (data: FormData) => void,
+  bottomSheetRef: React.RefObject<BottomSheet>,
+  formDataLastValue: FormData,
+  itemUuid: string
+) {
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: async (data: { brandEmail: string; formData: FormData }) => {
+      const result = InsertItemSchema.safeParse({
+        ...data.formData,
+        uuid: itemUuid,
+      });
+      if (!result.success) {
+        throw new ZodError(result.error.errors);
+      }
+      setErrors({});
+
+      setIsSubmitting(true);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      bottomSheetRef.current?.close();
+
+      // Only include fields that have changed compared to formDataLastValue
+      const itemUpdated: Partial<FormData> = {};
+
+      if (result.data.name !== formDataLastValue.name) {
+        itemUpdated.name = result.data.name;
+      }
+      if (result.data.description !== formDataLastValue.description) {
+        itemUpdated.description = result.data.description;
+      }
+      if (result.data.price !== formDataLastValue.price) {
+        itemUpdated.price = result.data.price;
+      }
+      if (result.data.image_url !== formDataLastValue.image_url) {
+        itemUpdated.image_url = result.data.image_url;
+      }
+      if (result.data.url !== formDataLastValue.url) {
+        itemUpdated.url = result.data.url;
+      }
+
+      setFormData({
+        ...formDataLastValue,
+        ...itemUpdated,
+      });
+
+      const response = await safeFetch({
+        url: `http://${LOCAL_IP}:3000/update-item?uuid=${itemUuid}`,
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(itemUpdated),
+        schema: UpdateItemResponseSchema,
+      });
+      if (response.data.error) {
+        throw new Error(response.data.details);
+      }
+      return response.data;
+    },
+    onSuccess: (data, variables) => {
+      console.log("itemUuid in useUpdateItem", itemUuid);
+      void queryClient.invalidateQueries({
+        queryKey: ["item-detail", itemUuid],
+      });
+      onSubmit(variables.formData);
+      Toast.show({
+        type: "normal",
+        text1: `The item ${variables.formData.name} has been successfully updated in the catalog!`,
+        visibilityTime: 2000,
+      });
+    },
+    onError: (responseError, data) => {
+      const newErrors: FormErrors = {};
+      if (responseError instanceof ZodError) {
+        responseError.errors.forEach(error => {
+          const field = error.path[0] as keyof FormData;
+          console.log("field", field);
+          newErrors[field] = error.message;
+        });
+        setErrors(newErrors);
+        setIsSubmitting(false);
+        return;
+      }
+      if (responseError instanceof Error) {
+        if (responseError.message.includes("[1] duplicados")) {
+          Toast.show({
+            type: "error",
+            text1: `The item ${data.formData.name} already exists in the catalog.`,
+            visibilityTime: 6000,
+          });
+        } else if (responseError.message.includes("[1] mal formados")) {
+          Toast.show({
+            type: "error",
+            text1: `The item ${data.formData.name} is not valid.`,
+            visibilityTime: 6000,
+          });
+        } else {
+          Toast.show({
+            type: "error",
+            text1: `Error updating item ${data.formData.name}: ${responseError.message}`,
+            visibilityTime: 6000,
+          });
+        }
+        setIsSubmitting(false);
+      }
+    },
+    onSettled: () => {
+      setIsSubmitting(false);
+      Keyboard.dismiss();
     },
   });
 

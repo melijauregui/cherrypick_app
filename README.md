@@ -1,8 +1,8 @@
 # Run 
 - front:  npx expo run:ios   
 - server: npx ts-node server/index.ts
-- database: (dentro de database) uvicorn server:app --reload    (source .venv/bin/activate)
 - database: (dentro de database-users) docker compose up --build 
+- database: (dentro de database) uvicorn server:app --reload    (source .venv/bin/activate)
 - crear tables auth: (dentro de database-users) cat auth-schema.sql | docker exec -i cherrypick_db mysql -u cherrypick -p'password' cherrypick_db
 - ejecutar script: node test-endpoints/test-catalog-upload.js
 

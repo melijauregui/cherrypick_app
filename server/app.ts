@@ -33,6 +33,7 @@ import {
   GetBrand,
   VerifyBrand,
   DeleteFromCatalog,
+  UpdateItem,
 } from "./app/catalogFunctions";
 import {
   CatalogResponseSchema,
@@ -44,6 +45,10 @@ import {
   GetItemQuerySchema,
   GetItemResponseSchema,
   GetItemResponseSchemaType,
+  UpdateItemQuerySchema,
+  UpdateItemBodySchema,
+  UpdateItemResponseSchema,
+  UpdateItemResponseSchemaType,
 } from "../schemas/catalog/catalog-schema";
 import {
   QueryWeaviateImage,
@@ -485,7 +490,6 @@ const paginatedRoute = createRoute({
 });
 app.openapi(paginatedRoute, async c => {
   const { page, limit } = c.req.valid("query");
-  console.log("Received request with pageeee", page, "and limit", limit);
   const embedding = Array(768).fill(0.5);
 
   const res = await QueryWeaviateImage(embedding, page, limit, undefined);
@@ -512,7 +516,6 @@ const paginatedRouteBrand = createRoute({
 });
 app.openapi(paginatedRouteBrand, async c => {
   const { page, limit, brandEmail } = c.req.valid("query");
-  console.log("Brand email and page and limit", brandEmail, page, limit);
 
   const embedding = Array(768).fill(0.5);
 
@@ -698,19 +701,8 @@ const allBrandItemsRoute = createRoute({
 });
 app.openapi(allBrandItemsRoute, async c => {
   const { brandEmail, filter, page = 0, limit = 10 } = c.req.valid("query");
-  console.log(
-    "Brand email for all items",
-    brandEmail,
-    "filter:",
-    filter,
-    "page:",
-    page,
-    "limit:",
-    limit
-  );
   let res: AllBrandItemsSchemaResType;
   res = await QueryWeaviateAllItems(brandEmail, filter, page, limit);
-  console.log("res", res);
   return c.json(res, 200);
 });
 
@@ -734,13 +726,12 @@ const getItemRoute = createRoute({
 });
 
 app.openapi(getItemRoute, async c => {
-  const { name, brandEmail } = c.req.valid("query");
-  console.log("Getting item:", name, "from brandEmail:", brandEmail);
+  const { uuid } = c.req.valid("query");
 
   let res: GetItemResponseSchemaType;
 
   try {
-    res = await QueryWeaviateItem(name, brandEmail);
+    res = await QueryWeaviateItem(uuid);
   } catch (error) {
     console.error("Error getting item:", error);
     res = {
@@ -748,6 +739,51 @@ app.openapi(getItemRoute, async c => {
       details: "Error interno del servidor",
     };
   }
+
+  return c.json(res, 200);
+});
+
+// endpoint que actualiza un item específico por name y brand
+const updateItemRoute = createRoute({
+  method: "put",
+  path: "/update-item",
+  request: {
+    query: UpdateItemQuerySchema,
+    body: {
+      content: {
+        "application/json": { schema: UpdateItemBodySchema },
+      },
+    },
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: UpdateItemResponseSchema,
+        },
+      },
+      description: "Actualiza un item específico por nombre y marca",
+    },
+  },
+});
+
+app.openapi(updateItemRoute, async c => {
+  const { uuid } = c.req.valid("query");
+  const updatedItem = c.req.valid("json");
+
+  let res: UpdateItemResponseSchemaType;
+
+  // Verificar que la marca exista en la base de datos //TODO
+  // const brandExists = await VerifyBrand(brandEmail);
+  // if (!brandExists) {
+  //   res = {
+  //     error: true,
+  //     details: "Marca no encontrada",
+  //   };
+  //   return c.json(res, 200);
+  // }
+
+  res = await UpdateItem(uuid, updatedItem);
 
   return c.json(res, 200);
 });

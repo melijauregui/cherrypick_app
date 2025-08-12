@@ -22,17 +22,13 @@ async function QueryWeaviateImage(
     }
     const collection = resCollection.collection;
 
-    const filters = brandEmail
-      ? Filters.and(
-          collection.filter.byProperty("embedding_type").equal("image"),
-          collection.filter.byProperty("brandEmail").equal(brandEmail)
-        )
-      : collection.filter.byProperty("embedding_type").equal("image");
+    const filters = collection.filter
+      .byProperty("brandEmail")
+      .equal(brandEmail);
 
     let offset = page * limit;
-    console.log("offset", offset);
     const queryOptions: any = {
-      filters: filters,
+      filters: brandEmail ? filters : undefined,
       limit: limit,
       offset: offset,
       returnProperties: [
@@ -42,17 +38,9 @@ async function QueryWeaviateImage(
         "url",
         "brandEmail",
         "price",
-        "embedding_type",
       ],
     };
     const result = await collection.query.fetchObjects(queryOptions);
-
-    console.log(
-      "topResults en catalogoo",
-      result.objects.map(
-        match => match.properties?.name + " " + match.properties?.embedding_type
-      )
-    );
 
     const topResults: CatalogItemSchemaType[] = result.objects
       .map(match => {
@@ -63,6 +51,7 @@ async function QueryWeaviateImage(
           url: match.properties?.url || "",
           brandEmail: match.properties?.brandEmail || "",
           price: match.properties?.price || 0,
+          uuid: match.uuid || "",
         };
 
         // Validar el item usando Zod schema
@@ -83,7 +72,6 @@ async function QueryWeaviateImage(
 }
 export { QueryWeaviateImage };
 
-//funcion para hacer query a pinecone
 async function QueryWeaviateAllItems(
   brandEmail: string,
   filter?: string,
@@ -97,10 +85,7 @@ async function QueryWeaviateAllItems(
     }
     const collection = resCollection.collection;
 
-    let filters = Filters.and(
-      collection.filter.byProperty("embedding_type").equal("image"),
-      collection.filter.byProperty("brandEmail").equal(brandEmail)
-    );
+    let filters = collection.filter.byProperty("brandEmail").equal(brandEmail);
 
     // Add filter for name search if provided
     if (filter && filter.trim() !== "") {
@@ -118,11 +103,6 @@ async function QueryWeaviateAllItems(
       returnProperties: ["name"],
     };
     const result = await collection.query.fetchObjects(queryOptions);
-
-    console.log(
-      "topResults",
-      result.objects.map(match => match.properties?.name)
-    );
 
     const topResults: { name: string }[] = result.objects
       .map(match => {
@@ -149,8 +129,7 @@ export { QueryWeaviateAllItems };
 
 // Function to query specific item by name and brand in Weaviate
 async function QueryWeaviateItem(
-  name: string,
-  brandEmail: string
+  uuid: string
 ): Promise<GetItemResponseSchemaType> {
   try {
     const resCollection = await getCollection();
@@ -162,12 +141,7 @@ async function QueryWeaviateItem(
     }
     const collection = resCollection.collection;
 
-    // Filter by name, brand, and image embedding type to get unique item
-    const filters = Filters.and(
-      collection.filter.byProperty("name").equal(name),
-      collection.filter.byProperty("brandEmail").equal(brandEmail),
-      collection.filter.byProperty("embedding_type").equal("image")
-    );
+    const filters = collection.filter.byId().equal(uuid);
 
     const queryOptions: any = {
       filters: filters,
@@ -183,14 +157,6 @@ async function QueryWeaviateItem(
     };
 
     const result = await collection.query.fetchObjects(queryOptions);
-
-    console.log(
-      "QueryWeaviateItem result for",
-      name,
-      brandEmail,
-      "found:",
-      result.objects.length
-    );
 
     if (result.objects.length === 0) {
       return {
@@ -213,6 +179,7 @@ async function QueryWeaviateItem(
       url: match.properties?.url || "",
       brandEmail: match.properties?.brandEmail || "",
       price: match.properties?.price || 0,
+      uuid: match.uuid || "",
     };
 
     // Validate the item using Zod schema

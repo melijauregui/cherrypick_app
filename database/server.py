@@ -13,6 +13,13 @@ model_name = "Marqo/marqo-fashionSigLIP"
 pretrained_model_name="Marqo/marqo-fashionSigLIP"
 device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 
+# Load model and processor once at startup
+print("Loading model and processor...")
+model = AutoModel.from_pretrained(model_name, trust_remote_code=True).to(device)
+processor = AutoProcessor.from_pretrained(pretrained_model_name, trust_remote_code=True)
+model.eval()
+torch.manual_seed(42)
+print("Model and processor loaded successfully!")
 
 
 @app.post("/extract-image-features/")
@@ -41,11 +48,6 @@ def extract_feat_image_url(image_url: str):
     """
     Extrae características de una imagen desde una URL
     """
-    model = AutoModel.from_pretrained(model_name, trust_remote_code=True).to(device)
-    processor = AutoProcessor.from_pretrained(pretrained_model_name, trust_remote_code=True)
-    model.eval()
-    torch.manual_seed(42)  
-
     try:
         # Descargar imagen desde URL
         response = requests.get(image_url, timeout=30)
@@ -53,7 +55,7 @@ def extract_feat_image_url(image_url: str):
         
         # Cargar y procesar imagen
         image = Image.open(BytesIO(response.content)).convert("RGB")
-        image_inputs = processor(images=image, return_tensors="pt", padding=True).to(device)
+        image_inputs = processor(images=image, return_tensors="pt", padding=True, truncation=True).to(device)
 
         with torch.no_grad():
             image_features = model.get_image_features(**image_inputs)
@@ -71,13 +73,8 @@ def extract_feat_text(text: str):
     """
     Extrae características de un texto (descripción)
     """
-    model = AutoModel.from_pretrained(model_name, trust_remote_code=True).to(device)
-    processor = AutoProcessor.from_pretrained(pretrained_model_name, trust_remote_code=True)
-    model.eval()
-    torch.manual_seed(42)  
-
-    # Procesar texto
-    text_inputs = processor(text=text, return_tensors="pt", padding=True).to(device)
+    # Procesar texto con truncation para respetar el límite de 64 tokens
+    text_inputs = processor(text=text, return_tensors="pt", padding=True, truncation=True, max_length=64).to(device)
 
     with torch.no_grad():
         text_features = model.get_text_features(**text_inputs)

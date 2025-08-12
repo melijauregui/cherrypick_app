@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   ScrollView,
@@ -9,83 +9,127 @@ import {
   Linking,
 } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
-import { Feather, Entypo, Ionicons, FontAwesome } from "@expo/vector-icons";
+import {
+  EvilIcons,
+  Feather,
+  Entypo,
+  Ionicons,
+  FontAwesome,
+} from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import {
   CatalogItemSchemaType,
   GetItemResponseSchema,
 } from "@/schemas/catalog/catalog-schema";
 import Toast from "react-native-toast-message";
-import safeFetch from "../../../utils/safe-fetch";
+import safeFetch from "../../utils/safe-fetch";
 import { LOCAL_IP } from "@/config/api";
 import { CatalogItemArraySchema } from "@/schemas/catalog/catalog-schema";
-import ListItems from "../../../components/ListClotheItems";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import ListItems from "../../components/ListClotheItems";
+import { useQuery } from "@tanstack/react-query";
 import { useFetchBrandProfile } from "@/app/(tabs)/profile";
+import { UpdateItemModal } from "@/app/components/profile/insertNewItems";
+import { FormData } from "@/app/components/profile/insertNewItems";
+import BottomSheet from "@gorhom/bottom-sheet";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const ItemDetail = () => {
   const params = useLocalSearchParams();
+  const bottomSheetRefAddItem = useRef<BottomSheet>(null);
 
   // Decodificar los parámetros en caso de que vengan de un link compartido
+  const decodedUuid = decodeURIComponent(params.uuid as string);
   const decodedName = decodeURIComponent(params.name as string);
   const decodedBrandEmail = decodeURIComponent(params.brand as string);
   const brand = useFetchBrandProfile(decodedBrandEmail);
+  const [firstTime, setFirstTime] = useState(true);
 
   const item = useFetchItem(
+    decodedUuid,
     decodedName,
     decodedBrandEmail,
     params.imageUrl as string | undefined,
     params.description as string | undefined,
-    parseFloat(params.price as string) || undefined,
-    params.url as string | undefined
+    params.price as string | undefined,
+    params.url as string | undefined,
+    firstTime,
+    setFirstTime
   );
 
   const [isPressed, setIsPressed] = useState(false);
+
+  const openSheetUpdateItem = () => {
+    bottomSheetRefAddItem.current?.snapToIndex(0);
+  };
+
+  const handleSubmitAddItem = (data: FormData) => {
+    console.log("Form submitted with data:", data);
+  };
 
   if (!item) {
     return null;
   }
 
   return (
-    <View className="flex-1 bg-brown-strong">
-      <TouchableOpacity
-        onPress={() => router.back()}
-        onPressIn={() => setIsPressed(true)}
-        onPressOut={() => setIsPressed(false)}
-        className={`absolute top-12 left-4 w-14 h-14 rounded-2xl bg-black items-center justify-center z-50 ${
-          isPressed ? "opacity-100" : "opacity-80"
-        }`}
-        activeOpacity={1}
-      >
-        <Entypo name="chevron-thin-left" size={22} color="white" />
-      </TouchableOpacity>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <View className="flex-1 bg-brown-strong">
+        <TouchableOpacity
+          onPress={() => router.back()}
+          onPressIn={() => setIsPressed(true)}
+          onPressOut={() => setIsPressed(false)}
+          className={`absolute top-12 left-4 w-14 h-14 rounded-2xl bg-black items-center justify-center z-50 ${
+            isPressed ? "opacity-100" : "opacity-80"
+          }`}
+          activeOpacity={1}
+        >
+          <Entypo name="chevron-thin-left" size={22} color="white" />
+        </TouchableOpacity>
 
-      <ScrollView className="flex-1">
-        <View className="relative">
-          <ImageComponent imageUrl={item.item.image_url} url={item.item.url} />
-        </View>
+        <ScrollView className="flex-1">
+          <View className="relative">
+            <ImageComponent
+              imageUrl={item.item.image_url}
+              url={item.item.url}
+            />
+          </View>
 
-        <View className="px-5 flex flex-col gap-6">
-          <IconComponent
-            name={item.item.name}
-            brand={brand?.brand?.name || ""}
+          <View className="px-5 flex flex-col gap-6">
+            <IconComponent
+              name={item.item.name}
+              brand={brand?.brand?.name || ""}
+              openSheetUpdateItem={openSheetUpdateItem}
+            />
+
+            <ItemDetailComponent item={item.item} brand={brand?.brand} />
+
+            <Text className="pt-3 text-white text-xl font-psemibold">
+              Más para explorar
+            </Text>
+          </View>
+
+          <ListItems
+            profileData={null}
+            getClothingItems={getClothingItems}
+            limit={100}
+            columnCount={2}
           />
+        </ScrollView>
 
-          <ItemDetailComponent item={item.item} brand={brand?.brand} />
-
-          <Text className="pt-3 text-white text-xl font-psemibold">
-            Más para explorar
-          </Text>
-        </View>
-
-        <ListItems
-          profileData={null}
-          getClothingItems={getClothingItems}
-          limit={100}
-          columnCount={2}
+        <UpdateItemModal
+          bottomSheetRef={bottomSheetRefAddItem}
+          onSubmit={handleSubmitAddItem}
+          brandEmail={item.item.brandEmail}
+          formDataLastValue={{
+            name: item.item.name,
+            price: item.item.price.toString(),
+            url: item.item.url,
+            image_url: item.item.image_url,
+            description: item.item.description,
+          }}
+          itemUuid={decodedUuid}
         />
-      </ScrollView>
-    </View>
+      </View>
+    </GestureHandlerRootView>
   );
 };
 
@@ -215,7 +259,15 @@ const ItemDetailComponent = ({
   );
 };
 
-const IconComponent = ({ name, brand }: { name: string; brand: string }) => {
+const IconComponent = ({
+  name,
+  brand,
+  openSheetUpdateItem,
+}: {
+  name: string;
+  brand: string;
+  openSheetUpdateItem: () => void;
+}) => {
   const handleShareItem = async () => {
     try {
       // Luego encodear los parámetros para manejar caracteres especiales y espacios
@@ -246,20 +298,44 @@ const IconComponent = ({ name, brand }: { name: string; brand: string }) => {
   };
 
   return (
-    <View className="pt-4 flex-row items-center gap-8">
-      <TouchableOpacity className="w-8 h-8 items-center justify-center">
-        <Ionicons name="heart-outline" size={24} color="white" />
-      </TouchableOpacity>
-      <TouchableOpacity className="w-8 h-8 items-center justify-center">
-        <FontAwesome name="bookmark-o" size={24} color="white" />
-      </TouchableOpacity>
+    <View className="flex-row justify-between">
+      <View className="pt-4 flex-row items-center gap-8">
+        <TouchableOpacity className="w-8 h-8 items-center justify-center">
+          <Ionicons name="heart-outline" size={24} color="white" />
+        </TouchableOpacity>
+        <TouchableOpacity className="w-8 h-8 items-center justify-center">
+          <FontAwesome name="bookmark-o" size={24} color="white" />
+        </TouchableOpacity>
 
-      <TouchableOpacity
-        className="w-8 h-8 items-center justify-center"
-        onPress={handleShareItem}
-      >
-        <Feather name="link" size={24} color="white" />
-      </TouchableOpacity>
+        <TouchableOpacity
+          className="w-8 h-8 items-center justify-center"
+          onPress={handleShareItem}
+        >
+          <Feather name="link" size={24} color="white" />
+        </TouchableOpacity>
+      </View>
+      <View className="pt-4 flex-row items-center gap-4">
+        <TouchableOpacity
+          className="w-10 h-10 rounded-xl items-center justify-center"
+          style={{
+            backgroundColor: "rgba(107, 114, 128, 0.5)",
+          }}
+          onPress={openSheetUpdateItem}
+        >
+          <Ionicons name="pencil-outline" size={20} color="white" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          className="w-10 h-10 rounded-xl items-center justify-center"
+          onPress={() => {
+            console.log("delete");
+          }}
+          style={{
+            backgroundColor: "rgba(107, 114, 128, 0.5)",
+          }}
+        >
+          <EvilIcons name="trash" size={30} color="white" />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -283,29 +359,34 @@ async function getClothingItems(
 }
 
 function useFetchItem(
+  itemUuid: string,
   itemName: string,
   brandEmail: string,
   imageUrl: string | undefined,
   description: string | undefined,
-  price: number | undefined,
-  url: string | undefined
+  price: string | undefined,
+  url: string | undefined,
+  firstTime: boolean,
+  setFirstTime: (firstTime: boolean) => void
 ): {
-  item: {
-    name: string;
-    brandEmail: string;
-    image_url: string;
-    description: string;
-    price: number;
-    url: string;
-  };
+  item: CatalogItemSchemaType;
 } | null {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["item-detail", itemName, brandEmail],
+    queryKey: ["item-detail", itemUuid],
     queryFn: async () => {
-      if (!imageUrl || !description || !price || !url) {
+      if (
+        !imageUrl ||
+        !description ||
+        !price ||
+        !url ||
+        !brandEmail ||
+        !itemName ||
+        !firstTime
+      ) {
+        console.log("not first time or no data", itemUuid);
         try {
           const { data } = await safeFetch({
-            url: `http://${LOCAL_IP}:3000/get-item?brandEmail=${brandEmail}&name=${itemName}`,
+            url: `http://${LOCAL_IP}:3000/get-item?uuid=${itemUuid}`,
             method: "GET",
             schema: GetItemResponseSchema,
           });
@@ -318,8 +399,10 @@ function useFetchItem(
           return null;
         }
       } else {
+        setFirstTime(false);
         return {
           item: {
+            uuid: itemUuid,
             name: itemName,
             brandEmail: brandEmail,
             image_url: imageUrl,

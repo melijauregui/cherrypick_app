@@ -1,17 +1,35 @@
 import { z } from "zod";
 
-export const catalogJsonItemSchema = z.object({
-  name: z.string().min(1, "El nombre es requerido"),
-  description: z.string().min(1, "La descripción es requerida"),
-  price: z.number().positive("El precio debe ser positivo"),
-  image_url: z.string().url("Debe ser una URL válida"),
-  url: z.string().url("Debe ser una URL válida"),
+export const InsertItemSchema = z.object({
+  name: z
+    .string()
+    .min(1, { message: "Product name is required" })
+    .refine(val => /[a-zA-Z0-9]/.test(val), {
+      message: "Product name must contain at least one letter or number",
+    }),
+  description: z.string().min(1, { message: "Description is required" }),
+  price: z
+    .string()
+    .min(1, { message: "Price is required" })
+    .transform(val => val.replace(",", "."))
+    .refine(val => !isNaN(Number(val)) && Number(val) > 0, {
+      message: "Price must be a positive number",
+    }),
+  url: z
+    .string()
+    .min(1, { message: "URL is required" })
+    .url({ message: "Please enter a valid URL" }),
+  image_url: z
+    .string()
+    .min(1, { message: "Image URL is required" })
+    .url({ message: "Please enter a valid image URL" }),
+  uuid: z.string().min(1, { message: "UUID is required" }),
 });
 
-export type catalogJsonItemSchemaType = z.infer<typeof catalogJsonItemSchema>;
+export type InsertItemSchemaType = z.infer<typeof InsertItemSchema>;
 
 export const CatalogItemSchema = z.object({
-  ...catalogJsonItemSchema.shape,
+  ...InsertItemSchema.shape,
   brandEmail: z.string().min(1, "El email de la marca es requerido"),
 });
 
@@ -82,14 +100,13 @@ export { PaginationSchemaBrand };
 
 // Schema for JSON catalog upload
 export const jsonCatalogUploadSchema = z.object({
-  items: z.array(catalogJsonItemSchema).min(1, "Debe tener al menos un item"),
+  items: z.array(InsertItemSchema).min(1, "Debe tener al menos un item"),
   brandEmail: z.string().min(1, "El email de la marca es requerido"),
 });
 
 // Schema for get-item query parameters
 export const GetItemQuerySchema = z.object({
-  name: z.string().min(1, "El nombre es requerido"),
-  brandEmail: z.string().min(1, "El email de la marca es requerido"),
+  uuid: z.string().min(1, "El uuid es requerido"),
 });
 
 // Response schema for get-item
@@ -106,3 +123,28 @@ export const GetItemResponseSchema = z.union([
 
 export type GetItemQuerySchemaType = z.infer<typeof GetItemQuerySchema>;
 export type GetItemResponseSchemaType = z.infer<typeof GetItemResponseSchema>;
+
+// Schema for update-item query parameters
+export const UpdateItemQuerySchema = z.object({
+  uuid: z.string().min(1, "El uuid es requerido"),
+});
+
+// Schema for update-item request body
+export const UpdateItemBodySchema = InsertItemSchema.partial();
+
+// Response schema for update-item
+export const UpdateItemResponseSchema = z.union([
+  z.object({
+    error: z.literal(true),
+    details: z.string(),
+  }),
+  z.object({
+    error: z.literal(false),
+  }),
+]);
+
+export type UpdateItemQuerySchemaType = z.infer<typeof UpdateItemQuerySchema>;
+export type UpdateItemBodySchemaType = z.infer<typeof UpdateItemBodySchema>;
+export type UpdateItemResponseSchemaType = z.infer<
+  typeof UpdateItemResponseSchema
+>;

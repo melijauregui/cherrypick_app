@@ -88,6 +88,8 @@ const InputBoxWithName = ({
             placeholder={placeholder}
             length={length}
             height={height}
+            autoCapitalize={autoCapitalize}
+            keyboardType={keyboardType}
           />
         </ScrollView>
       ) : (
@@ -97,6 +99,8 @@ const InputBoxWithName = ({
           placeholder={placeholder}
           length={length}
           height={height}
+          autoCapitalize={autoCapitalize}
+          keyboardType={keyboardType}
         />
       )}
       {error && (

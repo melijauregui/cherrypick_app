@@ -1,10 +1,10 @@
 import {
-  catalogJsonItemSchema,
   CatalogItemSchema,
   CatalogItemSchemaType,
   CatalogResponseSchemaType,
   CatalogResponseSchemaDeleteType,
-  catalogJsonItemSchemaType,
+  InsertItemSchemaType,
+  UpdateItemBodySchemaType,
 } from "../../schemas/catalog/catalog-schema";
 import { config } from "../config";
 import {
@@ -12,12 +12,7 @@ import {
   QueryDbSchemaBrand,
 } from "../../schemas/auth/brand-schema";
 import { db } from "../db";
-import weaviate, {
-  Collection,
-  vectorizer,
-  generateUuid5,
-  Filters,
-} from "weaviate-client";
+import weaviate, { Collection, Filters } from "weaviate-client";
 
 // Función para extraer características de imagen desde URL
 async function extractImageFeatures(imageUrl: string): Promise<number[]> {
@@ -96,12 +91,14 @@ async function getCollection(): Promise<{
           { name: "name", dataType: "text" },
           { name: "brandEmail", dataType: "text" },
           { name: "description", dataType: "text" },
-          { name: "price", dataType: "number" },
+          { name: "price", dataType: "text" },
           { name: "image_url", dataType: "text" },
           { name: "url", dataType: "text" },
-          { name: "embedding_type", dataType: "text" },
         ],
-        vectorizers: weaviate.configure.vectorizer.none(),
+        vectorizers: [
+          weaviate.configure.vectors.selfProvided({ name: "image_vector" }),
+          weaviate.configure.vectors.selfProvided({ name: "text_vector" }),
+        ],
       })) as Collection;
     } else {
       collection = client.collections.get("FashionItem") as Collection;
@@ -244,7 +241,7 @@ export async function validateCsvFile(
 
 // Función para validar items JSON
 export async function validateJsonItems(
-  items: catalogJsonItemSchemaType[],
+  items: InsertItemSchemaType[],
   collection: Collection,
   brandEmail: string
 ): Promise<
@@ -254,7 +251,7 @@ export async function validateJsonItems(
     }
   | {
       error: false;
-      catalogItems: catalogJsonItemSchemaType[];
+      catalogItems: InsertItemSchemaType[];
     }
 > {
   try {
@@ -308,7 +305,7 @@ export async function validateJsonItems(
 
 // Cambiado para aceptar items JSON
 export async function UpdateCatalog(
-  items: catalogJsonItemSchemaType[],
+  items: InsertItemSchemaType[],
   brandEmail: string
 ): Promise<CatalogResponseSchemaType> {
   let res: CatalogResponseSchemaType;
@@ -394,7 +391,7 @@ export async function VerifyBrand(brand: string): Promise<boolean> {
 
 // Función para insertar items del catálogo en Pinecone
 export async function insertCatalogItemsToWeaviate(
-  catalogItems: catalogJsonItemSchemaType[],
+  catalogItems: InsertItemSchemaType[],
   brandEmail: string,
   collection: Collection
 ): Promise<{
@@ -411,6 +408,12 @@ export async function insertCatalogItemsToWeaviate(
         const imageFeatures = await extractImageFeatures(item.image_url);
         const textFeatures = await extractTextFeatures(item.description);
 
+        if (imageFeatures.length === 0 && textFeatures.length === 0) {
+          throw new Error(
+            "No se pudieron extraer características de la imagen o el texto"
+          );
+        }
+
         const itemData = {
           name: item.name,
           description: item.description,
@@ -420,29 +423,16 @@ export async function insertCatalogItemsToWeaviate(
           url: item.url,
         };
 
-        // Insertar embedding de imagen
-        if (imageFeatures) {
-          const result = await collection.data.insert({
-            properties: {
-              ...itemData,
-              embedding_type: "image",
-            },
-            vectors: imageFeatures,
-          });
-          insertedCount++;
-        }
-
-        // Insertar embedding de texto
-        if (textFeatures) {
-          const result = await collection.data.insert({
-            properties: {
-              ...itemData,
-              embedding_type: "text",
-            },
-            vectors: textFeatures,
-          });
-          insertedCount++;
-        }
+        const result = await collection.data.insert({
+          properties: {
+            ...itemData,
+          },
+          vectors: {
+            image_vector: imageFeatures,
+            text_vector: textFeatures,
+          },
+        });
+        insertedCount++;
       } catch (error) {
         const errorMsg = `Error processing item ${item.name}: ${error}`;
         console.error(errorMsg);
@@ -540,7 +530,6 @@ export async function DeleteFromCatalog(
   return res;
 }
 
-// Función para validar CSV
 export async function validateItemsToDelete(
   itemsNames: string[],
   collection: Collection,
@@ -599,7 +588,7 @@ export async function validateItemsToDelete(
   } catch (error) {
     return {
       error: true,
-      details: "Error interno del servidor al procesar el CSV",
+      details: "Error interno del servidor al validar items",
     };
   }
 }
@@ -613,9 +602,6 @@ async function deleteCatalogItemsFromWeaviate(
     let numberDeleted = 0;
     const invalidItems: string[] = [];
     for (const itemName of itemsNames) {
-      const object_uuid = generateUuid5(
-        JSON.stringify({ name: itemName, brandEmail: brandEmail })
-      );
       const response = await collection.data.deleteMany(
         Filters.and(
           collection.filter.byProperty("name").equal(itemName),
@@ -644,6 +630,96 @@ async function deleteCatalogItemsFromWeaviate(
       error: true,
       details: `Error deleting from Weaviate: ${error}`,
       numberDeleted: 0,
+    };
+  }
+}
+
+export async function UpdateItem(
+  uuid: string,
+  updatedItem: UpdateItemBodySchemaType
+): Promise<
+  | {
+      error: true;
+      details: string;
+    }
+  | {
+      error: false;
+    }
+> {
+  try {
+    const collectionResult = await getCollection();
+    if (collectionResult.error) {
+      return {
+        error: true,
+        details: collectionResult.details,
+      };
+    }
+
+    const collection = collectionResult.collection!;
+
+    // Fetch the object
+    const result = await collection.query.fetchObjects({
+      filters: collection.filter.byId().equal(uuid),
+      limit: 1,
+    });
+
+    if (result.objects.length === 0) {
+      return {
+        error: true,
+        details: `No se encontró el item "${uuid}"`,
+      };
+    }
+
+    const object = result.objects[0];
+    if (!object || !object.uuid) {
+      return {
+        error: true,
+        details: "No se pudo obtener el ID del item a actualizar",
+      };
+    }
+
+    const id = object.uuid;
+
+    // Prepare properties to update (only include fields that are provided)
+    const propertiesToUpdate: any = {};
+    if (updatedItem.name !== undefined)
+      propertiesToUpdate.name = updatedItem.name;
+    if (updatedItem.description !== undefined)
+      propertiesToUpdate.description = updatedItem.description;
+    if (updatedItem.price !== undefined)
+      propertiesToUpdate.price = updatedItem.price;
+    if (updatedItem.image_url !== undefined)
+      propertiesToUpdate.image_url = updatedItem.image_url;
+    if (updatedItem.url !== undefined) propertiesToUpdate.url = updatedItem.url;
+
+    const vectorsToUpdate: any = {};
+    if (updatedItem.image_url) {
+      console.log("extracting image features");
+      const imageFeatures = await extractImageFeatures(updatedItem.image_url);
+      vectorsToUpdate.image_vector = imageFeatures;
+    }
+    if (updatedItem.description) {
+      console.log("extracting text features");
+      const textFeatures = await extractTextFeatures(updatedItem.description);
+      vectorsToUpdate.text_vector = textFeatures;
+    }
+
+    // Update the object
+    const updateData: any = {
+      id: id,
+      properties: propertiesToUpdate,
+      vectors: vectorsToUpdate,
+    };
+    await collection.data.update(updateData);
+
+    return {
+      error: false,
+    };
+  } catch (error) {
+    console.error("Error updating item:", error);
+    return {
+      error: true,
+      details: `Error al actualizar el item: ${error instanceof Error ? error.message : "Error desconocido"}`,
     };
   }
 }

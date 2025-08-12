@@ -61,10 +61,10 @@ const ClothingItemComponent = ({
   }
 
   const handlePress = () => {
-    const itemId = generateItemId(item.name, item.brandEmail);
     router.push({
-      pathname: "/(items)/[brand]/[name]/item-detail",
+      pathname: "/(items)/[uuid]/item-detail",
       params: {
+        uuid: item.uuid,
         brand: encodeURIComponent(item.brandEmail),
         name: encodeURIComponent(item.name),
         imageUrl: item.image_url,

@@ -5,6 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   Dimensions,
+  Keyboard,
 } from "react-native";
 import BottomSheet from "@gorhom/bottom-sheet";
 import Toast from "react-native-toast-message";
@@ -115,6 +116,7 @@ const DeleteCatalogItemsModal = ({
           onPress={() => {
             bottomSheetRef.current?.close();
             handleCancel();
+            Keyboard.dismiss();
           }}
         >
           <Text className="text-xl  font-plight">Cancel</Text>
@@ -275,6 +277,7 @@ function useDelete(
     },
     onSettled: () => {
       setDeleting(false);
+      Keyboard.dismiss();
     },
   });
 
