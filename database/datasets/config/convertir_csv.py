@@ -3,8 +3,8 @@ import re
 from collections import Counter
 import pandas as pd
 
-input_file = 'preferencias/preferencias-v5.csv'
-output_file = 'preferencias/preferencias-v5.csv'
+input_file = 'unificado/roturas-preferencias.csv'
+output_file = 'unificado/roturas-preferencias-v2.csv'
 
 
 def __clean_description(texto):
@@ -152,7 +152,22 @@ def extraer_estilos(descripcion):
     return 'Estilos: ' + ', '.join(estilo for estilo, _ in estilos_ordenados)
 
 
+def agregar_tasks():
+    df = pd.read_csv(input_file, header=0, names=[
+                     'image', 'description', 'tags'])
+    df['task'] = df['tags'].apply(agregar_task)
+    df.to_csv(output_file, index=False, header=True)
+    print(f"Archivo con tasks guardado en {output_file}")
+
+
+def agregar_task(tag):
+    if re.search(r'Estilos:', tag, re.IGNORECASE):
+        return 'estilos'
+    return 'roturas'
+
+
 if __name__ == "__main__":
     # transform_tags(__extract_tags_ripped_jeans)
-    transform_tags(extraer_estilos)
+    # transform_tags(extraer_estilos)
     # transform_tags(extraer_tipos_jeans_y_roturas)
+    agregar_tasks()

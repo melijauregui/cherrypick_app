@@ -6,9 +6,10 @@ import pandas as pd
 from PIL import Image
 import requests
 from tqdm import tqdm
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset, DataLoader, Sampler
 from transformers import AutoProcessor, AutoModel
 import torch
+import random
 from torchvision import transforms
 import torch.optim as optim
 # pip install nlpaug transformers sentencepiece
@@ -57,6 +58,49 @@ data_transforms = transforms.Compose([
 
 
 # --- DATASET PERSONALIZADO ---
+
+class BalancedBatchSampler(Sampler):
+    def __init__(self, dataframe, batch_size):
+        self.batch_size = batch_size
+
+        # Reindexar dataframe para que sea de 0..n-1
+        df = dataframe.reset_index(drop=True)
+
+        # Guardar índices por categoría
+        self.indices_jeans = df[df["task"] == "roturas"].index.tolist()
+        self.indices_estilos = df[df["task"] == "estilos"].index.tolist()
+
+        assert self.indices_jeans and self.indices_estilos, "Faltan datos de alguna categoría"
+
+    def __iter__(self):
+        jeans = self.indices_jeans.copy()
+        estilos = self.indices_estilos.copy()
+
+        # Repetir la categoría más chica para empatar tamaño
+        while len(jeans) < len(estilos):
+            faltan = len(estilos) - \
+                len(jeans) if len(estilos) > len(jeans) else 0
+            if faltan > 0:
+                jeans += random.choices(jeans, k=faltan)
+        while len(estilos) < len(jeans):
+            faltan = len(jeans) - \
+                len(estilos) if len(jeans) > len(estilos) else 0
+            if faltan > 0:
+                estilos += random.choices(estilos, k=faltan)
+
+        # Mezclar
+        random.shuffle(jeans)
+        random.shuffle(estilos)
+
+        # Mezclar intercalando
+        combined = [val for pair in zip(jeans, estilos) for val in pair]
+
+        # Entregar en batches
+        for i in range(0, len(combined), self.batch_size):
+            yield combined[i:i+self.batch_size]
+
+    def __len__(self):
+        return (max(len(self.indices_jeans), len(self.indices_estilos)) * 2) // self.batch_size
 
 
 class FashionDataset(Dataset):
@@ -280,6 +324,8 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
 
     freeze_func(model, n_layers=n_layers)
 
+    train_sampler = BalancedBatchSampler(train_df, batch_size=batch_size)
+
     train_dataset = FashionDataset(
         train_df, processor, data_aug=data_aug)
 
@@ -287,7 +333,14 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
         val_df, processor, data_aug=False)
 
     train_loader = DataLoader(
-        train_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn, num_workers=NUM_WORKERS)
+        train_dataset,
+        batch_sampler=train_sampler,
+        collate_fn=collate_fn,
+        num_workers=NUM_WORKERS
+    )
+
+    # train_loader = DataLoader(
+    #    train_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn, num_workers=NUM_WORKERS)
     val_loader = DataLoader(
         val_dataset, batch_size=batch_size, shuffle=False, collate_fn=collate_fn, num_workers=NUM_WORKERS)
 
@@ -457,7 +510,7 @@ def evaluate(model, loader, processor, loss_func, desc):
 
 if __name__ == "__main__":
     multiprocessing.freeze_support()
-    fine_tune(csv_path="datasets/roturas-preferencias.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
-              model_name_to_push="Sofia-gb/cherrypick-sigLip", data_aug=False,
+    fine_tune(csv_path="datasets/unificado/roturas-preferencias-v2.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
+              model_name_to_push="Sofia-gb/cherrypick-sigLip3", data_aug=False,
               loss_func=contrastive_loss_InfoNCE, batch_size=8, epochs=32, lr=2e-5,
               n_layers=2)
