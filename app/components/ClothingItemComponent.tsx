@@ -2,6 +2,8 @@ import { View, Image, Dimensions, TouchableOpacity } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import { router } from "expo-router";
 import { CatalogItemSchemaType } from "@/schemas/catalog/catalog-schema";
+import { useQueryClient } from "@tanstack/react-query";
+import { LOCAL_IP } from "@/config/api";
 
 // Función para generar un ID único basado en nombre y marca
 const generateItemId = (name: string, brandEmail: string): string => {
@@ -41,7 +43,7 @@ const ClothingItemComponent = ({
       },
       error => console.error("Failed to get dimensions for image 1:", error)
     );
-  }, []);
+  }, [item.uuid]);
 
   // Si los valores son inválidos, no renderizar nada
   if (

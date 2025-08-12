@@ -5,6 +5,7 @@ import { BrandSchemaType } from "@/schemas/auth/brand-schema";
 import { RefreshControl } from "react-native";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { LOCAL_IP } from "@/config/api";
 
 const ListItems = ({
   profileData,
@@ -23,10 +24,42 @@ const ListItems = ({
 }) => {
   const [refreshKey, setRefreshKey] = useState(0);
 
+  const queryClient = useQueryClient();
+
   const { data, fetchNextPage, refetch } = useInfiniteQuery({
     queryKey: ["clothing-items", profileData?.email],
-    queryFn: ({ pageParam }) =>
-      getClothingItems(pageParam, limit, profileData?.email),
+    queryFn: async ({ pageParam }) => {
+      const items = await getClothingItems(
+        pageParam,
+        limit,
+        profileData?.email
+      );
+
+      // Prefetch item-detail queries for each item fetched
+      items.forEach(item => {
+        console.log("prefetching item-detail", item.uuid);
+        queryClient.prefetchQuery({
+          queryKey: ["item-detail", item.uuid],
+          queryFn: async () => {
+            try {
+              const response = await fetch(
+                `http://${LOCAL_IP}:3000/get-item?uuid=${item.uuid}`
+              );
+              const data = await response.json();
+              if (data.error) {
+                throw new Error(data.details);
+              }
+              return data;
+            } catch (error) {
+              console.error("Error prefetching item detail:", error);
+              return null;
+            }
+          },
+        });
+      });
+
+      return items;
+    },
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
       if (lastPage.length === 0) {
@@ -35,7 +68,6 @@ const ListItems = ({
       return lastPageParam + 1;
     },
   });
-  const queryClient = useQueryClient();
   const resetInfiniteQueryPagination = () => {
     return queryClient.setQueryData(
       ["clothing-items", profileData?.email],
