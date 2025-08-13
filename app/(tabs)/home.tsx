@@ -7,8 +7,36 @@ import {
   CatalogItemSchemaType,
 } from "@/schemas/catalog/catalog-schema";
 import safeFetch from "../utils/safe-fetch";
+import LoadingPage from "../components/LoadingPage";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Home = () => {
+  const queryClient = useQueryClient();
+  const [hasData, setHasData] = useState(false);
+
+  useEffect(() => {
+    // Check immediately first
+    const existingData = queryClient.getQueryData(["clothing-items", null]);
+    if (existingData) {
+      setHasData(true);
+      return;
+    }
+
+    const interval = setInterval(() => {
+      const data = queryClient.getQueryData(["clothing-items", null]);
+      if (data) {
+        setHasData(true);
+        clearInterval(interval);
+      }
+    }, 500);
+
+    return () => clearInterval(interval);
+  }, [queryClient]);
+
+  if (!hasData) {
+    return <LoadingPage />;
+  }
+
   return (
     <SafeAreaProvider>
       <SafeAreaView className="bg-brown-strong w-full flex-1 ">

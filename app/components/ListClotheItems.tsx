@@ -54,7 +54,9 @@ const ListItems = ({
               }
               return data;
             } catch (error) {
-              console.error("Error prefetching item detail:", error);
+              if (profileData?.email) {
+                console.error("Error prefetching item detail:", error);
+              }
               return null;
             }
           },

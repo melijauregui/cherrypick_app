@@ -42,6 +42,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CustomBottomLogout } from "@/app/components/profile/bottomSheets";
 import EditBrandProfile from "../components/profile/editBrandProfile";
 import { FormData } from "../components/profile/insertNewItems";
+import LoadingPage from "../components/LoadingPage";
 
 interface UserInfo {
   email: string;
@@ -52,8 +53,11 @@ export type { UserInfo };
 const Profile = () => {
   const { user } = useSession();
   const { signOut } = authClient;
+  const queryClient = useQueryClient();
 
   const logout = async () => {
+    // Limpiar toda la caché de React Query antes de hacer logout
+    await queryClient.clear();
     signOut();
   };
 
@@ -121,7 +125,7 @@ const BrandProfile = ({
   };
 
   if (!data) {
-    return null;
+    return <LoadingPage />;
   }
 
   const description = data.brand.description || "";
@@ -272,7 +276,7 @@ const ClientProfile = ({
   logout: () => Promise<void>;
 }) => {
   const data = useFetchClientProfile(user);
-  const mutateUser = useUpdateClient();
+  const mutateUser = useUpdateClient(user.email);
 
   const bottomSheetRef = useRef<BottomSheet>(null);
   const bottomSheetRefDate = useRef<BottomSheet>(null);
@@ -308,7 +312,7 @@ const ClientProfile = ({
   };
 
   if (!data) {
-    return null;
+    return <LoadingPage />;
   }
 
   return (
@@ -403,7 +407,7 @@ function useFetchClientProfile(user: UserInfo): {
   };
 } | null {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["fetch-client-profile"],
+    queryKey: ["fetch-client-profile", user.email],
     queryFn: async () => {
       try {
         const { data } = await safeFetch({
@@ -430,11 +434,10 @@ function useFetchClientProfile(user: UserInfo): {
     console.log("No data found", error);
     return null;
   }
-  console.log("Data found:", data);
   return data;
 }
 
-function useUpdateClient() {
+function useUpdateClient(email: string) {
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: async (data: {
@@ -460,7 +463,7 @@ function useUpdateClient() {
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({
-        queryKey: ["fetch-client-profile"],
+        queryKey: ["fetch-client-profile", email],
       });
     },
     onError: error => {
