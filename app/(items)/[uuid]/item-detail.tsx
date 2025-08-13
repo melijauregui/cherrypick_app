@@ -19,6 +19,7 @@ import {
 import * as Clipboard from "expo-clipboard";
 import {
   CatalogItemSchemaType,
+  CatalogResponseSchemaDelete,
   GetItemResponseSchema,
 } from "@/schemas/catalog/catalog-schema";
 import Toast from "react-native-toast-message";
@@ -26,22 +27,31 @@ import safeFetch from "../../utils/safe-fetch";
 import { LOCAL_IP } from "@/config/api";
 import { CatalogItemArraySchema } from "@/schemas/catalog/catalog-schema";
 import ListItems from "../../components/ListClotheItems";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFetchBrandProfile } from "@/app/(tabs)/profile";
 import { UpdateItemModal } from "@/app/components/profile/insertNewItems";
 import { FormData } from "@/app/components/profile/insertNewItems";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { useSession } from "@/lib/auth-client";
+import CustomModal from "@/app/components/Modal";
+import LoadingPage from "@/app/components/LoadingPage";
 
 const ItemDetail = () => {
+  const { user } = useSession();
   const params = useLocalSearchParams();
   const bottomSheetRefAddItem = useRef<BottomSheet>(null);
+  const [visibleModal, setVisibleModal] = useState(false);
 
   const decodedUuid = decodeURIComponent(params.uuid as string);
   const item = useFetchItem(decodedUuid);
   const brand = useFetchBrandProfile(item?.item.brandEmail || "");
 
   const [isPressed, setIsPressed] = useState(false);
+  const deleteItem = useDeleteItem(
+    item?.item.brandEmail || "",
+    item?.item.name || ""
+  );
 
   const openSheetUpdateItem = () => {
     bottomSheetRefAddItem.current?.snapToIndex(0);
@@ -52,7 +62,7 @@ const ItemDetail = () => {
   };
 
   if (!item) {
-    return null;
+    return <LoadingPage />;
   }
 
   return (
@@ -81,7 +91,11 @@ const ItemDetail = () => {
           <View className="px-5 flex flex-col gap-6">
             <IconComponent
               uuid={item.item.uuid}
+              userEmail={user?.email || ""}
+              itemEmail={item.item.brandEmail}
               openSheetUpdateItem={openSheetUpdateItem}
+              itemName={item.item.name}
+              setVisibleModal={setVisibleModal}
             />
 
             <ItemDetailComponent item={item.item} brand={brand?.brand} />
@@ -113,6 +127,16 @@ const ItemDetail = () => {
           itemUuid={decodedUuid}
         />
       </View>
+      <CustomModal
+        title="Eliminar producto"
+        text={`¿Estás seguro de querer eliminar este producto? Este proceso es irreversible.`}
+        onSubmit={() => {
+          deleteItem.mutate();
+          setVisibleModal(false);
+        }}
+        onCancel={() => setVisibleModal(false)}
+        visible={visibleModal}
+      />
     </GestureHandlerRootView>
   );
 };
@@ -244,11 +268,19 @@ const ItemDetailComponent = ({
 };
 
 const IconComponent = ({
+  userEmail,
+  itemEmail,
   uuid,
   openSheetUpdateItem,
+  itemName,
+  setVisibleModal,
 }: {
   uuid: string;
+  userEmail: string;
+  itemEmail: string;
   openSheetUpdateItem: () => void;
+  itemName: string;
+  setVisibleModal: (visible: boolean) => void;
 }) => {
   const handleShareItem = async () => {
     try {
@@ -291,31 +323,72 @@ const IconComponent = ({
           <Feather name="link" size={24} color="white" />
         </TouchableOpacity>
       </View>
-      <View className="pt-4 flex-row items-center gap-4">
-        <TouchableOpacity
-          className="w-10 h-10 rounded-xl items-center justify-center"
-          style={{
-            backgroundColor: "rgba(107, 114, 128, 0.5)",
-          }}
-          onPress={openSheetUpdateItem}
-        >
-          <Ionicons name="pencil-outline" size={20} color="white" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          className="w-10 h-10 rounded-xl items-center justify-center"
-          onPress={() => {
-            console.log("delete");
-          }}
-          style={{
-            backgroundColor: "rgba(107, 114, 128, 0.5)",
-          }}
-        >
-          <EvilIcons name="trash" size={30} color="white" />
-        </TouchableOpacity>
-      </View>
+      {userEmail === itemEmail && (
+        <View className="pt-4 flex-row items-center gap-4">
+          <TouchableOpacity
+            className="w-10 h-10 rounded-xl items-center justify-center"
+            style={{
+              backgroundColor: "rgba(107, 114, 128, 0.5)",
+            }}
+            onPress={openSheetUpdateItem}
+          >
+            <Ionicons name="pencil-outline" size={20} color="white" />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            className="w-10 h-10 rounded-xl items-center justify-center"
+            onPress={() => {
+              setVisibleModal(true);
+            }}
+            style={{
+              backgroundColor: "rgba(107, 114, 128, 0.5)",
+            }}
+          >
+            <EvilIcons name="trash" size={30} color="white" />
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 };
+
+function useDeleteItem(brandEmail: string, itemName: string) {
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: async () => {
+      const response = await safeFetch({
+        url: `http://${LOCAL_IP}:3000/delete-catalog-brand`,
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: [{ name: itemName }],
+        }),
+        schema: CatalogResponseSchemaDelete,
+      });
+      if (response.data.error) {
+        throw new Error(response.data.details);
+      }
+      return response.data;
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: ["delete-catalog-items", brandEmail],
+      });
+
+      Toast.show({
+        type: "normal",
+        text1: `Producto eliminado correctamente`,
+      });
+      router.back();
+    },
+    onError: error => {
+      console.log(`could not delete item:`, error);
+      Toast.show({ type: "error", text1: error.message });
+    },
+  });
+
+  return mutation;
+}
 
 async function getClothingItems(
   page: number,

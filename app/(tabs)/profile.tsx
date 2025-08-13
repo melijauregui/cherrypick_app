@@ -24,10 +24,9 @@ import {
   RenderProfileItemPreferences,
 } from "@/app/components/profile/bottomSheets";
 import ProfileAndLogOut from "@/app/components/profile/profileAndLogOut";
-import { BrandSchemaRes, BrandSchemaType } from "@/schemas/auth/brand-schema";
+import { BrandSchemaRes } from "@/schemas/auth/brand-schema";
 import { Linking } from "react-native";
 import {
-  CatalogItemArraySchema,
   CatalogItemArraySchemaResponse,
   CatalogItemSchemaType,
 } from "@/schemas/catalog/catalog-schema";

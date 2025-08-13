@@ -4,6 +4,8 @@ import { VerifyAccountDeletedSchema } from "@/schemas/auth/sign-up-schema";
 import { TouchableOpacity, Text } from "react-native";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { authClient } from "@/lib/auth-client";
+import CustomModal from "../Modal";
+import BottomSheet from "@gorhom/bottom-sheet";
 
 const LogOutButton: React.FC<{ logout: () => Promise<void> }> = ({
   logout,
@@ -26,17 +28,40 @@ export default LogOutButton;
 const DeleteAccountButton: React.FC<{
   user: { email: string };
   logout: () => Promise<void>;
-}> = ({ user, logout }) => {
+  setVisibleModal: (visible: boolean) => void;
+  visibleModal: boolean;
+  bottomSheetRefLogout: React.RefObject<BottomSheet>;
+}> = ({
+  user,
+  logout,
+  setVisibleModal,
+  bottomSheetRefLogout,
+  visibleModal,
+}) => {
   const mutateDeleteAccount = useDeleteAccount(logout);
   return (
-    <TouchableOpacity
-      className="flex flex-row bg-red-600 h-[50px] justify-center items-center rounded-full"
-      onPress={() => mutateDeleteAccount.mutate()}
-    >
-      <Text className="text-white font-psemibold text-[15px]">
-        Delete Account
-      </Text>
-    </TouchableOpacity>
+    <>
+      <TouchableOpacity
+        className="flex flex-row bg-brown-light h-[50px] justify-center items-center rounded-full"
+        onPress={() => setVisibleModal(true)}
+      >
+        <Text className="text-white font-psemibold text-[15px]">
+          Delete Account
+        </Text>
+      </TouchableOpacity>
+      <CustomModal
+        title="Eliminar cuenta"
+        text={`¿Estás seguro de querer eliminar tu cuenta? Este proceso es irreversible.`}
+        onSubmit={() => {
+          mutateDeleteAccount.mutate();
+          bottomSheetRefLogout.current?.close();
+          logout();
+          setVisibleModal(false);
+        }}
+        onCancel={() => setVisibleModal(false)}
+        visible={visibleModal}
+      />
+    </>
   );
 };
 export { DeleteAccountButton };

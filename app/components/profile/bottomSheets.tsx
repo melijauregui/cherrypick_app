@@ -1,4 +1,4 @@
-import { ImageSourcePropType, Keyboard } from "react-native";
+import { ImageSourcePropType, Keyboard, Modal } from "react-native";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import React, { useState, useEffect, useCallback } from "react";
 import { TouchableOpacity, Text } from "react-native";
@@ -71,21 +71,30 @@ function CustomBottomLogout({
   logout: () => Promise<void>;
   user: { email: string };
 }) {
+  const [visibleModal, setVisibleModal] = useState(false);
   const buttonsLogoutDelete = (
     <View className="flex flex-col justify-center items-center flex-1 px-5">
       <View className="flex flex-col px-[16px] bg-white rounded-2xl w-full py-2 gap-2">
         <LogOutButton logout={logout} />
-        <DeleteAccountButton user={user} logout={logout} />
+        <DeleteAccountButton
+          user={user}
+          logout={logout}
+          setVisibleModal={setVisibleModal}
+          visibleModal={visibleModal}
+          bottomSheetRefLogout={bottomSheetRef}
+        />
       </View>
     </View>
   );
   return (
-    <BottomSheetSame
-      bottomSheetRef={bottomSheetRef}
-      hasDone={false}
-      componentView={buttonsLogoutDelete}
-      value={"Account Settings"}
-    />
+    <>
+      <BottomSheetSame
+        bottomSheetRef={bottomSheetRef}
+        hasDone={false}
+        componentView={buttonsLogoutDelete}
+        value={"Account Settings"}
+      />
+    </>
   );
 }
 
@@ -232,13 +241,7 @@ function BottomSheetSame({
                 onCancel?.();
               }}
             >
-              <Text
-                className={`
-                ${hasDone ? "text-xl  font-pmedium" : "text-xl  font-plight"}
-              `}
-              >
-                Cancel
-              </Text>
+              <Text className="text-xl  font-pregular">Cancelar</Text>
             </TouchableOpacity>
           )}
 
@@ -267,31 +270,25 @@ function BottomSheetSame({
             >
               <Text
                 className={`
-                text-xl  font-pmedium
+                text-xl  font-pregular
                 ${!isReady ? "text-black opacity-40" : "text-black"}
               `}
               >
-                Done
+                Aceptar
               </Text>
             </TouchableOpacity>
           )}
 
           {!hasDone && (
             <TouchableOpacity
-              className={`flex flex-row ${hasDone ? "mr-auto" : "ml-auto"}`}
+              className={`flex flex-row mr-auto`}
               onPress={() => {
                 bottomSheetRef.current?.close();
                 Keyboard.dismiss();
                 onCancel?.();
               }}
             >
-              <Text
-                className={`
-                ${hasDone ? "text-xl  font-pmedium" : "text-xl  font-plight"}
-              `}
-              >
-                Cancel
-              </Text>
+              <Text className="text-xl  font-pregular">Cancelar</Text>
             </TouchableOpacity>
           )}
         </View>
