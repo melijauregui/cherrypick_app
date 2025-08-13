@@ -1,3 +1,4 @@
+import math
 from sklearn.metrics import confusion_matrix
 from torch.nn.functional import cosine_similarity
 import os
@@ -72,35 +73,57 @@ class BalancedBatchSampler(Sampler):
 
         assert self.indices_jeans and self.indices_estilos, "Faltan datos de alguna categoría"
 
+    def use_data_augmentation(self):
+        return len(self.indices_jeans) != len(self.indices_estilos)
+
     def __iter__(self):
         jeans = self.indices_jeans.copy()
         estilos = self.indices_estilos.copy()
 
-        # Repetir la categoría más chica para empatar tamaño
-        while len(jeans) < len(estilos):
-            faltan = len(estilos) - \
-                len(jeans) if len(estilos) > len(jeans) else 0
-            if faltan > 0:
-                jeans += random.choices(jeans, k=faltan)
-        while len(estilos) < len(jeans):
-            faltan = len(jeans) - \
-                len(estilos) if len(jeans) > len(estilos) else 0
-            if faltan > 0:
-                estilos += random.choices(estilos, k=faltan)
+        # Data aug a la categoría más chica para empatar tamaño
+        if len(jeans) > len(estilos):
+            diff = len(jeans) - len(estilos)
+            if diff > len(estilos):
+                augment_indices = random.choices(estilos, k=diff)
+            else:
+                augment_indices = random.sample(estilos, diff)
+
+            estilos += [(idx, True) for idx in augment_indices]
+        elif len(estilos) > len(jeans):
+            diff = len(estilos) - len(jeans)
+            if diff > len(estilos):
+                augment_indices = random.choices(estilos, k=diff)
+            else:
+                augment_indices = random.sample(estilos, diff)
+            jeans += [(idx, True) for idx in augment_indices]
 
         # Mezclar
-        random.shuffle(jeans)
-        random.shuffle(estilos)
+        jeans = self.shuffle_mixed(jeans)
+        estilos = self.shuffle_mixed(estilos)
 
-        # Mezclar intercalando
         combined = [val for pair in zip(jeans, estilos) for val in pair]
 
         # Entregar en batches
         for i in range(0, len(combined), self.batch_size):
             yield combined[i:i+self.batch_size]
 
+    def shuffle_mixed(self, lst):
+        normal = [x for x in lst if not (
+            isinstance(x, tuple) and x[1] is True)]
+        augmented = [x for x in lst if isinstance(x, tuple) and x[1] is True]
+        random.shuffle(normal)
+        random.shuffle(augmented)
+        return normal + augmented
+
     def __len__(self):
-        return (max(len(self.indices_jeans), len(self.indices_estilos)) * 2) // self.batch_size
+        jeans = len(self.indices_jeans)
+        estilos = len(self.indices_estilos)
+        max_len = max(jeans, estilos)
+
+        total_items = max_len * 2
+        res = math.ceil(total_items / self.batch_size)
+
+        return res
 
 
 class FashionDataset(Dataset):
@@ -122,31 +145,39 @@ class FashionDataset(Dataset):
         if not self.data_aug:
             return len(self.dataframe)
         else:
-            return len(self.dataframe) * (self.n_augmented + 1)
+            jeans = self.dataframe[self.dataframe["task"]
+                                   == "roturas"].index.tolist()
+            estilos = self.dataframe[self.dataframe["task"]
+                                     == "estilos"].index.tolist()
+            res_len = max(len(jeans), len(estilos)) * 2
+
+            return res_len
+            # return len(self.dataframe) * (self.n_augmented + 1)
 
     def __getitem__(self, idx):
-        if not self.data_aug:
-            row = self.dataframe.iloc[idx]
-            is_augmented = False
-        else:
-            base_idx = idx // (self.n_augmented + 1)
-            is_augmented = idx % (self.n_augmented + 1) != 0
-            row = self.dataframe.iloc[base_idx]
+        apply_aug = False
+        if self.data_aug and isinstance(idx, tuple):
+            #    base_idx = idx // (self.n_augmented + 1)
+            #    apply_aug = idx % (self.n_augmented + 1) != 0
+            #    idx = base_idx
+            idx, apply_aug = idx
 
-        # ahora es la ruta local a la imagen PNG ya procesada
+        row = self.dataframe.iloc[idx]
+
         filename = row["image"]
 
         try:
             image = Image.open(filename).convert("RGB")
-            if is_augmented:
+            if apply_aug:
                 image = self.augment(image)
         except Exception as e:
             print(f"⚠️ Error al cargar la imagen {filename}: {e}")
-            return None
+            raise e
+            # return None
 
         text = row["description"]
         if row.get("tags", "") != "":
-            if not text.endswith("."):
+            if text != "" and not text.endswith("."):
                 text += "."
             text += f" {row['tags']}"
         return image, text
@@ -326,8 +357,10 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
 
     train_sampler = BalancedBatchSampler(train_df, batch_size=batch_size)
 
+    use_data_aug = data_aug or train_sampler.use_data_augmentation()
+
     train_dataset = FashionDataset(
-        train_df, processor, data_aug=data_aug)
+        train_df, processor, data_aug=use_data_aug)
 
     val_dataset = FashionDataset(
         val_df, processor, data_aug=False)
@@ -511,6 +544,6 @@ def evaluate(model, loader, processor, loss_func, desc):
 if __name__ == "__main__":
     multiprocessing.freeze_support()
     fine_tune(csv_path="datasets/unificado/roturas-preferencias-v2.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
-              model_name_to_push="Sofia-gb/cherrypick-sigLip3", data_aug=False,
+              model_name_to_push="Sofia-gb/cherrypick-sigLip5", data_aug=False,
               loss_func=contrastive_loss_InfoNCE, batch_size=8, epochs=32, lr=2e-5,
               n_layers=2)

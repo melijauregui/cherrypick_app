@@ -51,3 +51,57 @@ Resultados TEST:
 - recall@10: 0.9901
 - MRR: 0.7895
 - Precision@5: 0.9406
+
+#### Modelo: Sofia-gb/cherrypick-sigLip2
+
+Resultads TRAIN:
+- Loss: 0.0208
+- recall@1: 0.9706
+- recall@5: 1.0000
+- recall@10: 1.0000
+- MRR: 0.9853
+- Precision@5: 1.0000
+
+Resultados TEST:
+- Loss: 0.0881
+- recall@1: 0.9706
+- recall@5: 0.9706
+- recall@10: 1.0000
+- MRR: 0.9739
+- Precision@5: 0.9706
+
+#### Modelo: Sofia-gb/cherrypick-sigLip3
+
+Resultados TRAIN:                                                                                          
+- Loss: 0.0417
+- recall@1: 0.4557
+- recall@5: 0.9520
+- recall@10: 0.9963
+- MRR: 0.6622
+- Precision@5: 0.9520
+
+Resultados TEST:
+- Loss: 0.1935
+- recall@1: 0.6436
+- recall@5: 0.9307
+- recall@10: 0.9802
+- MRR: 0.7742
+- Precision@5: 0.9307
+
+#### Modelo: Sofia-gb/cherrypick-sigLip5
+
+Resultados TRAIN:
+- Loss: 0.0536
+- recall@1: 0.4797
+- recall@5: 0.9373
+- recall@10: 0.9834
+- MRR: 0.6676
+- Precision@5: 0.9391
+
+Resultados TEST:
+- Loss: 0.1927
+- recall@1: 0.6832
+- recall@5: 0.9406
+- recall@10: 0.9901
+- MRR: 0.8032
+- Precision@5: 0.9406
