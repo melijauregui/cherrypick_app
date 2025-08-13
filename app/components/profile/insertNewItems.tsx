@@ -25,8 +25,10 @@ import {
   CatalogResponseSchema,
   UpdateItemResponseSchema,
   InsertItemSchema,
+  CatalogPropertiesSchema,
 } from "@/schemas/catalog/catalog-schema";
 import InputBoxWithName from "./inputBox";
+import { BrandSchema } from "@/schemas/auth/brand-schema";
 
 export type FormData = {
   name: string;
@@ -343,7 +345,10 @@ function useInsertItem(
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: async (data: { brandEmail: string; formData: FormData }) => {
-      const result = InsertItemSchema.safeParse(data.formData);
+      const result = CatalogPropertiesSchema.safeParse({
+        ...data.formData,
+        brandEmail: data.brandEmail,
+      });
       if (!result.success) {
         throw new ZodError(result.error.errors);
       }
@@ -398,6 +403,7 @@ function useInsertItem(
       if (responseError instanceof ZodError) {
         responseError.errors.forEach(error => {
           const field = error.path[0] as keyof FormData;
+          console.log("field", field);
           newErrors[field] = error.message;
         });
         setErrors(newErrors);

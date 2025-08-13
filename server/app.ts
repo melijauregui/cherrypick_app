@@ -86,12 +86,42 @@ import {
 } from "../schemas/catalog/catalog-schema";
 import { auth } from "../lib/auth";
 
-const app = new OpenAPIHono();
+export type AppEnv = {
+  Variables: {
+    user: typeof auth.$Infer.Session.user | null;
+    session: typeof auth.$Infer.Session.session | null;
+  };
+};
+
+const app = new OpenAPIHono<AppEnv>();
 export default app;
 
-app.on(["POST", "GET"], "/api/auth/**", async c => {
-  const res = await auth.handler(c.req.raw);
-  return res;
+app.use("*", async (c, next) => {
+  const session = await auth.api.getSession({ headers: c.req.raw.headers });
+
+  if (!session) {
+    if (
+      c.req.path.startsWith("/api/auth/") ||
+      c.req.path.startsWith("/verify-email") ||
+      c.req.path.startsWith("/code-verification") ||
+      c.req.path.startsWith("/verify-code") ||
+      c.req.path.startsWith("/verify-user") ||
+      c.req.path.startsWith("/create-account")
+      // c.req.path.startsWith("/insert-catalog-brand") //TODO NO DEBERIA ESTAR SOLO PARA ENDPOINTS
+    ) {
+      return next();
+    }
+    c.set("user", null);
+    c.set("session", null);
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+  c.set("user", session.user);
+  c.set("session", session.session);
+  return next();
+});
+
+app.on(["POST", "GET"], "/api/auth/*", c => {
+  return auth.handler(c.req.raw);
 });
 
 // endpoint que verifica si un mail esta registrado en la base de datos
@@ -272,7 +302,17 @@ const createUserRoute = createRoute({
 });
 
 app.openapi(createUserRoute, async c => {
-  const { name, email, dateString, preferences } = c.req.valid("json");
+  const body = await c.req.json();
+  console.log("Raw request body:", body);
+
+  // Validate the body manually
+  const validationResult = CreateAccountSchema.safeParse(body);
+  if (!validationResult.success) {
+    console.log("Validation error:", validationResult.error);
+    return c.json({ error: true, details: "Invalid request body" }, 200);
+  }
+
+  const { name, email, dateString, preferences } = validationResult.data;
   let res: CreateAccountSchemaResType;
   console.log("Creating client:", name, email, dateString, preferences);
 

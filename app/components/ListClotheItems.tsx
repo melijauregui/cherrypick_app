@@ -1,4 +1,7 @@
-import { CatalogItemSchemaType } from "@/schemas/catalog/catalog-schema";
+import {
+  CatalogItemSchemaType,
+  GetItemResponseSchema,
+} from "@/schemas/catalog/catalog-schema";
 import ClothingItemComponent from "@/app/components/ClothingItemComponent";
 import { MasonryFlashList } from "@shopify/flash-list";
 import { BrandSchemaType } from "@/schemas/auth/brand-schema";
@@ -6,6 +9,7 @@ import { RefreshControl } from "react-native";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { LOCAL_IP } from "@/config/api";
+import safeFetch from "@/app/utils/safe-fetch";
 
 const ListItems = ({
   profileData,
@@ -37,15 +41,14 @@ const ListItems = ({
 
       // Prefetch item-detail queries for each item fetched
       items.forEach(item => {
-        console.log("prefetching item-detail", item.uuid);
         queryClient.prefetchQuery({
           queryKey: ["item-detail", item.uuid],
           queryFn: async () => {
             try {
-              const response = await fetch(
-                `http://${LOCAL_IP}:3000/get-item?uuid=${item.uuid}`
-              );
-              const data = await response.json();
+              const { data } = await safeFetch({
+                url: `http://${LOCAL_IP}:3000/get-item?uuid=${item.uuid}`,
+                schema: GetItemResponseSchema,
+              });
               if (data.error) {
                 throw new Error(data.details);
               }

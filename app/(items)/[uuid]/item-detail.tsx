@@ -37,24 +37,9 @@ const ItemDetail = () => {
   const params = useLocalSearchParams();
   const bottomSheetRefAddItem = useRef<BottomSheet>(null);
 
-  // Decodificar los parámetros en caso de que vengan de un link compartido
   const decodedUuid = decodeURIComponent(params.uuid as string);
-  const decodedName = decodeURIComponent(params.name as string);
-  const decodedBrandEmail = decodeURIComponent(params.brand as string);
-  const brand = useFetchBrandProfile(decodedBrandEmail);
-  const [firstTime, setFirstTime] = useState(true);
-
-  const item = useFetchItem(
-    decodedUuid,
-    decodedName,
-    decodedBrandEmail,
-    params.imageUrl as string | undefined,
-    params.description as string | undefined,
-    params.price as string | undefined,
-    params.url as string | undefined,
-    firstTime,
-    setFirstTime
-  );
+  const item = useFetchItem(decodedUuid);
+  const brand = useFetchBrandProfile(item?.item.brandEmail || "");
 
   const [isPressed, setIsPressed] = useState(false);
 
@@ -95,8 +80,7 @@ const ItemDetail = () => {
 
           <View className="px-5 flex flex-col gap-6">
             <IconComponent
-              name={item.item.name}
-              brand={brand?.brand?.name || ""}
+              uuid={item.item.uuid}
               openSheetUpdateItem={openSheetUpdateItem}
             />
 
@@ -260,22 +244,15 @@ const ItemDetailComponent = ({
 };
 
 const IconComponent = ({
-  name,
-  brand,
+  uuid,
   openSheetUpdateItem,
 }: {
-  name: string;
-  brand: string;
+  uuid: string;
   openSheetUpdateItem: () => void;
 }) => {
   const handleShareItem = async () => {
     try {
-      // Luego encodear los parámetros para manejar caracteres especiales y espacios
-      const encodedBrand = encodeURIComponent(brand);
-      const encodedName = encodeURIComponent(name);
-
-      // Crear el link con solo los parámetros brand y name encodeados
-      const itemLink = `cherrypick://item/${encodedBrand}/${encodedName}`;
+      const itemLink = `cherrypick://item/${uuid}`;
 
       // Copiar al clipboard
       await Clipboard.setStringAsync(itemLink);
@@ -358,59 +335,25 @@ async function getClothingItems(
   }
 }
 
-function useFetchItem(
-  itemUuid: string,
-  itemName: string,
-  brandEmail: string,
-  imageUrl: string | undefined,
-  description: string | undefined,
-  price: string | undefined,
-  url: string | undefined,
-  firstTime: boolean,
-  setFirstTime: (firstTime: boolean) => void
-): {
+function useFetchItem(itemUuid: string): {
   item: CatalogItemSchemaType;
 } | null {
   const { data, isLoading, error } = useQuery({
     queryKey: ["item-detail", itemUuid],
     queryFn: async () => {
-      if (
-        !imageUrl ||
-        !description ||
-        !price ||
-        !url ||
-        !brandEmail ||
-        !itemName ||
-        !firstTime
-      ) {
-        console.log("not first time or no data", itemUuid);
-        try {
-          const { data } = await safeFetch({
-            url: `http://${LOCAL_IP}:3000/get-item?uuid=${itemUuid}`,
-            method: "GET",
-            schema: GetItemResponseSchema,
-          });
-          if (data.error) {
-            throw new Error(data.details);
-          }
-          return data;
-        } catch (error) {
-          console.error("Error fetching user data2:", error);
-          return null;
+      try {
+        const { data } = await safeFetch({
+          url: `http://${LOCAL_IP}:3000/get-item?uuid=${itemUuid}`,
+          method: "GET",
+          schema: GetItemResponseSchema,
+        });
+        if (data.error) {
+          throw new Error(data.details);
         }
-      } else {
-        setFirstTime(false);
-        return {
-          item: {
-            uuid: itemUuid,
-            name: itemName,
-            brandEmail: brandEmail,
-            image_url: imageUrl,
-            description: description,
-            price: price,
-            url: url,
-          },
-        };
+        return data;
+      } catch (error) {
+        console.error("Error fetching user data4:", error);
+        return null;
       }
     },
   });

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const InsertItemSchema = z.object({
+export const PropertiesItemSchema = z.object({
   name: z
     .string()
     .min(1, { message: "Product name is required" })
@@ -23,6 +23,12 @@ export const InsertItemSchema = z.object({
     .string()
     .min(1, { message: "Image URL is required" })
     .url({ message: "Please enter a valid image URL" }),
+});
+
+export type PropertiesItemSchemaType = z.infer<typeof PropertiesItemSchema>;
+
+export const InsertItemSchema = z.object({
+  ...PropertiesItemSchema.shape,
   uuid: z.string().min(1, { message: "UUID is required" }),
 });
 
@@ -32,6 +38,15 @@ export const CatalogItemSchema = z.object({
   ...InsertItemSchema.shape,
   brandEmail: z.string().min(1, "El email de la marca es requerido"),
 });
+
+export const CatalogPropertiesSchema = z.object({
+  ...PropertiesItemSchema.shape,
+  brandEmail: z.string().min(1, "El email de la marca es requerido"),
+});
+
+export type CatalogPropertiesSchemaType = z.infer<
+  typeof CatalogPropertiesSchema
+>;
 
 // Schema for CSV file upload
 export const csvFileUploadSchema = z.object({
@@ -100,7 +115,7 @@ export { PaginationSchemaBrand };
 
 // Schema for JSON catalog upload
 export const jsonCatalogUploadSchema = z.object({
-  items: z.array(InsertItemSchema).min(1, "Debe tener al menos un item"),
+  items: z.array(PropertiesItemSchema).min(1, "Debe tener al menos un item"),
   brandEmail: z.string().min(1, "El email de la marca es requerido"),
 });
 

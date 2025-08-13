@@ -67,12 +67,6 @@ const ClothingItemComponent = ({
       pathname: "/(items)/[uuid]/item-detail",
       params: {
         uuid: item.uuid,
-        brand: encodeURIComponent(item.brandEmail),
-        name: encodeURIComponent(item.name),
-        imageUrl: item.image_url,
-        description: item.description,
-        price: item.price.toString(),
-        url: item.url,
       },
     });
   };

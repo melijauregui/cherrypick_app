@@ -239,6 +239,13 @@ function useCreateAccount() {
       dateOfBirth: string;
       preferences: string[];
     }) => {
+      CreateAccountSchema.parse({
+        name: user.username,
+        email: user.email,
+        dateString: user.dateOfBirth,
+        preferences: user.preferences,
+      });
+
       console.log(
         "Creating account with name:",
         user.username,
@@ -249,12 +256,7 @@ function useCreateAccount() {
         "preferences:",
         user.preferences
       );
-      CreateAccountSchema.parse({
-        name: user.username,
-        email: user.email,
-        dateString: user.dateOfBirth,
-        preferences: user.preferences,
-      });
+
       const { data } = await safeFetch({
         url: `http://${LOCAL_IP}:3000/create-account`,
         headers: {

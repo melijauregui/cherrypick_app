@@ -207,7 +207,6 @@ export async function UpdateBrand(
     [email]
   );
   if (existing.length === 0) {
-    console.log("brand not found");
     res = {
       error: true,
       details: "Email not registered",

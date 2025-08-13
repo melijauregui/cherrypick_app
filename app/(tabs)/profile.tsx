@@ -486,6 +486,10 @@ export function useFetchBrandProfile(email: string): {
   const { data, isLoading, error } = useQuery({
     queryKey: ["fetch-brand-profile", email],
     queryFn: async () => {
+      if (!email) {
+        console.log("No email found");
+        return null;
+      }
       try {
         const { data } = await safeFetch({
           url: `http://${LOCAL_IP}:3000/get-brand?email=${email}`,
@@ -497,7 +501,7 @@ export function useFetchBrandProfile(email: string): {
         }
         return data;
       } catch (error) {
-        console.error("Error fetching user data2:", error);
+        console.error("Error fetching brand data2:", error);
         return null;
       }
     },

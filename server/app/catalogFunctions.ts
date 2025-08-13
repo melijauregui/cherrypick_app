@@ -4,7 +4,10 @@ import {
   CatalogResponseSchemaType,
   CatalogResponseSchemaDeleteType,
   InsertItemSchemaType,
+  PropertiesItemSchemaType,
   UpdateItemBodySchemaType,
+  CatalogPropertiesSchema,
+  CatalogPropertiesSchemaType,
 } from "../../schemas/catalog/catalog-schema";
 import { config } from "../config";
 import {
@@ -241,7 +244,7 @@ export async function validateCsvFile(
 
 // Función para validar items JSON
 export async function validateJsonItems(
-  items: InsertItemSchemaType[],
+  items: PropertiesItemSchemaType[],
   collection: Collection,
   brandEmail: string
 ): Promise<
@@ -251,7 +254,7 @@ export async function validateJsonItems(
     }
   | {
       error: false;
-      catalogItems: InsertItemSchemaType[];
+      catalogItems: PropertiesItemSchemaType[];
     }
 > {
   try {
@@ -263,11 +266,11 @@ export async function validateJsonItems(
     }
     const invalidRows: number[] = [];
     const duplicateRows: number[] = [];
-    const validItems: CatalogItemSchemaType[] = [];
+    const validItems: CatalogPropertiesSchemaType[] = [];
     for (let i = 0; i < items.length; i++) {
       const item = { ...items[i], brandEmail };
       try {
-        const validatedItem = CatalogItemSchema.parse(item);
+        const validatedItem = CatalogPropertiesSchema.parse(item);
         // Check if item already exists in Weaviate with same name and brand
         const isDuplicate = await checkDuplicateInWeaviate(
           collection,
@@ -305,7 +308,7 @@ export async function validateJsonItems(
 
 // Cambiado para aceptar items JSON
 export async function UpdateCatalog(
-  items: InsertItemSchemaType[],
+  items: PropertiesItemSchemaType[],
   brandEmail: string
 ): Promise<CatalogResponseSchemaType> {
   let res: CatalogResponseSchemaType;
@@ -356,6 +359,7 @@ export async function UpdateCatalog(
 
 export async function GetBrand(email: string): Promise<BrandSchemaResType> {
   let res: BrandSchemaResType;
+  console.log("email IN BRAND", email);
   const [result]: any = await db.query("SELECT * FROM brands WHERE email = ?", [
     email,
   ]);
@@ -374,6 +378,7 @@ export async function GetBrand(email: string): Promise<BrandSchemaResType> {
       },
     };
   } else {
+    console.log("brand not found!!!????", email);
     res = {
       error: true,
       details: "Brand not found",
@@ -391,7 +396,7 @@ export async function VerifyBrand(brand: string): Promise<boolean> {
 
 // Función para insertar items del catálogo en Pinecone
 export async function insertCatalogItemsToWeaviate(
-  catalogItems: InsertItemSchemaType[],
+  catalogItems: PropertiesItemSchemaType[],
   brandEmail: string,
   collection: Collection
 ): Promise<{

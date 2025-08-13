@@ -1,3 +1,4 @@
+import { authClient } from "@/lib/auth-client";
 import { z } from "zod";
 
 type SafeFetchOpts<T> = {
@@ -7,7 +8,15 @@ type SafeFetchOpts<T> = {
 
 async function safeFetch<T>(opts: SafeFetchOpts<T>) {
   const { url, schema, ...fetchOpts } = opts;
-  const res = await fetch(url, fetchOpts);
+  const cookie = authClient.getCookie();
+  // console.log("cookie", cookie);
+
+  const res = await fetch(url, {
+    ...fetchOpts,
+    headers: {
+      Cookie: cookie,
+    },
+  });
 
   if (!res.ok) {
     throw new Error("Network response was not ok " + res.statusText);
