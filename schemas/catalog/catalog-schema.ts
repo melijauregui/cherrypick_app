@@ -68,7 +68,6 @@ export const deleteItemsJsonSchema = z.object({
       })
     )
     .min(1, "Debe tener al menos un item"),
-  brandEmail: z.string().min(1, "El email de la marca es requerido"),
 });
 
 // Response schema for catalog update
@@ -101,6 +100,21 @@ export type CatalogResponseSchemaDeleteType = z.infer<
 //array de catalogItemSchema
 export const CatalogItemArraySchema = z.array(CatalogItemSchema);
 
+export const CatalogItemArraySchemaResponse = z.union([
+  z.object({
+    error: z.literal(true),
+    details: z.string(),
+  }),
+  z.object({
+    error: z.literal(false),
+    items: CatalogItemArraySchema,
+  }),
+]);
+
+export type CatalogItemArraySchemaResponseType = z.infer<
+  typeof CatalogItemArraySchemaResponse
+>;
+
 export type CatalogItem = z.infer<typeof CatalogItemSchema>;
 export type CsvFileUpload = z.infer<typeof csvFileUploadSchema>;
 export type CatalogItemSchemaType = z.infer<typeof CatalogItemSchema>;
@@ -116,7 +130,11 @@ export { PaginationSchemaBrand };
 // Schema for JSON catalog upload
 export const jsonCatalogUploadSchema = z.object({
   items: z.array(PropertiesItemSchema).min(1, "Debe tener al menos un item"),
-  brandEmail: z.string().min(1, "El email de la marca es requerido"),
+});
+
+export const jsonCatalogUploadSchema2 = z.object({
+  items: z.array(PropertiesItemSchema).min(1, "Debe tener al menos un item"),
+  brandEmail: z.string().min(1, "La marca es requerida"),
 });
 
 // Schema for get-item query parameters
@@ -139,15 +157,11 @@ export const GetItemResponseSchema = z.union([
 export type GetItemQuerySchemaType = z.infer<typeof GetItemQuerySchema>;
 export type GetItemResponseSchemaType = z.infer<typeof GetItemResponseSchema>;
 
-// Schema for update-item query parameters
 export const UpdateItemQuerySchema = z.object({
   uuid: z.string().min(1, "El uuid es requerido"),
 });
-
-// Schema for update-item request body
 export const UpdateItemBodySchema = InsertItemSchema.partial();
 
-// Response schema for update-item
 export const UpdateItemResponseSchema = z.union([
   z.object({
     error: z.literal(true),

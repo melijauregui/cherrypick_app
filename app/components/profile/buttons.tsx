@@ -31,7 +31,7 @@ const DeleteAccountButton: React.FC<{
   return (
     <TouchableOpacity
       className="flex flex-row bg-red-600 h-[50px] justify-center items-center rounded-full"
-      onPress={() => mutateDeleteAccount.mutate(user.email)}
+      onPress={() => mutateDeleteAccount.mutate()}
     >
       <Text className="text-white font-psemibold text-[15px]">
         Delete Account
@@ -44,14 +44,13 @@ export { DeleteAccountButton };
 function useDeleteAccount(logout: () => Promise<void>) {
   const queryClient = useQueryClient();
   const mutation = useMutation({
-    mutationFn: async (email: string) => {
+    mutationFn: async () => {
       const { data } = await safeFetch({
         url: `http://${LOCAL_IP}:3000/delete-account`,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email: email }),
         schema: VerifyAccountDeletedSchema,
       });
       if (data.error) {

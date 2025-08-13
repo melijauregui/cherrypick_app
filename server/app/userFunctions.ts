@@ -33,7 +33,6 @@ export async function VerifyUserExists(
         details: "User not found",
       };
     } else {
-      console.log("Brand found:", brandRows);
       // Usando la estructura correcta de la tabla brands
       const brand = brandRows[0];
       res = {
@@ -42,7 +41,6 @@ export async function VerifyUserExists(
       };
     }
   } else {
-    console.log("User found:", userRows);
     const parsedRows = queryDbSchemaUser.parse(userRows);
     res = {
       error: false,
@@ -81,7 +79,7 @@ export async function CreateUser(
     "INSERT INTO users (name, email, date_of_birth, preferences) VALUES (?, ?, ?, ?)",
     [name, email, dateBirth, JSON.stringify(preferences)]
   );
-  console.log("User created:", result);
+
   res = {
     error: false,
   };

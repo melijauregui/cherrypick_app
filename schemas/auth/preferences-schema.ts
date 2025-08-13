@@ -1,15 +1,9 @@
 import { z } from "zod";
-const CreateAccountSchema = z.object({
+export const UpdateClientSchema = z.object({
   name: z.string({
     required_error: "Name is required",
     invalid_type_error: "Name must be a string",
   }),
-  email: z
-    .string({
-      required_error: "Email is required",
-      invalid_type_error: "Email must be a string",
-    })
-    .email("Invalid email format"),
   dateString: z.string().nullable(),
   preferences: z
     .array(z.string().min(1), {
@@ -19,6 +13,16 @@ const CreateAccountSchema = z.object({
     .min(1, {
       message: "At least one preference is required",
     }),
+});
+
+const CreateAccountSchema = z.object({
+  ...UpdateClientSchema.shape,
+  email: z
+    .string({
+      required_error: "Email is required",
+      invalid_type_error: "Email must be a string",
+    })
+    .email("Invalid email format"),
 });
 export { CreateAccountSchema };
 

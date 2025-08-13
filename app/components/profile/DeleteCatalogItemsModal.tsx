@@ -220,7 +220,7 @@ export default DeleteCatalogItemsModal;
 const fetchItems = async (brandEmail: string, search: string, page: number) => {
   const limit = 20;
   const res = await safeFetch({
-    url: `http://${LOCAL_IP}:3000/all-brand-items?brandEmail=${brandEmail}&filter=${search}&page=${page}&limit=${limit}`,
+    url: `http://${LOCAL_IP}:3000/all-brand-items?filter=${search}&page=${page}&limit=${limit}&brandEmail=${brandEmail}`,
     schema: AllBrandItemsSchemaRes,
   });
   if (res.data.error) {
@@ -251,7 +251,6 @@ function useDelete(
         },
         body: JSON.stringify({
           items: Array.from(selected).map(name => ({ name })),
-          brandEmail,
         }),
         schema: CatalogResponseSchemaDelete,
       });

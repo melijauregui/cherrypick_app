@@ -14,6 +14,7 @@ async function safeFetch<T>(opts: SafeFetchOpts<T>) {
   const res = await fetch(url, {
     ...fetchOpts,
     headers: {
+      ...fetchOpts.headers,
       Cookie: cookie,
     },
   });

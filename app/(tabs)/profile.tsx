@@ -28,6 +28,7 @@ import { BrandSchemaRes, BrandSchemaType } from "@/schemas/auth/brand-schema";
 import { Linking } from "react-native";
 import {
   CatalogItemArraySchema,
+  CatalogItemArraySchemaResponse,
   CatalogItemSchemaType,
 } from "@/schemas/catalog/catalog-schema";
 import ListItems from "@/app/components/ListClotheItems";
@@ -354,7 +355,6 @@ const ClientProfile = ({
             onSubmit={async (editInputValue: string) => {
               mutateUser.mutate({
                 username: editInputValue,
-                email: data.user.email,
                 dateOfBirth: data.user.dateOfBirth,
                 preferences: data.user.preferences,
               });
@@ -366,7 +366,6 @@ const ClientProfile = ({
             onSubmit={async (editInputValue: Date) => {
               mutateUser.mutate({
                 username: data.user.username,
-                email: data.user.email,
                 dateOfBirth: editInputValue,
                 preferences: data.user.preferences,
               });
@@ -379,7 +378,6 @@ const ClientProfile = ({
             onSubmit={async (val: string[]) => {
               mutateUser.mutate({
                 username: data.user.username,
-                email: data.user.email,
                 dateOfBirth: data.user.dateOfBirth,
                 preferences: val,
               });
@@ -425,12 +423,14 @@ function useFetchClientProfile(user: UserInfo): {
   });
 
   if (isLoading) {
+    console.log("Loading...");
     return null;
   }
   if (!data) {
     console.log("No data found", error);
     return null;
   }
+  console.log("Data found:", data);
   return data;
 }
 
@@ -439,7 +439,6 @@ function useUpdateClient() {
   const mutation = useMutation({
     mutationFn: async (data: {
       username: string;
-      email: string;
       dateOfBirth: Date | null;
       preferences: string[];
     }) => {
@@ -449,7 +448,6 @@ function useUpdateClient() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: data.username,
-          email: data.email,
           dateString: data.dateOfBirth?.toISOString() ?? null,
           preferences: data.preferences,
         }),
@@ -526,7 +524,6 @@ function useUpdateBrand(brandEmail: string) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email: brandEmail,
           description: data.description,
           url: data.url,
         }),
@@ -564,9 +561,12 @@ async function getClothingItems(
     const { data } = await safeFetch({
       url: `http://${LOCAL_IP}:3000/all-brand?page=${page}&limit=${limit}&brandEmail=${brandEmail}`,
       method: "GET",
-      schema: CatalogItemArraySchema,
+      schema: CatalogItemArraySchemaResponse,
     });
-    return data;
+    if (data.error) {
+      throw new Error(data.details);
+    }
+    return data.items;
   } catch (error: unknown) {
     console.error("Error:", error instanceof Error ? error.message : error);
     return [];

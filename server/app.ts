@@ -23,6 +23,7 @@ import {
   QueryGetUserSchema,
   UserSchemaRes,
   UserSchemaResType,
+  UpdateClientSchema,
 } from "../schemas/auth/preferences-schema";
 import {
   VerifyUserResponseSchema,
@@ -49,6 +50,9 @@ import {
   UpdateItemBodySchema,
   UpdateItemResponseSchema,
   UpdateItemResponseSchemaType,
+  CatalogItemArraySchemaResponse,
+  CatalogItemArraySchemaResponseType,
+  jsonCatalogUploadSchema2,
 } from "../schemas/catalog/catalog-schema";
 import {
   QueryWeaviateImage,
@@ -106,8 +110,8 @@ app.use("*", async (c, next) => {
       c.req.path.startsWith("/code-verification") ||
       c.req.path.startsWith("/verify-code") ||
       c.req.path.startsWith("/verify-user") ||
-      c.req.path.startsWith("/create-account")
-      // c.req.path.startsWith("/insert-catalog-brand") //TODO NO DEBERIA ESTAR SOLO PARA ENDPOINTS
+      c.req.path.startsWith("/create-account") ||
+      c.req.path.startsWith("/insert-catalog-brand2") //TODO NO DEBERIA ESTAR SOLO PARA ENDPOINTS
     ) {
       return next();
     }
@@ -302,17 +306,8 @@ const createUserRoute = createRoute({
 });
 
 app.openapi(createUserRoute, async c => {
-  const body = await c.req.json();
-  console.log("Raw request body:", body);
+  const { name, email, dateString, preferences } = await c.req.valid("json");
 
-  // Validate the body manually
-  const validationResult = CreateAccountSchema.safeParse(body);
-  if (!validationResult.success) {
-    console.log("Validation error:", validationResult.error);
-    return c.json({ error: true, details: "Invalid request body" }, 200);
-  }
-
-  const { name, email, dateString, preferences } = validationResult.data;
   let res: CreateAccountSchemaResType;
   console.log("Creating client:", name, email, dateString, preferences);
 
@@ -336,15 +331,6 @@ app.openapi(createUserRoute, async c => {
 const deleteAccountRoute = createRoute({
   method: "post",
   path: "/delete-account",
-  request: {
-    body: {
-      content: {
-        "application/json": {
-          schema: BodyUserVerificationPostSchema,
-        },
-      },
-    },
-  },
   responses: {
     200: {
       description: "Elimina la cuenta del usuario",
@@ -358,9 +344,16 @@ const deleteAccountRoute = createRoute({
 });
 
 app.openapi(deleteAccountRoute, async c => {
-  const { email } = c.req.valid("json");
   let res: VerifyAccountDeletedSchemaType;
-
+  const user = c.get("user");
+  const email = user?.email;
+  if (!email) {
+    res = {
+      error: true,
+      details: "No tienes permisos para eliminar la cuenta",
+    };
+    return c.json(res, 200);
+  }
   try {
     res = await DeleteUser(email);
   } catch (error) {
@@ -410,7 +403,7 @@ const updateClientRoute = createRoute({
     body: {
       content: {
         "application/json": {
-          schema: CreateAccountSchema,
+          schema: UpdateClientSchema,
         },
       },
     },
@@ -428,8 +421,18 @@ const updateClientRoute = createRoute({
 });
 
 app.openapi(updateClientRoute, async c => {
-  var { name, email, dateString, preferences } = c.req.valid("json");
+  const { name, dateString, preferences } = await c.req.valid("json");
+
   let res: CreateAccountSchemaResType;
+  const user = c.get("user");
+  const email = user?.email;
+  if (!email) {
+    res = {
+      error: true,
+      details: "No tienes permisos para actualizar el cliente",
+    };
+    return c.json(res, 200);
+  }
   console.log("Updating client:", name, email, dateString, preferences);
   try {
     res = await UpdateClient(email, name, dateString, preferences);
@@ -498,11 +501,20 @@ const updateBrandRoute = createRoute({
 });
 
 app.openapi(updateBrandRoute, async c => {
-  var { description, url, email } = c.req.valid("json");
+  var { description, url } = c.req.valid("json");
+  const user = c.get("user");
+  const brandEmail = user?.email;
   let res: CreateAccountSchemaResType;
+  if (!brandEmail) {
+    res = {
+      error: true,
+      details: "No tienes permisos para actualizar la marca",
+    };
+    return c.json(res, 200);
+  }
   console.log("Updating brand:", description, url);
   try {
-    res = await UpdateBrand(email, description, url);
+    res = await UpdateBrand(brandEmail, description, url);
   } catch (error) {
     console.error(error);
     return c.json({ error: true as true, details: "Server error" }, 200);
@@ -536,7 +548,7 @@ app.openapi(paginatedRoute, async c => {
   return c.json(res, 200);
 });
 
-// endpoint que devuelve los 10 resultados de los items de una marca
+// endpoint que devuelve los resultados de los items de una marca
 const paginatedRouteBrand = createRoute({
   method: "get",
   path: "/all-brand",
@@ -547,7 +559,7 @@ const paginatedRouteBrand = createRoute({
     200: {
       content: {
         "application/json": {
-          schema: CatalogItemArraySchema,
+          schema: CatalogItemArraySchemaResponse,
         },
       },
       description: "Devuelve los datos de la base de datos de forma paginada",
@@ -556,10 +568,26 @@ const paginatedRouteBrand = createRoute({
 });
 app.openapi(paginatedRouteBrand, async c => {
   const { page, limit, brandEmail } = c.req.valid("query");
+  let res: CatalogItemArraySchemaResponseType;
+
+  const brandExists = await VerifyBrand(brandEmail);
+
+  if (!brandExists) {
+    res = {
+      error: true,
+      details: "Marca no encontrada",
+    };
+    return c.json(res, 200);
+  }
 
   const embedding = Array(768).fill(0.5);
 
-  const res = await QueryWeaviateImage(embedding, page, limit, brandEmail);
+  const items = await QueryWeaviateImage(embedding, page, limit, brandEmail);
+
+  res = {
+    error: false,
+    items: items,
+  };
   return c.json(res, 200);
 });
 
@@ -646,9 +674,70 @@ const updateCatalogRoute = createRoute({
 });
 
 app.openapi(updateCatalogRoute, async c => {
+  const { items } = await c.req.valid("json");
+
+  //verifico que la marca exista en la base de datos
+  let res: CatalogResponseSchemaType;
+
+  const user = c.get("user");
+  const brandEmail = user?.email;
+
+  if (!brandEmail) {
+    res = {
+      error: true,
+      details: "No tienes permisos para insertar items",
+    };
+    return c.json(res, 200);
+  }
+
+  const brandExists = await VerifyBrand(brandEmail);
+  if (!brandExists) {
+    res = {
+      error: true,
+      details: "Marca no encontrada",
+    };
+    return c.json(res, 200);
+  }
+  try {
+    res = await UpdateCatalog(items, brandEmail);
+    return c.json(res, 200);
+  } catch (error) {
+    res = {
+      error: true,
+      details: `Error interno del servidor ${error}`,
+    };
+    return c.json(res, 200);
+  }
+});
+
+// endpoint que inserta items en el catálogo de una marca con datos JSON
+const updateCatalogRoute2 = createRoute({
+  method: "post",
+  path: "/insert-catalog-brand2",
+  request: {
+    body: {
+      content: {
+        "application/json": { schema: jsonCatalogUploadSchema2 },
+      },
+    },
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: CatalogResponseSchema,
+        },
+      },
+      description: "Valida y actualiza el catálogo con datos JSON",
+    },
+  },
+});
+
+app.openapi(updateCatalogRoute2, async c => {
   const { items, brandEmail } = await c.req.valid("json");
   //verifico que la marca exista en la base de datos
   let res: CatalogResponseSchemaType;
+
   const brandExists = await VerifyBrand(brandEmail);
   if (!brandExists) {
     res = {
@@ -693,12 +782,24 @@ const deleteCatalogRoute = createRoute({
 });
 
 app.openapi(deleteCatalogRoute, async c => {
-  const { items, brandEmail } = c.req.valid("json");
+  const { items } = c.req.valid("json");
+
+  const user = c.get("user");
+  const brandEmail = user?.email;
+  let res: CatalogResponseSchemaDeleteType;
+  if (!brandEmail) {
+    res = {
+      error: true,
+      details: "No tienes permisos para actualizar este item",
+      numberDeleted: 0,
+    };
+    return c.json(res, 200);
+  }
+
   // Extraer los nombres de los items del array de objetos
   const itemsNames = items.map(item => item.name);
 
   //verifico que la marca exista en la base de datos
-  let res: CatalogResponseSchemaDeleteType;
   const brandExists = await VerifyBrand(brandEmail);
   if (!brandExists) {
     res = {
@@ -740,8 +841,29 @@ const allBrandItemsRoute = createRoute({
   },
 });
 app.openapi(allBrandItemsRoute, async c => {
-  const { brandEmail, filter, page = 0, limit = 10 } = c.req.valid("query");
+  const { filter, page = 0, limit = 10 } = c.req.valid("query");
   let res: AllBrandItemsSchemaResType;
+  const user = c.get("user");
+  const brandEmail = user?.email;
+
+  if (!brandEmail) {
+    res = {
+      error: true,
+      details: "No tienes permisos para actualizar este item",
+    };
+    return c.json(res, 200);
+  }
+
+  //verifico que el usuario tenga una marca
+  const brandExists = await VerifyBrand(brandEmail);
+  if (!brandExists) {
+    res = {
+      error: true,
+      details: "No tienes permisos para actualizar este item",
+    };
+    return c.json(res, 200);
+  }
+
   res = await QueryWeaviateAllItems(brandEmail, filter, page, limit);
   return c.json(res, 200);
 });
@@ -809,19 +931,27 @@ const updateItemRoute = createRoute({
 
 app.openapi(updateItemRoute, async c => {
   const { uuid } = c.req.valid("query");
-  const updatedItem = c.req.valid("json");
-
+  const updatedItem = await c.req.valid("json");
   let res: UpdateItemResponseSchemaType;
+  const user = c.get("user");
+  const itemResult = await QueryWeaviateItem(uuid);
 
-  // Verificar que la marca exista en la base de datos //TODO
-  // const brandExists = await VerifyBrand(brandEmail);
-  // if (!brandExists) {
-  //   res = {
-  //     error: true,
-  //     details: "Marca no encontrada",
-  //   };
-  //   return c.json(res, 200);
-  // }
+  if (itemResult.error) {
+    res = {
+      error: true,
+      details: itemResult.details,
+    };
+    return c.json(res, 200);
+  }
+
+  const item = itemResult.item;
+  if (user?.email !== item.brandEmail) {
+    res = {
+      error: true,
+      details: "No tienes permisos para actualizar este item",
+    };
+    return c.json(res, 200);
+  }
 
   res = await UpdateItem(uuid, updatedItem);
 

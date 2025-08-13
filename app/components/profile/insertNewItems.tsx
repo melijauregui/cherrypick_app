@@ -380,7 +380,6 @@ function useInsertItem(
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          brandEmail: data.brandEmail,
           items: [item],
         }),
         schema: CatalogResponseSchema,
@@ -424,6 +423,7 @@ function useInsertItem(
             visibilityTime: 6000,
           });
         } else {
+          console.log("Error inserting item wwhaat:");
           Toast.show({
             type: "error",
             text1: `Error inserting item ${data.formData.name}: ${responseError.message}`,

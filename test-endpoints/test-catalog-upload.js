@@ -6,7 +6,7 @@ async function testCatalogUploadJson(brandEmail, filePath) {
   const items = JSON.parse(await fs.readFile(filePath, "utf-8"));
   try {
     const response = await fetch(
-      `http://${LOCAL_IP}:3000/insert-catalog-brand`,
+      `http://${LOCAL_IP}:3000/insert-catalog-brand2`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

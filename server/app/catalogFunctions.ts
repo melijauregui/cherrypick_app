@@ -359,7 +359,6 @@ export async function UpdateCatalog(
 
 export async function GetBrand(email: string): Promise<BrandSchemaResType> {
   let res: BrandSchemaResType;
-  console.log("email IN BRAND", email);
   const [result]: any = await db.query("SELECT * FROM brands WHERE email = ?", [
     email,
   ]);
