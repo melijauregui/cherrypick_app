@@ -42,6 +42,11 @@ import { CustomBottomLogout } from "@/app/components/profile/bottomSheets";
 import EditBrandProfile from "../components/profile/editBrandProfile";
 import { FormData } from "../components/profile/insertNewItems";
 import LoadingPage from "../components/LoadingPage";
+import useUpdateBrand, { useUpdateClient } from "@/app/utils/update";
+import getClothingItems, {
+  useFetchBrandProfile,
+  useFetchClientProfile,
+} from "@/app/utils/fetch";
 
 interface UserInfo {
   email: string;
@@ -226,7 +231,7 @@ const BrandProfile = ({
 
           <DeleteCatalogItemsModal
             bottomSheetRef={bottomSheetRefDeleteItem}
-            brandEmail={data.brand.email}
+            brandId={data.brand.id}
             onDelete={() => {}}
           />
 
@@ -396,184 +401,6 @@ const ClientProfile = ({
     </GestureHandlerRootView>
   );
 };
-
-function useFetchClientProfile(user: UserInfo): {
-  user: {
-    username: string;
-    email: string;
-    preferences: string[];
-    dateOfBirth: Date | null;
-  };
-} | null {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["fetch-client-profile", user.email],
-    queryFn: async () => {
-      try {
-        const { data } = await safeFetch({
-          url: `http://${LOCAL_IP}:3000/get-client?email=${user.email}`,
-          method: "GET",
-          schema: UserSchemaRes,
-        });
-        if (data.error) {
-          throw new Error(data.details);
-        }
-        return data;
-      } catch (error) {
-        console.error("Error fetching user data2:", error);
-        return null;
-      }
-    },
-  });
-
-  if (isLoading) {
-    console.log("Loading...");
-    return null;
-  }
-  if (!data) {
-    console.log("No data found", error);
-    return null;
-  }
-  return data;
-}
-
-function useUpdateClient(email: string) {
-  const queryClient = useQueryClient();
-  const mutation = useMutation({
-    mutationFn: async (data: {
-      username: string;
-      dateOfBirth: Date | null;
-      preferences: string[];
-    }) => {
-      const response = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/update-client`,
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: data.username,
-          dateString: data.dateOfBirth?.toISOString() ?? null,
-          preferences: data.preferences,
-        }),
-        schema: CreateAccountSchemaRes,
-      });
-      if (response.data.error) {
-        throw new Error(response.data.details);
-      }
-      return response.data;
-    },
-    onSuccess: () => {
-      void queryClient.invalidateQueries({
-        queryKey: ["fetch-client-profile", email],
-      });
-    },
-    onError: error => {
-      // TODO PUSH TOAST
-      console.log(`could not update user:`, error);
-    },
-  });
-
-  return mutation;
-}
-
-export function useFetchBrandProfile(email: string): {
-  brand: {
-    name: string;
-    description: string;
-    email: string;
-    url: string;
-    logo_url: string;
-  };
-} | null {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["fetch-brand-profile", email],
-    queryFn: async () => {
-      if (!email) {
-        console.log("No email found");
-        return null;
-      }
-      try {
-        const { data } = await safeFetch({
-          url: `http://${LOCAL_IP}:3000/get-brand?email=${email}`,
-          method: "GET",
-          schema: BrandSchemaRes,
-        });
-        if (data.error) {
-          throw new Error(data.details);
-        }
-        return data;
-      } catch (error) {
-        console.error("Error fetching brand data2:", error);
-        return null;
-      }
-    },
-  });
-
-  if (isLoading) {
-    return null;
-  }
-  if (!data) {
-    console.log("No data found", error);
-    return null;
-  }
-  return data;
-}
-
-function useUpdateBrand(brandEmail: string) {
-  const queryClient = useQueryClient();
-  const mutation = useMutation({
-    mutationFn: async (data: { description: string; url: string }) => {
-      const response = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/update-brand`,
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          description: data.description,
-          url: data.url,
-        }),
-        schema: CreateAccountSchemaRes,
-      });
-      if (response.data.error) {
-        throw new Error(response.data.details);
-      }
-      return response.data;
-    },
-    onSuccess: () => {
-      void queryClient.invalidateQueries({
-        queryKey: ["fetch-brand-profile", brandEmail],
-      });
-    },
-    onError: error => {
-      // TODO PUSH TOAST
-      console.log(`could not update user:`, error);
-    },
-  });
-
-  return mutation;
-}
-
-async function getClothingItems(
-  page: number,
-  limit: number,
-  brandEmail: string | undefined
-): Promise<CatalogItemSchemaType[]> {
-  if (brandEmail === undefined || brandEmail === null) {
-    console.log("No brand email found yet");
-    return [];
-  }
-  try {
-    const { data } = await safeFetch({
-      url: `http://${LOCAL_IP}:3000/all-brand?page=${page}&limit=${limit}&brandEmail=${brandEmail}`,
-      method: "GET",
-      schema: CatalogItemArraySchemaResponse,
-    });
-    if (data.error) {
-      throw new Error(data.details);
-    }
-    return data.items;
-  } catch (error: unknown) {
-    console.error("Error:", error instanceof Error ? error.message : error);
-    return [];
-  }
-}
 
 const handleSubmitAddItem = (data: FormData) => {
   console.log("Form submitted with data:", data);

@@ -19,7 +19,6 @@ export default function App() {
   const queryClient = useQueryClient();
   const [timeout, setHasTimedOut] = useState(false);
 
-  // Set timeout after 2 seconds
   if (!timeout) {
     setTimeout(() => setHasTimedOut(true), 1000);
   }
@@ -34,7 +33,7 @@ export default function App() {
 
   if (loading || !timeout) {
     if (user) {
-      prefetchHome(queryClient);
+      prefetchHome(queryClient, user.email);
       prefetchProfile(user, queryClient);
     }
     return (
@@ -52,7 +51,7 @@ export default function App() {
 
   // Redirect based on authentication status
   if (user) {
-    return <Redirect href="/home" />;
+    return <Redirect href="/home?prefetch=true" />;
   } else {
     return <Redirect href="/sign-in" />;
   }

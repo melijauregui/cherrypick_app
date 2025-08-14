@@ -26,6 +26,7 @@ import {
   UpdateItemResponseSchema,
   InsertItemSchema,
   CatalogPropertiesSchema,
+  PropertiesItemSchema,
 } from "@/schemas/catalog/catalog-schema";
 import InputBoxWithName from "./inputBox";
 import { BrandSchema } from "@/schemas/auth/brand-schema";
@@ -69,11 +70,8 @@ export const InsertNewItemsModal: React.FC<{
     <ItemsModalDetails
       bottomSheetRef={bottomSheetRef}
       onSubmit={onSubmit}
-      brandEmail={brandEmail}
       formDataLastValue={formDataLastValue}
-      submitMutate={(brandEmail, formData) =>
-        mutation.mutate({ brandEmail, formData })
-      }
+      submitMutate={formData => mutation.mutate({ formData })}
       setFormData={setFormData}
       formData={formData}
       setIsSubmitting={setIsSubmitting}
@@ -88,16 +86,9 @@ export const InsertNewItemsModal: React.FC<{
 export const UpdateItemModal: React.FC<{
   bottomSheetRef: React.RefObject<BottomSheet>;
   onSubmit: (data: FormData) => void;
-  brandEmail: string;
   formDataLastValue: FormData;
   itemUuid: string;
-}> = ({
-  bottomSheetRef,
-  onSubmit,
-  brandEmail,
-  formDataLastValue,
-  itemUuid,
-}) => {
+}> = ({ bottomSheetRef, onSubmit, formDataLastValue, itemUuid }) => {
   const [formData, setFormData] = useState<FormData>({
     ...formDataLastValue,
   });
@@ -117,11 +108,8 @@ export const UpdateItemModal: React.FC<{
     <ItemsModalDetails
       bottomSheetRef={bottomSheetRef}
       onSubmit={onSubmit}
-      brandEmail={brandEmail}
       formDataLastValue={formDataLastValue}
-      submitMutate={(brandEmail, formData) =>
-        mutation.mutate({ brandEmail, formData })
-      }
+      submitMutate={formData => mutation.mutate({ formData })}
       setFormData={setFormData}
       formData={formData}
       setIsSubmitting={setIsSubmitting}
@@ -136,9 +124,8 @@ export const UpdateItemModal: React.FC<{
 const ItemsModalDetails: React.FC<{
   bottomSheetRef: React.RefObject<BottomSheet>;
   onSubmit: (data: FormData) => void;
-  brandEmail: string;
   formDataLastValue: FormData;
-  submitMutate: (brandEmail: string, formData: FormData) => void;
+  submitMutate: (formData: FormData) => void;
   setFormData: React.Dispatch<React.SetStateAction<FormData>>;
   formData: FormData;
   setIsSubmitting: (isSubmitting: boolean) => void;
@@ -149,7 +136,6 @@ const ItemsModalDetails: React.FC<{
 }> = ({
   bottomSheetRef,
   onSubmit,
-  brandEmail,
   formDataLastValue,
   submitMutate,
   setFormData,
@@ -233,7 +219,7 @@ const ItemsModalDetails: React.FC<{
             errors={errors}
             isFormValid={isFormValid}
             isSubmitting={isSubmitting}
-            handleSubmit={() => submitMutate(brandEmail, formData)}
+            handleSubmit={() => submitMutate(formData)}
             isNewItem={isNewItem}
           />
         </TouchableWithoutFeedback>
@@ -344,10 +330,9 @@ function useInsertItem(
 ) {
   const queryClient = useQueryClient();
   const mutation = useMutation({
-    mutationFn: async (data: { brandEmail: string; formData: FormData }) => {
-      const result = CatalogPropertiesSchema.safeParse({
+    mutationFn: async (data: { formData: FormData }) => {
+      const result = PropertiesItemSchema.safeParse({
         ...data.formData,
-        brandEmail: data.brandEmail,
       });
       if (!result.success) {
         throw new ZodError(result.error.errors);
@@ -453,7 +438,7 @@ function useUpdateItem(
 ) {
   const queryClient = useQueryClient();
   const mutation = useMutation({
-    mutationFn: async (data: { brandEmail: string; formData: FormData }) => {
+    mutationFn: async (data: { formData: FormData }) => {
       const result = InsertItemSchema.safeParse({
         ...data.formData,
         uuid: itemUuid,

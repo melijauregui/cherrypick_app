@@ -3,12 +3,13 @@ import { View, Text, Animated } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useQueryClient } from "@tanstack/react-query";
 import prefetchHome, { prefetchProfile } from "@/app/utils/prefetchs";
-import { authClient } from "@/lib/auth-client";
+import { useSession } from "@/lib/auth-client";
 
-const LoadingPage: React.FC = ({}) => {
+const LoadingPage: React.FC<{ alreadyPrefetched?: boolean }> = ({
+  alreadyPrefetched,
+}) => {
   const queryClient = useQueryClient();
-  const { data: session } = authClient.useSession();
-  const user = session?.user;
+  const { user } = useSession();
 
   const spinValue = useRef(new Animated.Value(0)).current;
 
@@ -29,8 +30,8 @@ const LoadingPage: React.FC = ({}) => {
   }, []);
 
   // Do prefetch if user is available
-  if (user) {
-    prefetchHome(queryClient);
+  if (user && !alreadyPrefetched) {
+    prefetchHome(queryClient, user.email);
     prefetchProfile(user, queryClient);
   }
 

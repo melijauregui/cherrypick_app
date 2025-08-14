@@ -28,7 +28,12 @@ import { LOCAL_IP } from "@/config/api";
 import { CatalogItemArraySchema } from "@/schemas/catalog/catalog-schema";
 import ListItems from "../../components/ListClotheItems";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useFetchBrandProfile } from "@/app/(tabs)/profile";
+import {
+  getClothingItemsSimilar,
+  useFetchBrandProfileItem,
+  useFetchItem,
+  useIsMyItem,
+} from "@/app/utils/fetch";
 import { UpdateItemModal } from "@/app/components/profile/insertNewItems";
 import { FormData } from "@/app/components/profile/insertNewItems";
 import BottomSheet from "@gorhom/bottom-sheet";
@@ -36,6 +41,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useSession } from "@/lib/auth-client";
 import CustomModal from "@/app/components/Modal";
 import LoadingPage from "@/app/components/LoadingPage";
+import { useDeleteItem } from "@/app/utils/update";
 
 const ItemDetail = () => {
   const { user } = useSession();
@@ -44,21 +50,20 @@ const ItemDetail = () => {
   const [visibleModal, setVisibleModal] = useState(false);
 
   const decodedUuid = decodeURIComponent(params.uuid as string);
-  const item = useFetchItem(decodedUuid);
-  const brand = useFetchBrandProfile(item?.item.brandEmail || "");
+  const itemData = useFetchItem(decodedUuid);
 
   const [isPressed, setIsPressed] = useState(false);
-  const deleteItem = useDeleteItem(
-    item?.item.brandEmail || "",
-    item?.item.name || ""
-  );
+  const item = itemData?.item;
+  const brand = useFetchBrandProfileItem(item?.brandId || "");
+  const isBrandItem = useIsMyItem(item?.uuid || "")?.isMyItem;
+  const deleteItem = useDeleteItem(item?.name || "");
 
   const openSheetUpdateItem = () => {
     bottomSheetRefAddItem.current?.snapToIndex(0);
   };
 
   const handleSubmitAddItem = (data: FormData) => {
-    console.log("Form submitted with data:", data);
+    // console.log("Form submitted with data:", data);
   };
 
   if (!item) {
@@ -82,23 +87,19 @@ const ItemDetail = () => {
 
         <ScrollView className="flex-1">
           <View className="relative">
-            <ImageComponent
-              imageUrl={item.item.image_url}
-              url={item.item.url}
-            />
+            <ImageComponent imageUrl={item.image_url} url={item.url} />
           </View>
 
           <View className="px-5 flex flex-col gap-6">
             <IconComponent
-              uuid={item.item.uuid}
-              userEmail={user?.email || ""}
-              itemEmail={item.item.brandEmail}
+              uuid={item.uuid}
+              isBrandItem={isBrandItem || false}
               openSheetUpdateItem={openSheetUpdateItem}
-              itemName={item.item.name}
+              itemName={item.name}
               setVisibleModal={setVisibleModal}
             />
 
-            <ItemDetailComponent item={item.item} brand={brand?.brand} />
+            <ItemDetailComponent item={item} brand={brand?.brand} />
 
             <Text className="pt-3 text-white text-xl font-psemibold">
               Más para explorar
@@ -107,7 +108,7 @@ const ItemDetail = () => {
 
           <ListItems
             profileData={null}
-            getClothingItems={getClothingItems}
+            getClothingItems={getClothingItemsSimilar}
             limit={100}
             columnCount={2}
           />
@@ -116,13 +117,12 @@ const ItemDetail = () => {
         <UpdateItemModal
           bottomSheetRef={bottomSheetRefAddItem}
           onSubmit={handleSubmitAddItem}
-          brandEmail={item.item.brandEmail}
           formDataLastValue={{
-            name: item.item.name,
-            price: item.item.price.toString(),
-            url: item.item.url,
-            image_url: item.item.image_url,
-            description: item.item.description,
+            name: item.name,
+            price: item.price.toString(),
+            url: item.url,
+            image_url: item.image_url,
+            description: item.description,
           }}
           itemUuid={decodedUuid}
         />
@@ -202,7 +202,7 @@ const ItemDetailComponent = ({
   item: CatalogItemSchemaType;
   brand:
     | {
-        email: string;
+        id: string;
         name: string;
         url: string;
         logo_url: string;
@@ -268,16 +268,14 @@ const ItemDetailComponent = ({
 };
 
 const IconComponent = ({
-  userEmail,
-  itemEmail,
+  isBrandItem,
   uuid,
   openSheetUpdateItem,
   itemName,
   setVisibleModal,
 }: {
   uuid: string;
-  userEmail: string;
-  itemEmail: string;
+  isBrandItem: boolean;
   openSheetUpdateItem: () => void;
   itemName: string;
   setVisibleModal: (visible: boolean) => void;
@@ -323,7 +321,7 @@ const IconComponent = ({
           <Feather name="link" size={24} color="white" />
         </TouchableOpacity>
       </View>
-      {userEmail === itemEmail && (
+      {isBrandItem && (
         <View className="pt-4 flex-row items-center gap-4">
           <TouchableOpacity
             className="w-10 h-10 rounded-xl items-center justify-center"
@@ -351,91 +349,3 @@ const IconComponent = ({
     </View>
   );
 };
-
-function useDeleteItem(brandEmail: string, itemName: string) {
-  const queryClient = useQueryClient();
-  const mutation = useMutation({
-    mutationFn: async () => {
-      const response = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/delete-catalog-brand`,
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          items: [{ name: itemName }],
-        }),
-        schema: CatalogResponseSchemaDelete,
-      });
-      if (response.data.error) {
-        throw new Error(response.data.details);
-      }
-      return response.data;
-    },
-    onSuccess: () => {
-      void queryClient.invalidateQueries({
-        queryKey: ["delete-catalog-items", brandEmail],
-      });
-
-      Toast.show({
-        type: "normal",
-        text1: `Producto eliminado correctamente`,
-      });
-      router.back();
-    },
-    onError: error => {
-      console.log(`could not delete item:`, error);
-      Toast.show({ type: "error", text1: error.message });
-    },
-  });
-
-  return mutation;
-}
-
-async function getClothingItems(
-  page: number,
-  limit: number,
-  brandEmail: string | undefined
-): Promise<CatalogItemSchemaType[]> {
-  try {
-    const { data } = await safeFetch({
-      url: `http://${LOCAL_IP}:3000/all?page=${page}&limit=${limit}`,
-      method: "GET",
-      schema: CatalogItemArraySchema,
-    });
-    return data;
-  } catch (error: unknown) {
-    console.error("Error:", error instanceof Error ? error.message : error);
-    return [];
-  }
-}
-
-function useFetchItem(itemUuid: string): {
-  item: CatalogItemSchemaType;
-} | null {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["item-detail", itemUuid],
-    queryFn: async () => {
-      try {
-        const { data } = await safeFetch({
-          url: `http://${LOCAL_IP}:3000/get-item?uuid=${itemUuid}`,
-          method: "GET",
-          schema: GetItemResponseSchema,
-        });
-        if (data.error) {
-          throw new Error(data.details);
-        }
-        return data;
-      } catch (error) {
-        console.error("Error fetching user data4:", error);
-        return null;
-      }
-    },
-  });
-
-  if (isLoading) {
-    return null;
-  }
-  if (!data) {
-    return null;
-  }
-  return data;
-}

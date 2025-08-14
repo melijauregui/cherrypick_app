@@ -36,12 +36,12 @@ export type InsertItemSchemaType = z.infer<typeof InsertItemSchema>;
 
 export const CatalogItemSchema = z.object({
   ...InsertItemSchema.shape,
-  brandEmail: z.string().min(1, "El email de la marca es requerido"),
+  brandId: z.string().min(1, "El id de la marca es requerido"),
 });
 
 export const CatalogPropertiesSchema = z.object({
   ...PropertiesItemSchema.shape,
-  brandEmail: z.string().min(1, "El email de la marca es requerido"),
+  brandId: z.string().min(1, "El id de la marca es requerido"),
 });
 
 export type CatalogPropertiesSchemaType = z.infer<
@@ -123,7 +123,6 @@ export type CatalogResponseSchemaType = z.infer<typeof CatalogResponseSchema>;
 const PaginationSchemaBrand = z.object({
   page: z.preprocess(val => parseInt(val as string) || 0, z.number().min(0)),
   limit: z.preprocess(val => parseInt(val as string) || 10, z.number().min(1)),
-  brandEmail: z.string().min(1, "La marca es requerida"),
 });
 export { PaginationSchemaBrand };
 
@@ -177,3 +176,23 @@ export type UpdateItemBodySchemaType = z.infer<typeof UpdateItemBodySchema>;
 export type UpdateItemResponseSchemaType = z.infer<
   typeof UpdateItemResponseSchema
 >;
+
+// Schema for is-my-item query parameters
+export const IsMyItemQuerySchema = z.object({
+  uuid: z.string().min(1, "El uuid es requerido"),
+});
+
+// Response schema for is-my-item
+export const IsMyItemSchema = z.union([
+  z.object({
+    error: z.literal(true),
+    details: z.string(),
+  }),
+  z.object({
+    error: z.literal(false),
+    isMyItem: z.boolean(),
+  }),
+]);
+
+export type IsMyItemQuerySchemaType = z.infer<typeof IsMyItemQuerySchema>;
+export type IsMyItemSchemaType = z.infer<typeof IsMyItemSchema>;

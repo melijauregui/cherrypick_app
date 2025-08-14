@@ -9,10 +9,15 @@ import {
 import safeFetch from "../utils/safe-fetch";
 import LoadingPage from "../components/LoadingPage";
 import { useQueryClient } from "@tanstack/react-query";
+import { useLocalSearchParams } from "expo-router";
 
 const Home = () => {
   const queryClient = useQueryClient();
   const [hasData, setHasData] = useState(false);
+  const params = useLocalSearchParams();
+
+  // Puedes acceder al parámetro prefetch así:
+  const alreadyPrefetched = params.prefetch === "true";
 
   useEffect(() => {
     // Check immediately first
@@ -34,7 +39,7 @@ const Home = () => {
   }, [queryClient]);
 
   if (!hasData) {
-    return <LoadingPage />;
+    return <LoadingPage alreadyPrefetched={alreadyPrefetched} />;
   }
 
   return (

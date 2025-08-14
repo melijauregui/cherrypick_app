@@ -13,7 +13,7 @@ async function QueryWeaviateImage(
   queryVector: number[],
   page: number,
   limit: number,
-  brandEmail: string | undefined
+  brandId: string | undefined
 ): Promise<CatalogItemSchemaType[]> {
   try {
     const resCollection = await getCollection();
@@ -22,13 +22,11 @@ async function QueryWeaviateImage(
     }
     const collection = resCollection.collection;
 
-    const filters = collection.filter
-      .byProperty("brandEmail")
-      .equal(brandEmail);
+    const filters = collection.filter.byProperty("brandId").equal(brandId);
 
     let offset = page * limit;
     const queryOptions: any = {
-      filters: brandEmail ? filters : undefined,
+      filters: brandId ? filters : undefined,
       limit: limit,
       offset: offset,
       returnProperties: [
@@ -36,7 +34,7 @@ async function QueryWeaviateImage(
         "description",
         "image_url",
         "url",
-        "brandEmail",
+        "brandId",
         "price",
       ],
     };
@@ -49,7 +47,7 @@ async function QueryWeaviateImage(
           description: match.properties?.description || "",
           image_url: match.properties?.image_url || "",
           url: match.properties?.url || "",
-          brandEmail: match.properties?.brandEmail || "",
+          brandId: match.properties?.brandId || "",
           price: match.properties?.price || 0,
           uuid: match.uuid || "",
         };
@@ -73,7 +71,7 @@ async function QueryWeaviateImage(
 export { QueryWeaviateImage };
 
 async function QueryWeaviateAllItems(
-  brandEmail: string,
+  brandId: string,
   filter?: string,
   page: number = 0,
   limit: number = 10
@@ -85,7 +83,7 @@ async function QueryWeaviateAllItems(
     }
     const collection = resCollection.collection;
 
-    let filters = collection.filter.byProperty("brandEmail").equal(brandEmail);
+    let filters = collection.filter.byProperty("brandId").equal(brandId);
 
     // Add filter for name search if provided
     if (filter && filter.trim() !== "") {
@@ -151,7 +149,7 @@ async function QueryWeaviateItem(
         "description",
         "image_url",
         "url",
-        "brandEmail",
+        "brandId",
         "price",
       ],
     };
@@ -177,7 +175,7 @@ async function QueryWeaviateItem(
       description: match.properties?.description || "",
       image_url: match.properties?.image_url || "",
       url: match.properties?.url || "",
-      brandEmail: match.properties?.brandEmail || "",
+      brandId: match.properties?.brandId || "",
       price: match.properties?.price || 0,
       uuid: match.uuid || "",
     };

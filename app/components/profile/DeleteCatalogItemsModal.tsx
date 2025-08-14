@@ -9,27 +9,21 @@ import {
 } from "react-native";
 import BottomSheet from "@gorhom/bottom-sheet";
 import Toast from "react-native-toast-message";
-import { LOCAL_IP } from "@/config/api";
-import safeFetch from "@/app/utils/safe-fetch";
-import { AllBrandItemsSchemaRes } from "@/schemas/auth/brand-schema";
-import { CatalogResponseSchemaDelete } from "@/schemas/catalog/catalog-schema";
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { FlashList } from "@shopify/flash-list";
 import { ButtonSubmit } from "./insertNewItems";
+import { useDelete } from "@/app/utils/update";
+import { fetchItems } from "@/app/utils/fetch";
 
 const screenHeight = Dimensions.get("window").height;
 
 const DeleteCatalogItemsModal = ({
   bottomSheetRef,
-  brandEmail,
+  brandId,
   onDelete,
 }: {
   bottomSheetRef: React.RefObject<BottomSheet>;
-  brandEmail: string;
+  brandId: string;
   onDelete: () => void;
 }) => {
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -39,13 +33,13 @@ const DeleteCatalogItemsModal = ({
     setSelected,
     onDelete,
     bottomSheetRef,
-    brandEmail,
+    brandId,
     setDeleting
   );
 
   const { data, fetchNextPage, isLoading, error } = useInfiniteQuery({
-    queryKey: ["delete-catalog-items", brandEmail, search],
-    queryFn: ({ pageParam }) => fetchItems(brandEmail, search, pageParam),
+    queryKey: ["delete-catalog-items", brandId, search],
+    queryFn: ({ pageParam }) => fetchItems(search, pageParam),
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
       if (lastPage.length === 0) {
@@ -58,7 +52,7 @@ const DeleteCatalogItemsModal = ({
   const queryClient = useQueryClient();
   const resetInfiniteQueryPagination = () => {
     return queryClient.setQueryData(
-      ["delete-catalog-items", brandEmail, search],
+      ["delete-catalog-items", brandId, search],
       (oldData: any) => {
         if (!oldData) return undefined;
 
@@ -216,72 +210,6 @@ const FormContent = ({
 };
 
 export default DeleteCatalogItemsModal;
-
-const fetchItems = async (brandEmail: string, search: string, page: number) => {
-  const limit = 20;
-  const res = await safeFetch({
-    url: `http://${LOCAL_IP}:3000/all-brand-items?filter=${search}&page=${page}&limit=${limit}&brandEmail=${brandEmail}`,
-    schema: AllBrandItemsSchemaRes,
-  });
-  if (res.data.error) {
-    throw new Error(res.data.details);
-  } else {
-    return res.data.data || [];
-  }
-};
-
-function useDelete(
-  setSelected: (selected: Set<string>) => void,
-  onDelete: () => void,
-  bottomSheetRef: React.RefObject<BottomSheet>,
-  brandEmail: string,
-  setDeleting: (deleting: boolean) => void
-) {
-  const queryClient = useQueryClient();
-  const mutation = useMutation({
-    mutationFn: async (selected: Set<string>) => {
-      setDeleting(true);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      bottomSheetRef.current?.close();
-      const { data } = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/delete-catalog-brand`,
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          items: Array.from(selected).map(name => ({ name })),
-        }),
-        schema: CatalogResponseSchemaDelete,
-      });
-      if (data.error) {
-        throw new Error(data.details);
-      }
-      return data;
-    },
-    onSuccess: data => {
-      void queryClient.invalidateQueries({
-        queryKey: ["delete-catalog-items", brandEmail],
-      });
-
-      Toast.show({
-        type: "success",
-        text1: `${data.numberDeleted} productos eliminados correctamente`,
-      });
-      setSelected(new Set());
-      onDelete();
-    },
-    onError: error => {
-      Toast.show({ type: "error", text1: error.message });
-    },
-    onSettled: () => {
-      setDeleting(false);
-      Keyboard.dismiss();
-    },
-  });
-
-  return mutation;
-}
 
 const ItemStyle = ({
   item,

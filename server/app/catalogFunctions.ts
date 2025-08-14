@@ -92,7 +92,7 @@ async function getCollection(): Promise<{
         name: "FashionItem",
         properties: [
           { name: "name", dataType: "text" },
-          { name: "brandEmail", dataType: "text" },
+          { name: "brandId", dataType: "text" },
           { name: "description", dataType: "text" },
           { name: "price", dataType: "text" },
           { name: "image_url", dataType: "text" },
@@ -246,7 +246,7 @@ export async function validateCsvFile(
 export async function validateJsonItems(
   items: PropertiesItemSchemaType[],
   collection: Collection,
-  brandEmail: string
+  brandId: string
 ): Promise<
   | {
       error: true;
@@ -268,14 +268,14 @@ export async function validateJsonItems(
     const duplicateRows: number[] = [];
     const validItems: CatalogPropertiesSchemaType[] = [];
     for (let i = 0; i < items.length; i++) {
-      const item = { ...items[i], brandEmail };
+      const item = { ...items[i], brandId };
       try {
         const validatedItem = CatalogPropertiesSchema.parse(item);
         // Check if item already exists in Weaviate with same name and brand
         const isDuplicate = await checkDuplicateInWeaviate(
           collection,
           validatedItem.name,
-          brandEmail
+          brandId
         );
         if (isDuplicate) {
           duplicateRows.push(i + 1);
@@ -309,7 +309,7 @@ export async function validateJsonItems(
 // Cambiado para aceptar items JSON
 export async function UpdateCatalog(
   items: PropertiesItemSchemaType[],
-  brandEmail: string
+  brandId: string
 ): Promise<CatalogResponseSchemaType> {
   let res: CatalogResponseSchemaType;
   const collectionRes = await getCollection();
@@ -326,18 +326,16 @@ export async function UpdateCatalog(
       details: "Collection not found",
     };
   }
-  const validationResult = await validateJsonItems(
-    items,
-    collection,
-    brandEmail
-  );
+  console.log("to validate json items", brandId);
+  const validationResult = await validateJsonItems(items, collection, brandId);
   if (validationResult.error) {
     res = validationResult;
     return res;
   }
+
   const weaviateResult = await insertCatalogItemsToWeaviate(
     validationResult.catalogItems,
-    brandEmail,
+    brandId,
     collection
   );
   if (weaviateResult.success) {
@@ -365,10 +363,11 @@ export async function GetBrand(email: string): Promise<BrandSchemaResType> {
 
   if (result.length > 0) {
     const parsedRows = QueryDbSchemaBrand.parse(result);
-    const { name, description, email, url, logo_url } = parsedRows[0];
+    const { name, description, email, url, logo_url, id } = parsedRows[0];
     res = {
       error: false,
       brand: {
+        id: id,
         name: name,
         description: description,
         email: email,
@@ -393,10 +392,26 @@ export async function VerifyBrand(brand: string): Promise<boolean> {
   return result.length > 0;
 }
 
+export async function GetBrandId(brandEmail: string): Promise<string | null> {
+  const [result]: any = await db.query(
+    "SELECT id FROM brands WHERE email = ?",
+    [brandEmail]
+  );
+  return result[0].id || null;
+}
+
+export async function GetBrandEmail(brandId: string): Promise<string | null> {
+  const [result]: any = await db.query(
+    "SELECT email FROM brands WHERE id = ?",
+    [brandId]
+  );
+  return result[0].email || null;
+}
+
 // Función para insertar items del catálogo en Pinecone
 export async function insertCatalogItemsToWeaviate(
   catalogItems: PropertiesItemSchemaType[],
-  brandEmail: string,
+  brandId: string,
   collection: Collection
 ): Promise<{
   success: boolean;
@@ -422,7 +437,7 @@ export async function insertCatalogItemsToWeaviate(
           name: item.name,
           description: item.description,
           price: item.price,
-          brandEmail: brandEmail,
+          brandId: brandId,
           image_url: item.image_url,
           url: item.url,
         };
@@ -466,31 +481,25 @@ export async function insertCatalogItemsToWeaviate(
 async function checkDuplicateInWeaviate(
   collection: Collection,
   name: string,
-  brandEmail: string
+  brandId: string
 ): Promise<boolean> {
   const result = await collection.query.fetchObjects({
     filters: Filters.and(
       collection.filter.byProperty("name").equal(name),
-      collection.filter.byProperty("brandEmail").equal(brandEmail)
+      collection.filter.byProperty("brandId").equal(brandId)
     ),
     limit: 1,
   });
 
   const exists = result.objects.length > 0;
-  console.log(
-    "check duplicate in weaviate for",
-    name,
-    brandEmail,
-    "is",
-    exists
-  );
+  console.log("check duplicate in weaviate for", name, brandId, "is", exists);
 
   return exists;
 }
 
 export async function DeleteFromCatalog(
   itemsNames: string[],
-  brandEmail: string
+  brandId: string
 ): Promise<CatalogResponseSchemaDeleteType> {
   let res: CatalogResponseSchemaDeleteType;
   const collectionRes = await getCollection();
@@ -513,7 +522,7 @@ export async function DeleteFromCatalog(
   const validationResult = await validateItemsToDelete(
     itemsNames,
     collection,
-    brandEmail
+    brandId
   );
 
   if (validationResult.error) {
@@ -525,11 +534,7 @@ export async function DeleteFromCatalog(
     return res;
   }
 
-  res = await deleteCatalogItemsFromWeaviate(
-    itemsNames,
-    collection,
-    brandEmail
-  );
+  res = await deleteCatalogItemsFromWeaviate(itemsNames, collection, brandId);
 
   return res;
 }
@@ -537,7 +542,7 @@ export async function DeleteFromCatalog(
 export async function validateItemsToDelete(
   itemsNames: string[],
   collection: Collection,
-  brandEmail: string
+  brandId: string
 ): Promise<
   | {
       error: true;
@@ -566,7 +571,7 @@ export async function validateItemsToDelete(
         const isDuplicate = await checkDuplicateInWeaviate(
           collection,
           itemName,
-          brandEmail
+          brandId
         );
         if (!isDuplicate) {
           invalidItems.push(itemName);
@@ -600,7 +605,7 @@ export async function validateItemsToDelete(
 async function deleteCatalogItemsFromWeaviate(
   itemsNames: string[],
   collection: Collection,
-  brandEmail: string
+  brandId: string
 ): Promise<CatalogResponseSchemaDeleteType> {
   try {
     let numberDeleted = 0;
@@ -609,7 +614,7 @@ async function deleteCatalogItemsFromWeaviate(
       const response = await collection.data.deleteMany(
         Filters.and(
           collection.filter.byProperty("name").equal(itemName),
-          collection.filter.byProperty("brandEmail").equal(brandEmail)
+          collection.filter.byProperty("brandId").equal(brandId)
         )
       );
       if (response) {

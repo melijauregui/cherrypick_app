@@ -15,42 +15,28 @@ CREATE TABLE IF NOT EXISTS users (
     name VARCHAR(50) NOT NULL,
     date_of_birth DATE,
     preferences JSON
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS registerInProgress (
     email VARCHAR(50) PRIMARY KEY,
     verification_code VARCHAR(6) NOT NULL,
     verification_code_expiration VARCHAR(30) NOT NULL
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS brands (
-    email VARCHAR(50) PRIMARY KEY,
+    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    email VARCHAR(50) UNIQUE NOT NULL,
     name VARCHAR(50) NOT NULL,
     description VARCHAR(255) NOT NULL,
     url VARCHAR(255) NOT NULL,
     logo_url VARCHAR(255) NOT NULL
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-
-/* CREATE TABLE IF NOT EXISTS clothingItem (
-id INT AUTO_INCREMENT PRIMARY KEY,
-description VARCHAR(255) NOT NULL,
-price DECIMAL(10, 2) NOT NULL,
-brand VARCHAR(50) NOT NULL,
-);
-
 CREATE TABLE IF NOT EXISTS likes (
-id INT AUTO_INCREMENT PRIMARY KEY,
-user_id INT NOT NULL,        
-item_id INT NOT NULL,         
-FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-FOREIGN KEY (item_id) REFERENCES clothingItem(id) ON DELETE CASCADE,
-);
-
-CREATE TABLE IF NOT EXISTS views (
-id INT AUTO_INCREMENT PRIMARY KEY,
-user_id INT NOT NULL,        
-item_id INT NOT NULL,         
-FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-FOREIGN KEY (item_id) REFERENCES clothingItem(id) ON DELETE CASCADE,
-); */
+    userEmail VARCHAR(50) NOT NULL,        
+    brand VARCHAR(50) NOT NULL,
+    itemName VARCHAR(50) NOT NULL,         
+    FOREIGN KEY (userEmail) REFERENCES users(email) ON DELETE CASCADE,
+    FOREIGN KEY (brand) REFERENCES brands(email) ON DELETE CASCADE,
+    PRIMARY KEY (userEmail, brand, itemName)
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

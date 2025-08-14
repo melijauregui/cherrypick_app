@@ -35,6 +35,8 @@ import {
   VerifyBrand,
   DeleteFromCatalog,
   UpdateItem,
+  GetBrandId,
+  GetBrandEmail,
 } from "./app/catalogFunctions";
 import {
   CatalogResponseSchema,
@@ -53,6 +55,9 @@ import {
   CatalogItemArraySchemaResponse,
   CatalogItemArraySchemaResponseType,
   jsonCatalogUploadSchema2,
+  IsMyItemQuerySchema,
+  IsMyItemSchema,
+  IsMyItemSchemaType,
 } from "../schemas/catalog/catalog-schema";
 import {
   QueryWeaviateImage,
@@ -194,7 +199,6 @@ app.openapi(codeVerificationRoute, async c => {
   let res: ResCodeVerificationPostSchemaType;
 
   if (!emailSent) {
-    // return c.json({ error: true as true, details: "Invalid email" }, 200);
     res = {
       error: true,
       details: "Invalid email",
@@ -366,10 +370,7 @@ app.openapi(deleteAccountRoute, async c => {
 // endpoint que obtiene la información del cliente
 const getClientRoute = createRoute({
   method: "get",
-  path: "/get-client",
-  request: {
-    query: QueryGetUserSchema,
-  },
+  path: "/get-self-client", //TODO: cambiar a get-self-client
   responses: {
     200: {
       description: "Obtiene la información del usuario",
@@ -383,9 +384,16 @@ const getClientRoute = createRoute({
 });
 
 app.openapi(getClientRoute, async c => {
-  const { email } = c.req.valid("query");
   let res: UserSchemaResType;
-
+  const user = c.get("user");
+  const email = user?.email;
+  if (!email) {
+    res = {
+      error: true,
+      details: "No tienes permisos para obtener el cliente",
+    };
+    return c.json(res, 200);
+  }
   try {
     res = await GetClient(email);
   } catch (error) {
@@ -446,7 +454,44 @@ app.openapi(updateClientRoute, async c => {
 // endpoint que obtiene la información de la marca
 const getBrandRoute = createRoute({
   method: "get",
-  path: "/get-brand",
+  path: "/get-self-brand", //QueryGetBrandSchema
+  responses: {
+    200: {
+      description: "Obtiene la información de la marca",
+      content: {
+        "application/json": {
+          schema: BrandSchemaRes,
+        },
+      },
+    },
+  },
+});
+
+app.openapi(getBrandRoute, async c => {
+  const user = c.get("user");
+  const email = user?.email;
+  let res: BrandSchemaResType;
+  if (!email) {
+    res = {
+      error: true,
+      details: "No tienes permisos para obtener la marca",
+    };
+    return c.json(res, 200);
+  }
+
+  try {
+    res = await GetBrand(email);
+  } catch (error) {
+    console.error(error);
+    return c.json({ error: true as true, details: "Server error" }, 200);
+  }
+  return c.json(res, 200);
+});
+
+// endpoint que obtiene la información de la marca con su id
+const getBrandRouteId = createRoute({
+  method: "get",
+  path: "/get-brand", //QueryGetBrandSchema
   request: {
     query: QueryGetBrandSchema,
   },
@@ -462,16 +507,20 @@ const getBrandRoute = createRoute({
   },
 });
 
-app.openapi(getBrandRoute, async c => {
-  const { email } = c.req.valid("query");
+app.openapi(getBrandRouteId, async c => {
+  const { id } = c.req.valid("query");
   let res: BrandSchemaResType;
 
-  try {
-    res = await GetBrand(email);
-  } catch (error) {
-    console.error(error);
-    return c.json({ error: true as true, details: "Server error" }, 200);
+  const brandEmail = await GetBrandEmail(id);
+  if (!brandEmail) {
+    res = {
+      error: true,
+      details: "Marca no encontrada",
+    };
+    return c.json(res, 200);
   }
+
+  res = await GetBrand(brandEmail);
   return c.json(res, 200);
 });
 
@@ -551,7 +600,7 @@ app.openapi(paginatedRoute, async c => {
 // endpoint que devuelve los resultados de los items de una marca
 const paginatedRouteBrand = createRoute({
   method: "get",
-  path: "/all-brand",
+  path: "/all-self-brand",
   request: {
     query: PaginationSchemaBrand,
   },
@@ -567,12 +616,21 @@ const paginatedRouteBrand = createRoute({
   },
 });
 app.openapi(paginatedRouteBrand, async c => {
-  const { page, limit, brandEmail } = c.req.valid("query");
+  const { page, limit } = c.req.valid("query");
   let res: CatalogItemArraySchemaResponseType;
+  const user = c.get("user");
+  const brandEmail = user?.email;
+  if (!brandEmail) {
+    res = {
+      error: true,
+      details: "No tienes permisos para obtener los items de la marca",
+    };
+    return c.json(res, 200);
+  }
 
-  const brandExists = await VerifyBrand(brandEmail);
+  const brandId = await GetBrandId(brandEmail);
 
-  if (!brandExists) {
+  if (!brandId) {
     res = {
       error: true,
       details: "Marca no encontrada",
@@ -582,7 +640,7 @@ app.openapi(paginatedRouteBrand, async c => {
 
   const embedding = Array(768).fill(0.5);
 
-  const items = await QueryWeaviateImage(embedding, page, limit, brandEmail);
+  const items = await QueryWeaviateImage(embedding, page, limit, brandId);
 
   res = {
     error: false,
@@ -690,8 +748,8 @@ app.openapi(updateCatalogRoute, async c => {
     return c.json(res, 200);
   }
 
-  const brandExists = await VerifyBrand(brandEmail);
-  if (!brandExists) {
+  const brandId = await GetBrandId(brandEmail);
+  if (!brandId) {
     res = {
       error: true,
       details: "Marca no encontrada",
@@ -699,7 +757,7 @@ app.openapi(updateCatalogRoute, async c => {
     return c.json(res, 200);
   }
   try {
-    res = await UpdateCatalog(items, brandEmail);
+    res = await UpdateCatalog(items, brandId);
     return c.json(res, 200);
   } catch (error) {
     res = {
@@ -735,11 +793,13 @@ const updateCatalogRoute2 = createRoute({
 
 app.openapi(updateCatalogRoute2, async c => {
   const { items, brandEmail } = await c.req.valid("json");
+
   //verifico que la marca exista en la base de datos
   let res: CatalogResponseSchemaType;
 
-  const brandExists = await VerifyBrand(brandEmail);
-  if (!brandExists) {
+  const brandId = await GetBrandId(brandEmail);
+  console.log("brandId", brandId);
+  if (!brandId) {
     res = {
       error: true,
       details: "Marca no encontrada",
@@ -747,7 +807,7 @@ app.openapi(updateCatalogRoute2, async c => {
     return c.json(res, 200);
   }
   try {
-    res = await UpdateCatalog(items, brandEmail);
+    res = await UpdateCatalog(items, brandId);
     return c.json(res, 200);
   } catch (error) {
     res = {
@@ -800,8 +860,8 @@ app.openapi(deleteCatalogRoute, async c => {
   const itemsNames = items.map(item => item.name);
 
   //verifico que la marca exista en la base de datos
-  const brandExists = await VerifyBrand(brandEmail);
-  if (!brandExists) {
+  const brandId = await GetBrandId(brandEmail);
+  if (!brandId) {
     res = {
       error: true,
       details: "Marca no encontrada",
@@ -810,7 +870,7 @@ app.openapi(deleteCatalogRoute, async c => {
     return c.json(res, 200);
   }
   try {
-    res = await DeleteFromCatalog(itemsNames, brandEmail);
+    res = await DeleteFromCatalog(itemsNames, brandId);
     return c.json(res, 200);
   } catch (error) {
     res = {
@@ -855,8 +915,8 @@ app.openapi(allBrandItemsRoute, async c => {
   }
 
   //verifico que el usuario tenga una marca
-  const brandExists = await VerifyBrand(brandEmail);
-  if (!brandExists) {
+  const brandId = await GetBrandId(brandEmail);
+  if (!brandId) {
     res = {
       error: true,
       details: "No tienes permisos para actualizar este item",
@@ -864,7 +924,7 @@ app.openapi(allBrandItemsRoute, async c => {
     return c.json(res, 200);
   }
 
-  res = await QueryWeaviateAllItems(brandEmail, filter, page, limit);
+  res = await QueryWeaviateAllItems(brandId, filter, page, limit);
   return c.json(res, 200);
 });
 
@@ -896,6 +956,79 @@ app.openapi(getItemRoute, async c => {
     res = await QueryWeaviateItem(uuid);
   } catch (error) {
     console.error("Error getting item:", error);
+    res = {
+      error: true,
+      details: "Error interno del servidor",
+    };
+  }
+
+  return c.json(res, 200);
+});
+
+// endpoint que verifica si un item pertenece al usuario autenticado
+const isMyItemRoute = createRoute({
+  method: "get",
+  path: "/is-my-item",
+  request: {
+    query: IsMyItemQuerySchema,
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: IsMyItemSchema,
+        },
+      },
+      description: "Verifica si un item pertenece al usuario autenticado",
+    },
+  },
+});
+
+app.openapi(isMyItemRoute, async c => {
+  const { uuid } = c.req.valid("query");
+  const user = c.get("user");
+  let res: IsMyItemSchemaType;
+
+  if (!user?.email) {
+    res = {
+      error: true,
+      details: "Usuario no autenticado",
+    };
+    return c.json(res, 200);
+  }
+
+  try {
+    // Obtener el item de Weaviate para obtener su brandId
+    const itemResult = await QueryWeaviateItem(uuid);
+    if (itemResult.error) {
+      res = {
+        error: true,
+        details: itemResult.details,
+      };
+      return c.json(res, 200);
+    }
+
+    const item = itemResult.item;
+
+    // Obtener el brandId del usuario autenticado
+    const userBrandId = await GetBrandId(user.email);
+    if (!userBrandId) {
+      res = {
+        error: true,
+        details: "Usuario no tiene una marca registrada",
+      };
+      return c.json(res, 200);
+    }
+
+    // Comparar si el brandId del item coincide con el brandId del usuario
+    const isMyItem = item.brandId === userBrandId;
+
+    res = {
+      error: false,
+      isMyItem,
+    };
+  } catch (error) {
+    console.error("Error checking if item belongs to user:", error);
     res = {
       error: true,
       details: "Error interno del servidor",
@@ -945,13 +1078,13 @@ app.openapi(updateItemRoute, async c => {
   }
 
   const item = itemResult.item;
-  if (user?.email !== item.brandEmail) {
-    res = {
-      error: true,
-      details: "No tienes permisos para actualizar este item",
-    };
-    return c.json(res, 200);
-  }
+  // if (user?.email !== item.brandEmail) {
+  //   res = {
+  //     error: true,
+  //     details: "No tienes permisos para actualizar este item",
+  //   };
+  //   return c.json(res, 200);
+  // } //TODO OBTENER EL MAIL DEL brandId DEL ITEM
 
   res = await UpdateItem(uuid, updatedItem);
 

@@ -8,8 +8,17 @@ export { UpdateBrandSchema };
 export type UpdateBrandSchemaType = z.infer<typeof UpdateBrandSchema>;
 
 const BrandSchema = z.object({
+  id: z.string(),
   name: z.string(),
   email: z.string(),
+  description: z.string(),
+  url: z.string(),
+  logo_url: z.string(),
+});
+
+const BrandSchemaProperties = z.object({
+  id: z.string(),
+  name: z.string(),
   description: z.string(),
   url: z.string(),
   logo_url: z.string(),
@@ -33,8 +42,23 @@ const BrandSchemaRes = z.union([
 export { BrandSchemaRes };
 export type BrandSchemaResType = z.infer<typeof BrandSchemaRes>;
 
+const BrandSchemaPropertiesRes = z.union([
+  z.object({
+    error: z.literal(false),
+    brand: BrandSchemaProperties,
+  }),
+  z.object({
+    error: z.literal(true),
+    details: z.string(),
+  }),
+]);
+export { BrandSchemaPropertiesRes };
+export type BrandSchemaPropertiesResType = z.infer<
+  typeof BrandSchemaPropertiesRes
+>;
+
 const QueryGetBrandSchema = z.object({
-  email: z.string(),
+  id: z.string(),
 });
 export { QueryGetBrandSchema };
 
