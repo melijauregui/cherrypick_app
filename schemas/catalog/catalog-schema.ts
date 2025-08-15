@@ -126,6 +126,12 @@ const PaginationSchemaBrand = z.object({
 });
 export { PaginationSchemaBrand };
 
+const PaginationSchemaBrandWithId = z.object({
+  ...PaginationSchemaBrand.shape,
+  id: z.string().min(1, "El id es requerido"),
+});
+export { PaginationSchemaBrandWithId };
+
 // Schema for JSON catalog upload
 export const jsonCatalogUploadSchema = z.object({
   items: z.array(PropertiesItemSchema).min(1, "Debe tener al menos un item"),

@@ -2,18 +2,10 @@ import { ImageSourcePropType } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
-import React, { useState, useRef } from "react";
-import { LOCAL_IP } from "@/config/api";
-import { TouchableOpacity, Text, Image } from "react-native";
-import safeFetch from "@/app/utils/safe-fetch";
-import { Ionicons } from "@expo/vector-icons";
+import React, { useRef } from "react";
 import { format } from "date-fns";
 import images from "../../constants/images";
 import { View } from "react-native";
-import {
-  CreateAccountSchemaRes,
-  UserSchemaRes,
-} from "@/schemas/auth/preferences-schema";
 import {
   CustomBottomSheet,
   CustomBottomSheetDate,
@@ -24,29 +16,13 @@ import {
   RenderProfileItemPreferences,
 } from "@/app/components/profile/bottomSheets";
 import ProfileAndLogOut from "@/app/components/profile/profileAndLogOut";
-import { BrandSchemaRes } from "@/schemas/auth/brand-schema";
-import { Linking } from "react-native";
-import {
-  CatalogItemArraySchemaResponse,
-  CatalogItemSchemaType,
-} from "@/schemas/catalog/catalog-schema";
-import ListItems from "@/app/components/ListClotheItems";
-import splitDescriptionByLinesOrWords, {
-  AddAndDeleteItems,
-} from "@/app/components/profile/brandComponents";
-import { InsertNewItemsModal } from "../components/profile/insertNewItems";
-import DeleteCatalogItemsModal from "../components/profile/DeleteCatalogItemsModal";
 import { authClient, useSession } from "@/lib/auth-client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CustomBottomLogout } from "@/app/components/profile/bottomSheets";
-import EditBrandProfile from "../components/profile/editBrandProfile";
-import { FormData } from "../components/profile/insertNewItems";
 import LoadingPage from "../components/LoadingPage";
-import useUpdateBrand, { useUpdateClient } from "@/app/utils/update";
-import getClothingItems, {
-  useFetchBrandProfile,
-  useFetchClientProfile,
-} from "@/app/utils/fetch";
+import { useUpdateClient } from "@/app/utils/update";
+import { useFetchClientProfile } from "@/app/utils/fetch";
+import BrandProfile from "../components/profile/brandProfile";
 
 interface UserInfo {
   email: string;
@@ -84,179 +60,6 @@ const Profile = () => {
   }
 };
 export default Profile;
-
-const BrandProfile = ({
-  user,
-  logout,
-}: {
-  user: UserInfo;
-  logout: () => Promise<void>;
-}) => {
-  const [showFullDescription, setShowFullDescription] = useState(false);
-  const mutateBrand = useUpdateBrand(user.email);
-
-  const bottomSheetRefLogout = useRef<BottomSheet>(null);
-  const bottomSheetRefAddItem = useRef<BottomSheet>(null);
-  const bottomSheetRefDeleteItem = useRef<BottomSheet>(null);
-  const bottomSheetRefEdit = useRef<BottomSheet>(null);
-
-  const data = useFetchBrandProfile(user.email);
-  const openUsernameSheetLogout = () => {
-    bottomSheetRefAddItem.current?.close();
-    bottomSheetRefDeleteItem.current?.close();
-    bottomSheetRefEdit.current?.close();
-    bottomSheetRefLogout.current?.snapToIndex(0);
-  };
-  const openUsernameSheetAddItem = () => {
-    bottomSheetRefLogout.current?.close();
-    bottomSheetRefDeleteItem.current?.close();
-    bottomSheetRefEdit.current?.close();
-    bottomSheetRefAddItem.current?.snapToIndex(0);
-  };
-
-  const openUsernameSheetDeleteItem = () => {
-    bottomSheetRefLogout.current?.close();
-    bottomSheetRefAddItem.current?.close();
-    bottomSheetRefEdit.current?.close();
-    bottomSheetRefDeleteItem.current?.snapToIndex(0);
-  };
-
-  const openUsernameSheetEdit = () => {
-    bottomSheetRefLogout.current?.close();
-    bottomSheetRefAddItem.current?.close();
-    bottomSheetRefDeleteItem.current?.close();
-    bottomSheetRefEdit.current?.snapToIndex(0);
-  };
-
-  if (!data) {
-    return <LoadingPage />;
-  }
-
-  const description = data.brand.description || "";
-  const isLongDescription = description.length > 80;
-  const maxTotalLength = 80;
-  const lines =
-    showFullDescription || !isLongDescription
-      ? description.split("\n")
-      : splitDescriptionByLinesOrWords(description, maxTotalLength);
-  // Mostrar botón si no se muestran todas las líneas
-  const showSeeMore =
-    !showFullDescription && lines.join("\n").length < description.length;
-
-  return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
-        <SafeAreaView className="bg-brown-strong w-full flex-1 ">
-          <View className="flex flex-col w-full px-10 ">
-            <View className="flex flex-row  w-full py-4 gap-5">
-              {data.brand.logo_url ? (
-                <Image
-                  source={{
-                    uri: data.brand.logo_url,
-                  }}
-                  className="w-32 h-32 rounded-full"
-                  resizeMode="contain"
-                />
-              ) : null}
-              <Text className="text-right text-white font-plight text-3xl pt-10">
-                {data.brand.name}
-              </Text>
-              <View className="flex flex-row pt-10">
-                <TouchableOpacity onPress={openUsernameSheetLogout}>
-                  <Ionicons name="settings-outline" size={25} color="#6b7280" />
-                </TouchableOpacity>
-              </View>
-            </View>
-            <View className="flex flex-row items-center pt-2">
-              <Ionicons
-                name="link-outline"
-                size={20}
-                color="#38bdf8"
-                style={{ marginRight: 6 }}
-              />
-              <TouchableOpacity
-                onPress={() =>
-                  data.brand.url && Linking.openURL(data.brand.url)
-                }
-                activeOpacity={1}
-              >
-                <Text className="text-lg font-plight text-start text-sky-500">
-                  {data.brand.url}
-                </Text>
-              </TouchableOpacity>
-            </View>
-            <View className="pt-2">
-              {lines.map((line, idx) => (
-                <Text
-                  key={idx}
-                  className="text-white font-plight text-lg text-start"
-                >
-                  {line}
-                </Text>
-              ))}
-              {showSeeMore && (
-                <TouchableOpacity onPress={() => setShowFullDescription(true)}>
-                  <Text className="text-gray-400 font-plight text-base pt-1">
-                    Ver más
-                  </Text>
-                </TouchableOpacity>
-              )}
-            </View>
-
-            <AddAndDeleteItems
-              openUsernameSheetAddItem={openUsernameSheetAddItem}
-              openUsernameSheetDeleteItem={openUsernameSheetDeleteItem}
-              openUsernameSheetEdit={openUsernameSheetEdit}
-            />
-          </View>
-          <ListItems
-            profileData={data.brand}
-            getClothingItems={getClothingItems}
-            limit={100}
-            columnCount={3}
-          />
-
-          <InsertNewItemsModal
-            bottomSheetRef={bottomSheetRefAddItem}
-            onSubmit={handleSubmitAddItem}
-            brandEmail={data.brand.email}
-            formDataLastValue={{
-              name: "",
-              price: "",
-              url: "",
-              image_url: "",
-              description: "",
-            }}
-          />
-
-          <DeleteCatalogItemsModal
-            bottomSheetRef={bottomSheetRefDeleteItem}
-            brandId={data.brand.id}
-            onDelete={() => {}}
-          />
-
-          <EditBrandProfile
-            bottomSheetRef={bottomSheetRefEdit}
-            onSubmit={(editLinkValue, editDescriptionValue) => {
-              mutateBrand.mutate({
-                description: editDescriptionValue,
-                url: editLinkValue,
-              });
-            }}
-            lastValueLink={data.brand.url}
-            lastValueDescription={data.brand.description}
-          />
-
-          <CustomBottomLogout
-            bottomSheetRef={bottomSheetRefLogout}
-            logout={logout}
-            user={user}
-          />
-        </SafeAreaView>
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
-  );
-};
 
 const DATA_MAP = new Map<string, ImageSourcePropType>([
   ["Boho-chic", images.bohoChicImage],
@@ -400,8 +203,4 @@ const ClientProfile = ({
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
-};
-
-const handleSubmitAddItem = (data: FormData) => {
-  console.log("Form submitted with data:", data);
 };

@@ -7,15 +7,6 @@ const UpdateBrandSchema = z.object({
 export { UpdateBrandSchema };
 export type UpdateBrandSchemaType = z.infer<typeof UpdateBrandSchema>;
 
-const BrandSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  email: z.string(),
-  description: z.string(),
-  url: z.string(),
-  logo_url: z.string(),
-});
-
 const BrandSchemaProperties = z.object({
   id: z.string(),
   name: z.string(),
@@ -23,6 +14,14 @@ const BrandSchemaProperties = z.object({
   url: z.string(),
   logo_url: z.string(),
 });
+export { BrandSchemaProperties };
+export type BrandSchemaPropertiesType = z.infer<typeof BrandSchemaProperties>;
+
+const BrandSchema = z.object({
+  ...BrandSchemaProperties.shape,
+  email: z.string(),
+});
+
 export { BrandSchema };
 export type BrandSchemaType = z.infer<typeof BrandSchema>;
 

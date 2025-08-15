@@ -1,7 +1,6 @@
 import { CatalogItemSchemaType } from "@/schemas/catalog/catalog-schema";
 import ClothingItemComponent from "@/app/components/ClothingItemComponent";
 import { MasonryFlashList } from "@shopify/flash-list";
-import { BrandSchemaType } from "@/schemas/auth/brand-schema";
 import { RefreshControl } from "react-native";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -9,16 +8,18 @@ import { prefetchItemDetail } from "../utils/prefetchs";
 import { useSession } from "@/lib/auth-client";
 
 const ListItems = ({
-  profileData,
+  brandId,
+  brandEmail,
   getClothingItems,
   limit,
   columnCount,
 }: {
-  profileData: BrandSchemaType | null;
+  brandId: string | null;
+  brandEmail?: string;
   getClothingItems: (
     page: number,
     limit: number,
-    brandEmail: string | undefined
+    brandId: string | null
   ) => Promise<CatalogItemSchemaType[]>;
   limit: number;
   columnCount: number;
@@ -29,13 +30,9 @@ const ListItems = ({
   const queryClient = useQueryClient();
 
   const { data, fetchNextPage, refetch } = useInfiniteQuery({
-    queryKey: ["clothing-items", profileData?.email],
+    queryKey: ["clothing-items", brandEmail ? brandEmail : brandId],
     queryFn: async ({ pageParam }) => {
-      const items = await getClothingItems(
-        pageParam,
-        limit,
-        profileData?.email
-      );
+      const items = await getClothingItems(pageParam, limit, brandId);
 
       // Prefetch item-detail queries for each item fetched
       items.forEach(item => {
@@ -60,7 +57,7 @@ const ListItems = ({
   });
   const resetInfiniteQueryPagination = () => {
     return queryClient.setQueryData(
-      ["clothing-items", profileData?.email],
+      ["clothing-items", brandId],
       (oldData: any) => {
         if (!oldData) return undefined;
 

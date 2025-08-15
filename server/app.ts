@@ -58,6 +58,7 @@ import {
   IsMyItemQuerySchema,
   IsMyItemSchema,
   IsMyItemSchemaType,
+  PaginationSchemaBrandWithId,
 } from "../schemas/catalog/catalog-schema";
 import {
   QueryWeaviateImage,
@@ -641,6 +642,46 @@ app.openapi(paginatedRouteBrand, async c => {
   const embedding = Array(768).fill(0.5);
 
   const items = await QueryWeaviateImage(embedding, page, limit, brandId);
+
+  res = {
+    error: false,
+    items: items,
+  };
+  return c.json(res, 200);
+});
+
+// endpoint que devuelve los resultados de los items de una marca dado su id
+const paginatedRouteBrandWithId = createRoute({
+  method: "get",
+  path: "/all-brand",
+  request: {
+    query: PaginationSchemaBrandWithId,
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: CatalogItemArraySchemaResponse,
+        },
+      },
+      description: "Devuelve los datos de la base de datos de forma paginada",
+    },
+  },
+});
+app.openapi(paginatedRouteBrandWithId, async c => {
+  const { page, limit, id } = c.req.valid("query");
+  let res: CatalogItemArraySchemaResponseType;
+  const brandEmail = await GetBrandEmail(id);
+  if (!brandEmail) {
+    res = {
+      error: true,
+      details: "No tienes permisos para obtener los items de la marca",
+    };
+    return c.json(res, 200);
+  }
+  const embedding = Array(768).fill(0.5);
+
+  const items = await QueryWeaviateImage(embedding, page, limit, id);
 
   res = {
     error: false,

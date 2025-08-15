@@ -180,9 +180,9 @@ export function useIsMyItem(uuidItem: string): {
 export default async function getClothingItems(
   page: number,
   limit: number,
-  brandEmail: string | undefined
+  brandId: string | null
 ): Promise<CatalogItemSchemaType[]> {
-  if (brandEmail === undefined || brandEmail === null) {
+  if (brandId === null) {
     console.log("No brand email found yet");
     return [];
   }
@@ -202,10 +202,34 @@ export default async function getClothingItems(
   }
 }
 
-export async function getClothingItemsSimilar(
+export async function getClothingItemsBrand(
   page: number,
   limit: number,
-  brandEmail: string | undefined
+  brandId: string | null
+): Promise<CatalogItemSchemaType[]> {
+  if (brandId === null) {
+    console.log("No brand email found");
+    return [];
+  }
+  try {
+    const { data } = await safeFetch({
+      url: `http://${LOCAL_IP}:3000/all-brand?page=${page}&limit=${limit}&id=${brandId}`,
+      method: "GET",
+      schema: CatalogItemArraySchemaResponse,
+    });
+    if (data.error) {
+      throw new Error(data.details);
+    }
+    return data.items;
+  } catch (error: unknown) {
+    console.error("Error:", error instanceof Error ? error.message : error);
+    return [];
+  }
+}
+
+export async function getClothingItemsHome(
+  page: number,
+  limit: number
 ): Promise<CatalogItemSchemaType[]> {
   try {
     const { data } = await safeFetch({
@@ -218,6 +242,14 @@ export async function getClothingItemsSimilar(
     console.error("Error:", error instanceof Error ? error.message : error);
     return [];
   }
+}
+
+export async function getClothingItemsSimilar(
+  page: number,
+  limit: number,
+  brandId: string | null
+): Promise<CatalogItemSchemaType[]> {
+  return getClothingItemsHome(page, limit);
 }
 
 export function useFetchClientProfile(user: UserInfo): {

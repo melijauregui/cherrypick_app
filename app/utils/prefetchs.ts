@@ -63,7 +63,13 @@ export function prefetchProfile(
           throw new Error(data.details);
         }
         data.items.forEach(item => {
-          prefetchItemDetail(queryClient, item, user.email);
+          const existingData = queryClient.getQueryData([
+            "item-detail",
+            item.uuid,
+          ]);
+          if (!existingData) {
+            prefetchItemDetail(queryClient, item, user?.email);
+          }
         });
         return data.items;
       },
@@ -185,4 +191,50 @@ export function prefetchItemDetail(
       },
     });
   }
+}
+
+export function prefetchBrandPageItem(
+  queryClient: QueryClient,
+  brandId: string
+) {
+  queryClient.prefetchQuery({
+    queryKey: ["fetch-brand-profile", brandId],
+    queryFn: async () => {
+      const { data } = await safeFetch({
+        url: `http://${LOCAL_IP}:3000/get-brand?id=${brandId}`,
+        method: "GET",
+        schema: BrandSchemaRes,
+      });
+      if (!data.error) {
+        return data;
+      }
+    },
+  });
+
+  queryClient.prefetchInfiniteQuery({
+    queryKey: ["clothing-items", brandId],
+    queryFn: async () => {
+      const { data } = await safeFetch({
+        url: `http://${LOCAL_IP}:3000/all-brand?page=0&limit=100&id=${brandId}`,
+        method: "GET",
+        schema: CatalogItemArraySchemaResponse,
+      });
+      if (data.error) {
+        throw new Error(data.details);
+      }
+      return data.items;
+    },
+    initialPageParam: 0,
+    getNextPageParam: (
+      lastPage: CatalogItemSchemaType[],
+      allPages: CatalogItemSchemaType[][],
+      lastPageParam: number,
+      allPageParams: number[]
+    ) => {
+      if (lastPage.length === 0) {
+        return undefined;
+      }
+      return lastPageParam + 1;
+    },
+  });
 }

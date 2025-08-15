@@ -42,9 +42,12 @@ import { useSession } from "@/lib/auth-client";
 import CustomModal from "@/app/components/Modal";
 import LoadingPage from "@/app/components/LoadingPage";
 import { useDeleteItem } from "@/app/utils/update";
+import { prefetchBrandPageItem } from "@/app/utils/prefetchs";
 
 const ItemDetail = () => {
   const { user } = useSession();
+  const queryClient = useQueryClient();
+
   const params = useLocalSearchParams();
   const bottomSheetRefAddItem = useRef<BottomSheet>(null);
   const [visibleModal, setVisibleModal] = useState(false);
@@ -69,6 +72,8 @@ const ItemDetail = () => {
   if (!item) {
     return <LoadingPage />;
   }
+
+  prefetchBrandPageItem(queryClient, item.brandId || "");
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -107,7 +112,7 @@ const ItemDetail = () => {
           </View>
 
           <ListItems
-            profileData={null}
+            brandId={null}
             getClothingItems={getClothingItemsSimilar}
             limit={100}
             columnCount={2}
@@ -228,7 +233,12 @@ const ItemDetailComponent = ({
       <TouchableOpacity
         className="flex-row items-center gap-2"
         onPress={() => {
-          //todo
+          router.push({
+            pathname: "/(brand)/[id]/brand-profile",
+            params: {
+              id: brand?.id,
+            },
+          });
         }}
         activeOpacity={0.7}
       >
