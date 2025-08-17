@@ -3,8 +3,8 @@ import re
 from collections import Counter
 import pandas as pd
 
-input_file = 'unificado/roturas-preferencias.csv'
-output_file = 'unificado/roturas-preferencias-v2.csv'
+input_file = 'unificado/roturas-preferencias-v2.csv'
+output_file = 'unificado/roturas-preferencias-v3.csv'
 
 
 def __clean_description(texto):
@@ -100,6 +100,17 @@ def transform_tags(func):
     print(f"Archivo con tags guardado en {output_file}")
 
 
+def transform_jeans_tags(func):
+    df = pd.read_csv(input_file, header=0, names=[
+                     'image', 'description', 'tags', 'task'])
+    for index, row in df.iterrows():
+        current_tag = row['tags']
+        if 'Tipo jean' in current_tag:
+            df.at[index, 'tags'] = func(row['description'])
+    df.to_csv(output_file, index=False, header=True)
+    print(f"Archivo con tags guardado en {output_file}")
+
+
 def extraer_tipos_jeans_y_roturas(descripcion):
     tipos = [
         "wide leg", "recto", "skinny", "palazzo", "cargo", "acampanado", "mom"
@@ -120,7 +131,7 @@ def extraer_tipos_jeans_y_roturas(descripcion):
     if re.search(r'rotura(s)?', descripcion):
         roturas = True
 
-    return f"Tipo jean: {'roturas' if roturas else 'liso'}, {tipo_jean}".strip()
+    return f" {'roturas' if roturas else 'liso'}, {tipo_jean}".strip()
 
 
 def extraer_estilos(descripcion):
@@ -169,5 +180,5 @@ def agregar_task(tag):
 if __name__ == "__main__":
     # transform_tags(__extract_tags_ripped_jeans)
     # transform_tags(extraer_estilos)
-    # transform_tags(extraer_tipos_jeans_y_roturas)
-    agregar_tasks()
+    transform_tags(extraer_tipos_jeans_y_roturas)
+    # agregar_tasks()

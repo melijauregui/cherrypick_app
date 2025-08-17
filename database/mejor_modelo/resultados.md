@@ -105,3 +105,21 @@ Resultados TEST:
 - recall@10: 0.9901
 - MRR: 0.8032
 - Precision@5: 0.9406
+
+#### Modelo: Sofia-gb/cherrypick-sigLip6
+
+TRAIN:
+- Loss: 0.0631
+- recall@1: 0.4244
+- recall@5: 0.9096
+- recall@10: 0.9834
+- MRR: 0.6244
+- Precision@5: 0.9114
+
+TEST:
+- Loss: 0.1931
+- recall@1: 0.6634
+- recall@5: 0.9604
+- recall@10: 0.9901
+- MRR: 0.7866
+- Precision@5: 0.9604

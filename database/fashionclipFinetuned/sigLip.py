@@ -1,4 +1,5 @@
 import math
+import time
 from sklearn.metrics import confusion_matrix
 from torch.nn.functional import cosine_similarity
 import os
@@ -179,7 +180,8 @@ class FashionDataset(Dataset):
         if row.get("tags", "") != "":
             if text != "" and not text.endswith("."):
                 text += "."
-            text += f" {row['tags']}"
+            text += f" Etiquetas: {row['tags']}"
+            #  text += f" {row['tags']}"
         return image, text
 
 
@@ -194,7 +196,7 @@ def collate_fn(batch):
     return list(images), list(texts)
 
 
-def freeze_layers(model, n_layers=10):
+def freeze_layers(model, n_layers):
     # Descongelar todas las capas
     for param in model.parameters():
         param.requires_grad = False
@@ -541,9 +543,20 @@ def evaluate(model, loader, processor, loss_func, desc):
     return avg_loss
 
 
+def format_time(seconds):
+    hours = int(seconds // 3600)
+    minutes = int((seconds % 3600) // 60)
+    secs = int(seconds % 60)
+    return f"{hours}h {minutes}m {secs}s"
+
+
 if __name__ == "__main__":
     multiprocessing.freeze_support()
-    fine_tune(csv_path="datasets/unificado/roturas-preferencias-v2.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
-              model_name_to_push="Sofia-gb/cherrypick-sigLip5", data_aug=False,
+    start_time = time.time()
+    fine_tune(csv_path="datasets/unificado/roturas-preferencias-v3.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
+              model_name_to_push="Sofia-gb/cherrypick-sigLip6", data_aug=False,
               loss_func=contrastive_loss_InfoNCE, batch_size=8, epochs=32, lr=2e-5,
               n_layers=2)
+
+    elapsed_time = time.time() - start_time
+    print(f"⏱ Tiempo total de ejecución: {format_time(elapsed_time)}")
