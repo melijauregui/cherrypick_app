@@ -397,7 +397,12 @@ export async function GetBrandId(brandEmail: string): Promise<string | null> {
     "SELECT id FROM brands WHERE email = ?",
     [brandEmail]
   );
-  return result[0].id || null;
+  try {
+    return result[0]?.id;
+  } catch (error) {
+    console.log("error", error);
+    return null;
+  }
 }
 
 export async function GetBrandEmail(brandId: string): Promise<string | null> {

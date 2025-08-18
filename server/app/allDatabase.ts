@@ -1,65 +1,108 @@
-import { z } from "@hono/zod-openapi";
 import {
-  Pinecone,
-  RecordMetadata,
-  QueryResponse,
-} from "@pinecone-database/pinecone";
-import fs from "fs";
+  CheckLikeFavoriteResponseSchemaType,
+  LikeFavoriteResponseSchemaType,
+} from "@/schemas/activity/activity";
+import { db } from "../db";
 
-// Esquema para validar los parámetros de paginación (query string)
-const PaginationSchema = z.object({
-  page: z.preprocess(val => parseInt(val as string) || 0, z.number().min(0)),
-  limit: z.preprocess(val => parseInt(val as string) || 10, z.number().min(1)),
-});
-export { PaginationSchema };
+// Funciones para likes
+export async function toggleLike(
+  userEmail: string,
+  itemUuid: string,
+  userType: string
+): Promise<LikeFavoriteResponseSchemaType> {
+  try {
+    // Verificar si ya existe el like
+    const [existingLike] = await db.execute(
+      `SELECT id FROM item_likes_${userType} WHERE user_email = ? AND item_uuid = ?`,
+      [userEmail, itemUuid]
+    );
 
-// Esquema para la respuesta paginada
-const PaginatedResponseSchema = z.object({
-  data: z.array(z.string()),
-  page: z.number(),
-  limit: z.number(),
-  total: z.number(),
-});
-export { PaginatedResponseSchema };
-
-interface PaginatedPineconeResponse {
-  data: any[]; // Aquí puedes tipar según la forma de tus metadatos o resultados
-  page: number;
-  limit: number;
-  total: number;
+    if (Array.isArray(existingLike) && existingLike.length > 0) {
+      // Si existe, eliminar el like
+      await db.execute(
+        `DELETE FROM item_likes_${userType} WHERE user_email = ? AND item_uuid = ?`,
+        [userEmail, itemUuid]
+      );
+      return { error: false };
+    } else {
+      // Si no existe, agregar el like
+      await db.execute(
+        `INSERT INTO item_likes_${userType} (user_email, item_uuid) VALUES (?, ?)`,
+        [userEmail, itemUuid]
+      );
+      return { error: false };
+    }
+  } catch (error) {
+    console.error("Error toggling like: 3", error);
+    return { error: true, details: "Error al manejar el like" };
+  }
 }
 
-async function queryPineconePaginated(
-  page: number,
-  limit: number
-): Promise<PaginatedPineconeResponse> {
-  // Obtenemos el total de vectores del índice
-  const pc = new Pinecone({
-    apiKey: process.env.PINECONE_API_KEY?.toString() || "",
-  });
-  const index = pc.Index(process.env.PINECONE_INDEX_NAME?.toString() || "");
-  const indexInfo = await index.describeIndexStats();
-  const total = indexInfo?.totalRecordCount || 0;
+export async function checkIfLiked(
+  userEmail: string,
+  itemUuid: string,
+  userType: string
+): Promise<CheckLikeFavoriteResponseSchemaType> {
+  try {
+    const [rows] = await db.execute(
+      `SELECT id FROM item_likes_${userType} WHERE user_email = ? AND item_uuid = ?`,
+      [userEmail, itemUuid]
+    );
+    return { error: false, isSelected: Array.isArray(rows) && rows.length > 0 };
+  } catch (error) {
+    console.error("Error checking like:QQQQ", error);
+    return { error: true, details: "Error al verificar el like" };
+  }
+}
 
-  const offset = (page - 1) * limit;
-  console.log(`Simulando offset: ${offset}`);
+// Funciones para favoritos
+export async function toggleFavorite(
+  userEmail: string,
+  itemUuid: string,
+  userType: string
+): Promise<LikeFavoriteResponseSchemaType> {
+  try {
+    // Verificar si ya existe el favorito
+    const [existingFavorite] = await db.execute(
+      `SELECT id FROM item_favorites_${userType} WHERE user_email = ? AND item_uuid = ?`,
+      [userEmail, itemUuid]
+    );
 
-  const dummyVector = new Array(512).fill(0);
+    if (Array.isArray(existingFavorite) && existingFavorite.length > 0) {
+      // Si existe, eliminar el favorito
+      await db.execute(
+        `DELETE FROM item_favorites_${userType} WHERE user_email = ? AND item_uuid = ?`,
+        [userEmail, itemUuid]
+      );
+      return { error: false };
+    } else {
+      // Si no existe, agregar el favorito
+      await db.execute(
+        `INSERT INTO item_favorites_${userType} (user_email, item_uuid) VALUES (?, ?)`,
+        [userEmail, itemUuid]
+      );
+      return { error: false };
+    }
+  } catch (error) {
+    console.error("Error toggling favorite:", error);
+    return { error: true, details: "Error al manejar el favorito" };
+  }
+}
 
-  // Realizamos la consulta a Pinecone con topK igual a "limit".
-  // Esto retornará los vectores más similares al dummyVector.
-  const queryResponse: QueryResponse = await index.query({
-    vector: dummyVector,
-    topK: limit,
-    includeMetadata: true,
-  });
+export async function checkIfFavorited(
+  userEmail: string,
+  itemUuid: string,
+  userType: string
+): Promise<CheckLikeFavoriteResponseSchemaType> {
+  try {
+    const [rows] = await db.execute(
+      `SELECT id FROM item_favorites_${userType} WHERE user_email = ? AND item_uuid = ?`,
+      [userEmail, itemUuid]
+    );
 
-  const data = queryResponse.matches || [];
-
-  return {
-    data,
-    page,
-    limit,
-    total,
-  };
+    return { error: false, isSelected: Array.isArray(rows) && rows.length > 0 };
+  } catch (error) {
+    console.error("Error checking favorite:", error);
+    return { error: true, details: "Error al verificar el favorito" };
+  }
 }

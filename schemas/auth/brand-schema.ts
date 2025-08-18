@@ -72,10 +72,16 @@ const QueryAllBrandItemsSchema = z.object({
 });
 export { QueryAllBrandItemsSchema };
 
+const AllBrandNamesItemsSchema = z.object({ name: z.string() });
+export { AllBrandNamesItemsSchema };
+export type AllBrandNamesItemsSchemaType = z.infer<
+  typeof AllBrandNamesItemsSchema
+>;
+
 const AllBrandItemsSchemaRes = z.union([
   z.object({
     error: z.literal(false),
-    data: z.array(z.object({ name: z.string() })),
+    data: z.array(AllBrandNamesItemsSchema),
   }),
   z.object({
     error: z.literal(true),

@@ -6,6 +6,7 @@ import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { prefetchItemDetail } from "../utils/prefetchs";
 import { useSession } from "@/lib/auth-client";
+import LoadingPage from "./LoadingPage";
 
 const ListItems = ({
   brandId,
@@ -35,13 +36,13 @@ const ListItems = ({
       const items = await getClothingItems(pageParam, limit, brandId);
 
       // Prefetch item-detail queries for each item fetched
-      items.forEach(item => {
+      items.forEach(async item => {
         const existingData = queryClient.getQueryData([
           "item-detail",
           item.uuid,
         ]);
         if (!existingData) {
-          prefetchItemDetail(queryClient, item, user?.email);
+          await prefetchItemDetail(queryClient, item, user?.email);
         }
       });
 
@@ -76,7 +77,7 @@ const ListItems = ({
     setRefreshKey(k => k + 1);
   };
 
-  if (!data) return null;
+  if (!data) return <LoadingPage alreadyPrefetched={true} />;
 
   return (
     <MasonryFlashList

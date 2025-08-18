@@ -97,8 +97,21 @@ export type CatalogResponseSchemaDeleteType = z.infer<
   typeof CatalogResponseSchemaDelete
 >;
 
-//array de catalogItemSchema
 export const CatalogItemArraySchema = z.array(CatalogItemSchema);
+
+export const CatalogItemArraySchemaQuery = z.union([
+  z.object({
+    error: z.literal(true),
+    details: z.string(),
+  }),
+  z.object({
+    error: z.literal(false),
+    items: CatalogItemArraySchema,
+  }),
+]);
+export type CatalogItemArraySchemaQueryType = z.infer<
+  typeof CatalogItemArraySchemaQuery
+>;
 
 export const CatalogItemArraySchemaResponse = z.union([
   z.object({
@@ -202,3 +215,10 @@ export const IsMyItemSchema = z.union([
 
 export type IsMyItemQuerySchemaType = z.infer<typeof IsMyItemQuerySchema>;
 export type IsMyItemSchemaType = z.infer<typeof IsMyItemSchema>;
+
+// Esquema para validar los parámetros de paginación (query string)
+const PaginationSchema = z.object({
+  page: z.preprocess(val => parseInt(val as string) || 0, z.number().min(0)),
+  limit: z.preprocess(val => parseInt(val as string) || 10, z.number().min(1)),
+});
+export { PaginationSchema };

@@ -17,18 +17,12 @@ import {
 } from "@/app/components/profile/bottomSheets";
 import ProfileAndLogOut from "@/app/components/profile/profileAndLogOut";
 import { authClient, useSession } from "@/lib/auth-client";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { CustomBottomLogout } from "@/app/components/profile/bottomSheets";
 import LoadingPage from "../components/LoadingPage";
 import { useUpdateClient } from "@/app/utils/update";
-import { useFetchClientProfile } from "@/app/utils/fetch";
+import { useFetchClientProfile, UserInfo } from "@/app/utils/use-query";
 import BrandProfile from "../components/profile/brandProfile";
-
-interface UserInfo {
-  email: string;
-  name: string;
-}
-export type { UserInfo };
 
 const Profile = () => {
   const { user } = useSession();
@@ -36,7 +30,8 @@ const Profile = () => {
   const queryClient = useQueryClient();
 
   const logout = async () => {
-    // Limpiar toda la caché de React Query antes de hacer logout
+    // Cancelar todas las peticiones activas y limpiar la caché de React Query antes de hacer logout
+    await queryClient.cancelQueries();
     await queryClient.clear();
     signOut();
   };
@@ -119,7 +114,7 @@ const ClientProfile = ({
   };
 
   if (!data) {
-    return <LoadingPage />;
+    return <LoadingPage alreadyPrefetched={true} />;
   }
 
   return (

@@ -1,12 +1,6 @@
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import React, { useEffect, useState } from "react";
-import { LOCAL_IP } from "@/config/api";
 import ListItems from "../components/ListClotheItems";
-import {
-  CatalogItemArraySchema,
-  CatalogItemSchemaType,
-} from "@/schemas/catalog/catalog-schema";
-import safeFetch from "../utils/safe-fetch";
 import LoadingPage from "../components/LoadingPage";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";

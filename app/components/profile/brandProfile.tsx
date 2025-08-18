@@ -2,12 +2,11 @@ import { useState } from "react";
 import { useRef } from "react";
 import BottomSheet from "@gorhom/bottom-sheet";
 import useUpdateBrand from "@/app/utils/update";
-import getClothingItems, {
-  getClothingItemsBrand,
+import {
   useFetchBrandProfile,
   useFetchBrandProfileItem,
-} from "@/app/utils/fetch";
-import { UserInfo } from "@/app/(tabs)/profile";
+} from "@/app/utils/use-query";
+import { UserInfo } from "@/app/utils/use-query";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { View, Text, TouchableOpacity, Image, Linking } from "react-native";
@@ -23,6 +22,8 @@ import { FormData, InsertNewItemsModal } from "./insertNewItems";
 import { CustomBottomLogout } from "./bottomSheets";
 import { BrandSchemaPropertiesType } from "@/schemas/auth/brand-schema";
 import { router } from "expo-router";
+import { getBrandItems, getSelfBrandItems } from "@/app/utils/fetch";
+import React from "react";
 
 const BrandProfile = ({
   user,
@@ -67,7 +68,7 @@ const BrandProfile = ({
   };
 
   if (!data) {
-    return <LoadingPage />;
+    return <LoadingPage alreadyPrefetched={true} />;
   }
 
   return (
@@ -88,7 +89,7 @@ const BrandProfile = ({
           <ListItems
             brandId={data.brand.id}
             brandEmail={user.email}
-            getClothingItems={getClothingItems}
+            getClothingItems={getSelfBrandItems}
             limit={100}
             columnCount={3}
           />
@@ -167,7 +168,7 @@ const BrandProfilePage = ({ brandId }: { brandId: string }) => {
           </View>
           <ListItems
             brandId={data.brand.id}
-            getClothingItems={getClothingItemsBrand}
+            getClothingItems={getBrandItems}
             limit={100}
             columnCount={3}
           />
@@ -180,27 +181,44 @@ const BrandProfilePage = ({ brandId }: { brandId: string }) => {
 export { BrandProfilePage };
 
 const DescriptionBrand = ({ description }: { description: string }) => {
-  const [showFullDescription, setShowFullDescription] = useState(false);
-  const isLongDescription = description.length > 80;
-  const maxTotalLength = 80;
-  const lines =
-    showFullDescription || !isLongDescription
-      ? description.split("\n")
-      : splitDescriptionByLinesOrWords(description, maxTotalLength);
-  // Mostrar botón si no se muestran todas las líneas
-  const showSeeMore =
-    !showFullDescription && lines.join("\n").length < description.length;
+  const [measured, setMeasured] = React.useState(false); // ya medí?
+  const [overflows, setOverflows] = React.useState(false); // tiene >1 línea?
+  const [expanded, setExpanded] = React.useState(false);
+  const [lastDescription, setLastDescription] = React.useState(description);
+  const handleTextLayout = React.useCallback(
+    (e: any) => {
+      const lines = e?.nativeEvent?.lines ?? [];
+      // Solo actualizar si la descripción cambió o si no hemos medido aún
+      if (lastDescription !== description || !measured) {
+        setOverflows(lines.length > 3);
+        setMeasured(true);
+        setLastDescription(description);
+      }
+    },
+    [measured, description, lastDescription]
+  );
   return (
     <View className="pt-2">
-      {lines.map((line, idx) => (
-        <Text key={idx} className="text-white font-plight text-lg text-start">
-          {line}
-        </Text>
-      ))}
-      {showSeeMore && (
-        <TouchableOpacity onPress={() => setShowFullDescription(true)}>
+      {/* Text invisible para medir el número real de líneas */}
+      <Text
+        className="text-white text-xl font-pregular flex-1 absolute opacity-0"
+        onTextLayout={handleTextLayout}
+      >
+        {description}
+      </Text>
+
+      <Text
+        className="text-white font-plight text-lg text-start"
+        numberOfLines={expanded ? undefined : 3}
+        ellipsizeMode="tail"
+      >
+        {description}
+      </Text>
+
+      {overflows && !expanded && (
+        <TouchableOpacity onPress={() => setExpanded(v => !v)}>
           <Text className="text-gray-400 font-plight text-base pt-1">
-            Ver más
+            {expanded ? "" : "Ver más"}
           </Text>
         </TouchableOpacity>
       )}

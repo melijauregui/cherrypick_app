@@ -64,7 +64,7 @@ async function QueryWeaviateImage(
 
     return topResults;
   } catch (error) {
-    console.error("Error querying Pinecone:", error);
+    console.error("Error querying Weaviate:", error);
     return [];
   }
 }

@@ -14,9 +14,10 @@ async function verifyEmail(
   email: string
 ): Promise<VerifyAvailabilitySchemaType> {
   let res: VerifyAvailabilitySchemaType;
-  const [rows]: any[] = await db.query("SELECT * FROM users WHERE email = ?", [
-    email,
-  ]);
+  const [rows]: any[] = await db.query(
+    "SELECT * FROM clients WHERE email = ?",
+    [email]
+  );
   if (rows.length === 0) {
     // Email no registrado
     //verificar si es marca

@@ -1,247 +1,216 @@
-import { useQuery } from "@tanstack/react-query";
 import safeFetch from "./safe-fetch";
 import { LOCAL_IP } from "@/config/api";
 import {
   AllBrandItemsSchemaRes,
+  AllBrandNamesItemsSchemaType,
   BrandSchemaPropertiesRes,
+  BrandSchemaPropertiesType,
   BrandSchemaRes,
+  BrandSchemaType,
 } from "@/schemas/auth/brand-schema";
 import {
-  CatalogItemArraySchema,
+  CatalogItemArraySchemaQuery,
   CatalogItemArraySchemaResponse,
   CatalogItemSchemaType,
   GetItemResponseSchema,
   IsMyItemSchema,
 } from "@/schemas/catalog/catalog-schema";
-import { authClient, useSession } from "@/lib/auth-client";
-import { UserInfo } from "../(tabs)/profile";
-import { UserSchemaRes } from "@/schemas/auth/preferences-schema";
+import {
+  ClientSchemaType,
+  UserSchemaRes,
+} from "@/schemas/auth/preferences-schema";
+import {
+  CheckLikeFavoriteResponseSchema,
+  CheckLikeFavoriteResponseSchemaType,
+  LikeFavoriteResponseSchema,
+  LikeFavoriteResponseSchemaType,
+} from "@/schemas/activity/activity";
+import { ZodSchema } from "zod";
 
-export function useFetchItem(itemUuid: string): {
-  item: CatalogItemSchemaType;
-} | null {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["item-detail", itemUuid],
-    queryFn: async () => {
-      try {
-        const { data } = await safeFetch({
-          url: `http://${LOCAL_IP}:3000/get-item?uuid=${itemUuid}`,
-          method: "GET",
-          schema: GetItemResponseSchema,
-        });
-        if (data.error) {
-          throw new Error(data.details);
-        }
-        return data;
-      } catch (error) {
-        console.log("error", error);
-        console.log("itemUuid", itemUuid);
-        console.error("Error fetching user data4:", error);
-        return null;
-      }
-    },
-  });
+// Helper function to handle API responses consistently
+const handleApiResponse = async <T>(
+  apiCall: () => Promise<{ data: any }>,
+  schema: ZodSchema,
+  errorContext: string
+): Promise<T | null> => {
+  try {
+    const { data } = await apiCall();
 
-  if (isLoading) {
+    // Validate that the schema is a union type with error/success structure
+    if (!("_def" in schema) || !("options" in schema._def)) {
+      throw new Error("Schema must be a ZodUnion with error/success structure");
+    }
+
+    // Parse the response with the schema to validate the structure
+    const parsedData = schema.parse(data);
+
+    // Check if it's an error response using the schema validation
+    if (parsedData.error) {
+      throw new Error(parsedData.details);
+    }
+
+    const { error, ...dataPart } = parsedData;
+    return dataPart as T;
+  } catch (error) {
+    console.error(`Error in ${errorContext}:`, error);
     return null;
   }
-  if (!data) {
+};
+export default handleApiResponse;
+
+export const handleAuthError = (error: unknown, context: string) => {
+  if (
+    error instanceof Error &&
+    error.message.includes("Network response was not ok")
+  ) {
+    // Silently handle authentication errors - user likely logged out
     return null;
   }
+  // Re-throw other errors
+  throw error;
+};
 
-  return { item: data.item };
+export async function checkIsMyItem(
+  uuidItem: string,
+  userEmail?: string
+): Promise<boolean | null> {
+  if (!userEmail || !uuidItem) {
+    return null;
+  }
+  const res = await handleApiResponse<{ isMyItem: boolean }>(
+    () =>
+      safeFetch({
+        url: `http://${LOCAL_IP}:3000/is-my-item?uuid=${uuidItem}`,
+        method: "GET",
+        schema: IsMyItemSchema,
+      }),
+    IsMyItemSchema,
+    "checkIsMyItem"
+  );
+  return res?.isMyItem ?? null;
 }
 
-export function useFetchBrandProfile(email: string): {
-  brand: {
-    name: string;
-    description: string;
-    email: string;
-    url: string;
-    logo_url: string;
-    id: string;
-  };
-} | null {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["fetch-brand-profile", email],
-    queryFn: async () => {
-      if (!email) {
-        console.log("No email found");
-        return null;
-      }
-      try {
-        const { data } = await safeFetch({
-          url: `http://${LOCAL_IP}:3000/get-self-brand`,
-          method: "GET",
-          schema: BrandSchemaRes,
-        });
-        if (data.error) {
-          throw new Error(data.details);
-        }
-        return data;
-      } catch (error) {
-        console.error("Error fetching brand data2:", error);
-        return null;
-      }
-    },
-  });
+export async function getBrandProfile(
+  brandId: string
+): Promise<BrandSchemaPropertiesType | null> {
+  if (!brandId) {
+    return null;
+  }
 
-  if (isLoading) {
-    return null;
-  }
-  if (!data) {
-    console.log("No data found", error);
-    return null;
-  }
-  return data;
+  const res = await handleApiResponse<{
+    brand: BrandSchemaPropertiesType;
+  }>(
+    () =>
+      safeFetch({
+        url: `http://${LOCAL_IP}:3000/get-brand?id=${brandId}`,
+        method: "GET",
+        schema: BrandSchemaPropertiesRes,
+      }),
+    BrandSchemaPropertiesRes,
+    "getBrandProfile"
+  );
+
+  return res?.brand || null;
 }
 
-export function useFetchBrandProfileItem(brandId: string): {
-  brand: {
-    id: string;
-    name: string;
-    description: string;
-    url: string;
-    logo_url: string;
-  };
-} | null {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["fetch-brand-profile-item", brandId],
-    queryFn: async () => {
-      if (!brandId) {
-        console.log("No email found");
-        return null;
-      }
-      try {
-        const { data } = await safeFetch({
-          url: `http://${LOCAL_IP}:3000/get-brand?id=${brandId}`,
-          method: "GET",
-          schema: BrandSchemaPropertiesRes,
-        });
-        if (data.error) {
-          throw new Error(data.details);
-        }
-        return data;
-      } catch (error) {
-        console.error("Error fetching brand item data2:", error);
-        return null;
-      }
-    },
-  });
-
-  if (isLoading) {
-    return null;
-  }
-  if (!data) {
-    console.log("No data found", error);
-    return null;
-  }
-  return data;
-}
-
-export function useIsMyItem(uuidItem: string): {
-  isMyItem: boolean;
-} | null {
-  const { user } = useSession();
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["is-my-item", uuidItem, user?.email],
-    queryFn: async () => {
-      if (!user?.email || !uuidItem) {
-        console.log("No email or uuidItem found");
-        return null;
-      }
-      try {
-        const { data } = await safeFetch({
-          url: `http://${LOCAL_IP}:3000/is-my-item?uuid=${uuidItem}`,
-          method: "GET",
-          schema: IsMyItemSchema,
-        });
-        if (data.error) {
-          throw new Error(data.details);
-        }
-        return data;
-      } catch (error) {
-        console.error("Error fetching is my item:", error);
-        return null;
-      }
-    },
-  });
-
-  if (isLoading) {
-    return null;
-  }
-  if (!data) {
-    console.log("No data found", error);
-    return null;
-  }
-  return data;
-}
-
-export default async function getClothingItems(
+export async function getBrandItems(
   page: number,
   limit: number,
   brandId: string | null
 ): Promise<CatalogItemSchemaType[]> {
-  if (brandId === null) {
-    console.log("No brand email found yet");
+  if (!brandId) {
     return [];
   }
-  try {
-    const { data } = await safeFetch({
-      url: `http://${LOCAL_IP}:3000/all-self-brand?page=${page}&limit=${limit}`,
-      method: "GET",
-      schema: CatalogItemArraySchemaResponse,
-    });
-    if (data.error) {
-      throw new Error(data.details);
-    }
-    return data.items;
-  } catch (error: unknown) {
-    console.error("Error:", error instanceof Error ? error.message : error);
-    return [];
-  }
+
+  const res = await handleApiResponse<{
+    items: CatalogItemSchemaType[];
+  }>(
+    () =>
+      safeFetch({
+        url: `http://${LOCAL_IP}:3000/all-brand?page=${page}&limit=${limit}&id=${brandId}`,
+        method: "GET",
+        schema: CatalogItemArraySchemaResponse,
+      }),
+    CatalogItemArraySchemaResponse,
+    "getBrandItems"
+  );
+  return res?.items || [];
 }
 
-export async function getClothingItemsBrand(
+export async function getSelfBrandProfile(): Promise<BrandSchemaType | null> {
+  const res = await handleApiResponse<{
+    brand: BrandSchemaType;
+  }>(
+    () =>
+      safeFetch({
+        url: `http://${LOCAL_IP}:3000/get-self-brand`,
+        method: "GET",
+        schema: BrandSchemaRes,
+      }),
+    BrandSchemaRes,
+    "getBrandProfile"
+  );
+  return res?.brand || null;
+}
+
+export async function getSelfClientProfile(): Promise<{
+  username: string;
+  email: string;
+  preferences: string[];
+  dateOfBirth: Date | null;
+} | null> {
+  const res = await handleApiResponse<{
+    user: ClientSchemaType;
+  }>(
+    () =>
+      safeFetch({
+        url: `http://${LOCAL_IP}:3000/get-self-client`,
+        method: "GET",
+        schema: UserSchemaRes,
+      }),
+    UserSchemaRes,
+    "getSelfClientProfile"
+  );
+  return res?.user || null;
+}
+
+export async function getSelfBrandItems(
   page: number,
   limit: number,
   brandId: string | null
 ): Promise<CatalogItemSchemaType[]> {
-  if (brandId === null) {
-    console.log("No brand email found");
-    return [];
-  }
-  try {
-    const { data } = await safeFetch({
-      url: `http://${LOCAL_IP}:3000/all-brand?page=${page}&limit=${limit}&id=${brandId}`,
-      method: "GET",
-      schema: CatalogItemArraySchemaResponse,
-    });
-    if (data.error) {
-      throw new Error(data.details);
-    }
-    return data.items;
-  } catch (error: unknown) {
-    console.error("Error:", error instanceof Error ? error.message : error);
-    return [];
-  }
+  const res = await handleApiResponse<{
+    items: CatalogItemSchemaType[];
+  }>(
+    () =>
+      safeFetch({
+        url: `http://${LOCAL_IP}:3000/all-self-brand?page=${page}&limit=${limit}`,
+        method: "GET",
+        schema: CatalogItemArraySchemaResponse,
+      }),
+    CatalogItemArraySchemaResponse,
+    "getSelfBrandItems"
+  );
+  return res?.items || [];
 }
 
 export async function getClothingItemsHome(
   page: number,
   limit: number
 ): Promise<CatalogItemSchemaType[]> {
-  try {
-    const { data } = await safeFetch({
-      url: `http://${LOCAL_IP}:3000/all?page=${page}&limit=${limit}`,
-      method: "GET",
-      schema: CatalogItemArraySchema,
-    });
-    return data;
-  } catch (error: unknown) {
-    console.error("Error:", error instanceof Error ? error.message : error);
-    return [];
-  }
+  const res = await handleApiResponse<{
+    items: CatalogItemSchemaType[];
+  }>(
+    () =>
+      safeFetch({
+        url: `http://${LOCAL_IP}:3000/all?page=${page}&limit=${limit}`,
+        method: "GET",
+        schema: CatalogItemArraySchemaQuery,
+      }),
+    CatalogItemArraySchemaQuery,
+    "getClothingItemsHome"
+  );
+  return res?.items || [];
 }
 
 export async function getClothingItemsSimilar(
@@ -252,54 +221,120 @@ export async function getClothingItemsSimilar(
   return getClothingItemsHome(page, limit);
 }
 
-export function useFetchClientProfile(user: UserInfo): {
-  user: {
-    username: string;
-    email: string;
-    preferences: string[];
-    dateOfBirth: Date | null;
-  };
-} | null {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["fetch-client-profile", user.email],
-    queryFn: async () => {
-      try {
-        const { data } = await safeFetch({
-          url: `http://${LOCAL_IP}:3000/get-self-client`,
-          method: "GET",
-          schema: UserSchemaRes,
-        });
-        if (data.error) {
-          throw new Error(data.details);
-        }
-        return data;
-      } catch (error) {
-        console.error("Error fetching user data2:", error);
-        return null;
-      }
-    },
-  });
+export const fetchItems = async (
+  search: string,
+  page: number
+): Promise<AllBrandNamesItemsSchemaType[]> => {
+  const limit = 20;
+  const res = await handleApiResponse<{
+    data: AllBrandNamesItemsSchemaType[];
+  }>(
+    () =>
+      safeFetch({
+        url: `http://${LOCAL_IP}:3000/all-brand-items?filter=${search}&page=${page}&limit=${limit}`,
+        method: "GET",
+        schema: AllBrandItemsSchemaRes,
+      }),
+    AllBrandItemsSchemaRes,
+    "fetchItems"
+  );
+  return res?.data || [];
+};
 
-  if (isLoading) {
-    console.log("Loading...");
-    return null;
-  }
-  if (!data) {
-    console.log("No data found", error);
-    return null;
-  }
-  return data;
+export async function getItem(itemUuid: string): Promise<{
+  item: CatalogItemSchemaType;
+} | null> {
+  return handleApiResponse<{ item: CatalogItemSchemaType }>(
+    () =>
+      safeFetch({
+        url: `http://${LOCAL_IP}:3000/get-item?uuid=${itemUuid}`,
+        method: "GET",
+        schema: GetItemResponseSchema,
+      }),
+    GetItemResponseSchema,
+    "getItem"
+  );
 }
 
-export const fetchItems = async (search: string, page: number) => {
-  const limit = 20;
-  const res = await safeFetch({
-    url: `http://${LOCAL_IP}:3000/all-brand-items?filter=${search}&page=${page}&limit=${limit}`,
-    schema: AllBrandItemsSchemaRes,
-  });
-  if (res.data.error) {
-    throw new Error(res.data.details);
-  } else {
-    return res.data.data || [];
+// Funciones para likes y favoritos
+const toggleLikeFavorite = async (
+  action: "like" | "favorite",
+  itemUuid: string
+) => {
+  // try {
+  //   const response = await safeFetch({
+  //     url: `http://${LOCAL_IP}:3000/toggle-${action}`,
+  //     schema: LikeFavoriteResponseSchema,
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify({
+  //       item_uuid: itemUuid,
+  //     }),
+  //   });
+
+  //   return response.data;
+  // } catch (error) {
+  //   console.error(`Error toggling ${action}:`, error);
+  //   throw error;
+  // }
+  const res = await handleApiResponse<LikeFavoriteResponseSchemaType>(
+    () =>
+      safeFetch({
+        url: `http://${LOCAL_IP}:3000/toggle-${action}`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          item_uuid: itemUuid,
+        }),
+        schema: LikeFavoriteResponseSchema,
+      }),
+    LikeFavoriteResponseSchema,
+    "toggleLikeFavorite"
+  );
+  return res;
+};
+
+const checkLikeFavorite = async (
+  action: "like" | "favorite",
+  itemUuid: string
+) => {
+  const res = await handleApiResponse<{
+    isSelected: boolean;
+  }>(
+    () =>
+      safeFetch({
+        url: `http://${LOCAL_IP}:3000/check-${action}?item_uuid=${itemUuid}`,
+        method: "GET",
+        schema: CheckLikeFavoriteResponseSchema,
+      }),
+    CheckLikeFavoriteResponseSchema,
+    "checkLikeFavorite"
+  );
+  return res?.isSelected ?? null;
+};
+
+export const toggleLike = async (userEmail: string, itemUuid: string) => {
+  return toggleLikeFavorite("like", itemUuid);
+};
+
+export const toggleFavorite = async (userEmail: string, itemUuid: string) => {
+  return toggleLikeFavorite("favorite", itemUuid);
+};
+
+export const checkIfLiked = async (userEmail: string, itemUuid: string) => {
+  if (!userEmail || !itemUuid) {
+    return null;
   }
+  return checkLikeFavorite("like", itemUuid);
+};
+
+export const checkIfFavorited = async (userEmail: string, itemUuid: string) => {
+  if (!userEmail || !itemUuid) {
+    return null;
+  }
+  return checkLikeFavorite("favorite", itemUuid);
 };

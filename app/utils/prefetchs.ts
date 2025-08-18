@@ -1,18 +1,18 @@
 import { QueryClient } from "@tanstack/react-query";
-import { LOCAL_IP } from "@/config/api";
-import safeFetch from "./safe-fetch";
-import { UserSchemaRes } from "@/schemas/auth/preferences-schema";
+import { CatalogItemSchemaType } from "@/schemas/catalog/catalog-schema";
 import {
-  BrandSchemaRes,
-  BrandSchemaPropertiesRes,
-} from "@/schemas/auth/brand-schema";
-import {
-  CatalogItemArraySchema,
-  CatalogItemArraySchemaResponse,
-  CatalogItemSchemaType,
-  GetItemResponseSchema,
-  IsMyItemSchema,
-} from "@/schemas/catalog/catalog-schema";
+  checkIfLiked,
+  checkIfFavorited,
+  checkIsMyItem,
+  getBrandProfile,
+  getBrandItems,
+  getSelfBrandProfile,
+  getSelfClientProfile,
+  getSelfBrandItems,
+  getItem,
+  handleAuthError,
+  getClothingItemsHome,
+} from "./fetch";
 
 export function prefetchProfile(
   user: {
@@ -22,56 +22,41 @@ export function prefetchProfile(
   queryClient: QueryClient
 ) {
   if (user.userType === "client") {
+    console.log("prefetching client profile", user.email);
     queryClient.prefetchQuery({
       queryKey: ["fetch-client-profile", user.email],
-      queryFn: async () => {
-        const { data } = await safeFetch({
-          url: `http://${LOCAL_IP}:3000/get-self-client`,
-          method: "GET",
-          schema: UserSchemaRes,
-        });
-        if (!data.error) {
-          return data;
-        }
-      },
+      queryFn: () => getSelfClientProfile(),
     });
   } else if (user.userType === "brand") {
+    console.log("prefetching brand profile", user.email);
     queryClient.prefetchQuery({
       queryKey: ["fetch-brand-profile", user.email],
-      queryFn: async () => {
-        const { data } = await safeFetch({
-          url: `http://${LOCAL_IP}:3000/get-self-brand`,
-          method: "GET",
-          schema: BrandSchemaRes,
-        });
-        if (!data.error) {
-          return data;
-        }
-      },
+      queryFn: () => getSelfBrandProfile(),
     });
 
     // Also prefetch brand's clothing items
     queryClient.prefetchInfiniteQuery({
       queryKey: ["clothing-items", user.email],
       queryFn: async () => {
-        const { data } = await safeFetch({
-          url: `http://${LOCAL_IP}:3000/all-self-brand?page=0&limit=100`,
-          method: "GET",
-          schema: CatalogItemArraySchemaResponse,
-        });
-        if (data.error) {
-          throw new Error(data.details);
+        try {
+          const items = await getSelfBrandItems(0, 100, user.email);
+          items.forEach(item => {
+            const existingData = queryClient.getQueryData([
+              "item-detail",
+              item.uuid,
+            ]);
+            if (!existingData) {
+              prefetchItemDetail(queryClient, item, user?.email);
+            }
+          });
+          return items;
+        } catch (error) {
+          const result = handleAuthError(
+            error,
+            "prefetchProfile (brand items)"
+          );
+          return result === null ? [] : result;
         }
-        data.items.forEach(item => {
-          const existingData = queryClient.getQueryData([
-            "item-detail",
-            item.uuid,
-          ]);
-          if (!existingData) {
-            prefetchItemDetail(queryClient, item, user?.email);
-          }
-        });
-        return data.items;
       },
       initialPageParam: 0,
       getNextPageParam: (
@@ -93,23 +78,19 @@ export default function prefetchHome(
   queryClient: QueryClient,
   userEmail: string | undefined
 ) {
-  queryClient.prefetchInfiniteQuery({
-    queryKey: ["clothing-items", null],
-    queryFn: async () => {
+  prefetchInfiniteQueryIfNeeded(
+    queryClient,
+    ["clothing-items", null],
+    async () => {
       console.log("prefetching clothing items HOMEE");
-      const { data } = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/all?page=0&limit=100`,
-        method: "GET",
-        schema: CatalogItemArraySchema,
-      });
-
-      data.forEach(item => {
+      const items = await getClothingItemsHome(0, 100);
+      items.forEach(item => {
         prefetchItemDetail(queryClient, item, userEmail);
       });
-      return data;
+      return items;
     },
-    initialPageParam: 0,
-    getNextPageParam: (
+    0,
+    (
       lastPage: CatalogItemSchemaType[],
       allPages: CatalogItemSchemaType[][],
       lastPageParam: number,
@@ -119,8 +100,56 @@ export default function prefetchHome(
         return undefined;
       }
       return lastPageParam + 1;
-    },
+    }
+  );
+}
+
+function prefetchIfNeeded(
+  queryClient: QueryClient,
+  queryKey: string[],
+  queryFn: () => Promise<any>
+) {
+  const existingData = queryClient.getQueryData(queryKey);
+  const isPrefetching = queryClient.isFetching({
+    queryKey: queryKey,
   });
+
+  // Only prefetch when there is truly no cached entry (undefined)
+  if (existingData === undefined && !isPrefetching) {
+    console.log("prefetching: ", queryKey);
+    queryClient.prefetchQuery({
+      queryKey: queryKey,
+      queryFn: queryFn,
+    });
+  }
+}
+
+function prefetchInfiniteQueryIfNeeded(
+  queryClient: QueryClient,
+  queryKey: (string | null)[],
+  queryFn: () => Promise<any>,
+  initialPageParam: number,
+  getNextPageParam: (
+    lastPage: any[],
+    allPages: any[][],
+    lastPageParam: number,
+    allPageParams: number[]
+  ) => number | undefined
+) {
+  const existingData = queryClient.getQueryData(queryKey);
+  const isPrefetching = queryClient.isFetching({
+    queryKey: queryKey,
+  });
+
+  if (!existingData && !isPrefetching) {
+    console.log("prefetching infinite query: ", queryKey);
+    queryClient.prefetchInfiniteQuery({
+      queryKey: queryKey,
+      queryFn: queryFn,
+      initialPageParam: initialPageParam,
+      getNextPageParam: getNextPageParam,
+    });
+  }
 }
 
 export function prefetchItemDetail(
@@ -128,104 +157,56 @@ export function prefetchItemDetail(
   item: CatalogItemSchemaType,
   userEmail: string | undefined
 ) {
-  queryClient.prefetchQuery({
-    queryKey: ["item-detail", item.uuid],
-    queryFn: async () => {
-      try {
-        const { data } = await safeFetch({
-          url: `http://${LOCAL_IP}:3000/get-item?uuid=${item.uuid}`,
-          schema: GetItemResponseSchema,
-        });
-        if (data.error) {
-          throw new Error(data.details);
-        }
-        return data;
-      } catch (error) {
-        return null;
-      }
-    },
-  });
+  console.log("checking if prefetching item detail", item.uuid);
+  prefetchIfNeeded(queryClient, ["item-detail", item.uuid], () =>
+    getItem(item.uuid)
+  );
 
-  // Prefetch brand profile for the item
   if (item.brandId) {
-    queryClient.prefetchQuery({
-      queryKey: ["fetch-brand-profile-item", item.brandId],
-      queryFn: async () => {
-        try {
-          const { data } = await safeFetch({
-            url: `http://${LOCAL_IP}:3000/get-brand?id=${item.brandId}`,
-            method: "GET",
-            schema: BrandSchemaPropertiesRes,
-          });
-          if (data.error) {
-            throw new Error(data.details);
-          }
-          return data;
-        } catch (error) {
-          console.error("Error prefetching brand profile:", error);
-          return null;
-        }
-      },
-    });
+    prefetchIfNeeded(
+      queryClient,
+      ["fetch-brand-profile-item", item.brandId],
+      () => getBrandProfile(item.brandId)
+    );
   }
 
-  // Prefetch is-my-item check for the item
   if (userEmail) {
-    queryClient.prefetchQuery({
-      queryKey: ["is-my-item", item.uuid, userEmail],
-      queryFn: async () => {
-        try {
-          const { data } = await safeFetch({
-            url: `http://${LOCAL_IP}:3000/is-my-item?uuid=${item.uuid}`,
-            method: "GET",
-            schema: IsMyItemSchema,
-          });
-          if (data.error) {
-            throw new Error(data.details);
-          }
-          return data;
-        } catch (error) {
-          console.error("Error prefetching is-my-item check:", error);
-          return null;
-        }
-      },
-    });
+    prefetchIfNeeded(queryClient, ["is-liked", item.uuid], () =>
+      checkIfLiked(userEmail, item.uuid)
+    );
+    prefetchIfNeeded(queryClient, ["is-favorited", item.uuid], () =>
+      checkIfFavorited(userEmail, item.uuid)
+    );
+  }
+
+  if (userEmail) {
+    prefetchIfNeeded(queryClient, ["is-my-item", item.uuid], () =>
+      checkIsMyItem(item.uuid, userEmail)
+    );
   }
 }
 
 export function prefetchBrandPageItem(
   queryClient: QueryClient,
-  brandId: string
+  brandId: string,
+  userEmail: string
 ) {
-  queryClient.prefetchQuery({
-    queryKey: ["fetch-brand-profile", brandId],
-    queryFn: async () => {
-      const { data } = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/get-brand?id=${brandId}`,
-        method: "GET",
-        schema: BrandSchemaRes,
+  prefetchIfNeeded(queryClient, ["fetch-brand-profile-item", brandId], () =>
+    getBrandProfile(brandId)
+  );
+  console.log("going to check if prefetching brand page item", brandId);
+  prefetchInfiniteQueryIfNeeded(
+    queryClient,
+    ["clothing-items", brandId],
+    async () => {
+      const items = await getBrandItems(0, 100, brandId);
+      items.forEach(item => {
+        prefetchItemDetail(queryClient, item, userEmail);
       });
-      if (!data.error) {
-        return data;
-      }
+      return items;
     },
-  });
-
-  queryClient.prefetchInfiniteQuery({
-    queryKey: ["clothing-items", brandId],
-    queryFn: async () => {
-      const { data } = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/all-brand?page=0&limit=100&id=${brandId}`,
-        method: "GET",
-        schema: CatalogItemArraySchemaResponse,
-      });
-      if (data.error) {
-        throw new Error(data.details);
-      }
-      return data.items;
-    },
-    initialPageParam: 0,
-    getNextPageParam: (
+    0,
+    (
       lastPage: CatalogItemSchemaType[],
       allPages: CatalogItemSchemaType[][],
       lastPageParam: number,
@@ -235,6 +216,6 @@ export function prefetchBrandPageItem(
         return undefined;
       }
       return lastPageParam + 1;
-    },
-  });
+    }
+  );
 }

@@ -17,23 +17,21 @@ import {
   FontAwesome,
 } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
-import {
-  CatalogItemSchemaType,
-  CatalogResponseSchemaDelete,
-  GetItemResponseSchema,
-} from "@/schemas/catalog/catalog-schema";
+import { CatalogItemSchemaType } from "@/schemas/catalog/catalog-schema";
 import Toast from "react-native-toast-message";
-import safeFetch from "../../utils/safe-fetch";
-import { LOCAL_IP } from "@/config/api";
-import { CatalogItemArraySchema } from "@/schemas/catalog/catalog-schema";
 import ListItems from "../../components/ListClotheItems";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  getClothingItemsSimilar,
+import { useQueryClient } from "@tanstack/react-query";
+import { getClothingItemsSimilar } from "@/app/utils/fetch";
+import useIsMyItem, {
   useFetchBrandProfileItem,
   useFetchItem,
-  useIsMyItem,
-} from "@/app/utils/fetch";
+} from "@/app/utils/use-query";
+import useIsLiked from "@/app/utils/likes-favorites";
+import {
+  useIsFavorited,
+  useToggleLike,
+  useToggleFavorite,
+} from "@/app/utils/likes-favorites";
 import { UpdateItemModal } from "@/app/components/profile/insertNewItems";
 import { FormData } from "@/app/components/profile/insertNewItems";
 import BottomSheet from "@gorhom/bottom-sheet";
@@ -45,21 +43,31 @@ import { useDeleteItem } from "@/app/utils/update";
 import { prefetchBrandPageItem } from "@/app/utils/prefetchs";
 
 const ItemDetail = () => {
+  const params = useLocalSearchParams();
+  const decodedUuid = decodeURIComponent(params.uuid as string);
   const { user } = useSession();
   const queryClient = useQueryClient();
 
-  const params = useLocalSearchParams();
-  const bottomSheetRefAddItem = useRef<BottomSheet>(null);
-  const [visibleModal, setVisibleModal] = useState(false);
-
-  const decodedUuid = decodeURIComponent(params.uuid as string);
   const itemData = useFetchItem(decodedUuid);
-
-  const [isPressed, setIsPressed] = useState(false);
   const item = itemData?.item;
   const brand = useFetchBrandProfileItem(item?.brandId || "");
-  const isBrandItem = useIsMyItem(item?.uuid || "")?.isMyItem;
+  const isBrandItem = useIsMyItem(item?.uuid || "") || false;
   const deleteItem = useDeleteItem(item?.name || "");
+
+  // Ejecutar prefetch solo una vez cuando se monta el componente
+  useEffect(() => {
+    if (item?.brandId && user?.email) {
+      prefetchBrandPageItem(queryClient, item.brandId, user.email);
+    }
+  }, []); // Array vacío = solo se ejecuta una vez al montar
+
+  const bottomSheetRefAddItem = useRef<BottomSheet>(null);
+  const [visibleModal, setVisibleModal] = useState(false);
+  const [isPressed, setIsPressed] = useState(false);
+  const likeData = useIsLiked(item?.uuid || "");
+  const favoriteData = useIsFavorited(item?.uuid || "");
+  const toggleLikeMutation = useToggleLike();
+  const toggleFavoriteMutation = useToggleFavorite();
 
   const openSheetUpdateItem = () => {
     bottomSheetRefAddItem.current?.snapToIndex(0);
@@ -69,11 +77,9 @@ const ItemDetail = () => {
     // console.log("Form submitted with data:", data);
   };
 
-  if (!item) {
-    return <LoadingPage />;
+  if (!item || !user) {
+    return <LoadingPage alreadyPrefetched={true} />;
   }
-
-  prefetchBrandPageItem(queryClient, item.brandId || "");
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -98,6 +104,16 @@ const ItemDetail = () => {
           <View className="px-5 flex flex-col gap-6">
             <IconComponent
               uuid={item.uuid}
+              isLiked={likeData.data ?? false}
+              isFavorited={favoriteData.data ?? false}
+              onToggleLike={() =>
+                toggleLikeMutation.mutate({ itemUuid: item.uuid })
+              }
+              onToggleFavorite={() =>
+                toggleFavoriteMutation.mutate({ itemUuid: item.uuid })
+              }
+              isLoadingLike={toggleLikeMutation.isPending}
+              isLoadingFavorite={toggleFavoriteMutation.isPending}
               isBrandItem={isBrandItem || false}
               openSheetUpdateItem={openSheetUpdateItem}
               itemName={item.name}
@@ -217,15 +233,21 @@ const ItemDetailComponent = ({
   const [measured, setMeasured] = React.useState(false); // ya medí?
   const [overflows, setOverflows] = React.useState(false); // tiene >1 línea?
   const [expanded, setExpanded] = React.useState(false);
+  const [lastDescription, setLastDescription] = React.useState(
+    item.description
+  );
 
   const handleTextLayout = React.useCallback(
     (e: any) => {
-      if (measured) return; // medir solo una vez
       const lines = e?.nativeEvent?.lines ?? [];
-      setOverflows(lines.length > 1);
-      setMeasured(true);
+      // Solo actualizar si la descripción cambió o si no hemos medido aún
+      if (lastDescription !== item.description || !measured) {
+        setOverflows(lines.length > 1);
+        setMeasured(true);
+        setLastDescription(item.description);
+      }
     },
-    [measured]
+    [measured, item.description, lastDescription]
   );
 
   return (
@@ -254,12 +276,19 @@ const ItemDetailComponent = ({
           {"ARS $" + item.price}
         </Text>
         <View>
+          {/* Text invisible para medir el número real de líneas */}
+          <Text
+            className="text-white text-xl font-pregular flex-1 absolute opacity-0"
+            onTextLayout={handleTextLayout}
+          >
+            {item.description}
+          </Text>
+
           <View className="flex-row flex-wrap">
             <Text
               className="text-white text-xl font-pregular flex-1"
-              numberOfLines={measured && !expanded ? 1 : undefined}
+              numberOfLines={expanded ? undefined : 1}
               ellipsizeMode="tail"
-              onTextLayout={handleTextLayout}
             >
               {item.description}
             </Text>
@@ -283,12 +312,24 @@ const IconComponent = ({
   openSheetUpdateItem,
   itemName,
   setVisibleModal,
+  isLiked,
+  isFavorited,
+  onToggleLike,
+  onToggleFavorite,
+  isLoadingLike,
+  isLoadingFavorite,
 }: {
   uuid: string;
   isBrandItem: boolean;
   openSheetUpdateItem: () => void;
   itemName: string;
   setVisibleModal: (visible: boolean) => void;
+  isLiked: boolean;
+  isFavorited: boolean;
+  onToggleLike: () => void;
+  onToggleFavorite: () => void;
+  isLoadingLike: boolean;
+  isLoadingFavorite: boolean;
 }) => {
   const handleShareItem = async () => {
     try {
@@ -317,11 +358,27 @@ const IconComponent = ({
   return (
     <View className="flex-row justify-between">
       <View className="pt-4 flex-row items-center gap-8">
-        <TouchableOpacity className="w-8 h-8 items-center justify-center">
-          <Ionicons name="heart-outline" size={24} color="white" />
+        <TouchableOpacity
+          className="w-8 h-8 items-center justify-center"
+          onPress={onToggleLike}
+          disabled={isLoadingLike}
+        >
+          <Ionicons
+            name={isLiked ? "heart" : "heart-outline"}
+            size={24}
+            color={isLiked ? "#bd8e75" : "white"}
+          />
         </TouchableOpacity>
-        <TouchableOpacity className="w-8 h-8 items-center justify-center">
-          <FontAwesome name="bookmark-o" size={24} color="white" />
+        <TouchableOpacity
+          className="w-8 h-8 items-center justify-center"
+          onPress={onToggleFavorite}
+          disabled={isLoadingFavorite}
+        >
+          <FontAwesome
+            name={isFavorited ? "bookmark" : "bookmark-o"}
+            size={24}
+            color={isFavorited ? "#bd8e75" : "white"}
+          />
         </TouchableOpacity>
 
         <TouchableOpacity

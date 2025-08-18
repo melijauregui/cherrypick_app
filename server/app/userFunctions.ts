@@ -16,11 +16,11 @@ export async function VerifyUserExists(
 ): Promise<VerifyUserResponseSchemaType> {
   let res: VerifyUserResponseSchemaType;
   const [userRows]: any[] = await db.query(
-    "SELECT * FROM users WHERE email = ?",
+    "SELECT * FROM clients WHERE email = ?",
     [email]
   );
 
-  // Buscar en brands si no se encuentra en users
+  // Buscar en brands si no se encuentra en clients
   if (userRows.length === 0) {
     const [brandRows]: any[] = await db.query(
       "SELECT * FROM brands WHERE email = ?",
@@ -76,7 +76,7 @@ export async function CreateUser(
   }
 
   const [result]: any = await db.query(
-    "INSERT INTO users (name, email, date_of_birth, preferences) VALUES (?, ?, ?, ?)",
+    "INSERT INTO clients (name, email, date_of_birth, preferences) VALUES (?, ?, ?, ?)",
     [name, email, dateBirth, JSON.stringify(preferences)]
   );
 
@@ -104,7 +104,7 @@ export async function DeleteUser(
   if (resV.userType === "brand") {
     result = await db.query("DELETE FROM brands WHERE email = ?", [email]);
   } else {
-    result = await db.query("DELETE FROM users WHERE email = ?", [email]);
+    result = await db.query("DELETE FROM clients WHERE email = ?", [email]);
   }
 
   if (result[0].affectedRows > 0) {
@@ -123,9 +123,10 @@ export async function DeleteUser(
 
 export async function GetClient(email: string): Promise<UserSchemaResType> {
   let res: UserSchemaResType;
-  const [result]: any = await db.query("SELECT * FROM users WHERE email = ?", [
-    email,
-  ]);
+  const [result]: any = await db.query(
+    "SELECT * FROM clients WHERE email = ?",
+    [email]
+  );
 
   if (result.length > 0) {
     const parsedRows = queryDbSchemaUser.parse(result);
@@ -157,7 +158,7 @@ export async function UpdateClient(
 ): Promise<CreateAccountSchemaResType> {
   let res: CreateAccountSchemaResType;
   const [existing]: any[] = await db.query(
-    "SELECT * FROM users WHERE email = ?",
+    "SELECT * FROM clients WHERE email = ?",
     [email]
   );
   if (existing.length === 0) {
@@ -184,7 +185,7 @@ export async function UpdateClient(
   const dateBirth = dateString ? new Date(dateString) : null;
 
   const [result]: any = await db.query(
-    "UPDATE users SET name = ?, date_of_birth = ?, preferences = ? WHERE email = ?",
+    "UPDATE clients SET name = ?, date_of_birth = ?, preferences = ? WHERE email = ?",
     [name, dateBirth, JSON.stringify(preferences), email]
   );
   console.log("client updated");

@@ -4,7 +4,7 @@ USE cherrypick_db;
 
 -- Usuario de prueba ya registrado
 INSERT INTO
-    users (name, email, date_of_birth)
+    clients (name, email, date_of_birth)
 VALUES (
         'Pedro Pérez',
         'p@gmail.com',
@@ -12,8 +12,9 @@ VALUES (
     );
 
 INSERT INTO
-    brands (email, name, description, url, logo_url)
+    brands (id, email, name, description, url, logo_url)
 VALUES (
+        'ca8cce7e-792a-11f0-b577-0242ac120002',
         'cherrypick.brand.example@gmail.com',
         'tienda napoli',
         '10% off abonando con transferencia
@@ -25,9 +26,10 @@ Lun a sab: 11 a 19 hs',
         'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRj1uqWFGzt3iIfOyeOcputEeV7OeOgAjFiBkVOtD43PHCqGXdl0ABRrSSVumRY44FbXWw&usqp=CAU'
     );
 
-    INSERT INTO
-    brands (email, name, description, url, logo_url)
+INSERT INTO
+    brands (id, email, name, description, url, logo_url)
 VALUES (
+        'ca8ce0ae-792a-11f0-b577-0242ac120002',
         'charostoreok@gmail.com',
         'charo',
         'Info vía WhatsApp 📲 1161428031

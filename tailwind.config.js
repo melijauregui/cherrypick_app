@@ -23,6 +23,7 @@ module.exports = {
           strong: "#242424",
         },
         brown: {
+          extraLight: "#bd8e75",
           light: "#af785a",
           strong: "#301c11",
         },

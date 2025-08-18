@@ -15,8 +15,6 @@ import { ButtonSubmit } from "./insertNewItems";
 import { useDelete } from "@/app/utils/update";
 import { fetchItems } from "@/app/utils/fetch";
 
-const screenHeight = Dimensions.get("window").height;
-
 const DeleteCatalogItemsModal = ({
   bottomSheetRef,
   brandId,
@@ -37,17 +35,23 @@ const DeleteCatalogItemsModal = ({
     setDeleting
   );
 
-  const { data, fetchNextPage, isLoading, error } = useInfiniteQuery({
-    queryKey: ["delete-catalog-items", brandId, search],
-    queryFn: ({ pageParam }) => fetchItems(search, pageParam),
-    initialPageParam: 0,
-    getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
-      if (lastPage.length === 0) {
-        return undefined;
-      }
-      return lastPageParam + 1;
-    },
-  });
+  const { data, fetchNextPage, isLoading, error, isPending, isRefetching } =
+    useInfiniteQuery({
+      queryKey: ["delete-catalog-items", brandId, search],
+      queryFn: async ({ pageParam }) => {
+        const res = await fetchItems(search, pageParam);
+        return res;
+      },
+      initialPageParam: 0,
+      getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
+        if (lastPage.length === 0) {
+          return undefined;
+        }
+        return lastPageParam + 1;
+      },
+    });
+
+  const isStillLoading = isLoading || isPending || isRefetching;
 
   const queryClient = useQueryClient();
   const resetInfiniteQueryPagination = () => {
@@ -120,7 +124,7 @@ const DeleteCatalogItemsModal = ({
         search={search}
         setSearch={setSearch}
         resetInfiniteQueryPagination={resetInfiniteQueryPagination}
-        loading={isLoading}
+        loading={isStillLoading}
         filteredItems={data?.pages.flat() || []}
         selected={selected}
         toggleSelect={toggleSelect}
