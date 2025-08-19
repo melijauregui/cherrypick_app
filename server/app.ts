@@ -107,12 +107,15 @@ import {
   LikeFavoriteResponseSchemaType,
   CheckLikeFavoriteResponseSchema,
   CheckLikeFavoriteResponseSchemaType,
+  GetLikedFavoritedItemsResponseSchema,
 } from "../schemas/activity/activity";
 import {
   toggleLike,
   toggleFavorite,
   checkIfLiked,
   checkIfFavorited,
+  getAllLikedItems,
+  getAllFavoritedItems,
 } from "./app/allDatabase";
 
 export type AppEnv = {
@@ -1342,5 +1345,106 @@ app.openapi(checkFavoriteRoute, async c => {
     return c.json(res, 401);
   }
   res = await checkIfFavorited(user.email, item_uuid, user.userType);
+  return c.json(res, 200);
+});
+
+// Endpoint para obtener todos los items liked
+const getAllLikedItemsRoute = createRoute({
+  method: "get",
+  path: "/get-all-liked-items",
+  request: {
+    query: PaginationSchemaBrand,
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: GetLikedFavoritedItemsResponseSchema,
+        },
+      },
+      description: "Obtiene todos los items liked del usuario",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.boolean(),
+            details: z.string(),
+          }),
+        },
+      },
+      description: "Usuario no autenticado",
+    },
+  },
+});
+
+app.openapi(getAllLikedItemsRoute, async c => {
+  const { page, limit } = c.req.valid("query");
+  const user = c.get("user");
+
+  if (!user?.email) {
+    return c.json(
+      {
+        error: true,
+        details: "Usuario no autenticado",
+      },
+      401
+    );
+  }
+
+  const res = await getAllLikedItems(user.email, user.userType, page, limit);
+  return c.json(res, 200);
+});
+
+// Endpoint para obtener todos los items favorited
+const getAllFavoritedItemsRoute = createRoute({
+  method: "get",
+  path: "/get-all-favorited-items",
+  request: {
+    query: PaginationSchemaBrand,
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: GetLikedFavoritedItemsResponseSchema,
+        },
+      },
+      description: "Obtiene todos los items favorited del usuario",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.boolean(),
+            details: z.string(),
+          }),
+        },
+      },
+      description: "Usuario no autenticado",
+    },
+  },
+});
+
+app.openapi(getAllFavoritedItemsRoute, async c => {
+  const { page, limit } = c.req.valid("query");
+  const user = c.get("user");
+
+  if (!user?.email) {
+    return c.json(
+      {
+        error: true,
+        details: "Usuario no autenticado",
+      },
+      401
+    );
+  }
+
+  const res = await getAllFavoritedItems(
+    user.email,
+    user.userType,
+    page,
+    limit
+  );
   return c.json(res, 200);
 });

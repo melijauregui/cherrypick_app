@@ -3,6 +3,7 @@ import React from "react";
 import { Tabs, router } from "expo-router";
 import icons from "../../constants/icons";
 import { OnlyAuthenticated } from "@/lib/auth-client";
+import { Ionicons } from "@expo/vector-icons";
 
 const TabsLayout = () => {
   return (
@@ -19,6 +20,15 @@ const TabsLayout = () => {
           title: "Explore",
           icon: icons.search,
           iconName: "Explore",
+        })}
+        {Page({
+          name: "likes-favorites",
+          title: "Likes & Favorites",
+          icon: icons.profile,
+          iconName: "Likes",
+          Icon: ({ color }) => (
+            <Ionicons name="heart" size={24} color={color} />
+          ),
         })}
         {Page({
           name: "profile",
@@ -38,11 +48,13 @@ const Page = ({
   title,
   icon,
   iconName,
+  Icon,
 }: {
   name: string;
   title: string;
   icon: ImageSourcePropType;
   iconName: string;
+  Icon?: ({ color }: { color: string }) => React.ReactNode;
 }) => {
   return (
     <Tabs.Screen
@@ -58,14 +70,17 @@ const Page = ({
           paddingTop: 6,
         },
         tabBarActiveTintColor: "#FFFFFF",
-        tabBarIcon: ({ color, focused }) => (
-          <TabIcon
-            icon={icon}
-            name={iconName}
-            color={color}
-            focused={focused}
-          />
-        ),
+        tabBarIcon: ({ color, focused }) =>
+          Icon ? (
+            <Icon color={color} />
+          ) : (
+            <TabIcon
+              icon={icon}
+              name={iconName}
+              color={color}
+              focused={focused}
+            />
+          ),
       }}
     />
   );

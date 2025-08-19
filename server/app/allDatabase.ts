@@ -1,5 +1,6 @@
 import {
   CheckLikeFavoriteResponseSchemaType,
+  GetLikedFavoritedItemsResponseSchemaType,
   LikeFavoriteResponseSchemaType,
 } from "@/schemas/activity/activity";
 import { db } from "../db";
@@ -104,5 +105,68 @@ export async function checkIfFavorited(
   } catch (error) {
     console.error("Error checking favorite:", error);
     return { error: true, details: "Error al verificar el favorito" };
+  }
+}
+
+// Funciones para obtener todos los items liked y favorited
+export async function getAllLikedItems(
+  userEmail: string,
+  userType: string,
+  page: number = 0,
+  limit: number = 100
+): Promise<GetLikedFavoritedItemsResponseSchemaType> {
+  try {
+    const offset = page * limit;
+    // Primero obtener los UUIDs de los items liked
+    const [likedUuids] = await db.execute(
+      `SELECT item_uuid FROM item_likes_${userType} 
+       WHERE user_email = ? 
+       ORDER BY created_at DESC 
+       LIMIT ? OFFSET ?`,
+      [userEmail, limit, offset]
+    );
+
+    if (!Array.isArray(likedUuids) || likedUuids.length === 0) {
+      return { error: false, items: [] };
+    }
+
+    return {
+      error: false,
+      items: likedUuids.map((row: any) => row.item_uuid),
+    };
+  } catch (error) {
+    console.error("Error getting liked items:", error);
+    return { error: true, details: "Error al obtener los items liked" };
+  }
+}
+
+export async function getAllFavoritedItems(
+  userEmail: string,
+  userType: string,
+  page: number = 0,
+  limit: number = 100
+): Promise<GetLikedFavoritedItemsResponseSchemaType> {
+  try {
+    const offset = page * limit;
+    // Primero obtener los UUIDs de los items favorited
+    const [favoritedUuids] = await db.execute(
+      `SELECT item_uuid FROM item_favorites_${userType} 
+       WHERE user_email = ? 
+       ORDER BY created_at DESC 
+       LIMIT ? OFFSET ?`,
+      [userEmail, limit, offset]
+    );
+
+    if (!Array.isArray(favoritedUuids) || favoritedUuids.length === 0) {
+      return { error: false, items: [] };
+    }
+
+    return {
+      error: false,
+      items: favoritedUuids.map((row: any) => row.item_uuid),
+    };
+  } catch (error) {
+    console.error("Error getting favorited items:", error);
+    return { error: true, details: "Error al obtener los items favorited" };
   }
 }

@@ -40,14 +40,9 @@ export function prefetchProfile(
       queryFn: async () => {
         try {
           const items = await getSelfBrandItems(0, 100, user.email);
+          console.log("prefetching IN PROFILE!!!!!!!!", items.length);
           items.forEach(item => {
-            const existingData = queryClient.getQueryData([
-              "item-detail",
-              item.uuid,
-            ]);
-            if (!existingData) {
-              prefetchItemDetail(queryClient, item, user?.email);
-            }
+            prefetchItemDetail(queryClient, item, user?.email);
           });
           return items;
         } catch (error) {
@@ -60,8 +55,8 @@ export function prefetchProfile(
       },
       initialPageParam: 0,
       getNextPageParam: (
-        lastPage: CatalogItemSchemaType[],
-        allPages: CatalogItemSchemaType[][],
+        lastPage: { uuid: string }[],
+        allPages: { uuid: string }[][],
         lastPageParam: number,
         allPageParams: number[]
       ) => {
@@ -84,6 +79,7 @@ export default function prefetchHome(
     async () => {
       console.log("prefetching clothing items HOMEE");
       const items = await getClothingItemsHome(0, 100);
+      console.log("prefetching IN HOME!!!!!!!!", items.length);
       items.forEach(item => {
         prefetchItemDetail(queryClient, item, userEmail);
       });
@@ -91,8 +87,8 @@ export default function prefetchHome(
     },
     0,
     (
-      lastPage: CatalogItemSchemaType[],
-      allPages: CatalogItemSchemaType[][],
+      lastPage: { uuid: string }[],
+      allPages: { uuid: string }[][],
       lastPageParam: number,
       allPageParams: number[]
     ) => {
@@ -154,7 +150,7 @@ function prefetchInfiniteQueryIfNeeded(
 
 export function prefetchItemDetail(
   queryClient: QueryClient,
-  item: CatalogItemSchemaType,
+  item: { uuid: string },
   userEmail: string | undefined
 ) {
   console.log("checking if prefetching item detail", item.uuid);
@@ -162,11 +158,16 @@ export function prefetchItemDetail(
     getItem(item.uuid)
   );
 
-  if (item.brandId) {
+  //obtengo el item completo a traves de la ultima query
+  const itemQuery: CatalogItemSchemaType | undefined = queryClient.getQueryData(
+    ["item-detail", item.uuid]
+  );
+
+  if (itemQuery?.brandId) {
     prefetchIfNeeded(
       queryClient,
-      ["fetch-brand-profile-item", item.brandId],
-      () => getBrandProfile(item.brandId)
+      ["fetch-brand-profile-item", itemQuery.brandId],
+      () => getBrandProfile(itemQuery.brandId)
     );
   }
 
@@ -200,6 +201,7 @@ export function prefetchBrandPageItem(
     ["clothing-items", brandId],
     async () => {
       const items = await getBrandItems(0, 100, brandId);
+      console.log("prefetching IN BRAND PAGE!!!!!!!!", items.length);
       items.forEach(item => {
         prefetchItemDetail(queryClient, item, userEmail);
       });
@@ -207,8 +209,8 @@ export function prefetchBrandPageItem(
     },
     0,
     (
-      lastPage: CatalogItemSchemaType[],
-      allPages: CatalogItemSchemaType[][],
+      lastPage: { uuid: string }[],
+      allPages: { uuid: string }[][],
       lastPageParam: number,
       allPageParams: number[]
     ) => {

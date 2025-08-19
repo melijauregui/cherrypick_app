@@ -14,6 +14,7 @@ const ListItems = ({
   getClothingItems,
   limit,
   columnCount,
+  itemWhenNothingFound,
 }: {
   brandId: string | null;
   brandEmail?: string;
@@ -24,6 +25,7 @@ const ListItems = ({
   ) => Promise<CatalogItemSchemaType[]>;
   limit: number;
   columnCount: number;
+  itemWhenNothingFound?: () => React.ReactElement;
 }) => {
   const [refreshKey, setRefreshKey] = useState(0);
   const { user } = useSession();
@@ -106,6 +108,7 @@ const ListItems = ({
           colors={["#ffffff"]}
         />
       }
+      ListEmptyComponent={itemWhenNothingFound}
     />
   );
 };
