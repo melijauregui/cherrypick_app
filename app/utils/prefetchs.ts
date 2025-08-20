@@ -1,4 +1,4 @@
-import { QueryClient } from "@tanstack/react-query";
+import { QueryClient, useQueryClient } from "@tanstack/react-query";
 import { CatalogItemSchemaType } from "@/schemas/catalog/catalog-schema";
 import {
   checkIfLiked,
@@ -78,7 +78,7 @@ export default function prefetchHome(
     ["clothing-items", null],
     async () => {
       console.log("prefetching clothing items HOMEE");
-      const items = await getClothingItemsHome(0, 100);
+      const items = await getClothingItemsHome(0, 10);
       console.log("prefetching IN HOME!!!!!!!!", items.length);
       items.forEach(item => {
         prefetchItemDetail(queryClient, item, userEmail);
@@ -148,12 +148,11 @@ function prefetchInfiniteQueryIfNeeded(
   }
 }
 
-export function prefetchItemDetail(
+export async function prefetchItemDetail(
   queryClient: QueryClient,
   item: { uuid: string },
   userEmail: string | undefined
 ) {
-  console.log("checking if prefetching item detail", item.uuid);
   prefetchIfNeeded(queryClient, ["item-detail", item.uuid], () =>
     getItem(item.uuid)
   );
@@ -200,7 +199,7 @@ export function prefetchBrandPageItem(
     queryClient,
     ["clothing-items", brandId],
     async () => {
-      const items = await getBrandItems(0, 100, brandId);
+      const items = await getBrandItems(0, 18, brandId);
       console.log("prefetching IN BRAND PAGE!!!!!!!!", items.length);
       items.forEach(item => {
         prefetchItemDetail(queryClient, item, userEmail);

@@ -2,13 +2,12 @@ import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import React, { useEffect, useState } from "react";
 import { TextInput, View, Image } from "react-native";
 import icons from "../../constants/icons";
-import { LOCAL_IP } from "@/config/api";
-import ListItems from "../components/ListClotheItems";
+import List2 from "@/app/components/List2";
 import {
   CatalogItemArraySchema,
   CatalogItemSchemaType,
 } from "@/schemas/catalog/catalog-schema";
-import safeFetch from "../utils/safe-fetch";
+import { getClothingItemsHome } from "@/app/utils/fetch";
 
 const Explore = () => {
   const [clothingItems, setClothingItems] = useState<CatalogItemSchemaType[]>(
@@ -18,7 +17,7 @@ const Explore = () => {
 
   useEffect(() => {
     const fetchClothingItems = async () => {
-      const items = await getClothingItems(0, 100, undefined); //todo
+      const items = await getClothingItemsHome(0, 100); //todo
       setClothingItems(items);
     };
 
@@ -44,9 +43,9 @@ const Explore = () => {
           />
         </View>
 
-        <ListItems
-          profileData={null}
-          getClothingItems={getClothingItems}
+        <List2
+          brandId={null}
+          getClothingItems={getClothingItemsHome}
           limit={100}
           columnCount={2}
         />
@@ -55,21 +54,3 @@ const Explore = () => {
   );
 };
 export default Explore;
-
-async function getClothingItems(
-  page: number,
-  limit: number,
-  brandEmail: string | undefined
-): Promise<CatalogItemSchemaType[]> {
-  try {
-    const { data } = await safeFetch({
-      url: `http://${LOCAL_IP}:3000/all?page=${page}&limit=${limit}`,
-      method: "GET",
-      schema: CatalogItemArraySchema,
-    });
-    return data;
-  } catch (error: unknown) {
-    console.error("Error:", error instanceof Error ? error.message : error);
-    return [];
-  }
-}

@@ -21,7 +21,7 @@ import {
 } from "@/schemas/auth/preferences-schema";
 import {
   CheckLikeFavoriteResponseSchema,
-  CheckLikeFavoriteResponseSchemaType,
+  GetLikedFavoritedItemsResponseSchema,
   LikeFavoriteResponseSchema,
   LikeFavoriteResponseSchemaType,
 } from "@/schemas/activity/activity";
@@ -244,6 +244,7 @@ export const fetchItems = async (
 export async function getItem(itemUuid: string): Promise<{
   item: CatalogItemSchemaType;
 } | null> {
+  console.log("getting item", itemUuid);
   return handleApiResponse<{ item: CatalogItemSchemaType }>(
     () =>
       safeFetch({
@@ -337,4 +338,44 @@ export const checkIfFavorited = async (userEmail: string, itemUuid: string) => {
     return null;
   }
   return checkLikeFavorite("favorite", itemUuid);
+};
+
+// Funciones para obtener todos los items liked y favorited
+export const getAllLikedItems = async (
+  page: number = 0,
+  limit: number = 100,
+  brandId: string | null = null
+): Promise<{ uuid: string }[]> => {
+  const res = await handleApiResponse<{
+    items: string[];
+  }>(
+    () =>
+      safeFetch({
+        url: `http://${LOCAL_IP}:3000/get-all-liked-items?page=${page}&limit=${limit}`,
+        method: "GET",
+        schema: GetLikedFavoritedItemsResponseSchema,
+      }),
+    GetLikedFavoritedItemsResponseSchema,
+    "getAllLikedItems"
+  );
+  return res?.items.map(item => ({ uuid: item })) || [];
+};
+
+export const getAllFavoritedItems = async (
+  page: number = 0,
+  limit: number = 100
+): Promise<{ uuid: string }[]> => {
+  const res = await handleApiResponse<{
+    items: string[];
+  }>(
+    () =>
+      safeFetch({
+        url: `http://${LOCAL_IP}:3000/get-all-favorited-items?page=${page}&limit=${limit}`,
+        method: "GET",
+        schema: GetLikedFavoritedItemsResponseSchema,
+      }),
+    GetLikedFavoritedItemsResponseSchema,
+    "getAllFavoritedItems"
+  );
+  return res?.items.map(item => ({ uuid: item })) || [];
 };

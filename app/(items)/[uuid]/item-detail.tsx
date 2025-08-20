@@ -19,7 +19,6 @@ import {
 import * as Clipboard from "expo-clipboard";
 import { CatalogItemSchemaType } from "@/schemas/catalog/catalog-schema";
 import Toast from "react-native-toast-message";
-import ListItems from "../../components/ListClotheItems";
 import { useQueryClient } from "@tanstack/react-query";
 import { getClothingItemsSimilar } from "@/app/utils/fetch";
 import useIsMyItem, {
@@ -41,6 +40,7 @@ import CustomModal from "@/app/components/Modal";
 import LoadingPage from "@/app/components/LoadingPage";
 import { useDeleteItem } from "@/app/utils/update";
 import { prefetchBrandPageItem } from "@/app/utils/prefetchs";
+import List2 from "@/app/components/List2";
 
 const ItemDetail = () => {
   const params = useLocalSearchParams();
@@ -127,7 +127,7 @@ const ItemDetail = () => {
             </Text>
           </View>
 
-          <ListItems
+          <List2
             brandId={null}
             getClothingItems={getClothingItemsSimilar}
             limit={100}

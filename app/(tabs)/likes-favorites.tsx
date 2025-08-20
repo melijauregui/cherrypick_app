@@ -123,7 +123,9 @@ const LikesFavoritesPage = () => {
           <ListClotheItems
             brandId={null}
             brandEmail={undefined}
-            getClothingItems={() => Promise.resolve([])}
+            getClothingItems={
+              activeTab === "likes" ? getAllLikedItems : getAllFavoritedItems
+            }
             limit={100}
             columnCount={numColumns}
             itemWhenNothingFound={renderEmptyState}

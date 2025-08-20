@@ -1,10 +1,10 @@
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import React, { useEffect, useState } from "react";
-import ListItems from "../components/ListClotheItems";
 import LoadingPage from "../components/LoadingPage";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import { getClothingItemsHome } from "../utils/fetch";
+import List2 from "../components/List2";
 
 const Home = () => {
   const queryClient = useQueryClient();
@@ -40,10 +40,10 @@ const Home = () => {
   return (
     <SafeAreaProvider>
       <SafeAreaView className="bg-brown-strong w-full flex-1 ">
-        <ListItems
+        <List2
           brandId={null}
           getClothingItems={getClothingItemsHome}
-          limit={100}
+          limit={10}
           columnCount={2}
         />
       </SafeAreaView>

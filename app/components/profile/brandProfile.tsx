@@ -12,7 +12,6 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { View, Text, TouchableOpacity, Image, Linking } from "react-native";
 import { Entypo, Ionicons } from "@expo/vector-icons";
 import LoadingPage from "../LoadingPage";
-import ListItems from "../ListClotheItems";
 import DeleteCatalogItemsModal from "./DeleteCatalogItemsModal";
 import EditBrandProfile from "./editBrandProfile";
 import splitDescriptionByLinesOrWords, {
@@ -24,6 +23,7 @@ import { BrandSchemaPropertiesType } from "@/schemas/auth/brand-schema";
 import { router } from "expo-router";
 import { getBrandItems, getSelfBrandItems } from "@/app/utils/fetch";
 import React from "react";
+import List2 from "../../components/List2";
 
 const BrandProfile = ({
   user,
@@ -86,11 +86,11 @@ const BrandProfile = ({
               openUsernameSheetEdit={openUsernameSheetEdit}
             />
           </View>
-          <ListItems
+          <List2
             brandId={data.brand.id}
             brandEmail={user.email}
             getClothingItems={getSelfBrandItems}
-            limit={100}
+            limit={18}
             columnCount={3}
           />
 
@@ -166,10 +166,10 @@ const BrandProfilePage = ({ brandId }: { brandId: string }) => {
           <View className="flex flex-col w-full px-10 pb-4">
             <BrandDetails brand={data.brand} />
           </View>
-          <ListItems
+          <List2
             brandId={data.brand.id}
             getClothingItems={getBrandItems}
-            limit={100}
+            limit={18}
             columnCount={3}
           />
         </SafeAreaView>
