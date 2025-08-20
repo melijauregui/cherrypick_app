@@ -87,8 +87,7 @@ const BrandProfile = ({
             />
           </View>
           <List2
-            brandId={data.brand.id}
-            brandEmail={user.email}
+            queryKey={["self-brand-items", user.email]}
             getClothingItems={getSelfBrandItems}
             limit={18}
             columnCount={3}
@@ -167,8 +166,10 @@ const BrandProfilePage = ({ brandId }: { brandId: string }) => {
             <BrandDetails brand={data.brand} />
           </View>
           <List2
-            brandId={data.brand.id}
-            getClothingItems={getBrandItems}
+            queryKey={["brand-items", data.brand.id]}
+            getClothingItems={(limit, pageParam) =>
+              getBrandItems(pageParam, limit, data.brand.id)
+            }
             limit={18}
             columnCount={3}
           />

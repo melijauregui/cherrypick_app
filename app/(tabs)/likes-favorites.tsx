@@ -8,11 +8,9 @@ import {
 } from "react-native";
 import { useQuery } from "@tanstack/react-query";
 import { getAllLikedItems, getAllFavoritedItems } from "../utils/fetch";
-import ClothingItemComponent from "../components/ClothingItemComponent";
-import { CatalogItemSchemaType } from "@/schemas/catalog/catalog-schema";
 import { useSession } from "@/lib/auth-client";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
-import ListClotheItems from "../components/ListClotheItems";
+import List2 from "@/app/components/List2";
 
 const { width } = Dimensions.get("window");
 const numColumns = 3;
@@ -46,14 +44,6 @@ const LikesFavoritesPage = () => {
   const currentItems = activeTab === "likes" ? likedItems : favoritedItems;
   const isLoading = activeTab === "likes" ? isLoadingLikes : isLoadingFavorites;
   const error = activeTab === "likes" ? errorLikes : errorFavorites;
-
-  const renderItem = ({
-    item,
-    index,
-  }: {
-    item: CatalogItemSchemaType;
-    index: number;
-  }) => <ClothingItemComponent i={index} item={item} numColumns={numColumns} />;
 
   const renderEmptyState = () => (
     <View className="flex-1 justify-center items-center px-8">
@@ -120,13 +110,16 @@ const LikesFavoritesPage = () => {
             </Text>
           </View>
         ) : (
-          <ListClotheItems
-            brandId={null}
-            brandEmail={undefined}
+          <List2
+            queryKey={
+              activeTab === "likes"
+                ? ["all-liked-items", user?.email]
+                : ["all-favorited-items", user?.email]
+            }
             getClothingItems={
               activeTab === "likes" ? getAllLikedItems : getAllFavoritedItems
             }
-            limit={100}
+            limit={10}
             columnCount={numColumns}
             itemWhenNothingFound={renderEmptyState}
           />

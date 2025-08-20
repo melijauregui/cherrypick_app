@@ -24,25 +24,24 @@ export function prefetchProfile(
   if (user.userType === "client") {
     console.log("prefetching client profile", user.email);
     queryClient.prefetchQuery({
-      queryKey: ["fetch-client-profile", user.email],
+      queryKey: ["self-client-profile", user.email],
       queryFn: () => getSelfClientProfile(),
     });
   } else if (user.userType === "brand") {
     console.log("prefetching brand profile", user.email);
     queryClient.prefetchQuery({
-      queryKey: ["fetch-brand-profile", user.email],
+      queryKey: ["self-brand-profile", user.email],
       queryFn: () => getSelfBrandProfile(),
     });
 
     // Also prefetch brand's clothing items
     queryClient.prefetchInfiniteQuery({
-      queryKey: ["clothing-items", user.email],
+      queryKey: ["self-brand-items", user.email],
       queryFn: async () => {
         try {
-          const items = await getSelfBrandItems(0, 100, user.email);
-          console.log("prefetching IN PROFILE!!!!!!!!", items.length);
+          const items = await getSelfBrandItems(0, 18);
           items.forEach(item => {
-            prefetchItemDetail(queryClient, item, user?.email);
+            prefetchItemDetail(queryClient, item, user?.email, item.brandId);
           });
           return items;
         } catch (error) {
@@ -71,17 +70,18 @@ export function prefetchProfile(
 
 export default function prefetchHome(
   queryClient: QueryClient,
-  userEmail: string | undefined
+  userEmail: string
 ) {
+  console.log("prefetchHome called for user:", userEmail);
   prefetchInfiniteQueryIfNeeded(
     queryClient,
-    ["clothing-items", null],
+    ["home-items", userEmail],
     async () => {
       console.log("prefetching clothing items HOMEE");
       const items = await getClothingItemsHome(0, 10);
-      console.log("prefetching IN HOME!!!!!!!!", items.length);
+      console.log(`prefetchHome got ${items.length} items`);
       items.forEach(item => {
-        prefetchItemDetail(queryClient, item, userEmail);
+        prefetchItemDetail(queryClient, item, userEmail, item.brandId);
       });
       return items;
     },
@@ -109,6 +109,11 @@ function prefetchIfNeeded(
   const isPrefetching = queryClient.isFetching({
     queryKey: queryKey,
   });
+
+  // if (queryKey[0] === "brand-profile-item") {
+  //   console.log("existingData", existingData);
+  //   console.log("isPrefetching", isPrefetching);
+  // }
 
   // Only prefetch when there is truly no cached entry (undefined)
   if (existingData === undefined && !isPrefetching) {
@@ -145,28 +150,37 @@ function prefetchInfiniteQueryIfNeeded(
       initialPageParam: initialPageParam,
       getNextPageParam: getNextPageParam,
     });
+  } else {
+    console.log(
+      "skipping prefetch for infinite query (already cached or fetching): ",
+      queryKey
+    );
   }
 }
 
 export async function prefetchItemDetail(
   queryClient: QueryClient,
   item: { uuid: string },
-  userEmail: string | undefined
+  userEmail: string,
+  brandId: string
 ) {
   prefetchIfNeeded(queryClient, ["item-detail", item.uuid], () =>
     getItem(item.uuid)
   );
 
-  //obtengo el item completo a traves de la ultima query
-  const itemQuery: CatalogItemSchemaType | undefined = queryClient.getQueryData(
-    ["item-detail", item.uuid]
-  );
+  // //obtengo el item completo a traves de la ultima query
+  // const itemQuery: CatalogItemSchemaType | undefined = queryClient.getQueryData(
+  //   ["item-detail", item.uuid]
+  // );
 
-  if (itemQuery?.brandId) {
-    prefetchIfNeeded(
-      queryClient,
-      ["fetch-brand-profile-item", itemQuery.brandId],
-      () => getBrandProfile(itemQuery.brandId)
+  // if (itemQuery) {
+  //   console.log("itemQuery brandId", itemQuery.brandId);
+  //   console.log("itemQuery name", itemQuery.name);
+  // }
+
+  if (brandId) {
+    prefetchIfNeeded(queryClient, ["brand-profile-item", brandId], () =>
+      getBrandProfile(brandId)
     );
   }
 
@@ -191,18 +205,17 @@ export function prefetchBrandPageItem(
   brandId: string,
   userEmail: string
 ) {
-  prefetchIfNeeded(queryClient, ["fetch-brand-profile-item", brandId], () =>
+  prefetchIfNeeded(queryClient, ["brand-profile-item", brandId], () =>
     getBrandProfile(brandId)
   );
   console.log("going to check if prefetching brand page item", brandId);
   prefetchInfiniteQueryIfNeeded(
     queryClient,
-    ["clothing-items", brandId],
+    ["brand-items", brandId],
     async () => {
-      const items = await getBrandItems(0, 18, brandId);
-      console.log("prefetching IN BRAND PAGE!!!!!!!!", items.length);
+      const items = await getBrandItems(0, 6, brandId);
       items.forEach(item => {
-        prefetchItemDetail(queryClient, item, userEmail);
+        prefetchItemDetail(queryClient, item, userEmail, brandId);
       });
       return items;
     },

@@ -21,7 +21,6 @@ import {
 } from "@/schemas/auth/preferences-schema";
 import {
   CheckLikeFavoriteResponseSchema,
-  GetLikedFavoritedItemsResponseSchema,
   LikeFavoriteResponseSchema,
   LikeFavoriteResponseSchemaType,
 } from "@/schemas/activity/activity";
@@ -96,6 +95,7 @@ export async function getBrandProfile(
   if (!brandId) {
     return null;
   }
+  console.log("getBrandProfile", brandId);
 
   const res = await handleApiResponse<{
     brand: BrandSchemaPropertiesType;
@@ -138,6 +138,7 @@ export async function getBrandItems(
 }
 
 export async function getSelfBrandProfile(): Promise<BrandSchemaType | null> {
+  console.log("getSelfBrandProfile");
   const res = await handleApiResponse<{
     brand: BrandSchemaType;
   }>(
@@ -159,6 +160,7 @@ export async function getSelfClientProfile(): Promise<{
   preferences: string[];
   dateOfBirth: Date | null;
 } | null> {
+  console.log("getSelfClientProfile");
   const res = await handleApiResponse<{
     user: ClientSchemaType;
   }>(
@@ -176,9 +178,9 @@ export async function getSelfClientProfile(): Promise<{
 
 export async function getSelfBrandItems(
   page: number,
-  limit: number,
-  brandId: string | null
+  limit: number
 ): Promise<CatalogItemSchemaType[]> {
+  console.log("getSelfBrandItems", page, limit);
   const res = await handleApiResponse<{
     items: CatalogItemSchemaType[];
   }>(
@@ -198,6 +200,7 @@ export async function getClothingItemsHome(
   page: number,
   limit: number
 ): Promise<CatalogItemSchemaType[]> {
+  console.log("getClothingItemsHome", page, limit);
   const res = await handleApiResponse<{
     items: CatalogItemSchemaType[];
   }>(
@@ -215,8 +218,7 @@ export async function getClothingItemsHome(
 
 export async function getClothingItemsSimilar(
   page: number,
-  limit: number,
-  brandId: string | null
+  limit: number
 ): Promise<CatalogItemSchemaType[]> {
   return getClothingItemsHome(page, limit);
 }
@@ -262,24 +264,6 @@ const toggleLikeFavorite = async (
   action: "like" | "favorite",
   itemUuid: string
 ) => {
-  // try {
-  //   const response = await safeFetch({
-  //     url: `http://${LOCAL_IP}:3000/toggle-${action}`,
-  //     schema: LikeFavoriteResponseSchema,
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify({
-  //       item_uuid: itemUuid,
-  //     }),
-  //   });
-
-  //   return response.data;
-  // } catch (error) {
-  //   console.error(`Error toggling ${action}:`, error);
-  //   throw error;
-  // }
   const res = await handleApiResponse<LikeFavoriteResponseSchemaType>(
     () =>
       safeFetch({
@@ -345,37 +329,39 @@ export const getAllLikedItems = async (
   page: number = 0,
   limit: number = 100,
   brandId: string | null = null
-): Promise<{ uuid: string }[]> => {
+): Promise<CatalogItemSchemaType[]> => {
+  console.log("getAllLikedItems", page, limit);
   const res = await handleApiResponse<{
-    items: string[];
+    items: CatalogItemSchemaType[];
   }>(
     () =>
       safeFetch({
         url: `http://${LOCAL_IP}:3000/get-all-liked-items?page=${page}&limit=${limit}`,
         method: "GET",
-        schema: GetLikedFavoritedItemsResponseSchema,
+        schema: CatalogItemArraySchemaQuery,
       }),
-    GetLikedFavoritedItemsResponseSchema,
+    CatalogItemArraySchemaQuery,
     "getAllLikedItems"
   );
-  return res?.items.map(item => ({ uuid: item })) || [];
+  return res?.items || [];
 };
 
 export const getAllFavoritedItems = async (
   page: number = 0,
   limit: number = 100
-): Promise<{ uuid: string }[]> => {
+): Promise<CatalogItemSchemaType[]> => {
+  console.log("getAllFavoritedItems", page, limit);
   const res = await handleApiResponse<{
-    items: string[];
+    items: CatalogItemSchemaType[];
   }>(
     () =>
       safeFetch({
         url: `http://${LOCAL_IP}:3000/get-all-favorited-items?page=${page}&limit=${limit}`,
         method: "GET",
-        schema: GetLikedFavoritedItemsResponseSchema,
+        schema: CatalogItemArraySchemaQuery,
       }),
-    GetLikedFavoritedItemsResponseSchema,
+    CatalogItemArraySchemaQuery,
     "getAllFavoritedItems"
   );
-  return res?.items.map(item => ({ uuid: item })) || [];
+  return res?.items || [];
 };

@@ -40,7 +40,7 @@ export function useFetchClientProfile(user: UserInfo): {
   };
 } | null {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["fetch-client-profile", user.email],
+    queryKey: ["self-client-profile", user.email],
     queryFn: () => getSelfClientProfile(),
     staleTime: 5 * 60 * 1000,
   });
@@ -66,7 +66,7 @@ export function useFetchBrandProfile(email: string): {
   };
 } | null {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["fetch-brand-profile", email],
+    queryKey: ["self-brand-profile", email],
     queryFn: () => getSelfBrandProfile(),
     staleTime: 5 * 60 * 1000,
   });
@@ -90,7 +90,7 @@ export function useFetchBrandProfileItem(brandId: string): {
   };
 } | null {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["fetch-brand-profile-item", brandId],
+    queryKey: ["brand-profile-item", brandId],
     queryFn: () => {
       console.log("fetching brand profile item", brandId);
       return getBrandProfile(brandId);

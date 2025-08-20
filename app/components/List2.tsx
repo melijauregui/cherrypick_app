@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Dimensions,
   Image,
@@ -16,10 +16,8 @@ import { CatalogItemSchemaType } from "@/schemas/catalog/catalog-schema";
 import {
   QueryClient,
   useInfiniteQuery,
-  useQueries,
   useQueryClient,
 } from "@tanstack/react-query";
-import { getClothingItemsHome, getItem } from "../utils/fetch";
 import LoadingPage from "./LoadingPage";
 import { prefetchItemDetail } from "../utils/prefetchs";
 import { useSession } from "@/lib/auth-client";
@@ -27,32 +25,31 @@ import { useSession } from "@/lib/auth-client";
 const width = Dimensions.get("window").width;
 
 const ImageGallery = ({
-  brandId,
-  brandEmail,
+  queryKey,
   getClothingItems,
   limit,
   columnCount,
   itemWhenNothingFound,
+  contentUp,
 }: {
-  brandId: string | null;
-  brandEmail?: string;
+  queryKey: any[];
   getClothingItems: (
     page: number,
-    limit: number,
-    brandId: string | null
+    limit: number
   ) => Promise<CatalogItemSchemaType[]>;
   limit: number;
   columnCount: number;
   itemWhenNothingFound?: () => React.ReactElement;
+  contentUp?: React.ReactElement;
 }) => {
   const { user } = useSession();
   const lastTriggeredHeightRef = useRef(0);
   const queryClient = useQueryClient();
-  const queryKey = ["clothing-items", brandEmail ? brandEmail : brandId];
   const { data, fetchNextPage, refetch } = useInfiniteGetItems(
     queryKey,
-    pageParam => getClothingItems(pageParam, limit, brandId),
-    item => prefetchItemDetail(queryClient, item, user?.email)
+    pageParam => getClothingItems(pageParam, limit),
+    item =>
+      prefetchItemDetail(queryClient, item, user?.email ?? "", item.brandId)
   );
 
   // State for organized columns with calculated dimensions
@@ -104,12 +101,45 @@ const ImageGallery = ({
     }
   };
 
-  if (!data || organizedColumns.length === 0)
-    return <LoadingPage alreadyPrefetched={true} />;
+  // if (!data || organizedColumns.length === 0)
+  //   return <LoadingPage alreadyPrefetched={true} />;
+
+  const content =
+    organizedColumns.length === 0 ? (
+      <LoadingPage alreadyPrefetched={true} />
+    ) : (
+      <>
+        <View style={styles.container}>
+          {organizedColumns.map((items, columnIndex) => (
+            <View key={columnIndex}>
+              {items?.map((item, i) => {
+                return item ? (
+                  <ClothingItemComponent
+                    key={item.uuid}
+                    i={i * columnCount + columnIndex}
+                    item={item as CatalogItemSchemaType}
+                    numColumns={columnCount}
+                    renderedHeight={item.renderedHeight}
+                    renderedWidth={item.renderedWidth}
+                  />
+                ) : (
+                  <ItemPlaceholder
+                    key={i}
+                    width={width / columnCount - 10}
+                    height={280}
+                    marginTop={i < columnCount ? 0 : 18}
+                  />
+                );
+              })}
+            </View>
+          ))}
+        </View>
+      </>
+    );
 
   return (
     <ScrollView
-      contentContainerStyle={styles.container}
+      // contentContainerStyle={}
       showsVerticalScrollIndicator={false}
       onScroll={handleScroll}
       scrollEventThrottle={16}
@@ -122,29 +152,8 @@ const ImageGallery = ({
         />
       }
     >
-      {organizedColumns.map((items, columnIndex) => (
-        <View key={columnIndex}>
-          {items?.map((item, i) => {
-            return item ? (
-              <ClothingItemComponent
-                key={item.uuid}
-                i={i * columnCount + columnIndex}
-                item={item as CatalogItemSchemaType}
-                numColumns={columnCount}
-                renderedHeight={item.renderedHeight}
-                renderedWidth={item.renderedWidth}
-              />
-            ) : (
-              <ItemPlaceholder
-                key={i}
-                width={width / columnCount - 10}
-                height={280}
-                marginTop={i < columnCount ? 0 : 18}
-              />
-            );
-          })}
-        </View>
-      ))}
+      {contentUp}
+      {content}
     </ScrollView>
   );
 };
@@ -179,6 +188,10 @@ function useInfiniteGetItems(
     queryKey: queryKey,
     queryFn: async ({ pageParam }) => {
       const items = await getClothingItems(pageParam);
+      console.log(
+        `useInfiniteQuery got ${items.length} items for page ${pageParam}, queryKey:`,
+        queryKey
+      );
 
       items.forEach(async item => {
         await prefetchItemDetail(item);
@@ -192,6 +205,13 @@ function useInfiniteGetItems(
       }
       return lastPageParam + 1;
     },
+    // Configuraciones para optimizar el uso de datos prefetched
+    staleTime: 5 * 60 * 1000, // 5 minutos
+    gcTime: 10 * 60 * 1000, // 10 minutos (antes cacheTime)
+    refetchOnMount: false, // No refetch automáticamente al montar
+    refetchOnWindowFocus: false, // No refetch al enfocar la ventana
+    refetchOnReconnect: false, // No refetch al reconectar
+    retry: true, // No reintentar en caso de error
   });
 }
 
@@ -269,27 +289,3 @@ const prepareColumns = async (
     return Array.from({ length: numColumns }, () => []);
   }
 };
-
-//--------------------------------
-//   const allUuids = useMemo(
-//     () => data?.pages.flat().map(x => x.uuid) ?? [],
-//     [data?.pages]
-//   );
-
-// 1) Lanzamos todas las queries en el MISMO orden que allUuids
-//   const itemResults = useQueries({
-//     queries: allUuids.map(uuid => ({
-//       queryKey: ["item-detail", uuid],
-//       queryFn: () => getItem(uuid),
-//       staleTime: 60_000,
-//       gcTime: 5 * 60_000,
-//       enabled: !!uuid,
-//     })),
-//   });
-
-//   // 2) Armamos data para la lista SIN perder posiciones
-//   type Row = { uuid: string; item?: CatalogItemSchemaType };
-//   const renderData: Row[] = allUuids.map((uuid, i) => ({
-//     uuid,
-//     item: itemResults[i]?.data?.item,
-//   }));

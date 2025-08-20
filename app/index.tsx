@@ -33,8 +33,11 @@ export default function App() {
 
   if (loading || !timeout) {
     if (user) {
-      prefetchHome(queryClient, user.email);
-      prefetchProfile(user, queryClient);
+      // Ejecutar prefetch de manera asíncrona
+      setTimeout(() => {
+        prefetchHome(queryClient, user.email);
+        prefetchProfile(user, queryClient);
+      }, 100);
     }
     return (
       <SafeAreaView className="flex-1 h-full bg-brown-strong">

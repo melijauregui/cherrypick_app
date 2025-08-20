@@ -81,6 +81,40 @@ const ItemDetail = () => {
     return <LoadingPage alreadyPrefetched={true} />;
   }
 
+  const content = (
+    <>
+      <View className="relative">
+        <ImageComponent imageUrl={item.image_url} url={item.url} />
+      </View>
+
+      <View className="px-5 flex flex-col gap-6">
+        <IconComponent
+          uuid={item.uuid}
+          isLiked={likeData.data ?? false}
+          isFavorited={favoriteData.data ?? false}
+          onToggleLike={() =>
+            toggleLikeMutation.mutate({ itemUuid: item.uuid })
+          }
+          onToggleFavorite={() =>
+            toggleFavoriteMutation.mutate({ itemUuid: item.uuid })
+          }
+          isLoadingLike={toggleLikeMutation.isPending}
+          isLoadingFavorite={toggleFavoriteMutation.isPending}
+          isBrandItem={isBrandItem || false}
+          openSheetUpdateItem={openSheetUpdateItem}
+          itemName={item.name}
+          setVisibleModal={setVisibleModal}
+        />
+
+        <ItemDetailComponent item={item} brand={brand?.brand} />
+
+        <Text className="py-3 text-neutral-300 text-xl font-psemibold">
+          Más para explorar
+        </Text>
+      </View>
+    </>
+  );
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View className="flex-1 bg-brown-strong">
@@ -96,44 +130,13 @@ const ItemDetail = () => {
           <Entypo name="chevron-thin-left" size={22} color="white" />
         </TouchableOpacity>
 
-        <ScrollView className="flex-1">
-          <View className="relative">
-            <ImageComponent imageUrl={item.image_url} url={item.url} />
-          </View>
-
-          <View className="px-5 flex flex-col gap-6">
-            <IconComponent
-              uuid={item.uuid}
-              isLiked={likeData.data ?? false}
-              isFavorited={favoriteData.data ?? false}
-              onToggleLike={() =>
-                toggleLikeMutation.mutate({ itemUuid: item.uuid })
-              }
-              onToggleFavorite={() =>
-                toggleFavoriteMutation.mutate({ itemUuid: item.uuid })
-              }
-              isLoadingLike={toggleLikeMutation.isPending}
-              isLoadingFavorite={toggleFavoriteMutation.isPending}
-              isBrandItem={isBrandItem || false}
-              openSheetUpdateItem={openSheetUpdateItem}
-              itemName={item.name}
-              setVisibleModal={setVisibleModal}
-            />
-
-            <ItemDetailComponent item={item} brand={brand?.brand} />
-
-            <Text className="pt-3 text-white text-xl font-psemibold">
-              Más para explorar
-            </Text>
-          </View>
-
-          <List2
-            brandId={null}
-            getClothingItems={getClothingItemsSimilar}
-            limit={100}
-            columnCount={2}
-          />
-        </ScrollView>
+        <List2
+          queryKey={["similar-items", item.uuid]}
+          getClothingItems={getClothingItemsSimilar}
+          limit={6}
+          columnCount={2}
+          contentUp={content}
+        />
 
         <UpdateItemModal
           bottomSheetRef={bottomSheetRefAddItem}

@@ -37,7 +37,6 @@ import {
 import {
   UpdateCatalog,
   GetBrand,
-  VerifyBrand,
   DeleteFromCatalog,
   UpdateItem,
   GetBrandId,
@@ -46,7 +45,6 @@ import {
 import {
   CatalogResponseSchema,
   CatalogResponseSchemaType,
-  CatalogItemArraySchema,
   PaginationSchemaBrand,
   CatalogResponseSchemaDelete,
   CatalogResponseSchemaDeleteType,
@@ -107,15 +105,13 @@ import {
   LikeFavoriteResponseSchemaType,
   CheckLikeFavoriteResponseSchema,
   CheckLikeFavoriteResponseSchemaType,
-  GetLikedFavoritedItemsResponseSchema,
 } from "../schemas/activity/activity";
 import {
   toggleLike,
   toggleFavorite,
   checkIfLiked,
   checkIfFavorited,
-  getAllLikedItems,
-  getAllFavoritedItems,
+  getAllLikedFavoritedItems,
 } from "./app/allDatabase";
 
 export type AppEnv = {
@@ -1359,7 +1355,7 @@ const getAllLikedItemsRoute = createRoute({
     200: {
       content: {
         "application/json": {
-          schema: GetLikedFavoritedItemsResponseSchema,
+          schema: CatalogItemArraySchemaQuery,
         },
       },
       description: "Obtiene todos los items liked del usuario",
@@ -1392,7 +1388,13 @@ app.openapi(getAllLikedItemsRoute, async c => {
     );
   }
 
-  const res = await getAllLikedItems(user.email, user.userType, page, limit);
+  const res = await getAllLikedFavoritedItems(
+    "liked",
+    user.email,
+    user.userType,
+    page,
+    limit
+  );
   return c.json(res, 200);
 });
 
@@ -1407,7 +1409,7 @@ const getAllFavoritedItemsRoute = createRoute({
     200: {
       content: {
         "application/json": {
-          schema: GetLikedFavoritedItemsResponseSchema,
+          schema: CatalogItemArraySchemaQuery,
         },
       },
       description: "Obtiene todos los items favorited del usuario",
@@ -1440,7 +1442,8 @@ app.openapi(getAllFavoritedItemsRoute, async c => {
     );
   }
 
-  const res = await getAllFavoritedItems(
+  const res = await getAllLikedFavoritedItems(
+    "favorited",
     user.email,
     user.userType,
     page,

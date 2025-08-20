@@ -44,9 +44,9 @@ const Explore = () => {
         </View>
 
         <List2
-          brandId={null}
+          queryKey={["explore-items"]}
           getClothingItems={getClothingItemsHome}
-          limit={100}
+          limit={10}
           columnCount={2}
         />
       </SafeAreaView>

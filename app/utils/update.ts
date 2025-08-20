@@ -31,7 +31,7 @@ export default function useUpdateBrand(brandEmail: string) {
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({
-        queryKey: ["fetch-brand-profile", brandEmail],
+        queryKey: ["self-brand-profile", brandEmail],
       });
     },
     onError: error => {
@@ -69,7 +69,7 @@ export function useUpdateClient(email: string) {
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({
-        queryKey: ["fetch-client-profile", email],
+        queryKey: ["self-client-profile", email],
       });
     },
     onError: error => {
