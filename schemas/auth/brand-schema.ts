@@ -72,7 +72,10 @@ const QueryAllBrandItemsSchema = z.object({
 });
 export { QueryAllBrandItemsSchema };
 
-const AllBrandNamesItemsSchema = z.object({ name: z.string() });
+const AllBrandNamesItemsSchema = z.object({
+  name: z.string(),
+  uuid: z.string(),
+});
 export { AllBrandNamesItemsSchema };
 export type AllBrandNamesItemsSchemaType = z.infer<
   typeof AllBrandNamesItemsSchema

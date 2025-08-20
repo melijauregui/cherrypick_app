@@ -10,6 +10,7 @@ import {
   QueryDbSchemaBrandUpdate,
   QueryDbSchemaBrand,
 } from "../../schemas/auth/brand-schema";
+import { DeleteFromWeaviate, GetBrandId } from "./catalogFunctions";
 
 export async function VerifyUserExists(
   email: string
@@ -87,21 +88,22 @@ export async function CreateUser(
 }
 
 export async function DeleteUser(
-  email: string
+  email: string,
+  userType: string
 ): Promise<VerifyAccountDeletedSchemaType> {
   let res: VerifyAccountDeletedSchemaType;
-  const resV = await VerifyUserExists(email);
-
-  if (resV.error) {
-    res = {
-      error: true,
-      details: "User not found1",
-    };
-    return res;
-  }
 
   let result: any;
-  if (resV.userType === "brand") {
+  if (userType === "brand") {
+    const brandId = await GetBrandId(email);
+    if (!brandId) {
+      res = {
+        error: true,
+        details: "Brand not found",
+      };
+      return res;
+    }
+    res = await DeleteFromWeaviate(brandId);
     result = await db.query("DELETE FROM brands WHERE email = ?", [email]);
   } else {
     result = await db.query("DELETE FROM clients WHERE email = ?", [email]);
@@ -110,12 +112,11 @@ export async function DeleteUser(
   if (result[0].affectedRows > 0) {
     res = {
       error: false,
-      success: true,
     };
   } else {
     res = {
       error: true,
-      details: "User not found2",
+      details: "User not found",
     };
   }
   return res;

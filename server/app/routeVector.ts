@@ -6,7 +6,10 @@ import {
 } from "../../schemas/catalog/catalog-schema";
 import weaviate, { Filters } from "weaviate-client";
 import { getCollection } from "./catalogFunctions";
-import { AllBrandItemsSchemaResType } from "../../schemas/auth/brand-schema";
+import {
+  AllBrandItemsSchemaResType,
+  AllBrandNamesItemsSchemaType,
+} from "../../schemas/auth/brand-schema";
 
 //funcion para hacer query a pinecone
 async function QueryWeaviateImage(
@@ -102,14 +105,14 @@ async function QueryWeaviateAllItems(
     };
     const result = await collection.query.fetchObjects(queryOptions);
 
-    const topResults: { name: string }[] = result.objects
+    const topResults: AllBrandNamesItemsSchemaType[] = result.objects
       .map(match => {
         if (match.properties?.name) {
-          return { name: match.properties.name };
+          return { name: match.properties.name, uuid: match.uuid };
         }
         return null;
       })
-      .filter((item): item is { name: string } => item !== null);
+      .filter((item): item is AllBrandNamesItemsSchemaType => item !== null);
 
     return {
       error: false,

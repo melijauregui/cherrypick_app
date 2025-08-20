@@ -52,7 +52,7 @@ const ItemDetail = () => {
   const item = itemData?.item;
   const brand = useFetchBrandProfileItem(item?.brandId || "");
   const isBrandItem = useIsMyItem(item?.uuid || "") || false;
-  const deleteItem = useDeleteItem(item?.name || "");
+  const deleteItem = useDeleteItem(item?.uuid || "");
 
   // Ejecutar prefetch solo una vez cuando se monta el componente
   useEffect(() => {

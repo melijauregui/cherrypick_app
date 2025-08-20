@@ -101,7 +101,7 @@ export function useDelete(
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          items: Array.from(selected).map(name => ({ name })),
+          items: Array.from(selected).map(uuid => ({ uuid })),
         }),
         schema: CatalogResponseSchemaDelete,
       });
@@ -145,7 +145,7 @@ export function useDeleteItem(itemUuid: string) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          items: [{ name: itemUuid }],
+          items: [{ uuid: itemUuid }],
         }),
         schema: CatalogResponseSchemaDelete,
       });

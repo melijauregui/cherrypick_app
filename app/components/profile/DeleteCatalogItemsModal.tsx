@@ -14,6 +14,7 @@ import { FlashList } from "@shopify/flash-list";
 import { ButtonSubmit } from "./insertNewItems";
 import { useDelete } from "@/app/utils/update";
 import { fetchItems } from "@/app/utils/fetch";
+import { AllBrandNamesItemsSchemaType } from "@/schemas/auth/brand-schema";
 
 const DeleteCatalogItemsModal = ({
   bottomSheetRef,
@@ -83,11 +84,11 @@ const DeleteCatalogItemsModal = ({
     }
   }, [error]);
 
-  const toggleSelect = (name: string) => {
+  const toggleSelect = (item: AllBrandNamesItemsSchemaType) => {
     setSelected(prev => {
       const newSet = new Set(prev);
-      if (newSet.has(name)) newSet.delete(name);
-      else newSet.add(name);
+      if (newSet.has(item.uuid)) newSet.delete(item.uuid);
+      else newSet.add(item.uuid);
       return newSet;
     });
   };
@@ -153,9 +154,9 @@ const FormContent = ({
   search: string;
   setSearch: (text: string) => void;
   loading: boolean;
-  filteredItems: { name: string }[];
+  filteredItems: AllBrandNamesItemsSchemaType[];
   selected: Set<string>;
-  toggleSelect: (name: string) => void;
+  toggleSelect: (item: AllBrandNamesItemsSchemaType) => void;
   handleDelete: () => void;
   deleting: boolean;
   fetchNextPage: () => void;
@@ -220,18 +221,18 @@ const ItemStyle = ({
   toggleSelect,
   selected,
 }: {
-  item: { name: string };
-  toggleSelect: (name: string) => void;
+  item: AllBrandNamesItemsSchemaType;
+  toggleSelect: (item: AllBrandNamesItemsSchemaType) => void;
   selected: Set<string>;
 }) => {
   return (
     <TouchableOpacity
-      key={item.name}
+      key={item.uuid}
       className="flex-row items-center py-2 gap-3"
-      onPress={() => toggleSelect(item.name)}
+      onPress={() => toggleSelect(item)}
     >
       <View
-        className={`w-7 h-7 rounded border border-gray-400  ${selected.has(item.name) ? "bg-brown-light opacity-70" : "bg-white"}`}
+        className={`w-7 h-7 rounded border border-gray-400  ${selected.has(item.uuid) ? "bg-brown-light opacity-70" : "bg-white"}`}
       ></View>
       <Text className="text-lg text-black font-pregular">{item.name}</Text>
     </TouchableOpacity>

@@ -370,7 +370,8 @@ app.openapi(deleteAccountRoute, async c => {
   let res: VerifyAccountDeletedSchemaType;
   const user = c.get("user");
   const email = user?.email;
-  if (!email) {
+  const userType = user?.userType;
+  if (!email || !userType) {
     res = {
       error: true,
       details: "No tienes permisos para eliminar la cuenta",
@@ -378,7 +379,7 @@ app.openapi(deleteAccountRoute, async c => {
     return c.json(res, 200);
   }
   try {
-    res = await DeleteUser(email);
+    res = await DeleteUser(email, userType);
   } catch (error) {
     console.error(error);
     return c.json({ error: true as true, details: "Server error" }, 200);
@@ -930,7 +931,7 @@ app.openapi(deleteCatalogRoute, async c => {
   }
 
   // Extraer los nombres de los items del array de objetos
-  const itemsNames = items.map(item => item.name);
+  const itemsUuids = items.map(item => item.uuid);
 
   //verifico que la marca exista en la base de datos
   const brandId = await GetBrandId(brandEmail);
@@ -943,7 +944,7 @@ app.openapi(deleteCatalogRoute, async c => {
     return c.json(res, 200);
   }
   try {
-    res = await DeleteFromCatalog(itemsNames, brandId);
+    res = await DeleteFromCatalog(itemsUuids, brandId);
     return c.json(res, 200);
   } catch (error) {
     res = {
@@ -1395,7 +1396,6 @@ app.openapi(getAllLikedItemsRoute, async c => {
     page,
     limit
   );
-  console.log("res", res);
   return c.json(res, 200);
 });
 

@@ -90,7 +90,6 @@ export { queryDbSchemaEmail };
 const VerifyAccountDeletedSchema = z.union([
   z.object({
     error: z.literal(false),
-    success: z.boolean(),
   }),
   z.object({
     error: z.literal(true),

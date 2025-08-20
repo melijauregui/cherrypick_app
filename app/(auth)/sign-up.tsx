@@ -262,7 +262,7 @@ async function verifyMailAvailability(
 
     if (data.error) {
       console.log("Error:", data.details);
-      throw new Error(data.details);
+      throw new Error(data.details || "Unexpected error");
     }
     return {
       isAvailable: true,

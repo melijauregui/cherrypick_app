@@ -503,7 +503,7 @@ async function checkDuplicateInWeaviate(
 }
 
 export async function DeleteFromCatalog(
-  itemsNames: string[],
+  itemsUuids: string[],
   brandId: string
 ): Promise<CatalogResponseSchemaDeleteType> {
   let res: CatalogResponseSchemaDeleteType;
@@ -524,108 +524,91 @@ export async function DeleteFromCatalog(
       numberDeleted: 0,
     };
   }
-  const validationResult = await validateItemsToDelete(
-    itemsNames,
-    collection,
-    brandId
-  );
-
-  if (validationResult.error) {
-    res = {
+  if (!itemsUuids || itemsUuids.length === 0) {
+    return {
       error: true,
-      details: validationResult.details,
+      details: "No se han proporcionado uuids de items",
       numberDeleted: 0,
     };
+  }
+
+  for (const itemUuid of itemsUuids) {
+    if (!itemUuid) continue; // Skip empty lines
+  }
+
+  res = await deleteCatalogItemsFromWeaviate(itemsUuids, collection, brandId);
+
+  if (res.error) {
     return res;
   }
 
-  res = await deleteCatalogItemsFromWeaviate(itemsNames, collection, brandId);
-
+  const deleteFromDatabaseRes = await deleteFromDatabase(itemsUuids);
+  if (deleteFromDatabaseRes.error) {
+    return {
+      error: true,
+      details: deleteFromDatabaseRes.details,
+      numberDeleted: res.numberDeleted,
+    };
+  }
   return res;
 }
 
-export async function validateItemsToDelete(
-  itemsNames: string[],
-  collection: Collection,
-  brandId: string
-): Promise<
-  | {
-      error: true;
-      details: string;
-    }
-  | {
-      error: false;
-    }
-> {
+async function deleteFromDatabase(
+  itemsUuids: string[]
+): Promise<CatalogResponseSchemaType> {
   try {
-    if (!itemsNames || itemsNames.length === 0) {
-      return {
-        error: true,
-        details: "No se han proporcionado nombres de items",
-      };
-    }
+    // Create placeholders for the IN clause
+    const placeholders = itemsUuids.map(() => "?").join(",");
 
-    const invalidItems: string[] = [];
+    // Delete from likes and favorites tables for both clients and brands
+    const queries = [
+      `DELETE FROM item_likes_client WHERE item_uuid IN (${placeholders})`,
+      `DELETE FROM item_favorites_client WHERE item_uuid IN (${placeholders})`,
+      `DELETE FROM item_likes_brand WHERE item_uuid IN (${placeholders})`,
+      `DELETE FROM item_favorites_brand WHERE item_uuid IN (${placeholders})`,
+    ];
 
-    for (const itemName of itemsNames) {
-      if (!itemName) continue; // Skip empty lines
-
-      // Validate item against schema
-      try {
-        // Check if item already exists in Weaviate with same name and brand
-        const isDuplicate = await checkDuplicateInWeaviate(
-          collection,
-          itemName,
-          brandId
-        );
-        if (!isDuplicate) {
-          invalidItems.push(itemName);
-        }
-      } catch (error) {
-        invalidItems.push(itemName);
-      }
-    }
-
-    // Check if there are any invalid rows
-    if (invalidItems.length > 0) {
-      const itemNames = invalidItems.join(",");
-      return {
-        error: true,
-        details: `items [${itemNames}] no encontrados`,
-      };
-    }
-
-    // All items are valid
     return {
       error: false,
     };
   } catch (error) {
+    console.error("Error deleting from database:", error);
     return {
       error: true,
-      details: "Error interno del servidor al validar items",
+      details: `Error deleting from database: ${error}`,
     };
   }
 }
 
 async function deleteCatalogItemsFromWeaviate(
-  itemsNames: string[],
+  itemsUuids: string[],
   collection: Collection,
   brandId: string
 ): Promise<CatalogResponseSchemaDeleteType> {
   try {
     let numberDeleted = 0;
     const invalidItems: string[] = [];
-    for (const itemName of itemsNames) {
-      const response = await collection.data.deleteMany(
-        Filters.and(
-          collection.filter.byProperty("name").equal(itemName),
-          collection.filter.byProperty("brandId").equal(brandId)
-        )
-      );
-      if (response) {
-        numberDeleted++;
+    for (const itemUuid of itemsUuids) {
+      // 1. Buscar el objeto por su id (uuid)
+      const result = await collection.query.fetchObjects({
+        filters: collection.filter.byId().equal(itemUuid),
+        limit: 1,
+        returnProperties: ["brandId"],
+      });
+
+      if (
+        result.objects.length > 0 &&
+        result.objects[0]?.properties?.brandId === brandId
+      ) {
+        const response = await collection.data.deleteById(itemUuid);
+        if (response) {
+          numberDeleted++;
+        } else {
+          invalidItems.push(itemUuid);
+        }
       } else {
-        invalidItems.push(itemName);
+        console.log("No se encontró un objeto con ese id y brandId.");
+        invalidItems.push(itemUuid);
       }
     }
     if (invalidItems.length > 0) {
@@ -734,6 +717,36 @@ export async function UpdateItem(
     return {
       error: true,
       details: `Error al actualizar el item: ${error instanceof Error ? error.message : "Error desconocido"}`,
+    };
+  }
+}
+
+export async function DeleteFromWeaviate(
+  brandId: string
+): Promise<CatalogResponseSchemaType> {
+  try {
+    const collectionRes = await getCollection();
+    if (collectionRes.error || !collectionRes.collection) {
+      return {
+        error: true,
+        details: collectionRes.details,
+      };
+    }
+    const collection = collectionRes.collection;
+    console.log("brandId", brandId);
+    const res = await collection.data.deleteMany(
+      collection.filter.byProperty("brandId").equal(brandId)
+    );
+    console.log("res", res);
+
+    return {
+      error: false,
+    };
+  } catch (error) {
+    console.error("Error deleting from Weaviate:", error);
+    return {
+      error: true,
+      details: `Error deleting from Weaviate: ${error}`,
     };
   }
 }

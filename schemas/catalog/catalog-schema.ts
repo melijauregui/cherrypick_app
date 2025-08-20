@@ -64,7 +64,7 @@ export const deleteItemsJsonSchema = z.object({
   items: z
     .array(
       z.object({
-        name: z.string().min(1, "El nombre es requerido"),
+        uuid: z.string().min(1, "El uuid es requerido"),
       })
     )
     .min(1, "Debe tener al menos un item"),

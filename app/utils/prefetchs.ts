@@ -110,11 +110,6 @@ function prefetchIfNeeded(
     queryKey: queryKey,
   });
 
-  // if (queryKey[0] === "brand-profile-item") {
-  //   console.log("existingData", existingData);
-  //   console.log("isPrefetching", isPrefetching);
-  // }
-
   // Only prefetch when there is truly no cached entry (undefined)
   if (existingData === undefined && !isPrefetching) {
     // console.log("prefetching: ", queryKey);
