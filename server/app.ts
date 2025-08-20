@@ -1141,8 +1141,22 @@ app.openapi(updateItemRoute, async c => {
   const updatedItem = await c.req.valid("json");
   let res: UpdateItemResponseSchemaType;
   const user = c.get("user");
+  if (!user?.email) {
+    res = {
+      error: true,
+      details: "Usuario no autenticado",
+    };
+    return c.json(res, 200);
+  }
+  const userBrandId = await GetBrandId(user.email);
+  if (!userBrandId) {
+    res = {
+      error: true,
+      details: "No tienes permisos para actualizar este item",
+    };
+    return c.json(res, 200);
+  }
   const itemResult = await QueryWeaviateItem(uuid);
-
   if (itemResult.error) {
     res = {
       error: true,
@@ -1151,14 +1165,13 @@ app.openapi(updateItemRoute, async c => {
     return c.json(res, 200);
   }
 
-  const item = itemResult.item;
-  // if (user?.email !== item.brandEmail) {
-  //   res = {
-  //     error: true,
-  //     details: "No tienes permisos para actualizar este item",
-  //   };
-  //   return c.json(res, 200);
-  // } //TODO OBTENER EL MAIL DEL brandId DEL ITEM
+  if (userBrandId !== itemResult.item.brandId) {
+    res = {
+      error: true,
+      details: "No tienes permisos para actualizar este item",
+    };
+    return c.json(res, 200);
+  }
 
   res = await UpdateItem(uuid, updatedItem);
 
