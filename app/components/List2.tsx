@@ -104,38 +104,39 @@ const ImageGallery = ({
   // if (!data || organizedColumns.length === 0)
   //   return <LoadingPage alreadyPrefetched={true} />;
 
-  const content =
-    organizedColumns.length === 0 ? (
-      <LoadingPage alreadyPrefetched={true} />
-    ) : (
-      <>
-        <View style={styles.container}>
-          {organizedColumns.map((items, columnIndex) => (
-            <View key={columnIndex}>
-              {items?.map((item, i) => {
-                return item ? (
-                  <ClothingItemComponent
-                    key={item.uuid}
-                    i={i * columnCount + columnIndex}
-                    item={item as CatalogItemSchemaType}
-                    numColumns={columnCount}
-                    renderedHeight={item.renderedHeight}
-                    renderedWidth={item.renderedWidth}
-                  />
-                ) : (
-                  <ItemPlaceholder
-                    key={i}
-                    width={width / columnCount - 10}
-                    height={280}
-                    marginTop={i < columnCount ? 0 : 18}
-                  />
-                );
-              })}
-            </View>
-          ))}
-        </View>
-      </>
-    );
+  const content = !data ? (
+    <LoadingPage alreadyPrefetched={true} />
+  ) : organizedColumns.length === 0 ? (
+    itemWhenNothingFound?.()
+  ) : (
+    <>
+      <View style={styles.container}>
+        {organizedColumns.map((items, columnIndex) => (
+          <View key={columnIndex}>
+            {items?.map((item, i) => {
+              return item ? (
+                <ClothingItemComponent
+                  key={item.uuid}
+                  i={i * columnCount + columnIndex}
+                  item={item as CatalogItemSchemaType}
+                  numColumns={columnCount}
+                  renderedHeight={item.renderedHeight}
+                  renderedWidth={item.renderedWidth}
+                />
+              ) : (
+                <ItemPlaceholder
+                  key={i}
+                  width={width / columnCount - 10}
+                  height={280}
+                  marginTop={i < columnCount ? 0 : 18}
+                />
+              );
+            })}
+          </View>
+        ))}
+      </View>
+    </>
+  );
 
   return (
     <ScrollView

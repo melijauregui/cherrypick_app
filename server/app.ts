@@ -1389,12 +1389,13 @@ app.openapi(getAllLikedItemsRoute, async c => {
   }
 
   const res = await getAllLikedFavoritedItems(
-    "liked",
+    "likes",
     user.email,
     user.userType,
     page,
     limit
   );
+  console.log("res", res);
   return c.json(res, 200);
 });
 
@@ -1443,7 +1444,7 @@ app.openapi(getAllFavoritedItemsRoute, async c => {
   }
 
   const res = await getAllLikedFavoritedItems(
-    "favorited",
+    "favorites",
     user.email,
     user.userType,
     page,

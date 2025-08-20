@@ -1,9 +1,13 @@
 import {
   CheckLikeFavoriteResponseSchemaType,
-  GetLikedFavoritedItemsResponseSchemaType,
   LikeFavoriteResponseSchemaType,
 } from "@/schemas/activity/activity";
 import { db } from "../db";
+import {
+  CatalogItemArraySchema,
+  CatalogItemArraySchemaQueryType,
+} from "../../schemas/catalog/catalog-schema";
+import { getCollection } from "./catalogFunctions";
 
 // Funciones para likes
 export async function toggleLike(
@@ -109,64 +113,111 @@ export async function checkIfFavorited(
 }
 
 // Funciones para obtener todos los items liked y favorited
-export async function getAllLikedItems(
+export async function getAllLikedFavoritedItems(
+  type: "likes" | "favorites",
   userEmail: string,
   userType: string,
   page: number = 0,
   limit: number = 100
-): Promise<GetLikedFavoritedItemsResponseSchemaType> {
+): Promise<CatalogItemArraySchemaQueryType> {
   try {
     const offset = page * limit;
     // Primero obtener los UUIDs de los items liked
-    const [likedUuids] = await db.execute(
-      `SELECT item_uuid FROM item_likes_${userType} 
+    const tableName = `item_${type}_${userType}`;
+    const [likedFavoritedUuids] = await db.query(
+      `SELECT item_uuid FROM ${tableName} 
        WHERE user_email = ? 
        ORDER BY created_at DESC 
        LIMIT ? OFFSET ?`,
       [userEmail, limit, offset]
     );
 
-    if (!Array.isArray(likedUuids) || likedUuids.length === 0) {
+    if (
+      !Array.isArray(likedFavoritedUuids) ||
+      likedFavoritedUuids.length === 0
+    ) {
       return { error: false, items: [] };
     }
 
-    return {
-      error: false,
-      items: likedUuids.map((row: any) => row.item_uuid),
-    };
+    // Obtener los items de weaviate
+    const items = await getItemsFromWeaviate(
+      likedFavoritedUuids.map((row: any) => row.item_uuid),
+      limit
+    );
+    return items;
   } catch (error) {
     console.error("Error getting liked items:", error);
     return { error: true, details: "Error al obtener los items liked" };
   }
 }
 
-export async function getAllFavoritedItems(
-  userEmail: string,
-  userType: string,
-  page: number = 0,
-  limit: number = 100
-): Promise<GetLikedFavoritedItemsResponseSchemaType> {
+async function getItemsFromWeaviate(
+  uuids: string[],
+  limit: number
+): Promise<CatalogItemArraySchemaQueryType> {
   try {
-    const offset = page * limit;
-    // Primero obtener los UUIDs de los items favorited
-    const [favoritedUuids] = await db.execute(
-      `SELECT item_uuid FROM item_favorites_${userType} 
-       WHERE user_email = ? 
-       ORDER BY created_at DESC 
-       LIMIT ? OFFSET ?`,
-      [userEmail, limit, offset]
-    );
+    const resCollection = await getCollection();
+    if (resCollection.error || !resCollection.collection) {
+      return {
+        error: true,
+        details: resCollection.details || "Error getting collection",
+      };
+    }
+    const collection = resCollection.collection;
 
-    if (!Array.isArray(favoritedUuids) || favoritedUuids.length === 0) {
-      return { error: false, items: [] };
+    const filters = collection.filter.byId().containsAny(uuids);
+
+    const queryOptions: any = {
+      filters: filters,
+      limit: limit,
+      returnProperties: [
+        "name",
+        "description",
+        "image_url",
+        "url",
+        "brandId",
+        "price",
+      ],
+    };
+
+    const result = await collection.query.fetchObjects(queryOptions);
+
+    if (result.objects.length === 0) {
+      return {
+        error: true,
+        details: "Items not found",
+      };
+    }
+
+    const items = result.objects.map(obj => ({
+      name: obj.properties?.name || "",
+      description: obj.properties?.description || "",
+      image_url: obj.properties?.image_url || "",
+      url: obj.properties?.url || "",
+      brandId: obj.properties?.brandId || "",
+      price: obj.properties?.price || 0,
+      uuid: obj.uuid || "",
+    }));
+
+    // Validate the item using Zod schema
+    const validationResult = CatalogItemArraySchema.safeParse(items);
+    if (!validationResult.success) {
+      console.log("Item validation failed:", validationResult.error);
+      return {
+        error: true,
+        details: "Invalid items data",
+      };
     }
 
     return {
       error: false,
-      items: favoritedUuids.map((row: any) => row.item_uuid),
+      items: validationResult.data,
     };
   } catch (error) {
-    console.error("Error getting favorited items:", error);
-    return { error: true, details: "Error al obtener los items favorited" };
+    console.error("Error querying items in Weaviate:", error);
+    return {
+      error: true,
+      details: "Error querying Weaviate: " + error,
+    };
   }
 }

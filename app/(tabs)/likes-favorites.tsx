@@ -19,31 +19,31 @@ const LikesFavoritesPage = () => {
   const [activeTab, setActiveTab] = useState<"likes" | "favorites">("likes");
   const { user } = useSession();
 
-  // Query for liked items
-  const {
-    data: likedItems = [],
-    isLoading: isLoadingLikes,
-    error: errorLikes,
-  } = useQuery({
-    queryKey: ["liked-items"],
-    queryFn: () => getAllLikedItems(0, 100),
-    enabled: !!user?.email,
-  });
+  // // Query for liked items
+  // const {
+  //   data: likedItems = [],
+  //   isLoading: isLoadingLikes,
+  //   error: errorLikes,
+  // } = useQuery({
+  //   queryKey: ["liked-items"],
+  //   queryFn: () => getAllLikedItems(0, 10),
+  //   enabled: !!user?.email,
+  // });
 
-  // Query for favorited items
-  const {
-    data: favoritedItems = [],
-    isLoading: isLoadingFavorites,
-    error: errorFavorites,
-  } = useQuery({
-    queryKey: ["favorited-items"],
-    queryFn: () => getAllFavoritedItems(0, 100),
-    enabled: !!user?.email,
-  });
+  // // Query for favorited items
+  // const {
+  //   data: favoritedItems = [],
+  //   isLoading: isLoadingFavorites,
+  //   error: errorFavorites,
+  // } = useQuery({
+  //   queryKey: ["favorited-items"],
+  //   queryFn: () => getAllFavoritedItems(0, 100),
+  //   enabled: !!user?.email,
+  // });
 
-  const currentItems = activeTab === "likes" ? likedItems : favoritedItems;
-  const isLoading = activeTab === "likes" ? isLoadingLikes : isLoadingFavorites;
-  const error = activeTab === "likes" ? errorLikes : errorFavorites;
+  // const currentItems = activeTab === "likes" ? likedItems : favoritedItems;
+  // const isLoading = activeTab === "likes" ? isLoadingLikes : isLoadingFavorites;
+  // const error = activeTab === "likes" ? errorLikes : errorFavorites;
 
   const renderEmptyState = () => (
     <View className="flex-1 justify-center items-center px-8">
@@ -63,70 +63,72 @@ const LikesFavoritesPage = () => {
   return (
     <SafeAreaView className="flex-1 bg-brown-strong">
       {/* Tab Navigation */}
-      <View className="flex-row bg-brown-strong ">
-        <TouchableOpacity
-          className={`flex-1 py-4 px-6 ${
-            activeTab === "likes" ? "border-b-2 border-brown-extraLight" : ""
-          }`}
-          onPress={() => setActiveTab("likes")}
-        >
-          <View className="flex-row items-center justify-center gap-1">
+      <View className="flex-row bg-brown-strong mb-1">
+        <TabNavigation
+          activeTab={activeTab}
+          setActiveTab={() => setActiveTab("likes")}
+          tab="likes"
+          icon={
             <Ionicons
               name={activeTab === "likes" ? "heart" : "heart-outline"}
-              size={20}
+              size={24}
               color={activeTab === "likes" ? "#bd8e75" : "white"}
             />
-          </View>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          className={`flex-1 py-4 px-6 ${
-            activeTab === "favorites"
-              ? "border-b-2 border-brown-extraLight"
-              : ""
-          }`}
-          onPress={() => setActiveTab("favorites")}
-        >
-          <View className="flex-row items-center justify-center gap-2">
+          }
+        />
+        <TabNavigation
+          activeTab={activeTab}
+          setActiveTab={() => setActiveTab("favorites")}
+          tab="favorites"
+          icon={
             <FontAwesome
               name={activeTab === "favorites" ? "bookmark" : "bookmark-o"}
-              size={20}
+              size={24}
               color={activeTab === "favorites" ? "#bd8e75" : "white"}
             />
-          </View>
-        </TouchableOpacity>
+          }
+        />
       </View>
 
       {/* Content */}
-      <View className="flex-1 bg-brown-strong">
-        {isLoading ? (
-          <View className="flex-1 justify-center items-center">
-            <Text className="text-gray-500 text-lg">Cargando...</Text>
-          </View>
-        ) : error ? (
-          <View className="flex-1 justify-center items-center px-8">
-            <Text className="text-red-500 text-center text-lg">
-              Error al cargar los items
-            </Text>
-          </View>
-        ) : (
-          <List2
-            queryKey={
-              activeTab === "likes"
-                ? ["all-liked-items", user?.email]
-                : ["all-favorited-items", user?.email]
-            }
-            getClothingItems={
-              activeTab === "likes" ? getAllLikedItems : getAllFavoritedItems
-            }
-            limit={10}
-            columnCount={numColumns}
-            itemWhenNothingFound={renderEmptyState}
-          />
-        )}
-      </View>
+      <List2
+        queryKey={
+          activeTab === "likes"
+            ? ["all-liked-items", user?.email]
+            : ["all-favorited-items", user?.email]
+        }
+        getClothingItems={
+          activeTab === "likes" ? getAllLikedItems : getAllFavoritedItems
+        }
+        limit={10}
+        columnCount={numColumns}
+        itemWhenNothingFound={renderEmptyState}
+      />
     </SafeAreaView>
   );
 };
 
 export default LikesFavoritesPage;
+
+const TabNavigation = ({
+  activeTab,
+  setActiveTab,
+  tab,
+  icon,
+}: {
+  activeTab: "likes" | "favorites";
+  setActiveTab: () => void;
+  tab: "likes" | "favorites";
+  icon: React.ReactNode;
+}) => {
+  return (
+    <TouchableOpacity
+      className={`flex-1 py-4 px-6 ${
+        activeTab === tab ? "border-b-2 border-brown-extraLight" : ""
+      }`}
+      onPress={() => setActiveTab()}
+    >
+      <View className="flex-row items-center justify-center gap-1">{icon}</View>
+    </TouchableOpacity>
+  );
+};

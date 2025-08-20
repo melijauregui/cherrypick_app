@@ -117,7 +117,7 @@ function prefetchIfNeeded(
 
   // Only prefetch when there is truly no cached entry (undefined)
   if (existingData === undefined && !isPrefetching) {
-    console.log("prefetching: ", queryKey);
+    // console.log("prefetching: ", queryKey);
     queryClient.prefetchQuery({
       queryKey: queryKey,
       queryFn: queryFn,
