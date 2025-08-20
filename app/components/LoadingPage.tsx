@@ -2,7 +2,10 @@ import React, { useRef } from "react";
 import { View, Text, Animated } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useQueryClient } from "@tanstack/react-query";
-import prefetchHome, { prefetchProfile } from "@/app/utils/prefetchs";
+import prefetchHome, {
+  prefetchLikeAndFavoritePage,
+  prefetchProfile,
+} from "@/app/utils/prefetchs";
 import { useSession } from "@/lib/auth-client";
 
 const LoadingPage: React.FC<{ alreadyPrefetched?: boolean }> = ({
@@ -33,6 +36,7 @@ const LoadingPage: React.FC<{ alreadyPrefetched?: boolean }> = ({
   if (user && !alreadyPrefetched) {
     prefetchHome(queryClient, user.email);
     prefetchProfile(user, queryClient);
+    prefetchLikeAndFavoritePage(queryClient, user.email);
   }
 
   const spin = spinValue.interpolate({

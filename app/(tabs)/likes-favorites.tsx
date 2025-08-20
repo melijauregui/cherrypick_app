@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -19,34 +19,10 @@ const LikesFavoritesPage = () => {
   const [activeTab, setActiveTab] = useState<"likes" | "favorites">("likes");
   const { user } = useSession();
 
-  // // Query for liked items
-  // const {
-  //   data: likedItems = [],
-  //   isLoading: isLoadingLikes,
-  //   error: errorLikes,
-  // } = useQuery({
-  //   queryKey: ["liked-items"],
-  //   queryFn: () => getAllLikedItems(0, 10),
-  //   enabled: !!user?.email,
-  // });
-
-  // // Query for favorited items
-  // const {
-  //   data: favoritedItems = [],
-  //   isLoading: isLoadingFavorites,
-  //   error: errorFavorites,
-  // } = useQuery({
-  //   queryKey: ["favorited-items"],
-  //   queryFn: () => getAllFavoritedItems(0, 100),
-  //   enabled: !!user?.email,
-  // });
-
-  // const currentItems = activeTab === "likes" ? likedItems : favoritedItems;
-  // const isLoading = activeTab === "likes" ? isLoadingLikes : isLoadingFavorites;
-  // const error = activeTab === "likes" ? errorLikes : errorFavorites;
+  // Debug log when tab changes
 
   const renderEmptyState = () => (
-    <View className="flex-1 justify-center items-center px-8">
+    <View className="flex-1 justify-center items-center px-8 pt-16">
       <Text className="text-gray-500 text-center text-lg">
         {activeTab === "likes"
           ? "No tienes items que te gusten aún"
@@ -91,19 +67,31 @@ const LikesFavoritesPage = () => {
       </View>
 
       {/* Content */}
-      <List2
-        queryKey={
-          activeTab === "likes"
-            ? ["all-liked-items", user?.email]
-            : ["all-favorited-items", user?.email]
-        }
-        getClothingItems={
-          activeTab === "likes" ? getAllLikedItems : getAllFavoritedItems
-        }
-        limit={10}
-        columnCount={numColumns}
-        itemWhenNothingFound={renderEmptyState}
-      />
+      {activeTab === "likes" ? (
+        <>
+          <Text className="text-white text-2xl font-bold">Likes</Text>
+          <List2
+            key={`likes-${user?.email}`}
+            queryKey={["all-liked-items", user?.email]}
+            getClothingItems={getAllLikedItems}
+            limit={18}
+            columnCount={numColumns}
+            itemWhenNothingFound={renderEmptyState}
+          />
+        </>
+      ) : (
+        <>
+          <Text className="text-white text-2xl font-bold">Favorites</Text>
+          <List2
+            key={`favorites-${user?.email}`}
+            queryKey={["all-favorited-items", user?.email]}
+            getClothingItems={getAllFavoritedItems}
+            limit={18}
+            columnCount={numColumns}
+            itemWhenNothingFound={renderEmptyState}
+          />
+        </>
+      )}
     </SafeAreaView>
   );
 };

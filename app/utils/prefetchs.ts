@@ -12,6 +12,8 @@ import {
   getItem,
   handleAuthError,
   getClothingItemsHome,
+  getAllLikedItems,
+  getAllFavoritedItems,
 } from "./fetch";
 
 export function prefetchProfile(
@@ -34,37 +36,12 @@ export function prefetchProfile(
       queryFn: () => getSelfBrandProfile(),
     });
 
-    // Also prefetch brand's clothing items
-    queryClient.prefetchInfiniteQuery({
-      queryKey: ["self-brand-items", user.email],
-      queryFn: async () => {
-        try {
-          const items = await getSelfBrandItems(0, 18);
-          items.forEach(item => {
-            prefetchItemDetail(queryClient, item, user?.email, item.brandId);
-          });
-          return items;
-        } catch (error) {
-          const result = handleAuthError(
-            error,
-            "prefetchProfile (brand items)"
-          );
-          return result === null ? [] : result;
-        }
-      },
-      initialPageParam: 0,
-      getNextPageParam: (
-        lastPage: { uuid: string }[],
-        allPages: { uuid: string }[][],
-        lastPageParam: number,
-        allPageParams: number[]
-      ) => {
-        if (lastPage.length === 0) {
-          return undefined;
-        }
-        return lastPageParam + 1;
-      },
-    });
+    prefetchInfiniteQueryIfNeeded(
+      queryClient,
+      ["self-brand-items", user.email],
+      () => getSelfBrandItems(0, 18),
+      user.email
+    );
   }
 }
 
@@ -76,27 +53,8 @@ export default function prefetchHome(
   prefetchInfiniteQueryIfNeeded(
     queryClient,
     ["home-items", userEmail],
-    async () => {
-      console.log("prefetching clothing items HOMEE");
-      const items = await getClothingItemsHome(0, 10);
-      console.log(`prefetchHome got ${items.length} items`);
-      items.forEach(item => {
-        prefetchItemDetail(queryClient, item, userEmail, item.brandId);
-      });
-      return items;
-    },
-    0,
-    (
-      lastPage: { uuid: string }[],
-      allPages: { uuid: string }[][],
-      lastPageParam: number,
-      allPageParams: number[]
-    ) => {
-      if (lastPage.length === 0) {
-        return undefined;
-      }
-      return lastPageParam + 1;
-    }
+    () => getClothingItemsHome(0, 10),
+    userEmail
   );
 }
 
@@ -123,14 +81,8 @@ function prefetchIfNeeded(
 function prefetchInfiniteQueryIfNeeded(
   queryClient: QueryClient,
   queryKey: (string | null)[],
-  queryFn: () => Promise<any>,
-  initialPageParam: number,
-  getNextPageParam: (
-    lastPage: any[],
-    allPages: any[][],
-    lastPageParam: number,
-    allPageParams: number[]
-  ) => number | undefined
+  queryFn: () => Promise<CatalogItemSchemaType[]>,
+  userEmail: string
 ) {
   const existingData = queryClient.getQueryData(queryKey);
   const isPrefetching = queryClient.isFetching({
@@ -141,9 +93,25 @@ function prefetchInfiniteQueryIfNeeded(
     console.log("prefetching infinite query: ", queryKey);
     queryClient.prefetchInfiniteQuery({
       queryKey: queryKey,
-      queryFn: queryFn,
-      initialPageParam: initialPageParam,
-      getNextPageParam: getNextPageParam,
+      queryFn: async () => {
+        const items = await queryFn();
+        items.forEach(item => {
+          prefetchItemDetail(queryClient, item, userEmail, item.brandId);
+        });
+        return items;
+      },
+      initialPageParam: 0,
+      getNextPageParam: (
+        lastPage: CatalogItemSchemaType[],
+        allPages: CatalogItemSchemaType[][],
+        lastPageParam: number,
+        allPageParams: number[]
+      ) => {
+        if (lastPage.length === 0) {
+          return undefined;
+        }
+        return lastPageParam + 1;
+      },
     });
   } else {
     console.log(
@@ -162,16 +130,6 @@ export async function prefetchItemDetail(
   prefetchIfNeeded(queryClient, ["item-detail", item.uuid], () =>
     getItem(item.uuid)
   );
-
-  // //obtengo el item completo a traves de la ultima query
-  // const itemQuery: CatalogItemSchemaType | undefined = queryClient.getQueryData(
-  //   ["item-detail", item.uuid]
-  // );
-
-  // if (itemQuery) {
-  //   console.log("itemQuery brandId", itemQuery.brandId);
-  //   console.log("itemQuery name", itemQuery.name);
-  // }
 
   if (brandId) {
     prefetchIfNeeded(queryClient, ["brand-profile-item", brandId], () =>
@@ -207,24 +165,25 @@ export function prefetchBrandPageItem(
   prefetchInfiniteQueryIfNeeded(
     queryClient,
     ["brand-items", brandId],
-    async () => {
-      const items = await getBrandItems(0, 6, brandId);
-      items.forEach(item => {
-        prefetchItemDetail(queryClient, item, userEmail, brandId);
-      });
-      return items;
-    },
-    0,
-    (
-      lastPage: { uuid: string }[],
-      allPages: { uuid: string }[][],
-      lastPageParam: number,
-      allPageParams: number[]
-    ) => {
-      if (lastPage.length === 0) {
-        return undefined;
-      }
-      return lastPageParam + 1;
-    }
+    () => getBrandItems(0, 6, brandId),
+    userEmail
+  );
+}
+
+export function prefetchLikeAndFavoritePage(
+  queryClient: QueryClient,
+  userEmail: string
+) {
+  prefetchInfiniteQueryIfNeeded(
+    queryClient,
+    ["all-liked-items", userEmail],
+    () => getAllLikedItems(0, 18),
+    userEmail
+  );
+  prefetchInfiniteQueryIfNeeded(
+    queryClient,
+    ["all-favorited-items", userEmail],
+    () => getAllFavoritedItems(0, 18),
+    userEmail
   );
 }

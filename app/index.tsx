@@ -8,7 +8,10 @@ import "../global.css";
 import { Redirect } from "expo-router";
 import { authClient } from "@/lib/auth-client";
 import { useQueryClient } from "@tanstack/react-query";
-import prefetchHome, { prefetchProfile } from "@/app/utils/prefetchs";
+import prefetchHome, {
+  prefetchLikeAndFavoritePage,
+  prefetchProfile,
+} from "@/app/utils/prefetchs";
 import Toast from "react-native-toast-message";
 
 export default function App() {
@@ -37,6 +40,7 @@ export default function App() {
       setTimeout(() => {
         prefetchHome(queryClient, user.email);
         prefetchProfile(user, queryClient);
+        prefetchLikeAndFavoritePage(queryClient, user.email);
       }, 100);
     }
     return (

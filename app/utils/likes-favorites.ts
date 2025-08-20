@@ -68,6 +68,9 @@ export const useToggleLike = () => {
       queryClient.invalidateQueries({
         queryKey: ["is-liked", variables.itemUuid],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["all-liked-items", user?.email],
+      });
     },
     onError: error => {
       console.error("Error toggling like:", error);
@@ -103,6 +106,9 @@ export const useToggleFavorite = () => {
       // Actualizar el estado del favorite
       queryClient.invalidateQueries({
         queryKey: ["is-favorited", variables.itemUuid],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["all-favorited-items", user?.email],
       });
     },
     onError: error => {
