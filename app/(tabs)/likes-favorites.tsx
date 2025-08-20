@@ -68,29 +68,23 @@ const LikesFavoritesPage = () => {
 
       {/* Content */}
       {activeTab === "likes" ? (
-        <>
-          <Text className="text-white text-2xl font-bold">Likes</Text>
-          <List2
-            key={`likes-${user?.email}`}
-            queryKey={["all-liked-items", user?.email]}
-            getClothingItems={getAllLikedItems}
-            limit={18}
-            columnCount={numColumns}
-            itemWhenNothingFound={renderEmptyState}
-          />
-        </>
+        <List2
+          key={`likes-${user?.email}`}
+          queryKey={["all-liked-items", user?.email]}
+          getClothingItems={getAllLikedItems}
+          limit={18}
+          columnCount={numColumns}
+          itemWhenNothingFound={renderEmptyState}
+        />
       ) : (
-        <>
-          <Text className="text-white text-2xl font-bold">Favorites</Text>
-          <List2
-            key={`favorites-${user?.email}`}
-            queryKey={["all-favorited-items", user?.email]}
-            getClothingItems={getAllFavoritedItems}
-            limit={18}
-            columnCount={numColumns}
-            itemWhenNothingFound={renderEmptyState}
-          />
-        </>
+        <List2
+          key={`favorites-${user?.email}`}
+          queryKey={["all-favorited-items", user?.email]}
+          getClothingItems={getAllFavoritedItems}
+          limit={18}
+          columnCount={numColumns}
+          itemWhenNothingFound={renderEmptyState}
+        />
       )}
     </SafeAreaView>
   );
