@@ -343,10 +343,6 @@ export const getAllLikedItems = async (
     CatalogItemArraySchemaQuery,
     "getAllLikedItems"
   );
-  console.log(
-    "getAllLikedItems response:",
-    res?.items?.map(item => item.name)
-  );
   return res?.items || [];
 };
 

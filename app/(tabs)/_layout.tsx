@@ -3,7 +3,7 @@ import React from "react";
 import { Tabs, router } from "expo-router";
 import icons from "../../constants/icons";
 import { OnlyAuthenticated } from "@/lib/auth-client";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, Octicons } from "@expo/vector-icons";
 
 const TabsLayout = () => {
   return (
@@ -14,20 +14,38 @@ const TabsLayout = () => {
           title: "Home",
           icon: icons.home,
           iconName: "Home",
+          // Icon: ({ color, focused }) => (
+          //   <Ionicons
+          //     name={focused ? "home" : "home-outline"}
+          //     size={26}
+          //     color={color}
+          //   />
+          // ),
         })}
         {Page({
           name: "explore",
           title: "Explore",
           icon: icons.search,
           iconName: "Explore",
+          Icon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? "search" : "search-outline"}
+              size={28}
+              color={color}
+            />
+          ),
         })}
         {Page({
           name: "likes-favorites",
           title: "Likes & Favorites",
           icon: icons.profile,
           iconName: "Likes",
-          Icon: ({ color }) => (
-            <Ionicons name="heart" size={24} color={color} />
+          Icon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? "heart" : "heart-outline"}
+              size={24}
+              color={color}
+            />
           ),
         })}
         {Page({
@@ -35,6 +53,13 @@ const TabsLayout = () => {
           title: "Profile",
           icon: icons.profile,
           iconName: "Profile",
+          Icon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? "person" : "person-outline"}
+              size={26}
+              color={color}
+            />
+          ),
         })}
       </Tabs>
     </OnlyAuthenticated>
@@ -54,7 +79,13 @@ const Page = ({
   title: string;
   icon: ImageSourcePropType;
   iconName: string;
-  Icon?: ({ color }: { color: string }) => React.ReactNode;
+  Icon?: ({
+    color,
+    focused,
+  }: {
+    color: string;
+    focused: boolean;
+  }) => React.ReactNode;
 }) => {
   return (
     <Tabs.Screen
@@ -72,7 +103,7 @@ const Page = ({
         tabBarActiveTintColor: "#FFFFFF",
         tabBarIcon: ({ color, focused }) =>
           Icon ? (
-            <Icon color={color} />
+            <Icon color={color} focused={focused} />
           ) : (
             <TabIcon
               icon={icon}
