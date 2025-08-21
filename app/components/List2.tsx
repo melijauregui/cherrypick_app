@@ -31,6 +31,7 @@ const ImageGallery = ({
   columnCount,
   itemWhenNothingFound,
   contentUp,
+  roundRobin,
 }: {
   queryKey: any[];
   getClothingItems: (
@@ -41,6 +42,7 @@ const ImageGallery = ({
   columnCount: number;
   itemWhenNothingFound?: () => React.ReactElement;
   contentUp?: React.ReactElement;
+  roundRobin?: boolean;
 }) => {
   const { user } = useSession();
   const lastTriggeredHeightRef = useRef(0);
@@ -69,7 +71,11 @@ const ImageGallery = ({
     const organizeItems = async () => {
       if (data && data.pages.flat().length > 0) {
         const renderData = data.pages.flat() as CatalogItemSchemaType[];
-        const columns = await prepareColumns(renderData, columnCount);
+        const columns = await prepareColumns(
+          renderData,
+          columnCount,
+          roundRobin ?? false
+        );
         setOrganizedColumns(columns);
       }
     };
@@ -101,16 +107,23 @@ const ImageGallery = ({
     }
   };
 
-  // if (!data || organizedColumns.length === 0)
-  //   return <LoadingPage alreadyPrefetched={true} />;
-
+  const itemQuantity = data?.pages.flat().length;
+  const resto =
+    (width - (width / columnCount - 6) * columnCount) / (columnCount - 1);
   const content = !data ? (
     <LoadingPage alreadyPrefetched={true} />
-  ) : organizedColumns.length === 0 ? (
+  ) : itemQuantity === 0 ? (
     itemWhenNothingFound?.()
   ) : (
     <>
-      <View style={styles.container}>
+      <View
+        className={`flex-row ${
+          itemQuantity < columnCount ? `justify-start ` : "justify-between"
+        }`}
+        style={{
+          gap: itemQuantity < columnCount ? resto : 0,
+        }}
+      >
         {organizedColumns.map((items, columnIndex) => (
           <View key={columnIndex}>
             {items?.map((item, i) => {
@@ -158,13 +171,6 @@ const ImageGallery = ({
     </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-});
 
 export default ImageGallery;
 
@@ -233,7 +239,8 @@ const resetInfiniteQueryPagination = (
 
 const prepareColumns = async (
   items: CatalogItemSchemaType[],
-  numColumns: number
+  numColumns: number,
+  roundRobin: boolean
 ): Promise<
   Array<
     Array<
@@ -272,6 +279,18 @@ const prepareColumns = async (
         }
       >
     > = Array.from({ length: numColumns }, () => []);
+
+    if (roundRobin) {
+      for (let i = 0; i < itemsWithSizes.length; i++) {
+        const item = itemsWithSizes[i];
+        const columnIndex = i % numColumns;
+        if (item) {
+          columns[columnIndex]?.push(item);
+        }
+      }
+      return columns;
+    }
+
     const columnHeights: number[] = Array.from({ length: numColumns }, () => 0);
     for (const item of itemsWithSizes) {
       const minHeight = Math.min(...columnHeights);
@@ -281,6 +300,22 @@ const prepareColumns = async (
       columns[minHeightIndex]?.push(item);
       columnHeights[minHeightIndex] =
         (columnHeights[minHeightIndex] ?? 0) + item.renderedHeight;
+    }
+
+    // Reorganizar columnas al final: mover items de columnas más a la derecha hacia columnas más a la izquierda
+    for (let i = numColumns - 1; i > 0; i--) {
+      // Si la columna actual tiene más items que la columna anterior, mover el último item
+      const currentColumn = columns[i];
+      const previousColumn = columns[i - 1];
+
+      if (currentColumn && previousColumn) {
+        while (currentColumn.length > previousColumn.length) {
+          const lastItem = currentColumn.pop();
+          if (lastItem) {
+            previousColumn.push(lastItem);
+          }
+        }
+      }
     }
 
     return columns;

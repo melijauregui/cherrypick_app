@@ -75,6 +75,7 @@ const LikesFavoritesPage = () => {
           limit={18}
           columnCount={numColumns}
           itemWhenNothingFound={renderEmptyState}
+          roundRobin={true}
         />
       ) : (
         <List2
@@ -84,6 +85,7 @@ const LikesFavoritesPage = () => {
           limit={18}
           columnCount={numColumns}
           itemWhenNothingFound={renderEmptyState}
+          roundRobin={true}
         />
       )}
     </SafeAreaView>

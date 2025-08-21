@@ -189,15 +189,27 @@ async function getItemsFromWeaviate(
       };
     }
 
-    const items = result.objects.map(obj => ({
-      name: obj.properties?.name || "",
-      description: obj.properties?.description || "",
-      image_url: obj.properties?.image_url || "",
-      url: obj.properties?.url || "",
-      brandId: obj.properties?.brandId || "",
-      price: obj.properties?.price || 0,
-      uuid: obj.uuid || "",
-    }));
+    // Crear un mapa para mantener el orden original de los UUIDs
+    const uuidOrderMap = new Map();
+    uuids.forEach((uuid, index) => {
+      uuidOrderMap.set(uuid, index);
+    });
+
+    const items = result.objects
+      .map(obj => ({
+        name: obj.properties?.name || "",
+        description: obj.properties?.description || "",
+        image_url: obj.properties?.image_url || "",
+        url: obj.properties?.url || "",
+        brandId: obj.properties?.brandId || "",
+        price: obj.properties?.price || 0,
+        uuid: obj.uuid || "",
+      }))
+      .sort((a, b) => {
+        const orderA = uuidOrderMap.get(a.uuid) ?? Number.MAX_SAFE_INTEGER;
+        const orderB = uuidOrderMap.get(b.uuid) ?? Number.MAX_SAFE_INTEGER;
+        return orderA - orderB;
+      });
 
     // Validate the item using Zod schema
     const validationResult = CatalogItemArraySchema.safeParse(items);
