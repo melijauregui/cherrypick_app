@@ -567,6 +567,9 @@ async function deleteFromDatabase(
       `DELETE FROM item_likes_brand WHERE item_uuid IN (${placeholders})`,
       `DELETE FROM item_favorites_brand WHERE item_uuid IN (${placeholders})`,
     ];
+    for (const query of queries) {
+      const result = await db.query(query, itemsUuids);
+    }
 
     return {
       error: false,
@@ -735,12 +738,15 @@ export async function DeleteFromWeaviate(
     const collection = collectionRes.collection;
     console.log("brandId", brandId);
     const res = await collection.data.deleteMany(
-      collection.filter.byProperty("brandId").equal(brandId)
+      collection.filter.byProperty("brandId").equal(brandId),
+      { verbose: true }
     );
 
-    return {
-      error: false,
-    };
+    const itemsUuids = res.objects.map(obj => obj.id);
+
+    const deleteFromDatabaseRes = await deleteFromDatabase(itemsUuids);
+
+    return deleteFromDatabaseRes;
   } catch (error) {
     console.error("Error deleting from Weaviate:", error);
     return {
