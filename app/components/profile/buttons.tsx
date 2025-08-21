@@ -55,7 +55,6 @@ const DeleteAccountButton: React.FC<{
         onSubmit={() => {
           mutateDeleteAccount.mutate();
           bottomSheetRefLogout.current?.close();
-          logout();
           setVisibleModal(false);
         }}
         onCancel={() => setVisibleModal(false)}
@@ -89,7 +88,7 @@ function useDeleteAccount(logout: () => Promise<void>) {
     },
     onError: error => {
       // TODO PUSH TOAST
-      console.log(`could not update user:`, error);
+      console.log(`could not delete user:`, error);
     },
   });
 

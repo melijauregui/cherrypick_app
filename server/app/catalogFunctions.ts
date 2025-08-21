@@ -737,7 +737,6 @@ export async function DeleteFromWeaviate(
     const res = await collection.data.deleteMany(
       collection.filter.byProperty("brandId").equal(brandId)
     );
-    console.log("res", res);
 
     return {
       error: false,

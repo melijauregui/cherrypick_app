@@ -13,6 +13,7 @@ import prefetchHome, {
   prefetchProfile,
 } from "@/app/utils/prefetchs";
 import Toast from "react-native-toast-message";
+import LoadingPage from "./components/LoadingPage";
 
 export default function App() {
   //verificar si hay un usuario autenticado
@@ -35,8 +36,8 @@ export default function App() {
   }
 
   if (loading || !timeout) {
-    if (user) {
-      // Ejecutar prefetch de manera asíncrona
+    if (user && !user.new) {
+      // Solo ejecutar prefetch para usuarios existentes
       setTimeout(() => {
         prefetchHome(queryClient, user.email);
         prefetchProfile(user, queryClient);
@@ -58,7 +59,13 @@ export default function App() {
 
   // Redirect based on authentication status
   if (user) {
-    return <Redirect href="/home?prefetch=true" />;
+    if (user.new) {
+      // Usuario nuevo - redirigir a sign-in para que el useEffect maneje el redirect a preferences
+      return <LoadingPage alreadyPrefetched={true} />;
+    } else {
+      // Usuario existente - redirigir directamente a home
+      return <Redirect href="/home?prefetch=true" />;
+    }
   } else {
     return <Redirect href="/sign-in" />;
   }
