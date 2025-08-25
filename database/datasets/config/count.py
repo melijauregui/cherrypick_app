@@ -29,12 +29,13 @@ def contar_estilos(df):
 
 
 def contar_cortes(df):
-    for desc in df['description']:
+    for desc in df['tags']:
         desc_lower: str = desc.lower()
         for corte, _ in cortes.items():
             if corte in desc_lower:
-                prefix = "jean " + corte
-                if prefix in desc_lower and "rotura" in desc_lower:
+                # prefix = "jean " + corte
+                # if prefix in desc_lower and "rotura" in desc_lower:
+                if "rotura" in desc_lower:
                     cortes[corte][0] += 1
                 else:
                     cortes[corte][1] += 1
@@ -45,5 +46,6 @@ def contar_cortes(df):
 
 
 if __name__ == "__main__":
-    df = pd.read_csv('preferencias/preferencias-nobg5.csv')
+    df = pd.read_csv('unificado/roturas-preferencias-v2.csv')
     contar_estilos(df)
+    contar_cortes(df)
