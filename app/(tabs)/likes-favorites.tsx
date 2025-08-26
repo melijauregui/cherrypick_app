@@ -4,8 +4,8 @@ import {
   Text,
   TouchableOpacity,
   Dimensions,
-  SafeAreaView,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useQuery } from "@tanstack/react-query";
 import { getAllLikedItems, getAllFavoritedItems } from "../utils/fetch";
 import { useSession } from "@/lib/auth-client";
@@ -37,7 +37,7 @@ const LikesFavoritesPage = () => {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-brown-strong">
+    <SafeAreaView className="flex-1 bg-brown-strong" edges={["top"]}>
       {/* Tab Navigation */}
       <View className="flex-row bg-brown-strong mb-1">
         <TabNavigation
@@ -107,9 +107,8 @@ const TabNavigation = ({
 }) => {
   return (
     <TouchableOpacity
-      className={`flex-1 py-4 px-6 ${
-        activeTab === tab ? "border-b-2 border-brown-extraLight" : ""
-      }`}
+      className={`flex-1 py-4 px-6 ${activeTab === tab ? "border-b-2 border-brown-extraLight" : ""
+        }`}
       onPress={() => setActiveTab()}
     >
       <View className="flex-row items-center justify-center gap-1">{icon}</View>
