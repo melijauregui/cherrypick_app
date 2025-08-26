@@ -6,8 +6,8 @@ from io import BytesIO
 import requests
 from tqdm import tqdm
 
-INPUT_CSV = "datasets/unificado/roturas-preferencias-v4.csv"
-OUTPUT_CSV = "datasets/unificado/roturas-preferencias-v4.csv"
+INPUT_CSV = "datasets/unificado/roturas-preferencias-v5.csv"
+OUTPUT_CSV = "datasets/unificado/roturas-preferencias-v5.csv"
 
 
 df = pd.read_csv(INPUT_CSV)

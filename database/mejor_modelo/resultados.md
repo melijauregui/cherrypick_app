@@ -123,3 +123,51 @@ TEST:
 - recall@10: 0.9901
 - MRR: 0.7866
 - Precision@5: 0.9604
+
+#### 7
+🧪 Loss: 0.0896
+Recall 🔍 recall@1: 0.6123
+Recall 🔍 recall@5: 0.9102
+Recall 🔍 recall@10: 0.9622
+🔍 MRR: 0.7347
+🔍 Precision@5: 0.9078
+
+🧪 Loss: 0.1789
+Recall 🔍 recall@1: 0.6226
+Recall 🔍 recall@5: 0.9057
+Recall 🔍 recall@10: 0.9811
+🔍 MRR: 0.7450
+🔍 Precision@5: 0.9057
+
+#### 8
+
+🧪 Loss: 0.0864
+Recall 🔍 recall@1: 0.6572
+Recall 🔍 recall@5: 0.8936
+Recall 🔍 recall@10: 0.9527
+🔍 MRR: 0.7524
+🔍 Precision@5: 0.8936
+
+
+🧪 Loss: 0.1915
+Recall 🔍 recall@1: 0.6132
+Recall 🔍 recall@5: 0.9057
+Recall 🔍 recall@10: 0.9623
+🔍 MRR: 0.7462
+🔍 Precision@5: 0.9057
+
+#### 9
+
+🧪 Loss: 0.0389
+Recall 🔍 recall@1: 0.5392
+Recall 🔍 recall@5: 0.9664
+Recall 🔍 recall@10: 0.9981
+🔍 MRR: 0.7287
+🔍 Precision@5: 0.9646
+
+🧪 Loss: 0.1673
+Recall 🔍 recall@1: 0.6604
+Recall 🔍 recall@5: 0.9245
+Recall 🔍 recall@10: 0.9717
+🔍 MRR: 0.7764
+🔍 Precision@5: 0.9245
