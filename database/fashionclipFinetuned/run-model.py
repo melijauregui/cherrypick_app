@@ -67,7 +67,7 @@ print("\nDescripcion:", description)
 probabilities = find_similarities_matrix2(
     model, processor, description, image_paths, images)
 test_text_clasification(probabilities=probabilities,
-                        image_paths=image_paths, has=True, clasification_img="remera celeste")
+                        image_paths=image_paths, has=True, clasification_img="remera celeste", yellow_flags=["camisa celeste"])
 print("\n")
 
 description = "sweater rosa"
@@ -116,4 +116,76 @@ probabilities = find_similarities_matrix2(
     model, processor, description, image_paths, images)
 test_text_clasification(probabilities=probabilities,
                         image_paths=image_paths, has=True, clasification_img="vestido rojo")
+print("\n")
+
+description = "vestido estampado rojo"
+print("\nDescripcion:", description)
+probabilities = find_similarities_matrix2(
+    model, processor, description, image_paths, images)
+test_text_clasification(probabilities=probabilities,
+                        image_paths=image_paths, has=True, clasification_img="vestido estampado rojo")
+print("\n")
+
+description = "campera"
+print("\nDescripcion:", description)
+probabilities = find_similarities_matrix2(
+    model, processor, description, image_paths, images)
+test_text_clasification(probabilities=probabilities,
+                        image_paths=image_paths, has=True, clasification_img="campera")
+print("\n")
+
+description = "campera de cuero"
+print("\nDescripcion:", description)
+probabilities = find_similarities_matrix2(
+    model, processor, description, image_paths, images)
+test_text_clasification(probabilities=probabilities,
+                        image_paths=image_paths, has=True, clasification_img="campera cuero")
+print("\n")
+
+description = "campera negra"
+print("\nDescripcion:", description)
+probabilities = find_similarities_matrix2(
+    model, processor, description, image_paths, images)
+test_text_clasification(probabilities=probabilities,
+                        image_paths=image_paths, has=True, clasification_img="campera negra")
+print("\n")
+
+description = "campera de jean"
+print("\nDescripcion:", description)
+probabilities = find_similarities_matrix2(
+    model, processor, description, image_paths, images)
+test_text_clasification(probabilities=probabilities,
+                        image_paths=image_paths, has=True, clasification_img="campera jean")
+print("\n")
+
+description = "camisa"
+print("\nDescripcion:", description)
+probabilities = find_similarities_matrix2(
+    model, processor, description, image_paths, images)
+test_text_clasification(probabilities=probabilities,
+                        image_paths=image_paths, has=True, clasification_img="camisa")
+print("\n")
+
+description = "camisa celeste"
+print("\nDescripcion:", description)
+probabilities = find_similarities_matrix2(
+    model, processor, description, image_paths, images)
+test_text_clasification(probabilities=probabilities,
+                        image_paths=image_paths, has=True, clasification_img="camisa celeste", yellow_flags=["remera celeste"])
+print("\n")
+
+description = "camisa manga larga"
+print("\nDescripcion:", description)
+probabilities = find_similarities_matrix2(
+    model, processor, description, image_paths, images)
+test_text_clasification(probabilities=probabilities,
+                        image_paths=image_paths, has=True, clasification_img="camisa manga larga")
+print("\n")
+
+description = "camisa manga corta"
+print("\nDescripcion:", description)
+probabilities = find_similarities_matrix2(
+    model, processor, description, image_paths, images)
+test_text_clasification(probabilities=probabilities,
+                        image_paths=image_paths, has=True, clasification_img="camisa manga corta")
 print("\n")

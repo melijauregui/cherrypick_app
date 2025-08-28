@@ -146,7 +146,7 @@ def test_text_clasification(probabilities, image_paths, has, clasification_img, 
     best_idx_yellow_flag = None
     for j in no_rotura_imgs:
         if probabilities[j] > max_no_rotura:
-            if any(flag in image_names[j] for flag in yellow_flags):
+            if any(contains(flag, image_names[j]) for flag in yellow_flags):
                 if probabilities[j] > max_yellow_flag:
                     max_yellow_flag = probabilities[j]
                     best_idx_yellow_flag = j
