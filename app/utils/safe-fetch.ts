@@ -1,9 +1,9 @@
 import { authClient } from "@/lib/auth-client";
 import { z } from "zod";
 
-type SafeFetchOpts<T> = {
+type SafeFetchOpts<TOutput, TInput = unknown> = {
   url: string | URL | globalThis.Request;
-  schema: z.ZodType<T>;
+  schema: z.ZodType<TOutput, any, TInput>;
 } & RequestInit;
 
 async function safeFetch<T>(opts: SafeFetchOpts<T>) {
@@ -25,8 +25,6 @@ async function safeFetch<T>(opts: SafeFetchOpts<T>) {
 
   const data = await res.json();
 
-  const parsedData = schema.parse(data);
-
-  return { data: parsedData, res };
+  return { data, res };
 }
 export default safeFetch;

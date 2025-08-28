@@ -2,7 +2,7 @@ import { ImageSourcePropType } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { format } from "date-fns";
 import images from "../../constants/images";
 import { View } from "react-native";
@@ -79,6 +79,7 @@ const ClientProfile = ({
 }) => {
   const data = useFetchClientProfile(user);
   const mutateUser = useUpdateClient(user.email);
+  const [resetKey, setResetKey] = useState(false);
 
   const bottomSheetRef = useRef<BottomSheet>(null);
   const bottomSheetRefDate = useRef<BottomSheet>(null);
@@ -127,7 +128,7 @@ const ClientProfile = ({
             />
             <RenderProfileItem
               label="Username"
-              value={data.user.username}
+              value={data.user.name}
               canEdit={true}
               onPress={openUsernameSheet}
             />
@@ -157,25 +158,29 @@ const ClientProfile = ({
           />
           <CustomBottomSheet
             bottomSheetRef={bottomSheetRef}
-            lastValue={data.user.username}
+            lastValue={data.user.name}
             onSubmit={async (editInputValue: string) => {
               mutateUser.mutate({
                 username: editInputValue,
                 dateOfBirth: data.user.dateOfBirth,
                 preferences: data.user.preferences,
               });
+              setResetKey(!resetKey);
             }}
+            resetKey={resetKey}
           />
           <CustomBottomSheetDate
             bottomSheetRef={bottomSheetRefDate}
             lastValue={data.user.dateOfBirth ?? new Date()}
             onSubmit={async (editInputValue: Date) => {
               mutateUser.mutate({
-                username: data.user.username,
+                username: data.user.name,
                 dateOfBirth: editInputValue,
                 preferences: data.user.preferences,
               });
+              setResetKey(!resetKey);
             }}
+            resetKey={resetKey}
           />
           <CustomBottomSheetPreferences
             bottomSheetRef={bottomSheetRefPreferences}
@@ -183,11 +188,13 @@ const ClientProfile = ({
             totalItems={DATA}
             onSubmit={async (val: string[]) => {
               mutateUser.mutate({
-                username: data.user.username,
+                username: data.user.name,
                 dateOfBirth: data.user.dateOfBirth,
                 preferences: val,
               });
+              setResetKey(!resetKey);
             }}
+            resetKey={resetKey}
           />
           <CustomBottomLogout
             bottomSheetRef={bottomSheetRefLogout}

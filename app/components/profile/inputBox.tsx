@@ -70,6 +70,7 @@ const InputBoxWithName = ({
   autoCapitalize?: "none" | "sentences" | "words" | "characters";
   keyboardType?: KeyboardTypeOptions;
 }) => {
+  console.log("InputBoxWithName value", value);
   return (
     <View className="flex flex-col px-[16px] bg-white rounded-2xl border-[2px] border-gray-300 w-full py-2">
       <View className="flex flex-row justify-between items-center">

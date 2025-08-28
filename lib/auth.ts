@@ -1,16 +1,15 @@
 import { betterAuth } from "better-auth";
-import { createPool } from "mysql2/promise";
+import { Pool } from "pg";
 import { expo } from "@better-auth/expo";
-import { createAuthMiddleware } from "better-auth/api";
-import { verifyEmail } from "../server/app/verifyEmail";
+import { VerifyUserExists } from "../server/user/functions";
 
 console.log("BETTER_AUTH_URL", process.env.BETTER_AUTH_URL);
 
 export const auth = betterAuth({
   plugins: [expo()],
-  database: createPool({
+  database: new Pool({
     host: process.env.DB_HOST || "localhost",
-    port: Number(process.env.DB_PORT) || 3306,
+    port: Number(process.env.DB_PORT) || 5432,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
@@ -48,8 +47,13 @@ export const auth = betterAuth({
           new?: boolean;
           userType?: string;
         }) => {
-          const res = await verifyEmail(user.email);
-          if (!res.error) {
+          const res = await VerifyUserExists(user.email);
+          if (res.error) {
+            console.error("Error verifying user exists", res);
+            return;
+          }
+          if (!res.exists) {
+            console.error("User does not exist", res);
             return;
           }
           return { data: { ...user, new: false, userType: res.userType } };

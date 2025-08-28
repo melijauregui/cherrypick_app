@@ -1,0 +1,31 @@
+
+services:
+  postgres-test:
+    image: postgres:15
+    container_name: cherrypick-db-test
+    env_file:
+      - .env.test
+    environment:
+      POSTGRES_ROOT_PASSWORD: ${POSTGRES_ROOT_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    restart: unless-stopped
+    ports:
+      - "${DATABASE_PORT}:5432"
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+      - ./database:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      timeout: 10s
+      retries: 5
+      interval: 5s
+      start_period: 15s
+
+networks:
+  melodia-test-network:
+    driver: bridge
+
+volumes:
+  postgres_test_data:

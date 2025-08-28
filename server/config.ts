@@ -8,6 +8,7 @@ const {
   SMTP_PASS,
   WEAVIATE_URL,
   WEAVIATE_API_KEY,
+  DATABASE_URL,
 } = process.env;
 const REQUIRED_VARS = {
   EXPO_PUBLIC_ANDROID_CLIENT_ID,
@@ -16,6 +17,7 @@ const REQUIRED_VARS = {
   SMTP_PASS,
   WEAVIATE_URL,
   WEAVIATE_API_KEY,
+  DATABASE_URL,
 };
 
 // Check if any required variable is missing
@@ -32,10 +34,6 @@ if (missingVars.length > 0) {
 
 // Export the variables for easy use
 export const config = {
-  PINECONE_API_KEY: process.env.PINECONE_API_KEY as string,
-  PINECONE_INDEX_NAME: process.env.PINECONE_INDEX_NAME as string,
-  PINECONE_HOST_NAME: process.env.PINECONE_HOST_NAME as string,
-  PINECONE_NAMESPACE: process.env.PINECONE_NAMESPACE as string,
   EXPO_PUBLIC_ANDROID_CLIENT_ID: process.env
     .EXPO_PUBLIC_ANDROID_CLIENT_ID as string,
   EXPO_PUBLIC_IOS_CLIENT_ID: process.env.EXPO_PUBLIC_IOS_CLIENT_ID as string,
@@ -44,4 +42,5 @@ export const config = {
   SMTP_PASS: process.env.SMTP_PASS as string,
   WEAVIATE_URL: process.env.WEAVIATE_URL as string,
   WEAVIATE_API_KEY: process.env.WEAVIATE_API_KEY as string,
+  DATABASE_URL: process.env.DATABASE_URL as string,
 };

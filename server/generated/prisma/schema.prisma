@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../server/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Client {
+  email         String               @id @db.VarChar(50)
+  name          String               @db.VarChar(50)
+  dateOfBirth   DateTime?            @db.Timestamp(6)
+  preferences   Json?
+  itemFavorites ItemFavoriteClient[]
+  itemLikes     ItemLikeClient[]
+
+  @@index([email], map: "idx_client_email")
+  @@map("Client")
+}
+
+model RegisterInProgress {
+  email                      String @id @db.VarChar(50)
+  verificationCode           String @db.VarChar(6)
+  verificationCodeExpiration String @db.VarChar(30)
+
+  @@map("RegisterInProgress")
+}
+
+model Brand {
+  id            String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email         String              @unique @db.VarChar(50)
+  name          String              @db.VarChar(50)
+  description   String              @db.VarChar(255)
+  url           String              @db.VarChar(255)
+  logoUrl       String              @db.VarChar(255)
+  itemFavorites ItemFavoriteBrand[]
+  itemLikes     ItemLikeBrand[]
+
+  @@index([email], map: "idx_brand_email")
+  @@index([id], map: "idx_brand_id")
+  @@map("Brand")
+}
+
+model ItemLikeClient {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userEmail String    @db.VarChar(50)
+  itemUuid  String    @db.VarChar(255)
+  createdAt DateTime? @default(now()) @db.Timestamp(6)
+  client    Client    @relation(fields: [userEmail], references: [email], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([userEmail, itemUuid])
+  @@index([itemUuid], map: "idx_item_likes_client_item")
+  @@index([userEmail], map: "idx_item_likes_client_user")
+  @@map("ItemLikeClient")
+}
+
+model ItemFavoriteClient {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userEmail String    @db.VarChar(50)
+  itemUuid  String    @db.VarChar(255)
+  createdAt DateTime? @default(now()) @db.Timestamp(6)
+  client    Client    @relation(fields: [userEmail], references: [email], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([userEmail, itemUuid])
+  @@index([itemUuid], map: "idx_item_favorites_client_item")
+  @@index([userEmail], map: "idx_item_favorites_client_user")
+  @@map("ItemFavoriteClient")
+}
+
+model ItemLikeBrand {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userEmail String    @db.VarChar(50)
+  itemUuid  String    @db.VarChar(255)
+  createdAt DateTime? @default(now()) @db.Timestamp(6)
+  brand     Brand     @relation(fields: [userEmail], references: [email], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([userEmail, itemUuid])
+  @@index([itemUuid], map: "idx_item_likes_brand_item")
+  @@index([userEmail], map: "idx_item_likes_brand_user")
+  @@map("ItemLikeBrand")
+}
+
+model ItemFavoriteBrand {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userEmail String    @db.VarChar(50)
+  itemUuid  String    @db.VarChar(255)
+  createdAt DateTime? @default(now()) @db.Timestamp(6)
+  brand     Brand     @relation(fields: [userEmail], references: [email], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([userEmail, itemUuid])
+  @@index([itemUuid], map: "idx_item_favorites_brand_item")
+  @@index([userEmail], map: "idx_item_favorites_brand_user")
+  @@map("ItemFavoriteBrand")
+}

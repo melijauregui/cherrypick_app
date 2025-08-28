@@ -8,25 +8,6 @@ const FormSchemaCodeVerification = z.object({
 });
 export { FormSchemaCodeVerification };
 
-const VerifyCodeSchema = z.union([
-  z.object({
-    error: z.literal(false),
-    isCorrect: z.boolean(),
-  }),
-  z.object({
-    error: z.literal(true),
-    details: z.string(),
-  }),
-]);
-export { VerifyCodeSchema };
-export type VerifyCodeSchemaType = z.infer<typeof VerifyCodeSchema>;
-
-const QueryVerifyCodeSchema = z.object({
-  code: z.preprocess((val) => val?.toString(), z.string()),
-  email: z.preprocess((val) => val?.toString(), z.string()),
-});
-export { QueryVerifyCodeSchema };
-
 const queryDbSchemaRegisterInProgress = z.tuple([
   z.object({
     verification_code: z.string({ required_error: "Code must ve string" }),

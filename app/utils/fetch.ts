@@ -16,15 +16,16 @@ import {
   IsMyItemSchema,
 } from "@/schemas/catalog/catalog-schema";
 import {
-  ClientSchemaType,
-  UserSchemaRes,
-} from "@/schemas/auth/preferences-schema";
-import {
   CheckLikeFavoriteResponseSchema,
   LikeFavoriteResponseSchema,
   LikeFavoriteResponseSchemaType,
 } from "@/schemas/activity/activity";
 import { ZodSchema } from "zod";
+import {
+  ClientSchemaResponse,
+  ClientSchemaResponseType,
+  ClientSchemaType,
+} from "@/schemas/client/client";
 
 // Helper function to handle API responses consistently
 const handleApiResponse = async <T>(
@@ -154,23 +155,18 @@ export async function getSelfBrandProfile(): Promise<BrandSchemaType | null> {
   return res?.brand || null;
 }
 
-export async function getSelfClientProfile(): Promise<{
-  username: string;
-  email: string;
-  preferences: string[];
-  dateOfBirth: Date | null;
-} | null> {
+export async function getSelfClientProfile(): Promise<ClientSchemaType | null> {
   console.log("getSelfClientProfile");
   const res = await handleApiResponse<{
     user: ClientSchemaType;
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/get-self-client`,
+        url: `http://${LOCAL_IP}:3000/client`,
         method: "GET",
-        schema: UserSchemaRes,
+        schema: ClientSchemaResponse,
       }),
-    UserSchemaRes,
+    ClientSchemaResponse,
     "getSelfClientProfile"
   );
   return res?.user || null;

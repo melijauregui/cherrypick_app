@@ -1,14 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import safeFetch from "./safe-fetch";
 import { LOCAL_IP } from "@/config/api";
-import { UpdateBrandSchema } from "@/schemas/auth/brand-schema";
-import { CreateAccountSchemaRes } from "@/schemas/auth/preferences-schema";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { CatalogResponseSchemaDelete } from "@/schemas/catalog/catalog-schema";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { Keyboard } from "react-native";
 import { useSession } from "@/lib/auth-client";
 import { router } from "expo-router";
+import { ErrorResponseSchema } from "@/schemas/standar-response";
 
 export default function useUpdateBrand(brandEmail: string) {
   const queryClient = useQueryClient();
@@ -22,21 +21,22 @@ export default function useUpdateBrand(brandEmail: string) {
           description: data.description,
           url: data.url,
         }),
-        schema: CreateAccountSchemaRes,
+        schema: ErrorResponseSchema,
       });
       if (response.data.error) {
         throw new Error(response.data.details);
       }
       return response.data;
     },
-    onSuccess: () => {
-      void queryClient.invalidateQueries({
-        queryKey: ["self-brand-profile", brandEmail],
-      });
-    },
+    onSuccess: () => {},
     onError: error => {
       // TODO PUSH TOAST
       console.log(`could not update user:`, error);
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({
+        queryKey: ["self-brand-profile", brandEmail],
+      });
     },
   });
 
@@ -52,29 +52,32 @@ export function useUpdateClient(email: string) {
       preferences: string[];
     }) => {
       const response = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/update-client`,
-        method: "POST",
+        url: `http://${LOCAL_IP}:3000/client`,
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: data.username,
-          dateString: data.dateOfBirth?.toISOString() ?? null,
+          dateOfBirth: data.dateOfBirth,
           preferences: data.preferences,
         }),
-        schema: CreateAccountSchemaRes,
+        schema: ErrorResponseSchema,
       });
+      console.log("response.data", response.data);
       if (response.data.error) {
-        throw new Error(response.data.details);
+        throw new Error(response.data.details + "\n" + response.data.info);
       }
       return response.data;
     },
-    onSuccess: () => {
-      void queryClient.invalidateQueries({
-        queryKey: ["self-client-profile", email],
-      });
-    },
+    onSuccess: () => {},
     onError: error => {
       // TODO PUSH TOAST
       console.log(`could not update user:`, error);
+    },
+    onSettled: () => {
+      console.log("onSettled");
+      void queryClient.invalidateQueries({
+        queryKey: ["self-client-profile", email],
+      });
     },
   });
 

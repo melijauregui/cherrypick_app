@@ -16,15 +16,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useEffect, useRef } from "react";
 import React, { useState } from "react";
 import LogoCircle from "@/app/components/LogoCircle";
-import {
-  FormSchemaCodeVerification,
-  VerifyCodeSchema,
-} from "@/schemas/auth/code-verification-schema";
+import { FormSchemaCodeVerification } from "@/schemas/auth/code-verification-schema";
 import { useRouter } from "expo-router";
 import safeFetch from "@/app/utils/safe-fetch";
 import { useLocalSearchParams } from "expo-router";
 import { ResCodeVerificationPostSchema } from "@/schemas/auth/sign-up-schema";
 import { LOCAL_IP } from "@/config/api";
+import { VerifyCodeResponseSchema } from "@/schemas/formUser";
 
 const CodeVerification = () => {
   const router = useRouter();
@@ -398,11 +396,14 @@ async function verifyCode(
   email: string
 ): Promise<{ isCorrect: boolean }> {
   try {
-    console.log("Local IP:", LOCAL_IP);
     const { data } = await safeFetch({
-      url: `http://${LOCAL_IP}:3000/verify-code?code=${code}&email=${email}`,
-      schema: VerifyCodeSchema,
-      method: "GET",
+      url: `http://${LOCAL_IP}:3000/code-verification/verify`,
+      schema: VerifyCodeResponseSchema,
+      method: "POST",
+      body: JSON.stringify({ code, email }),
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
 
     if (data.error) {

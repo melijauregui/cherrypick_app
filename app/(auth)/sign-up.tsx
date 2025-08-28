@@ -13,12 +13,12 @@ import LogoCircle from "@/app/components/LogoCircle";
 import safeFetch from "@/app/utils/safe-fetch";
 import {
   FormSchemaSignUp,
-  VerifyAvailabilitySchema,
   ResCodeVerificationPostSchema,
 } from "@/schemas/auth/sign-up-schema";
 import DatePicker from "react-native-date-picker";
 import { useRouter } from "expo-router";
 import { LOCAL_IP } from "../../config/api";
+import { VerifyUserExistsResponseSchema } from "@/schemas/user/user";
 
 const SignIn = () => {
   const router = useRouter();
@@ -255,21 +255,31 @@ async function verifyMailAvailability(
 ): Promise<{ isAvailable: boolean }> {
   try {
     const { data } = await safeFetch({
-      url: `http://${LOCAL_IP}:3000/verify-email?email=${email}`,
-      schema: VerifyAvailabilitySchema,
-      method: "GET",
+      url: `http://${LOCAL_IP}:3000/user/verify`,
+      schema: VerifyUserExistsResponseSchema,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email }),
     });
 
     if (data.error) {
       console.log("Error:", data.details);
       throw new Error(data.details || "Unexpected error");
     }
-    return {
-      isAvailable: true,
-    };
+    if (data.exists) {
+      return {
+        isAvailable: false,
+      };
+    } else {
+      return {
+        isAvailable: true,
+      };
+    }
   } catch (error: unknown) {
     if (error instanceof Error) {
-      console.error("Error:", error.message);
+      console.error("Error3!!:", error.message);
       throw error;
     } else {
       console.error("Unexpected error:", error);
@@ -290,12 +300,12 @@ async function postCodeVerification({ email }: { email: string }) {
       schema: ResCodeVerificationPostSchema,
     });
     if (data.error) {
-      console.log("Error:", data.details);
+      console.log("Error!!!:", data.details);
       throw new Error(data.details);
     }
     console.log("Code success");
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Error2!!:", error);
     if (error instanceof Error) {
       throw error;
     } else {
@@ -328,40 +338,3 @@ const DateOfBirthInput = ({
     {error && <Text className="text-red-500 pt-0.5">{error}</Text>}
   </View>
 );
-
-// function DatePickerCustom({
-//   open,
-//   setOpen,
-//   onSubmit,
-//   lastValue,
-//   modal,
-// }: {
-//   open: boolean;
-//   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-//   onSubmit: (newDate: Date) => void;
-//   lastValue: Date;
-//   modal: boolean;
-// }) {
-//   const [date, setDate] = useState<Date>(
-//     lastValue ? new Date(lastValue) : new Date()
-//   );
-
-//   return (
-//     <DatePicker
-//       modal={modal}
-//       open={open}
-//       date={date}
-//       mode="date"
-//       // @ts-ignore
-//       androidVariant="nativeAndroid"
-//       onConfirm={(date: Date) => {
-//         setOpen(false);
-//         onSubmit?.(date);
-//       }}
-//       onCancel={() => {
-//         setOpen(false);
-//         onSubmit?.(lastValue);
-//       }}
-//     />
-//   );
-// }

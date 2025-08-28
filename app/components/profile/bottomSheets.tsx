@@ -9,7 +9,7 @@ import { FlatList } from "react-native-gesture-handler";
 import CarouselWithFlatList from "./carousel";
 import LogOutButton, { DeleteAccountButton } from "./buttons";
 import InputBoxWithName from "./inputBox";
-
+import { useQueryClient } from "@tanstack/react-query";
 type ItemData = {
   title: string;
   image: ImageSourcePropType;
@@ -21,15 +21,22 @@ function CustomBottomSheet({
   bottomSheetRef,
   lastValue,
   onSubmit,
+  resetKey,
 }: {
   bottomSheetRef: React.RefObject<BottomSheet>;
   lastValue: string;
   onSubmit: (editInputValue: string) => void;
+  resetKey: boolean;
 }) {
+  const queryClient = useQueryClient();
+
+  console.log("CustomBottomSheet lastValue", lastValue);
   const [editInputValue, setEditInputValue] = useState<string>(lastValue);
+  console.log("CustomBottomSheet editInputValue", editInputValue);
   useEffect(() => {
+    console.log("CustomBottomSheet useEffect lastValue", lastValue);
     setEditInputValue(lastValue);
-  }, [lastValue]);
+  }, [lastValue, resetKey]);
 
   const isReady = editInputValue.length > 0 && editInputValue !== lastValue;
 
@@ -39,7 +46,7 @@ function CustomBottomSheet({
         name="username"
         value={editInputValue}
         setValue={setEditInputValue}
-        lastValue={editInputValue}
+        lastValue={lastValue}
         isScrollable={false}
         placeholder="Escribe tu username"
         length={25}
@@ -105,16 +112,18 @@ function CustomBottomSheetPreferences({
   lastValue,
   totalItems,
   onSubmit,
+  resetKey,
 }: {
   bottomSheetRef: React.RefObject<BottomSheet>;
   lastValue: string[];
   onSubmit?: (editInputValue: string[]) => void;
   totalItems: ItemData[];
+  resetKey: boolean;
 }) {
   const [editInputValue, setEditInputValue] = useState<string[]>(lastValue);
   useEffect(() => {
     setEditInputValue(lastValue);
-  }, [lastValue]);
+  }, [lastValue, resetKey]);
 
   const isReady =
     !setsEqual(editInputValue, lastValue) && editInputValue.length > 0;
@@ -150,16 +159,18 @@ function CustomBottomSheetDate({
   bottomSheetRef,
   lastValue,
   onSubmit,
+  resetKey,
 }: {
   bottomSheetRef: React.RefObject<BottomSheet>;
   lastValue: Date;
   onSubmit?: (editInputValue: Date) => void;
+  resetKey: boolean;
 }) {
   const [editInputValue, setEditInputValue] = useState<Date>(lastValue);
 
   useEffect(() => {
     setEditInputValue(lastValue);
-  }, [lastValue]);
+  }, [lastValue, resetKey]);
 
   const isReady =
     editInputValue.getFullYear() !== lastValue.getFullYear() ||

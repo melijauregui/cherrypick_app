@@ -8,6 +8,7 @@ import {
   getItem,
 } from "./fetch";
 import { CatalogItemSchemaType } from "@/schemas/catalog/catalog-schema";
+import { ClientSchemaType } from "@/schemas/client/client";
 
 export default function useIsMyItem(uuidItem: string): boolean | null {
   const { user } = useSession();
@@ -32,12 +33,7 @@ interface UserInfo {
 }
 export type { UserInfo };
 export function useFetchClientProfile(user: UserInfo): {
-  user: {
-    username: string;
-    email: string;
-    preferences: string[];
-    dateOfBirth: Date | null;
-  };
+  user: ClientSchemaType;
 } | null {
   const { data, isLoading, error } = useQuery({
     queryKey: ["self-client-profile", user.email],

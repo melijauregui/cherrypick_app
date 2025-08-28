@@ -11,15 +11,13 @@ import LogoCircle from "@/app/components/LogoCircle";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import images from "../../constants/images";
-import {
-  CreateAccountSchemaRes,
-  CreateAccountSchema,
-} from "@/schemas/auth/preferences-schema";
 import safeFetch from "@/app/utils/safe-fetch";
 import { LOCAL_IP } from "@/config/api";
 import { authClient, useSession } from "@/lib/auth-client";
 import Toast from "react-native-toast-message";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ClientSchema } from "@/schemas/client/client";
+import { ErrorResponseSchema } from "@/schemas/standar-response";
 
 const Preferences = () => {
   const router = useRouter();
@@ -239,10 +237,10 @@ function useCreateAccount() {
       dateOfBirth: string;
       preferences: string[];
     }) => {
-      CreateAccountSchema.parse({
+      const client = ClientSchema.parse({
         name: user.username,
         email: user.email,
-        dateString: user.dateOfBirth,
+        dateOfBirth: user.dateOfBirth,
         preferences: user.preferences,
       });
 
@@ -258,17 +256,12 @@ function useCreateAccount() {
       );
 
       const { data } = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/create-account`,
+        url: `http://${LOCAL_IP}:3000/client`,
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          name: user.username,
-          email: user.email,
-          dateString: user.dateOfBirth,
-          preferences: user.preferences,
-        }),
-        schema: CreateAccountSchemaRes,
+        body: JSON.stringify(client),
+        schema: ErrorResponseSchema,
         method: "POST",
       });
       if (data.error) {

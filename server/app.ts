@@ -6,40 +6,15 @@ import {
   PaginationSchema,
 } from "../schemas/catalog/catalog-schema";
 import {
-  VerifyAvailabilitySchema,
-  QueryVerifyAvalabilitySchema,
-  VerifyAvailabilitySchemaType,
   ResCodeVerificationPostSchema,
   BodyCodeVerificationPostSchema,
-  BodyUserVerificationPostSchema,
   ResCodeVerificationPostSchemaType,
-  VerifyAccountDeletedSchema,
-  VerifyAccountDeletedSchemaType,
 } from "../schemas/auth/sign-up-schema";
-import {
-  QueryVerifyCodeSchema,
-  VerifyCodeSchema,
-  VerifyCodeSchemaType,
-} from "../schemas/auth/code-verification-schema";
-import {
-  CreateAccountSchemaRes,
-  CreateAccountSchemaResType,
-  CreateAccountSchema,
-  QueryGetUserSchema,
-  UserSchemaRes,
-  UserSchemaResType,
-  UpdateClientSchema,
-} from "../schemas/auth/preferences-schema";
-import {
-  VerifyUserResponseSchema,
-  VerifyUserResponseSchemaType,
-} from "../schemas/auth/sign-in-schema";
 import {
   UpdateCatalog,
   GetBrand,
   DeleteFromCatalog,
   UpdateItem,
-  GetBrandId,
   GetBrandEmail,
 } from "./app/catalogFunctions";
 import {
@@ -77,22 +52,7 @@ import {
   AllBrandItemsSchemaResType,
   UpdateBrandSchema,
 } from "../schemas/auth/brand-schema";
-import {
-  verifyEmail,
-  SaveVerificationCode,
-  GenerateVerificationCode,
-  SendEmail,
-  VerifyVerificationCode,
-  SendEmailBrand,
-} from "./app/verifyEmail";
-import {
-  VerifyUserExists,
-  CreateUser,
-  DeleteUser,
-  GetClient,
-  UpdateClient,
-  UpdateBrand,
-} from "./app/userFunctions";
+import { UpdateBrand } from "./app/userFunctions";
 import {
   jsonCatalogUploadSchema,
   deleteItemsJsonSchema,
@@ -113,6 +73,17 @@ import {
   checkIfFavorited,
   getAllLikedFavoritedItems,
 } from "./app/allDatabase";
+import { SendEmailBrand } from "./formUser/functions";
+import { VerifyUserExists } from "./user/functions";
+import FormUserApp from "./formUser/routes";
+import UserApp from "./user/routes";
+import ClientApp from "./client/routes";
+import { UpdateClientSchema } from "@/schemas/client/client";
+import {
+  ErrorResponseSchema,
+  ErrorResponseSchemaType,
+} from "@/schemas/standar-response";
+import { GetBrandId } from "./brand/functions";
 
 export type AppEnv = {
   Variables: {
@@ -125,16 +96,15 @@ const app = new OpenAPIHono<AppEnv>();
 export default app;
 
 app.use("*", async (c, next) => {
+  console.log("c.req.path", c.req.method, c.req.path);
   const session = await auth.api.getSession({ headers: c.req.raw.headers });
 
   if (!session) {
     if (
       c.req.path.startsWith("/api/auth/") ||
-      c.req.path.startsWith("/verify-email") ||
+      c.req.path === "/user/verify" ||
       c.req.path.startsWith("/code-verification") ||
-      c.req.path.startsWith("/verify-code") ||
-      c.req.path.startsWith("/verify-user") ||
-      c.req.path.startsWith("/create-account") ||
+      (c.req.path === "/client" && c.req.method === "POST") ||
       c.req.path.startsWith("/insert-catalog-brand2") //TODO NO DEBERIA ESTAR SOLO PARA ENDPOINTS
     ) {
       return next();
@@ -152,324 +122,9 @@ app.on(["POST", "GET"], "/api/auth/*", c => {
   return auth.handler(c.req.raw);
 });
 
-// endpoint que verifica si un mail esta registrado en la base de datos
-const verifiedEmailRoute = createRoute({
-  method: "get",
-  path: "/verify-email",
-  request: {
-    query: QueryVerifyAvalabilitySchema,
-  },
-  responses: {
-    200: {
-      content: {
-        "application/json": {
-          schema: VerifyAvailabilitySchema,
-        },
-      },
-      description:
-        "Devuelve un booleano que indica si el email está disponible",
-    },
-  },
-});
-app.openapi(verifiedEmailRoute, async c => {
-  const { email } = c.req.valid("query");
-  let res: VerifyAvailabilitySchemaType;
-  console.log("Verifying email availability:", email);
-  try {
-    res = await verifyEmail(email);
-  } catch (err) {
-    console.error("Error checking email:", err);
-    res = {
-      error: true,
-      details: "Error querying the database",
-      userType: null,
-    };
-  }
-  return c.json(res, 200);
-});
-
-// endpoint que publica un nuevo code-verification
-const codeVerificationRoute = createRoute({
-  method: "post",
-  path: "/code-verification",
-  request: {
-    body: {
-      content: {
-        "application/json": { schema: BodyCodeVerificationPostSchema },
-      },
-    },
-  },
-  responses: {
-    200: {
-      content: {
-        "application/json": {
-          schema: ResCodeVerificationPostSchema,
-        },
-      },
-      description:
-        "Devuelve un booleano que indica si se pudo enviar el código de verificación",
-    },
-  },
-});
-app.openapi(codeVerificationRoute, async c => {
-  const { email } = await c.req.valid("json");
-  const code = GenerateVerificationCode();
-  const emailSent = await SendEmail(email, code);
-  let res: ResCodeVerificationPostSchemaType;
-
-  if (!emailSent) {
-    res = {
-      error: true,
-      details: "Invalid email",
-    };
-    return c.json(res, 200);
-  }
-
-  // Guardar (o reemplazar) en DB
-  try {
-    res = await SaveVerificationCode(email, code);
-  } catch (err) {
-    console.error("Error al guardar código:", err);
-    res = {
-      error: true,
-      details: "Error al guardar en la base",
-    };
-  }
-  return c.json(res, 200);
-});
-
-// endpoint que verifica si el code de verificación es correcto
-const verifiedCodeRoute = createRoute({
-  method: "get",
-  path: "/verify-code",
-  request: {
-    query: QueryVerifyCodeSchema,
-  },
-  responses: {
-    200: {
-      content: {
-        "application/json": {
-          schema: VerifyCodeSchema,
-        },
-      },
-      description:
-        "Devuelve un booleano que indica si el codigo de verificación es correcto",
-    },
-  },
-});
-app.openapi(verifiedCodeRoute, async c => {
-  const { code, email } = c.req.valid("query");
-  let res: VerifyCodeSchemaType;
-
-  try {
-    res = await VerifyVerificationCode(email, code);
-    return c.json(res, 200);
-  } catch (err) {
-    console.error("Error al verificar código:", err);
-    return c.json({ error: true as true, details: "DB error" }, 200);
-  }
-});
-
-// endpoint que verifica si el usuario existe en la base de datos
-const verifyUserRoute = createRoute({
-  method: "post",
-  path: "/verify-user",
-  request: {
-    body: {
-      content: {
-        "application/json": { schema: BodyUserVerificationPostSchema },
-      },
-    },
-  },
-  responses: {
-    200: {
-      content: {
-        "application/json": {
-          schema: VerifyUserResponseSchema,
-        },
-      },
-      description: "Devuelve si el usuario existe o no",
-    },
-  },
-});
-app.openapi(verifyUserRoute, async c => {
-  const { email } = c.req.valid("json");
-  let res: VerifyUserResponseSchemaType;
-  console.log("Verifying user3:", email);
-
-  // Buscar primero en users
-  res = await VerifyUserExists(email);
-  console.log("Verifying user4:", res);
-  return c.json(res, 200);
-});
-
-// endpoint que crea un nuevo usuario en la base de datos
-const createUserRoute = createRoute({
-  method: "post",
-  path: "/create-account",
-  request: {
-    body: {
-      content: {
-        "application/json": {
-          schema: CreateAccountSchema,
-        },
-      },
-    },
-  },
-  responses: {
-    200: {
-      description: "Crea un nuevo usuario",
-      content: {
-        "application/json": {
-          schema: CreateAccountSchemaRes,
-        },
-      },
-    },
-  },
-});
-
-app.openapi(createUserRoute, async c => {
-  const { name, email, dateString, preferences } = await c.req.valid("json");
-
-  let res: CreateAccountSchemaResType;
-  console.log("Creating client:", name, email, dateString, preferences);
-
-  try {
-    let date = dateString;
-    if (dateString === "") {
-      date = null;
-    }
-    res = await CreateUser(email, name, date, preferences);
-  } catch (err) {
-    console.error(err);
-    res = {
-      error: true,
-      details: "Server error",
-    };
-  }
-  return c.json(res, 200);
-});
-
-// endpoint que elimina un usuario de la base de datos
-const deleteAccountRoute = createRoute({
-  method: "post",
-  path: "/delete-account",
-  responses: {
-    200: {
-      description: "Elimina la cuenta del usuario",
-      content: {
-        "application/json": {
-          schema: VerifyAccountDeletedSchema,
-        },
-      },
-    },
-  },
-});
-
-app.openapi(deleteAccountRoute, async c => {
-  let res: VerifyAccountDeletedSchemaType;
-  const user = c.get("user");
-  const email = user?.email;
-  const userType = user?.userType;
-  if (!email || !userType) {
-    res = {
-      error: true,
-      details: "No tienes permisos para eliminar la cuenta",
-    };
-    return c.json(res, 200);
-  }
-  try {
-    res = await DeleteUser(email, userType);
-  } catch (error) {
-    console.error(error);
-    return c.json({ error: true as true, details: "Server error" }, 200);
-  }
-  return c.json(res, 200);
-});
-
-// endpoint que obtiene la información del cliente
-const getClientRoute = createRoute({
-  method: "get",
-  path: "/get-self-client", //TODO: cambiar a get-self-client
-  responses: {
-    200: {
-      description: "Obtiene la información del usuario",
-      content: {
-        "application/json": {
-          schema: UserSchemaRes,
-        },
-      },
-    },
-  },
-});
-
-app.openapi(getClientRoute, async c => {
-  let res: UserSchemaResType;
-  const user = c.get("user");
-  const email = user?.email;
-  if (!email) {
-    res = {
-      error: true,
-      details: "No tienes permisos para obtener el cliente",
-    };
-    return c.json(res, 200);
-  }
-  try {
-    res = await GetClient(email);
-  } catch (error) {
-    console.error(error);
-    return c.json({ error: true as true, details: "Server error" }, 200);
-  }
-  return c.json(res, 200);
-});
-
-// endpoint que actualiza la información del cliente
-const updateClientRoute = createRoute({
-  method: "post",
-  path: "/update-client",
-  request: {
-    body: {
-      content: {
-        "application/json": {
-          schema: UpdateClientSchema,
-        },
-      },
-    },
-  },
-  responses: {
-    200: {
-      description: "Actualiza la información del usuario",
-      content: {
-        "application/json": {
-          schema: CreateAccountSchemaRes,
-        },
-      },
-    },
-  },
-});
-
-app.openapi(updateClientRoute, async c => {
-  const { name, dateString, preferences } = await c.req.valid("json");
-
-  let res: CreateAccountSchemaResType;
-  const user = c.get("user");
-  const email = user?.email;
-  if (!email) {
-    res = {
-      error: true,
-      details: "No tienes permisos para actualizar el cliente",
-    };
-    return c.json(res, 200);
-  }
-  console.log("Updating client:", name, email, dateString, preferences);
-  try {
-    res = await UpdateClient(email, name, dateString, preferences);
-  } catch (error) {
-    console.error(error);
-    return c.json({ error: true as true, details: "Server error" }, 200);
-  }
-  return c.json(res, 200);
-});
+app.route("/code-verification", FormUserApp);
+app.route("/user", UserApp);
+app.route("/client", ClientApp);
 
 // endpoint que obtiene la información de la marca
 const getBrandRoute = createRoute({
