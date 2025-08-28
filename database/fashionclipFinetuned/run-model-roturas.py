@@ -13,9 +13,9 @@ from fashionClipTestingText import test_text_clasification, find_similarities_ma
 # --- CONFIGURACIÓN ---
 ORIGINAL_MODEL_NAME = "Marqo/marqo-fashionSigLIP"
 # MODEL_NAME_TO_FINETUNE = "Marqo/marqo-fashionSigLIP"
-MODEL_NAME_TO_PUSH = "Sofia-gb/cherrypick-sigLip3"
+MODEL_NAME_TO_PUSH = "Sofia-gb/cherrypick-sigLip7"
 # CSV_PATH = "datasets/con-sin-roturas.csv"
-FOLDER_IMAGES_TESTING = "images_testing_general"
+FOLDER_IMAGES_TESTING = "images-testing"
 
 
 BATCH_SIZE = 32
@@ -41,9 +41,9 @@ model.eval()
 torch.manual_seed(42)
 
 input_folder = FOLDER_IMAGES_TESTING
-output_folder = "images-testing-general-nobg"
-# if not os.path.exists(output_folder):
-remove_background(input_folder, output_folder)
+output_folder = "images-testing-nob"
+if not os.path.exists(output_folder):
+    remove_background(input_folder, output_folder)
 
 image_paths = []
 for root, _, files in os.walk(output_folder):
@@ -54,66 +54,84 @@ for root, _, files in os.walk(output_folder):
 
 images = [Image.open(p).convert("RGB") for p in image_paths]
 
-description = "remera"
+# --- test texto con descripcion de roturas vs liso
+description = "jean liso"
 print("\nDescripcion:", description)
 probabilities = find_similarities_matrix2(
     model, processor, description, image_paths, images)
 test_text_clasification(probabilities=probabilities,
-                        image_paths=image_paths, has=True, clasification_img="remera")
+                        image_paths=image_paths, has=False, clasification_img="rotura")
 print("\n")
 
-description = "remera celeste"
+description = "jean con roturas"
 print("\nDescripcion:", description)
 probabilities = find_similarities_matrix2(
     model, processor, description, image_paths, images)
 test_text_clasification(probabilities=probabilities,
-                        image_paths=image_paths, has=True, clasification_img="remera celeste")
+                        image_paths=image_paths, has=True, clasification_img="rotura")
 print("\n")
 
-description = "sweater rosa"
+# --- test texto con descripcion de wide leg
+description = "jean wide leg"
 print("\nDescripcion:", description)
 probabilities = find_similarities_matrix2(
     model, processor, description, image_paths, images)
 test_text_clasification(probabilities=probabilities,
-                        image_paths=image_paths, has=True, clasification_img="sweater rosa")
+                        image_paths=image_paths, has=True, clasification_img="wide", yellow_flags=["palazzo"])
 print("\n")
 
-description = "sweater"
+# --- test texto con descripcion de skinny
+description = "jean skinny"
 print("\nDescripcion:", description)
 probabilities = find_similarities_matrix2(
     model, processor, description, image_paths, images)
 test_text_clasification(probabilities=probabilities,
-                        image_paths=image_paths, has=True, clasification_img="sweater")
+                        image_paths=image_paths, has=True, clasification_img="skinny")
 print("\n")
 
-description = "vestido"
+# --- test texto con descripcion de recto
+description = "jean recto"
 print("\nDescripcion:", description)
 probabilities = find_similarities_matrix2(
     model, processor, description, image_paths, images)
 test_text_clasification(probabilities=probabilities,
-                        image_paths=image_paths, has=True, clasification_img="vestido")
+                        image_paths=image_paths, has=True, clasification_img="recto",
+                        yellow_flags=["mom"])
 print("\n")
 
-description = "vestido estampado"
+# --- test texto con descripcion de palazzo
+description = "jean palazzo"
 print("\nDescripcion:", description)
 probabilities = find_similarities_matrix2(
     model, processor, description, image_paths, images)
 test_text_clasification(probabilities=probabilities,
-                        image_paths=image_paths, has=True, clasification_img="vestido estampado")
+                        image_paths=image_paths, has=True, clasification_img="palazzo", yellow_flags=["wide"])
 print("\n")
 
-description = "vestido liso"
+# --- test texto con descripcion de cargo
+description = "jean cargo"
 print("\nDescripcion:", description)
 probabilities = find_similarities_matrix2(
     model, processor, description, image_paths, images)
 test_text_clasification(probabilities=probabilities,
-                        image_paths=image_paths, has=True, clasification_img="vestido liso")
+                        image_paths=image_paths, has=True, clasification_img="cargo")
 print("\n")
 
-description = "vestido rojo"
+# --- test texto con descripcion de mom
+description = "jean mom"
 print("\nDescripcion:", description)
 probabilities = find_similarities_matrix2(
     model, processor, description, image_paths, images)
 test_text_clasification(probabilities=probabilities,
-                        image_paths=image_paths, has=True, clasification_img="vestido rojo")
+                        image_paths=image_paths, has=True, clasification_img="mom",
+                        yellow_flags=["recto"])
+print("\n")
+
+# --- test texto con descripcion de flared
+description = "jean acampanado"
+print("\nDescripcion:", description)
+probabilities = find_similarities_matrix2(
+    model, processor, description, image_paths, images)
+test_text_clasification(probabilities=probabilities,
+                        image_paths=image_paths, has=True, clasification_img="flared")
 print("\n")

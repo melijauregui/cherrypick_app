@@ -111,6 +111,14 @@ def find_similarities_matrix2(model, processor, description, image_paths, images
     return probabilities
 
 
+def contains(text, img_name):
+    words = text.lower().split()
+    for word in words:
+        if word not in img_name.lower():
+            return False
+    return True
+
+
 def test_text_clasification(probabilities, image_paths, has, clasification_img, yellow_flags=[], imprimir_mayores_al_minimo=False):
     # Extraer nombres de archivo
     image_names = [os.path.basename(path) for path in image_paths]
@@ -121,12 +129,12 @@ def test_text_clasification(probabilities, image_paths, has, clasification_img, 
 
     for i, name in enumerate(image_names):
         if has:
-            if has and clasification_img in name:
+            if has and contains(clasification_img, name):
                 rotura_imgs.append(i)
             else:
                 no_rotura_imgs.append(i)
         else:
-            if clasification_img in name:
+            if contains(clasification_img, name):
                 no_rotura_imgs.append(i)
             else:
                 rotura_imgs.append(i)
