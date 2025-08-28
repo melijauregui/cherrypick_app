@@ -11,14 +11,14 @@ from fashionClipTestingText import test_text_clasification, find_similarities_ma
 
 # --- CONFIGURACIÓN ---
 ORIGINAL_MODEL_NAME = "Marqo/marqo-fashionSigLIP"
-MODEL_NAME_TO_PUSH = "Sofia-gb/cherrypick-sigLip7"
+MODEL_NAME_TO_PUSH = "Sofia-gb/cherrypick-sigLip3"
 # CSV_PATH = "datasets/con-sin-roturas.csv"
 FOLDER_IMAGES_TESTING = "images-testing-preferences-nobg"
 
 input_folder = "images-testing-preferences"
 output_folder = FOLDER_IMAGES_TESTING
-if not os.path.exists(output_folder):
-    remove_background(input_folder, output_folder)
+# if not os.path.exists(output_folder):
+remove_background(input_folder, output_folder)
 
 
 BATCH_SIZE = 32

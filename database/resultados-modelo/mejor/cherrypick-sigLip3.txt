@@ -593,23 +593,27 @@ Descripcion: jean boho chic
 
    1. images-testing-preferences-nobg\jean-bohochic2.png → Similitud: 0.530
    2. images-testing-preferences-nobg\jean-bohochic3.png → Similitud: 0.525
-   3. images-testing-preferences-nobg\jean-oldmoney-minimalista2.png → Similitud: 0.510
-   4. images-testing-preferences-nobg\jean-bohochic.png → Similitud: 0.509
-   5. images-testing-preferences-nobg\pollera-jean-larga-minimalista.png → Similitud: 0.506
-   6. images-testing-preferences-nobg\pollera-jean-streetwear-minimalista.png → Similitud: 0.505
-   7. images-testing-preferences-nobg\jean-oldmoney-minimalista.png → Similitud: 0.504
-   8. images-testing-preferences-nobg\jean-streetwear-minimalista.png → Similitud: 0.503
-   9. images-testing-preferences-nobg\pollera-coquette2.png → Similitud: 0.503
-   10. images-testing-preferences-nobg\pollera-coquette.png → Similitud: 0.491
-   11. images-testing-preferences-nobg\short-rosa-sport.png → Similitud: 0.486
-   12. images-testing-preferences-nobg\top-sport2.png → Similitud: 0.481
-   13. images-testing-preferences-nobg\short-negro-sport.png → Similitud: 0.480
-   14. images-testing-preferences-nobg\short-gris-sport.png → Similitud: 0.478
-   15. images-testing-preferences-nobg\top-sport.png → Similitud: 0.478
-mayor red flag es jean-oldmoney-minimalista2.png con 0.5095157027244568 de probabilidad
-[bohochic] jean-bohochic.png: 0.509 > 0.510? ❌
-[bohochic] jean-bohochic2.png: 0.530 > 0.510? ✅
-[bohochic] jean-bohochic3.png: 0.525 > 0.510? ✅
+   3. images-testing-preferences-nobg\pollera-jean-streetwear2.png → Similitud: 0.513
+   4. images-testing-preferences-nobg\jean-oldmoney-minimalista2.png → Similitud: 0.510
+   5. images-testing-preferences-nobg\jean-bohochic.png → Similitud: 0.509
+   6. images-testing-preferences-nobg\pollera-jean-streetwear.png → Similitud: 0.508
+   7. images-testing-preferences-nobg\pollera-jean-larga-minimalista.png → Similitud: 0.506
+   8. images-testing-preferences-nobg\pollera-jean-streetwear-minimalista.png → Similitud: 0.505
+   9. images-testing-preferences-nobg\jean-oldmoney-minimalista.png → Similitud: 0.504
+   10. images-testing-preferences-nobg\jean-streetwear-minimalista.png → Similitud: 0.503
+   11. images-testing-preferences-nobg\jean-negro-streetwear.png → Similitud: 0.503
+   12. images-testing-preferences-nobg\pollera-coquette2.png → Similitud: 0.503
+   13. images-testing-preferences-nobg\short-negro-streetwear.png → Similitud: 0.495
+   14. images-testing-preferences-nobg\pollera-coquette.png → Similitud: 0.491
+   15. images-testing-preferences-nobg\short-rosa-sport.png → Similitud: 0.486
+   16. images-testing-preferences-nobg\top-sport2.png → Similitud: 0.481
+   17. images-testing-preferences-nobg\short-gris-sport.png → Similitud: 0.478
+   18. images-testing-preferences-nobg\top-sport.png → Similitud: 0.478
+   19. images-testing-preferences-nobg\short-negro-sport.png → Similitud: 0.473
+mayor red flag es pollera-jean-streetwear2.png con 0.5127078294754028 de probabilidad
+[bohochic] jean-bohochic.png: 0.509 > 0.513? ❌
+[bohochic] jean-bohochic2.png: 0.530 > 0.513? ✅
+[bohochic] jean-bohochic3.png: 0.525 > 0.513? ✅
 
 🎯 Porcentaje de acierto: 66.67% (2/3)
 
@@ -621,6 +625,7 @@ Probabilidad más baja: 0.509
 
 Imágenes con probabilidad mayor al mínimo:
 Esta imagen sobrepaso al minimo: jean-oldmoney-minimalista2.png: 0.510
+Esta imagen sobrepaso al minimo: pollera-jean-streetwear2.png: 0.513
 
 
 
@@ -629,33 +634,39 @@ Descripcion: jean old money
 📝 SIMILITUD CON DESCRIPCIÓN: 'jean old money'
 
    1. images-testing-preferences-nobg\jean-oldmoney-minimalista2.png → Similitud: 0.530
-   2. images-testing-preferences-nobg\jean-oldmoney-minimalista.png → Similitud: 0.517
-   3. images-testing-preferences-nobg\jean-streetwear-minimalista.png → Similitud: 0.511
-   4. images-testing-preferences-nobg\jean-bohochic2.png → Similitud: 0.507
-   5. images-testing-preferences-nobg\jean-bohochic3.png → Similitud: 0.503
-   6. images-testing-preferences-nobg\jean-bohochic.png → Similitud: 0.499
-   7. images-testing-preferences-nobg\pollera-jean-larga-minimalista.png → Similitud: 0.495
-   8. images-testing-preferences-nobg\pollera-jean-streetwear-minimalista.png → Similitud: 0.495
-   9. images-testing-preferences-nobg\pollera-coquette.png → Similitud: 0.492
-   10. images-testing-preferences-nobg\top-sport2.png → Similitud: 0.489
-   11. images-testing-preferences-nobg\short-negro-sport.png → Similitud: 0.489
-   12. images-testing-preferences-nobg\top-sport.png → Similitud: 0.488
-   13. images-testing-preferences-nobg\pollera-coquette2.png → Similitud: 0.488
-   14. images-testing-preferences-nobg\short-rosa-sport.png → Similitud: 0.486
-   15. images-testing-preferences-nobg\short-gris-sport.png → Similitud: 0.482
-mayor red flag es jean-streetwear-minimalista.png con 0.511338472366333 de probabilidad
-[oldmoney] jean-oldmoney-minimalista.png: 0.517 > 0.511? ✅
-[oldmoney] jean-oldmoney-minimalista2.png: 0.530 > 0.511? ✅
+   2. images-testing-preferences-nobg\pollera-jean-streetwear2.png → Similitud: 0.521
+   3. images-testing-preferences-nobg\short-negro-streetwear.png → Similitud: 0.519
+   4. images-testing-preferences-nobg\jean-oldmoney-minimalista.png → Similitud: 0.517
+   5. images-testing-preferences-nobg\pollera-jean-streetwear.png → Similitud: 0.512
+   6. images-testing-preferences-nobg\jean-streetwear-minimalista.png → Similitud: 0.511
+   7. images-testing-preferences-nobg\jean-bohochic2.png → Similitud: 0.507
+   8. images-testing-preferences-nobg\jean-negro-streetwear.png → Similitud: 0.503
+   9. images-testing-preferences-nobg\jean-bohochic3.png → Similitud: 0.503
+   10. images-testing-preferences-nobg\jean-bohochic.png → Similitud: 0.499
+   11. images-testing-preferences-nobg\pollera-jean-larga-minimalista.png → Similitud: 0.495
+   12. images-testing-preferences-nobg\pollera-jean-streetwear-minimalista.png → Similitud: 0.495
+   13. images-testing-preferences-nobg\pollera-coquette.png → Similitud: 0.492
+   14. images-testing-preferences-nobg\top-sport2.png → Similitud: 0.489
+   15. images-testing-preferences-nobg\top-sport.png → Similitud: 0.488
+   16. images-testing-preferences-nobg\pollera-coquette2.png → Similitud: 0.488
+   17. images-testing-preferences-nobg\short-rosa-sport.png → Similitud: 0.486
+   18. images-testing-preferences-nobg\short-gris-sport.png → Similitud: 0.482
+   19. images-testing-preferences-nobg\short-negro-sport.png → Similitud: 0.481
+mayor red flag es pollera-jean-streetwear2.png con 0.5209606289863586 de probabilidad
+[oldmoney] jean-oldmoney-minimalista.png: 0.517 > 0.521? ❌
+[oldmoney] jean-oldmoney-minimalista2.png: 0.530 > 0.521? ✅
 
-🎯 Porcentaje de acierto: 100.00% (2/2)
+🎯 Porcentaje de acierto: 50.00% (1/2)
 
 📊 Precision: 1.000
-📊 Recall: 1.000
+📊 Recall: 0.500
 📊 MRR (Mean Reciprocal Rank): 1.000
 
 Probabilidad más baja: 0.517
 
 Imágenes con probabilidad mayor al mínimo:
+Esta imagen sobrepaso al minimo: pollera-jean-streetwear2.png: 0.521
+Esta imagen sobrepaso al minimo: short-negro-streetwear.png: 0.519
 
 
 
@@ -663,33 +674,38 @@ Descripcion: short
 
 📝 SIMILITUD CON DESCRIPCIÓN: 'short'
 
-   1. images-testing-preferences-nobg\short-negro-sport.png → Similitud: 0.533
+   1. images-testing-preferences-nobg\short-negro-sport.png → Similitud: 0.528
    2. images-testing-preferences-nobg\short-rosa-sport.png → Similitud: 0.527
    3. images-testing-preferences-nobg\short-gris-sport.png → Similitud: 0.526
-   4. images-testing-preferences-nobg\pollera-jean-streetwear-minimalista.png → Similitud: 0.513
-   5. images-testing-preferences-nobg\pollera-coquette.png → Similitud: 0.513
-   6. images-testing-preferences-nobg\pollera-coquette2.png → Similitud: 0.511
-   7. images-testing-preferences-nobg\jean-oldmoney-minimalista2.png → Similitud: 0.510
-   8. images-testing-preferences-nobg\jean-streetwear-minimalista.png → Similitud: 0.510
-   9. images-testing-preferences-nobg\top-sport.png → Similitud: 0.503
-   10. images-testing-preferences-nobg\pollera-jean-larga-minimalista.png → Similitud: 0.499
-   11. images-testing-preferences-nobg\jean-oldmoney-minimalista.png → Similitud: 0.498
-   12. images-testing-preferences-nobg\jean-bohochic2.png → Similitud: 0.496
-   13. images-testing-preferences-nobg\jean-bohochic3.png → Similitud: 0.495
-   14. images-testing-preferences-nobg\top-sport2.png → Similitud: 0.494
-   15. images-testing-preferences-nobg\jean-bohochic.png → Similitud: 0.490
+   4. images-testing-preferences-nobg\short-negro-streetwear.png → Similitud: 0.522
+   5. images-testing-preferences-nobg\pollera-jean-streetwear-minimalista.png → Similitud: 0.513
+   6. images-testing-preferences-nobg\pollera-coquette.png → Similitud: 0.513
+   7. images-testing-preferences-nobg\pollera-coquette2.png → Similitud: 0.511
+   8. images-testing-preferences-nobg\jean-oldmoney-minimalista2.png → Similitud: 0.510
+   9. images-testing-preferences-nobg\jean-streetwear-minimalista.png → Similitud: 0.510
+   10. images-testing-preferences-nobg\pollera-jean-streetwear2.png → Similitud: 0.509
+   11. images-testing-preferences-nobg\pollera-jean-streetwear.png → Similitud: 0.508
+   12. images-testing-preferences-nobg\top-sport.png → Similitud: 0.503
+   13. images-testing-preferences-nobg\pollera-jean-larga-minimalista.png → Similitud: 0.499
+   14. images-testing-preferences-nobg\jean-oldmoney-minimalista.png → Similitud: 0.498
+   15. images-testing-preferences-nobg\jean-negro-streetwear.png → Similitud: 0.497
+   16. images-testing-preferences-nobg\jean-bohochic2.png → Similitud: 0.496
+   17. images-testing-preferences-nobg\jean-bohochic3.png → Similitud: 0.495
+   18. images-testing-preferences-nobg\top-sport2.png → Similitud: 0.494
+   19. images-testing-preferences-nobg\jean-bohochic.png → Similitud: 0.490
 mayor red flag es pollera-jean-streetwear-minimalista.png con 0.5134885907173157 de probabilidad
 [short] short-gris-sport.png: 0.526 > 0.513? ✅
-[short] short-negro-sport.png: 0.533 > 0.513? ✅
+[short] short-negro-sport.png: 0.528 > 0.513? ✅
+[short] short-negro-streetwear.png: 0.522 > 0.513? ✅
 [short] short-rosa-sport.png: 0.527 > 0.513? ✅
 
-🎯 Porcentaje de acierto: 100.00% (3/3)
+🎯 Porcentaje de acierto: 100.00% (4/4)
 
 📊 Precision: 1.000
 📊 Recall: 1.000
 📊 MRR (Mean Reciprocal Rank): 1.000
 
-Probabilidad más baja: 0.526
+Probabilidad más baja: 0.522
 
 Imágenes con probabilidad mayor al mínimo:
 
@@ -702,33 +718,41 @@ Descripcion: pollera
    1. images-testing-preferences-nobg\pollera-coquette2.png → Similitud: 0.533
    2. images-testing-preferences-nobg\pollera-jean-streetwear-minimalista.png → Similitud: 0.526
    3. images-testing-preferences-nobg\pollera-coquette.png → Similitud: 0.526
-   4. images-testing-preferences-nobg\pollera-jean-larga-minimalista.png → Similitud: 0.516
-   5. images-testing-preferences-nobg\short-rosa-sport.png → Similitud: 0.512
-   6. images-testing-preferences-nobg\short-gris-sport.png → Similitud: 0.510
-   7. images-testing-preferences-nobg\jean-bohochic3.png → Similitud: 0.506
-   8. images-testing-preferences-nobg\jean-bohochic2.png → Similitud: 0.505
-   9. images-testing-preferences-nobg\jean-oldmoney-minimalista2.png → Similitud: 0.505
-   10. images-testing-preferences-nobg\top-sport.png → Similitud: 0.502
-   11. images-testing-preferences-nobg\short-negro-sport.png → Similitud: 0.501
-   12. images-testing-preferences-nobg\jean-oldmoney-minimalista.png → Similitud: 0.498
-   13. images-testing-preferences-nobg\jean-bohochic.png → Similitud: 0.496
-   14. images-testing-preferences-nobg\jean-streetwear-minimalista.png → Similitud: 0.496
-   15. images-testing-preferences-nobg\top-sport2.png → Similitud: 0.491
+   4. images-testing-preferences-nobg\pollera-jean-streetwear2.png → Similitud: 0.516
+   5. images-testing-preferences-nobg\pollera-jean-larga-minimalista.png → Similitud: 0.516
+   6. images-testing-preferences-nobg\short-rosa-sport.png → Similitud: 0.512
+   7. images-testing-preferences-nobg\short-gris-sport.png → Similitud: 0.510
+   8. images-testing-preferences-nobg\pollera-jean-streetwear.png → Similitud: 0.510
+   9. images-testing-preferences-nobg\jean-bohochic3.png → Similitud: 0.506
+   10. images-testing-preferences-nobg\jean-bohochic2.png → Similitud: 0.505
+   11. images-testing-preferences-nobg\jean-oldmoney-minimalista2.png → Similitud: 0.505
+   12. images-testing-preferences-nobg\top-sport.png → Similitud: 0.502
+   13. images-testing-preferences-nobg\short-negro-sport.png → Similitud: 0.499
+   14. images-testing-preferences-nobg\jean-oldmoney-minimalista.png → Similitud: 0.498
+   15. images-testing-preferences-nobg\jean-bohochic.png → Similitud: 0.496
+   16. images-testing-preferences-nobg\jean-streetwear-minimalista.png → Similitud: 0.496
+   17. images-testing-preferences-nobg\short-negro-streetwear.png → Similitud: 0.496
+   18. images-testing-preferences-nobg\top-sport2.png → Similitud: 0.491
+   19. images-testing-preferences-nobg\jean-negro-streetwear.png → Similitud: 0.488
 mayor red flag es short-rosa-sport.png con 0.5120577216148376 de probabilidad
 [pollera] pollera-coquette.png: 0.526 > 0.512? ✅
 [pollera] pollera-coquette2.png: 0.533 > 0.512? ✅
 [pollera] pollera-jean-larga-minimalista.png: 0.516 > 0.512? ✅
 [pollera] pollera-jean-streetwear-minimalista.png: 0.526 > 0.512? ✅
+[pollera] pollera-jean-streetwear.png: 0.510 > 0.512? ❌
+[pollera] pollera-jean-streetwear2.png: 0.516 > 0.512? ✅
 
-🎯 Porcentaje de acierto: 100.00% (4/4)
+🎯 Porcentaje de acierto: 83.33% (5/6)
 
 📊 Precision: 1.000
-📊 Recall: 1.000
+📊 Recall: 0.833
 📊 MRR (Mean Reciprocal Rank): 1.000
 
-Probabilidad más baja: 0.516
+Probabilidad más baja: 0.510
 
 Imágenes con probabilidad mayor al mínimo:
+Esta imagen sobrepaso al minimo: short-gris-sport.png: 0.510
+Esta imagen sobrepaso al minimo: short-rosa-sport.png: 0.512
 
 
 
@@ -738,22 +762,26 @@ Descripcion: coquette
 
    1. images-testing-preferences-nobg\pollera-coquette.png → Similitud: 0.528
    2. images-testing-preferences-nobg\pollera-coquette2.png → Similitud: 0.518
-   3. images-testing-preferences-nobg\short-negro-sport.png → Similitud: 0.515
+   3. images-testing-preferences-nobg\short-negro-sport.png → Similitud: 0.513
    4. images-testing-preferences-nobg\short-rosa-sport.png → Similitud: 0.513
-   5. images-testing-preferences-nobg\pollera-jean-streetwear-minimalista.png → Similitud: 0.509
-   6. images-testing-preferences-nobg\jean-oldmoney-minimalista2.png → Similitud: 0.508
-   7. images-testing-preferences-nobg\short-gris-sport.png → Similitud: 0.508
-   8. images-testing-preferences-nobg\jean-streetwear-minimalista.png → Similitud: 0.502
-   9. images-testing-preferences-nobg\pollera-jean-larga-minimalista.png → Similitud: 0.501
-   10. images-testing-preferences-nobg\top-sport.png → Similitud: 0.498
-   11. images-testing-preferences-nobg\jean-bohochic2.png → Similitud: 0.498
-   12. images-testing-preferences-nobg\jean-bohochic3.png → Similitud: 0.495
-   13. images-testing-preferences-nobg\top-sport2.png → Similitud: 0.495
-   14. images-testing-preferences-nobg\jean-oldmoney-minimalista.png → Similitud: 0.495
-   15. images-testing-preferences-nobg\jean-bohochic.png → Similitud: 0.492
-mayor red flag es short-negro-sport.png con 0.5147767066955566 de probabilidad
-[coquette] pollera-coquette.png: 0.528 > 0.515? ✅
-[coquette] pollera-coquette2.png: 0.518 > 0.515? ✅
+   5. images-testing-preferences-nobg\pollera-jean-streetwear.png → Similitud: 0.511
+   6. images-testing-preferences-nobg\pollera-jean-streetwear2.png → Similitud: 0.510
+   7. images-testing-preferences-nobg\pollera-jean-streetwear-minimalista.png → Similitud: 0.509
+   8. images-testing-preferences-nobg\jean-oldmoney-minimalista2.png → Similitud: 0.508
+   9. images-testing-preferences-nobg\short-gris-sport.png → Similitud: 0.508
+   10. images-testing-preferences-nobg\jean-negro-streetwear.png → Similitud: 0.504
+   11. images-testing-preferences-nobg\jean-streetwear-minimalista.png → Similitud: 0.502
+   12. images-testing-preferences-nobg\pollera-jean-larga-minimalista.png → Similitud: 0.501
+   13. images-testing-preferences-nobg\short-negro-streetwear.png → Similitud: 0.500
+   14. images-testing-preferences-nobg\top-sport.png → Similitud: 0.498
+   15. images-testing-preferences-nobg\jean-bohochic2.png → Similitud: 0.498
+   16. images-testing-preferences-nobg\jean-bohochic3.png → Similitud: 0.495
+   17. images-testing-preferences-nobg\top-sport2.png → Similitud: 0.495
+   18. images-testing-preferences-nobg\jean-oldmoney-minimalista.png → Similitud: 0.495
+   19. images-testing-preferences-nobg\jean-bohochic.png → Similitud: 0.492
+mayor red flag es short-negro-sport.png con 0.5133013129234314 de probabilidad
+[coquette] pollera-coquette.png: 0.528 > 0.513? ✅
+[coquette] pollera-coquette2.png: 0.518 > 0.513? ✅
 
 🎯 Porcentaje de acierto: 100.00% (2/2)
 
@@ -776,16 +804,20 @@ Descripcion: minimalista
    3. images-testing-preferences-nobg\jean-oldmoney-minimalista.png → Similitud: 0.507
    4. images-testing-preferences-nobg\pollera-jean-larga-minimalista.png → Similitud: 0.506
    5. images-testing-preferences-nobg\short-gris-sport.png → Similitud: 0.506
-   6. images-testing-preferences-nobg\short-rosa-sport.png → Similitud: 0.504
-   7. images-testing-preferences-nobg\short-negro-sport.png → Similitud: 0.503
+   6. images-testing-preferences-nobg\short-negro-sport.png → Similitud: 0.505
+   7. images-testing-preferences-nobg\short-rosa-sport.png → Similitud: 0.504
    8. images-testing-preferences-nobg\top-sport.png → Similitud: 0.503
-   9. images-testing-preferences-nobg\pollera-coquette.png → Similitud: 0.502
-   10. images-testing-preferences-nobg\top-sport2.png → Similitud: 0.501
-   11. images-testing-preferences-nobg\pollera-jean-streetwear-minimalista.png → Similitud: 0.498
-   12. images-testing-preferences-nobg\pollera-coquette2.png → Similitud: 0.491
-   13. images-testing-preferences-nobg\jean-bohochic.png → Similitud: 0.491
-   14. images-testing-preferences-nobg\jean-bohochic3.png → Similitud: 0.491
-   15. images-testing-preferences-nobg\jean-bohochic2.png → Similitud: 0.488
+   9. images-testing-preferences-nobg\pollera-jean-streetwear2.png → Similitud: 0.503
+   10. images-testing-preferences-nobg\pollera-coquette.png → Similitud: 0.502
+   11. images-testing-preferences-nobg\short-negro-streetwear.png → Similitud: 0.502
+   12. images-testing-preferences-nobg\top-sport2.png → Similitud: 0.501
+   13. images-testing-preferences-nobg\pollera-jean-streetwear.png → Similitud: 0.501
+   14. images-testing-preferences-nobg\pollera-jean-streetwear-minimalista.png → Similitud: 0.498
+   15. images-testing-preferences-nobg\pollera-coquette2.png → Similitud: 0.491
+   16. images-testing-preferences-nobg\jean-bohochic.png → Similitud: 0.491
+   17. images-testing-preferences-nobg\jean-bohochic3.png → Similitud: 0.491
+   18. images-testing-preferences-nobg\jean-negro-streetwear.png → Similitud: 0.489
+   19. images-testing-preferences-nobg\jean-bohochic2.png → Similitud: 0.488
 mayor red flag es short-gris-sport.png con 0.5057342052459717 de probabilidad
 [minimalista] jean-oldmoney-minimalista.png: 0.507 > 0.506? ✅
 [minimalista] jean-oldmoney-minimalista2.png: 0.517 > 0.506? ✅
@@ -803,8 +835,11 @@ Probabilidad más baja: 0.498
 
 Imágenes con probabilidad mayor al mínimo:
 Esta imagen sobrepaso al minimo: pollera-coquette.png: 0.502
+Esta imagen sobrepaso al minimo: pollera-jean-streetwear.png: 0.501
+Esta imagen sobrepaso al minimo: pollera-jean-streetwear2.png: 0.503
 Esta imagen sobrepaso al minimo: short-gris-sport.png: 0.506
-Esta imagen sobrepaso al minimo: short-negro-sport.png: 0.503
+Esta imagen sobrepaso al minimo: short-negro-sport.png: 0.505
+Esta imagen sobrepaso al minimo: short-negro-streetwear.png: 0.502
 Esta imagen sobrepaso al minimo: short-rosa-sport.png: 0.504
 Esta imagen sobrepaso al minimo: top-sport.png: 0.503
 Esta imagen sobrepaso al minimo: top-sport2.png: 0.501
@@ -815,31 +850,39 @@ Descripcion: streetwear
 
 📝 SIMILITUD CON DESCRIPCIÓN: 'streetwear'
 
-   1. images-testing-preferences-nobg\short-negro-sport.png → Similitud: 0.506
+   1. images-testing-preferences-nobg\short-negro-streetwear.png → Similitud: 0.518
    2. images-testing-preferences-nobg\jean-streetwear-minimalista.png → Similitud: 0.505
-   3. images-testing-preferences-nobg\jean-oldmoney-minimalista2.png → Similitud: 0.504
-   4. images-testing-preferences-nobg\jean-oldmoney-minimalista.png → Similitud: 0.504
-   5. images-testing-preferences-nobg\short-rosa-sport.png → Similitud: 0.504
-   6. images-testing-preferences-nobg\top-sport.png → Similitud: 0.503
-   7. images-testing-preferences-nobg\short-gris-sport.png → Similitud: 0.502
-   8. images-testing-preferences-nobg\top-sport2.png → Similitud: 0.500
-   9. images-testing-preferences-nobg\pollera-coquette.png → Similitud: 0.499
-   10. images-testing-preferences-nobg\jean-bohochic3.png → Similitud: 0.499
-   11. images-testing-preferences-nobg\pollera-jean-larga-minimalista.png → Similitud: 0.498
-   12. images-testing-preferences-nobg\pollera-coquette2.png → Similitud: 0.497
-   13. images-testing-preferences-nobg\pollera-jean-streetwear-minimalista.png → Similitud: 0.497
-   14. images-testing-preferences-nobg\jean-bohochic2.png → Similitud: 0.494
-   15. images-testing-preferences-nobg\jean-bohochic.png → Similitud: 0.489
-mayor red flag es short-negro-sport.png con 0.5061681270599365 de probabilidad
+   3. images-testing-preferences-nobg\pollera-jean-streetwear.png → Similitud: 0.505
+   4. images-testing-preferences-nobg\jean-oldmoney-minimalista2.png → Similitud: 0.504
+   5. images-testing-preferences-nobg\jean-oldmoney-minimalista.png → Similitud: 0.504
+   6. images-testing-preferences-nobg\short-rosa-sport.png → Similitud: 0.504
+   7. images-testing-preferences-nobg\jean-negro-streetwear.png → Similitud: 0.503
+   8. images-testing-preferences-nobg\top-sport.png → Similitud: 0.503
+   9. images-testing-preferences-nobg\short-negro-sport.png → Similitud: 0.503
+   10. images-testing-preferences-nobg\pollera-jean-streetwear2.png → Similitud: 0.503
+   11. images-testing-preferences-nobg\short-gris-sport.png → Similitud: 0.502
+   12. images-testing-preferences-nobg\top-sport2.png → Similitud: 0.500
+   13. images-testing-preferences-nobg\pollera-coquette.png → Similitud: 0.499
+   14. images-testing-preferences-nobg\jean-bohochic3.png → Similitud: 0.499
+   15. images-testing-preferences-nobg\pollera-jean-larga-minimalista.png → Similitud: 0.498
+   16. images-testing-preferences-nobg\pollera-coquette2.png → Similitud: 0.497
+   17. images-testing-preferences-nobg\pollera-jean-streetwear-minimalista.png → Similitud: 0.497
+   18. images-testing-preferences-nobg\jean-bohochic2.png → Similitud: 0.494
+   19. images-testing-preferences-nobg\jean-bohochic.png → Similitud: 0.489
+mayor red flag es short-rosa-sport.png con 0.5040603280067444 de probabilidad
 mayor yellow flag es jean-oldmoney-minimalista2.png con 0.5042774081230164 de probabilidad
-[streetwear] jean-streetwear-minimalista.png: 0.505 > 0.506? ❌
-[streetwear] pollera-jean-streetwear-minimalista.png: 0.497 > 0.506? ❌
+[streetwear] jean-negro-streetwear.png: 0.503 > 0.504? ❌
+[streetwear] jean-streetwear-minimalista.png: 0.505 > 0.504? ✅
+[streetwear] pollera-jean-streetwear-minimalista.png: 0.497 > 0.504? ❌
+[streetwear] pollera-jean-streetwear.png: 0.505 > 0.504? ✅
+[streetwear] pollera-jean-streetwear2.png: 0.503 > 0.504? ❌
+[streetwear] short-negro-streetwear.png: 0.518 > 0.504? ✅
 
-🎯 Porcentaje de acierto: 0.00% (0/2)
+🎯 Porcentaje de acierto: 50.00% (3/6)
 
-📊 Precision: 0.000
-📊 Recall: 0.000
-📊 MRR (Mean Reciprocal Rank): 0.500
+📊 Precision: 0.600
+📊 Recall: 0.500
+📊 MRR (Mean Reciprocal Rank): 1.000
 
 Probabilidad más baja: 0.497
 
@@ -851,7 +894,7 @@ Esta imagen sobrepaso al minimo: pollera-coquette.png: 0.499
 Esta imagen sobrepaso al minimo: pollera-coquette2.png: 0.497
 Esta imagen sobrepaso al minimo: pollera-jean-larga-minimalista.png: 0.498
 Esta imagen sobrepaso al minimo: short-gris-sport.png: 0.502
-Esta imagen sobrepaso al minimo: short-negro-sport.png: 0.506
+Esta imagen sobrepaso al minimo: short-negro-sport.png: 0.503
 Esta imagen sobrepaso al minimo: short-rosa-sport.png: 0.504
 Esta imagen sobrepaso al minimo: top-sport.png: 0.503
 Esta imagen sobrepaso al minimo: top-sport2.png: 0.500
