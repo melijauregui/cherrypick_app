@@ -3,11 +3,10 @@ import { z } from "zod";
 
 type SafeFetchOpts<TOutput, TInput = unknown> = {
   url: string | URL | globalThis.Request;
-  schema: z.ZodType<TOutput, any, TInput>;
 } & RequestInit;
 
 async function safeFetch<T>(opts: SafeFetchOpts<T>) {
-  const { url, schema, ...fetchOpts } = opts;
+  const { url, ...fetchOpts } = opts;
   const cookie = authClient.getCookie();
   // console.log("cookie", cookie);
 

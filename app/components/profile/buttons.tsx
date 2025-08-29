@@ -1,11 +1,7 @@
-import { LOCAL_IP } from "@/config/api";
-import safeFetch from "@/app/utils/safe-fetch";
-import { VerifyAccountDeletedSchema } from "@/schemas/auth/sign-up-schema";
 import { TouchableOpacity, Text } from "react-native";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { authClient } from "@/lib/auth-client";
 import CustomModal from "../Modal";
 import BottomSheet from "@gorhom/bottom-sheet";
+import { useDeleteAccount } from "@/app/utils/update";
 
 const LogOutButton: React.FC<{ logout: () => Promise<void> }> = ({
   logout,
@@ -64,33 +60,3 @@ const DeleteAccountButton: React.FC<{
   );
 };
 export { DeleteAccountButton };
-
-function useDeleteAccount(logout: () => Promise<void>) {
-  const queryClient = useQueryClient();
-  const mutation = useMutation({
-    mutationFn: async () => {
-      const { data } = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/delete-account`,
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        schema: VerifyAccountDeletedSchema,
-      });
-      if (data.error) {
-        throw new Error(data.details);
-      }
-    },
-    onSuccess: async () => {
-      await authClient.deleteUser();
-      console.log("Account deleted successfully");
-      await logout();
-    },
-    onError: error => {
-      // TODO PUSH TOAST
-      console.log(`could not delete user:`, error);
-    },
-  });
-
-  return mutation;
-}

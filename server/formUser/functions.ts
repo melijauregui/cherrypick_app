@@ -1,14 +1,16 @@
-import { ResCodeVerificationPostSchemaType } from "@/schemas/auth/sign-up-schema";
 import { db } from "../db.config";
 import nodemailer from "nodemailer";
 import { randomInt } from "crypto";
-import { VerifyCodeResponseSchemaType } from "@/schemas/formUser";
+import { VerifyCodeResponseSchemaType } from "@/schemas/formUser-schema";
+import { SuccessSchemaType } from "@/schemas/standar-response-schema";
+import { ErrorSchemaType } from "@/schemas/standar-response-schema";
+import { ContentfulStatusCode } from "hono/utils/http-status";
 
 export async function SaveVerificationCode(
   email: string,
   code: string
-): Promise<ResCodeVerificationPostSchemaType> {
-  let res: ResCodeVerificationPostSchemaType;
+): Promise<SuccessSchemaType | ErrorSchemaType> {
+  let res: SuccessSchemaType | ErrorSchemaType;
 
   try {
     const expirationTime = new Date();
@@ -81,8 +83,11 @@ export { GenerateVerificationCode };
 export async function VerifyVerificationCode(
   email: string,
   code: string
-): Promise<VerifyCodeResponseSchemaType> {
-  let res: VerifyCodeResponseSchemaType;
+): Promise<
+  | VerifyCodeResponseSchemaType
+  | { error: true; errMsg: ErrorSchemaType; statusCode: ContentfulStatusCode }
+> {
+  let res: VerifyCodeResponseSchemaType | ErrorSchemaType;
 
   try {
     const registerInProgress = await db.registerInProgress.findUnique({
@@ -94,7 +99,7 @@ export async function VerifyVerificationCode(
         error: true,
         details: "Email not found",
       };
-      return res;
+      return { error: true, errMsg: res, statusCode: 404 };
     }
 
     const { verificationCode, verificationCodeExpiration } = registerInProgress;
@@ -112,15 +117,13 @@ export async function VerifyVerificationCode(
         error: true,
         details: "Verification code expired",
       };
-      return res;
+      return { error: true, errMsg: res, statusCode: 410 };
     }
 
     // Delete the verification code after successful verification
     await db.registerInProgress.delete({
       where: { email },
     });
-
-    console.log("Código de verificación correcto");
     res = {
       error: false,
       isCorrect: true,
@@ -130,7 +133,9 @@ export async function VerifyVerificationCode(
     res = {
       error: true,
       details: "Error verifying code",
+      info: error instanceof Error ? error.message : "Unknown error",
     };
+    return { error: true, errMsg: res, statusCode: 500 };
   }
 
   return res;
@@ -138,7 +143,7 @@ export async function VerifyVerificationCode(
 
 export async function SendEmailBrand(
   email: string
-): Promise<ResCodeVerificationPostSchemaType> {
+): Promise<SuccessSchemaType | ErrorSchemaType> {
   try {
     const transporter = nodemailer.createTransport({
       service: "gmail",

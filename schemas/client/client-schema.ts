@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ErrorSchema } from "../standar-response";
+import { ErrorSchema, SuccessSchema } from "../standar-response-schema";
 
 export const UpdateClientSchema = z.object({
   name: z.string({
@@ -37,14 +37,9 @@ export const ClientSchema = z.object({
 
 export type ClientSchemaType = z.infer<typeof ClientSchema>;
 
-const ClientSchemaResponse = z.union([
-  z.object({
-    error: z.literal(false),
-    user: ClientSchema,
-  }),
-  z.object({
-    ...ErrorSchema.shape,
-  }),
-]);
+const ClientSchemaResponse = z.object({
+  ...SuccessSchema.shape,
+  user: ClientSchema,
+});
 export { ClientSchemaResponse };
 export type ClientSchemaResponseType = z.infer<typeof ClientSchemaResponse>;

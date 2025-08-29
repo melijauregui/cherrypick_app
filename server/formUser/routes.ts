@@ -3,11 +3,7 @@ import { createRoute } from "@hono/zod-openapi";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { Context } from "hono";
 import { errorHandler } from "../errorHandler";
-import {
-  BodyCodeVerificationPostSchema,
-  ResCodeVerificationPostSchema,
-  ResCodeVerificationPostSchemaType,
-} from "@/schemas/auth/sign-up-schema";
+import { BodyCodeVerificationPostSchema } from "@/schemas/auth/sign-up-schema";
 import {
   GenerateVerificationCode,
   SaveVerificationCode,
@@ -18,7 +14,14 @@ import {
   QueryVerifyCodeSchema,
   VerifyCodeResponseSchema,
   VerifyCodeResponseSchemaType,
-} from "@/schemas/formUser";
+} from "@/schemas/formUser-schema";
+import {
+  ErrorSchema,
+  ErrorSchemaType,
+  SuccessSchema,
+  SuccessSchemaType,
+} from "@/schemas/standar-response-schema";
+import { ContentfulStatusCode } from "hono/utils/http-status";
 
 const FormUserApp = new OpenAPIHono({
   defaultHook: (result, c) => {
@@ -52,11 +55,27 @@ const codeVerificationRoute = createRoute({
     200: {
       content: {
         "application/json": {
-          schema: ResCodeVerificationPostSchema,
+          schema: SuccessSchema,
         },
       },
       description:
         "Devuelve un booleano que indica si se pudo enviar el código de verificación",
+    },
+    400: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Error al enviar el código de verificación",
+    },
+    500: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Error al enviar el código de verificación",
     },
   },
 });
@@ -64,25 +83,19 @@ FormUserApp.openapi(codeVerificationRoute, async c => {
   const { email } = await c.req.valid("json");
   const code = GenerateVerificationCode();
   const emailSent = await SendEmail(email, code);
-  let res: ResCodeVerificationPostSchemaType;
+  let res: SuccessSchemaType | ErrorSchemaType;
 
   if (!emailSent) {
     res = {
       error: true,
       details: "Invalid email",
     };
-    return c.json(res, 200);
+    return c.json(res, 400);
   }
-
   // Guardar (o reemplazar) en DB
-  try {
-    res = await SaveVerificationCode(email, code);
-  } catch (err) {
-    console.error("Error al guardar código:", err);
-    res = {
-      error: true,
-      details: "Error al guardar en la base",
-    };
+  res = await SaveVerificationCode(email, code);
+  if (res.error) {
+    return c.json(res, 500);
   }
   return c.json(res, 200);
 });
@@ -108,12 +121,38 @@ const verifiedCodeRoute = createRoute({
       description:
         "Devuelve un booleano que indica si el codigo de verificación es correcto",
     },
+    404: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Email not found",
+    },
+    410: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Verification code expired",
+    },
   },
 });
 FormUserApp.openapi(verifiedCodeRoute, async c => {
   const { code, email } = await c.req.valid("json");
-  let res: VerifyCodeResponseSchemaType;
+  let res:
+    | VerifyCodeResponseSchemaType
+    | {
+        error: true;
+        errMsg: ErrorSchemaType;
+        statusCode: ContentfulStatusCode;
+      };
 
   res = await VerifyVerificationCode(email, code);
+  if (res.error) {
+    const errorMsg: ErrorSchemaType = res.errMsg;
+    return c.json(errorMsg, res.statusCode as 404 | 410);
+  }
   return c.json(res, 200);
 });

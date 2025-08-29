@@ -3,10 +3,6 @@ import { LOCAL_IP } from "@/config/api";
 import {
   AllBrandItemsSchemaRes,
   AllBrandNamesItemsSchemaType,
-  BrandSchemaPropertiesRes,
-  BrandSchemaPropertiesType,
-  BrandSchemaRes,
-  BrandSchemaType,
 } from "@/schemas/auth/brand-schema";
 import {
   CatalogItemArraySchemaQuery,
@@ -23,9 +19,14 @@ import {
 import { ZodSchema } from "zod";
 import {
   ClientSchemaResponse,
-  ClientSchemaResponseType,
   ClientSchemaType,
-} from "@/schemas/client/client";
+} from "@/schemas/client/client-schema";
+import {
+  BrandSchemaPropertiesResponse,
+  BrandSchemaPropertiesType,
+  BrandSchemaResponse,
+  BrandSchemaType,
+} from "@/schemas/brand/brand-schema";
 
 // Helper function to handle API responses consistently
 const handleApiResponse = async <T>(
@@ -36,21 +37,15 @@ const handleApiResponse = async <T>(
   try {
     const { data } = await apiCall();
 
-    // Validate that the schema is a union type with error/success structure
-    if (!("_def" in schema) || !("options" in schema._def)) {
-      throw new Error("Schema must be a ZodUnion with error/success structure");
+    // Check if it's an error response
+    if (data.error) {
+      throw new Error(data.details + (data.info ?? ""));
     }
 
-    // Parse the response with the schema to validate the structure
     const parsedData = schema.parse(data);
-
-    // Check if it's an error response using the schema validation
-    if (parsedData.error) {
-      throw new Error(parsedData.details);
-    }
-
     const { error, ...dataPart } = parsedData;
-    return dataPart as T;
+
+    return { ...dataPart } as T;
   } catch (error) {
     console.error(`Error in ${errorContext}:`, error);
     return null;
@@ -82,7 +77,6 @@ export async function checkIsMyItem(
       safeFetch({
         url: `http://${LOCAL_IP}:3000/is-my-item?uuid=${uuidItem}`,
         method: "GET",
-        schema: IsMyItemSchema,
       }),
     IsMyItemSchema,
     "checkIsMyItem"
@@ -96,19 +90,18 @@ export async function getBrandProfile(
   if (!brandId) {
     return null;
   }
-  console.log("getBrandProfile", brandId);
+  console.log("getBrandProfileId", brandId);
 
   const res = await handleApiResponse<{
     brand: BrandSchemaPropertiesType;
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/get-brand?id=${brandId}`,
+        url: `http://${LOCAL_IP}:3000/brand/${brandId}`,
         method: "GET",
-        schema: BrandSchemaPropertiesRes,
       }),
-    BrandSchemaPropertiesRes,
-    "getBrandProfile"
+    BrandSchemaPropertiesResponse,
+    "getBrandProfileId"
   );
 
   return res?.brand || null;
@@ -130,7 +123,6 @@ export async function getBrandItems(
       safeFetch({
         url: `http://${LOCAL_IP}:3000/all-brand?page=${page}&limit=${limit}&id=${brandId}`,
         method: "GET",
-        schema: CatalogItemArraySchemaResponse,
       }),
     CatalogItemArraySchemaResponse,
     "getBrandItems"
@@ -145,12 +137,11 @@ export async function getSelfBrandProfile(): Promise<BrandSchemaType | null> {
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/get-self-brand`,
+        url: `http://${LOCAL_IP}:3000/brand`,
         method: "GET",
-        schema: BrandSchemaRes,
       }),
-    BrandSchemaRes,
-    "getBrandProfile"
+    BrandSchemaResponse,
+    "getSelfBrandProfile"
   );
   return res?.brand || null;
 }
@@ -164,7 +155,6 @@ export async function getSelfClientProfile(): Promise<ClientSchemaType | null> {
       safeFetch({
         url: `http://${LOCAL_IP}:3000/client`,
         method: "GET",
-        schema: ClientSchemaResponse,
       }),
     ClientSchemaResponse,
     "getSelfClientProfile"
@@ -184,7 +174,6 @@ export async function getSelfBrandItems(
       safeFetch({
         url: `http://${LOCAL_IP}:3000/all-self-brand?page=${page}&limit=${limit}`,
         method: "GET",
-        schema: CatalogItemArraySchemaResponse,
       }),
     CatalogItemArraySchemaResponse,
     "getSelfBrandItems"
@@ -204,7 +193,6 @@ export async function getClothingItemsHome(
       safeFetch({
         url: `http://${LOCAL_IP}:3000/all?page=${page}&limit=${limit}`,
         method: "GET",
-        schema: CatalogItemArraySchemaQuery,
       }),
     CatalogItemArraySchemaQuery,
     "getClothingItemsHome"
@@ -231,7 +219,6 @@ export const fetchItems = async (
       safeFetch({
         url: `http://${LOCAL_IP}:3000/all-brand-items?filter=${search}&page=${page}&limit=${limit}`,
         method: "GET",
-        schema: AllBrandItemsSchemaRes,
       }),
     AllBrandItemsSchemaRes,
     "fetchItems"
@@ -248,7 +235,6 @@ export async function getItem(itemUuid: string): Promise<{
       safeFetch({
         url: `http://${LOCAL_IP}:3000/get-item?uuid=${itemUuid}`,
         method: "GET",
-        schema: GetItemResponseSchema,
       }),
     GetItemResponseSchema,
     "getItem"
@@ -271,7 +257,6 @@ const toggleLikeFavorite = async (
         body: JSON.stringify({
           item_uuid: itemUuid,
         }),
-        schema: LikeFavoriteResponseSchema,
       }),
     LikeFavoriteResponseSchema,
     "toggleLikeFavorite"
@@ -290,7 +275,6 @@ const checkLikeFavorite = async (
       safeFetch({
         url: `http://${LOCAL_IP}:3000/check-${action}?item_uuid=${itemUuid}`,
         method: "GET",
-        schema: CheckLikeFavoriteResponseSchema,
       }),
     CheckLikeFavoriteResponseSchema,
     "checkLikeFavorite"
@@ -334,7 +318,6 @@ export const getAllLikedItems = async (
       safeFetch({
         url: `http://${LOCAL_IP}:3000/get-all-liked-items?page=${page}&limit=${limit}`,
         method: "GET",
-        schema: CatalogItemArraySchemaQuery,
       }),
     CatalogItemArraySchemaQuery,
     "getAllLikedItems"
@@ -354,7 +337,6 @@ export const getAllFavoritedItems = async (
       safeFetch({
         url: `http://${LOCAL_IP}:3000/get-all-favorited-items?page=${page}&limit=${limit}`,
         method: "GET",
-        schema: CatalogItemArraySchemaQuery,
       }),
     CatalogItemArraySchemaQuery,
     "getAllFavoritedItems"

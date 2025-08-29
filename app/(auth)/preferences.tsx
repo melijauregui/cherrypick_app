@@ -15,9 +15,8 @@ import safeFetch from "@/app/utils/safe-fetch";
 import { LOCAL_IP } from "@/config/api";
 import { authClient, useSession } from "@/lib/auth-client";
 import Toast from "react-native-toast-message";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ClientSchema } from "@/schemas/client/client";
-import { ErrorResponseSchema } from "@/schemas/standar-response";
+import { useMutation } from "@tanstack/react-query";
+import { ClientSchema } from "@/schemas/client/client-schema";
 
 const Preferences = () => {
   const router = useRouter();
@@ -261,7 +260,6 @@ function useCreateAccount() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(client),
-        schema: ErrorResponseSchema,
         method: "POST",
       });
       if (data.error) {

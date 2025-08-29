@@ -3,15 +3,17 @@ import { Context } from "hono";
 import { errorHandler } from "../errorHandler";
 import logger from "../logger";
 import {
-  ErrorResponseSchema,
-  ErrorResponseSchemaType,
-} from "@/schemas/standar-response";
+  ErrorSchema,
+  ErrorSchemaType,
+  SuccessSchema,
+  SuccessSchemaType,
+} from "@/schemas/standar-response-schema";
 import {
   ClientSchema,
   ClientSchemaResponse,
   ClientSchemaResponseType,
   UpdateClientSchema,
-} from "@/schemas/client/client";
+} from "@/schemas/client/client-schema";
 import { AppEnv } from "../app";
 import { CreateClient, GetClient, UpdateClient } from "./functions";
 
@@ -50,7 +52,7 @@ const createUserRoute = createRoute({
       description: "Crea un nuevo usuario",
       content: {
         "application/json": {
-          schema: ErrorResponseSchema,
+          schema: SuccessSchema,
         },
       },
     },
@@ -59,7 +61,7 @@ const createUserRoute = createRoute({
 
 ClientApp.openapi(createUserRoute, async c => {
   const { name, email, dateOfBirth, preferences } = await c.req.valid("json");
-  let res: ErrorResponseSchemaType;
+  let res: SuccessSchemaType;
   logger.info("Creating client:", name, email, dateOfBirth, preferences);
   await CreateClient(email, name, dateOfBirth, preferences);
   res = {
@@ -85,7 +87,15 @@ const getClientRoute = createRoute({
       description: "No tienes permisos para obtener el cliente",
       content: {
         "application/json": {
-          schema: ErrorResponseSchema,
+          schema: ErrorSchema,
+        },
+      },
+    },
+    404: {
+      description: "Cliente no encontrado",
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
         },
       },
     },
@@ -97,14 +107,18 @@ ClientApp.openapi(getClientRoute, async c => {
   const email = user?.email;
   if (!email) {
     logger.error("No tienes permisos para obtener el cliente");
-    const resError: ErrorResponseSchemaType = {
+    const resError: ErrorSchemaType = {
       error: true,
       details: "No tienes permisos para obtener el cliente",
     };
     return c.json(resError, 401);
   }
   logger.info("Getting client:", email);
-  const res: ClientSchemaResponseType = await GetClient(email);
+  const res: ClientSchemaResponseType | ErrorSchemaType =
+    await GetClient(email);
+  if (res.error) {
+    return c.json(res, 404);
+  }
   return c.json(res, 200);
 });
 
@@ -126,7 +140,7 @@ const updateClientRoute = createRoute({
       description: "Actualiza la información del usuario",
       content: {
         "application/json": {
-          schema: ErrorResponseSchema,
+          schema: SuccessSchema,
         },
       },
     },
@@ -134,7 +148,7 @@ const updateClientRoute = createRoute({
       description: "No tienes permisos para actualizar el cliente",
       content: {
         "application/json": {
-          schema: ErrorResponseSchema,
+          schema: ErrorSchema,
         },
       },
     },
@@ -144,7 +158,7 @@ const updateClientRoute = createRoute({
 ClientApp.openapi(updateClientRoute, async c => {
   logger.info("/PUT client");
   const { name, dateOfBirth, preferences } = await c.req.valid("json");
-  let res: ErrorResponseSchemaType;
+  let res: SuccessSchemaType | ErrorSchemaType;
   const user = c.get("user");
   const email = user?.email;
   if (!email) {

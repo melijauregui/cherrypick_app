@@ -1,5 +1,5 @@
 import { db } from "../db.config";
-import { VerifyUserExistsResponseSchemaType } from "@/schemas/user/user";
+import { VerifyUserExistsResponseSchemaType } from "@/schemas/user/user-schema";
 import { DeleteFromWeaviate } from "../app/catalogFunctions";
 import { GetBrandId } from "../brand/functions";
 import { NotFoundError } from "../errorHandler";

@@ -2,31 +2,29 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import safeFetch from "./safe-fetch";
 import { LOCAL_IP } from "@/config/api";
 import BottomSheet from "@gorhom/bottom-sheet";
-import { CatalogResponseSchemaDelete } from "@/schemas/catalog/catalog-schema";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { Keyboard } from "react-native";
-import { useSession } from "@/lib/auth-client";
+import { authClient, useSession } from "@/lib/auth-client";
 import { router } from "expo-router";
-import { ErrorResponseSchema } from "@/schemas/standar-response";
+import { SuccessSchema } from "@/schemas/standar-response-schema";
 
 export default function useUpdateBrand(brandEmail: string) {
   const queryClient = useQueryClient();
   const mutation = useMutation({
-    mutationFn: async (data: { description: string; url: string }) => {
-      const response = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/update-brand`,
-        method: "POST",
+    mutationFn: async (brand: { description: string; url: string }) => {
+      const { data } = await safeFetch({
+        url: `http://${LOCAL_IP}:3000/brand`,
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          description: data.description,
-          url: data.url,
+          description: brand.description,
+          url: brand.url,
         }),
-        schema: ErrorResponseSchema,
       });
-      if (response.data.error) {
-        throw new Error(response.data.details);
+      if (data.error) {
+        throw new Error(data.details);
       }
-      return response.data;
+      SuccessSchema.parse(data);
     },
     onSuccess: () => {},
     onError: error => {
@@ -46,27 +44,25 @@ export default function useUpdateBrand(brandEmail: string) {
 export function useUpdateClient(email: string) {
   const queryClient = useQueryClient();
   const mutation = useMutation({
-    mutationFn: async (data: {
+    mutationFn: async (user: {
       username: string;
       dateOfBirth: Date | null;
       preferences: string[];
     }) => {
-      const response = await safeFetch({
+      const { data } = await safeFetch({
         url: `http://${LOCAL_IP}:3000/client`,
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: data.username,
-          dateOfBirth: data.dateOfBirth,
-          preferences: data.preferences,
+          name: user.username,
+          dateOfBirth: user.dateOfBirth,
+          preferences: user.preferences,
         }),
-        schema: ErrorResponseSchema,
       });
-      console.log("response.data", response.data);
-      if (response.data.error) {
-        throw new Error(response.data.details + "\n" + response.data.info);
+      if (data.error) {
+        throw new Error(data.details + "\n" + data.info);
       }
-      return response.data;
+      SuccessSchema.parse(data);
     },
     onSuccess: () => {},
     onError: error => {
@@ -80,7 +76,6 @@ export function useUpdateClient(email: string) {
       });
     },
   });
-
   return mutation;
 }
 
@@ -106,7 +101,6 @@ export function useDelete(
         body: JSON.stringify({
           items: Array.from(selected).map(uuid => ({ uuid })),
         }),
-        schema: CatalogResponseSchemaDelete,
       });
       if (data.error) {
         throw new Error(data.details);
@@ -150,7 +144,6 @@ export function useDeleteItem(itemUuid: string) {
         body: JSON.stringify({
           items: [{ uuid: itemUuid }],
         }),
-        schema: CatalogResponseSchemaDelete,
       });
       if (response.data.error) {
         throw new Error(response.data.details);
@@ -171,6 +164,36 @@ export function useDeleteItem(itemUuid: string) {
     onError: error => {
       console.log(`could not delete item:`, error);
       Toast.show({ type: "error", text1: error.message });
+    },
+  });
+
+  return mutation;
+}
+
+export function useDeleteAccount(logout: () => Promise<void>) {
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: async () => {
+      const { data } = await safeFetch({
+        url: `http://${LOCAL_IP}:3000/user`,
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (data.error) {
+        throw new Error(data.details);
+      }
+      SuccessSchema.parse(data);
+    },
+    onSuccess: async () => {
+      await authClient.deleteUser();
+      console.log("Account deleted successfully");
+      await logout();
+    },
+    onError: error => {
+      // TODO PUSH TOAST
+      console.log(`could not delete user:`, error);
     },
   });
 

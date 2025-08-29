@@ -6,13 +6,15 @@ import { BodyUserVerificationPostSchema } from "@/schemas/auth/sign-up-schema";
 import {
   VerifyUserExistsResponseSchema,
   VerifyUserExistsResponseSchemaType,
-} from "@/schemas/user/user";
+} from "@/schemas/user/user-schema";
 import { DeleteUser } from "./functions";
 import { AppEnv } from "../app";
 import {
-  ErrorResponseSchema,
-  ErrorResponseSchemaType,
-} from "@/schemas/standar-response";
+  ErrorSchema,
+  ErrorSchemaType,
+  SuccessSchema,
+  SuccessSchemaType,
+} from "@/schemas/standar-response-schema";
 import logger from "../logger";
 
 const UserApp = new OpenAPIHono<AppEnv>({
@@ -52,15 +54,27 @@ const verifyUserRoute = createRoute({
       },
       description: "Devuelve si el usuario existe o no",
     },
+    400: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Email no válido",
+    },
   },
 });
 UserApp.openapi(verifyUserRoute, async c => {
   const { email } = c.req.valid("json");
   console.log("POST user/verify - Validated email:", email);
-  let res: VerifyUserExistsResponseSchemaType;
+  let res: VerifyUserExistsResponseSchemaType | ErrorSchemaType;
 
   // Buscar primero en users
   res = await VerifyUserExists(email);
+  logger.info("res!!", res);
+  if (res.error) {
+    return c.json(res, 400);
+  }
   return c.json(res, 200);
 });
 
@@ -73,7 +87,7 @@ const deleteAccountRoute = createRoute({
       description: "Elimina la cuenta del usuario",
       content: {
         "application/json": {
-          schema: ErrorResponseSchema,
+          schema: SuccessSchema,
         },
       },
     },
@@ -81,7 +95,7 @@ const deleteAccountRoute = createRoute({
       description: "Usuario no encontrado",
       content: {
         "application/json": {
-          schema: ErrorResponseSchema,
+          schema: ErrorSchema,
         },
       },
     },
@@ -89,7 +103,7 @@ const deleteAccountRoute = createRoute({
 });
 
 UserApp.openapi(deleteAccountRoute, async c => {
-  let res: ErrorResponseSchemaType;
+  let res: SuccessSchemaType | ErrorSchemaType;
   const user = c.get("user");
   const email = user?.email;
   const userType = user?.userType;

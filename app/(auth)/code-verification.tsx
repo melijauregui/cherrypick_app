@@ -20,9 +20,8 @@ import { FormSchemaCodeVerification } from "@/schemas/auth/code-verification-sch
 import { useRouter } from "expo-router";
 import safeFetch from "@/app/utils/safe-fetch";
 import { useLocalSearchParams } from "expo-router";
-import { ResCodeVerificationPostSchema } from "@/schemas/auth/sign-up-schema";
 import { LOCAL_IP } from "@/config/api";
-import { VerifyCodeResponseSchema } from "@/schemas/formUser";
+import { VerifyCodeResponseSchema } from "@/schemas/formUser-schema";
 
 const CodeVerification = () => {
   const router = useRouter();
@@ -94,7 +93,6 @@ const CodeVerification = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email }),
-        schema: ResCodeVerificationPostSchema,
       });
 
       if (data.error) {
@@ -398,7 +396,6 @@ async function verifyCode(
   try {
     const { data } = await safeFetch({
       url: `http://${LOCAL_IP}:3000/code-verification/verify`,
-      schema: VerifyCodeResponseSchema,
       method: "POST",
       body: JSON.stringify({ code, email }),
       headers: {

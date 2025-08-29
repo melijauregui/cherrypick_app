@@ -19,11 +19,11 @@ import splitDescriptionByLinesOrWords, {
 } from "./brandComponents";
 import { FormData, InsertNewItemsModal } from "./insertNewItems";
 import { CustomBottomLogout } from "./bottomSheets";
-import { BrandSchemaPropertiesType } from "@/schemas/auth/brand-schema";
 import { router } from "expo-router";
 import { getBrandItems, getSelfBrandItems } from "@/app/utils/fetch";
 import React from "react";
 import List2 from "../../components/List2";
+import { BrandSchemaPropertiesType } from "@/schemas/brand/brand-schema";
 
 const BrandProfile = ({
   user,
@@ -237,10 +237,10 @@ const BrandDetails = ({
   return (
     <View className="flex flex-col w-full">
       <View className="flex flex-row  w-full py-4 gap-5">
-        {brand.logo_url ? (
+        {brand.logoUrl ? (
           <Image
             source={{
-              uri: brand.logo_url,
+              uri: brand.logoUrl,
             }}
             className="w-32 h-32 rounded-full"
             resizeMode="contain"

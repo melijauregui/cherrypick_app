@@ -11,14 +11,16 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from "react";
 import LogoCircle from "@/app/components/LogoCircle";
 import safeFetch from "@/app/utils/safe-fetch";
-import {
-  FormSchemaSignUp,
-  ResCodeVerificationPostSchema,
-} from "@/schemas/auth/sign-up-schema";
+import { FormSchemaSignUp } from "@/schemas/auth/sign-up-schema";
 import DatePicker from "react-native-date-picker";
 import { useRouter } from "expo-router";
 import { LOCAL_IP } from "../../config/api";
-import { VerifyUserExistsResponseSchema } from "@/schemas/user/user";
+import { VerifyUserExistsResponseSchema } from "@/schemas/user/user-schema";
+import {
+  ErrorSchemaType,
+  SuccessSchema,
+  SuccessSchemaType,
+} from "@/schemas/standar-response-schema";
 
 const SignIn = () => {
   const router = useRouter();
@@ -55,50 +57,36 @@ const SignIn = () => {
     }
 
     const { name: nameValue, email: emailValue } = result.data;
-    try {
-      const { isAvailable } = await verifyMailAvailability(emailValue);
-      if (isAvailable) {
-        console.log("Email is available");
-      } else {
-        console.log("Email is not available");
-        setEmailError("Email is already registered");
-        return;
-      }
-      // Proceed with the next steps, e.g., navigate to the next screen
-      console.log(
-        "Proceeding with name:",
-        nameValue,
-        "and email:",
-        emailValue,
-        "and date:",
-        date.toISOString()
-      );
 
-      router.push({
-        pathname: "/code-verification",
-        params: {
-          name,
-          email,
-          dateBirth: date.toISOString(),
-        },
-      });
+    const resVerify = await verifyMailAvailability(emailValue);
+    if (resVerify.error) {
+      setEmailError(resVerify.details);
+      return;
+    }
+    // Proceed with the next steps, e.g., navigate to the next screen
+    console.log(
+      "Proceeding with name:",
+      nameValue,
+      "and email:",
+      emailValue,
+      "and date:",
+      date.toISOString()
+    );
 
-      console.log("Sending code verification to email:", emailValue);
-      try {
-        await postCodeVerification({ email: emailValue });
-      } catch (error) {
-        if (error instanceof Error) {
-          setEmailError(error.message);
-        } else {
-          setEmailError("Unexpected error occurred");
-        }
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        setEmailError(error.message);
-      } else {
-        setEmailError("Unexpected error occurred");
-      }
+    router.push({
+      pathname: "/code-verification",
+      params: {
+        name,
+        email,
+        dateBirth: date.toISOString(),
+      },
+    });
+
+    console.log("Sending code verification to email:", emailValue);
+
+    const resPost = await postCodeVerification({ email: emailValue });
+    if (resPost.error) {
+      setEmailError(resPost.details);
     }
   }
 
@@ -252,11 +240,10 @@ const Input = ({
 
 async function verifyMailAvailability(
   email: string
-): Promise<{ isAvailable: boolean }> {
+): Promise<SuccessSchemaType | ErrorSchemaType> {
   try {
     const { data } = await safeFetch({
       url: `http://${LOCAL_IP}:3000/user/verify`,
-      schema: VerifyUserExistsResponseSchema,
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -265,30 +252,29 @@ async function verifyMailAvailability(
     });
 
     if (data.error) {
-      console.log("Error:", data.details);
       throw new Error(data.details || "Unexpected error");
     }
+    VerifyUserExistsResponseSchema.parse(data);
     if (data.exists) {
-      return {
-        isAvailable: false,
-      };
+      throw new Error("Email is already registered");
     } else {
       return {
-        isAvailable: true,
+        error: false,
       };
     }
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error("Error3!!:", error.message);
-      throw error;
-    } else {
-      console.error("Unexpected error:", error);
-      throw new Error("Unexpected error");
-    }
+    return {
+      error: true,
+      details: error instanceof Error ? error.message : "Unexpected error",
+    };
   }
 }
 
-async function postCodeVerification({ email }: { email: string }) {
+async function postCodeVerification({
+  email,
+}: {
+  email: string;
+}): Promise<SuccessSchemaType | ErrorSchemaType> {
   try {
     const { data } = await safeFetch({
       url: `http://${LOCAL_IP}:3000/code-verification`,
@@ -297,20 +283,19 @@ async function postCodeVerification({ email }: { email: string }) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ email }),
-      schema: ResCodeVerificationPostSchema,
     });
     if (data.error) {
-      console.log("Error!!!:", data.details);
       throw new Error(data.details);
     }
-    console.log("Code success");
+    SuccessSchema.parse(data);
+    return {
+      error: false,
+    };
   } catch (error) {
-    console.error("Error2!!:", error);
-    if (error instanceof Error) {
-      throw error;
-    } else {
-      throw new Error("Unexpected error");
-    }
+    return {
+      error: true,
+      details: error instanceof Error ? error.message : "Unexpected error",
+    };
   }
 }
 

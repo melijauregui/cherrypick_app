@@ -5,14 +5,9 @@ import {
   CatalogItemArraySchemaQueryType,
   PaginationSchema,
 } from "../schemas/catalog/catalog-schema";
-import {
-  ResCodeVerificationPostSchema,
-  BodyCodeVerificationPostSchema,
-  ResCodeVerificationPostSchemaType,
-} from "../schemas/auth/sign-up-schema";
+import { BodyCodeVerificationPostSchema } from "../schemas/auth/sign-up-schema";
 import {
   UpdateCatalog,
-  GetBrand,
   DeleteFromCatalog,
   UpdateItem,
   GetBrandEmail,
@@ -44,15 +39,10 @@ import {
   QueryWeaviateItem,
 } from "./app/routeVector";
 import {
-  BrandSchemaRes,
-  BrandSchemaResType,
-  QueryGetBrandSchema,
   QueryAllBrandItemsSchema,
   AllBrandItemsSchemaRes,
   AllBrandItemsSchemaResType,
-  UpdateBrandSchema,
 } from "../schemas/auth/brand-schema";
-import { UpdateBrand } from "./app/userFunctions";
 import {
   jsonCatalogUploadSchema,
   deleteItemsJsonSchema,
@@ -78,12 +68,14 @@ import { VerifyUserExists } from "./user/functions";
 import FormUserApp from "./formUser/routes";
 import UserApp from "./user/routes";
 import ClientApp from "./client/routes";
-import { UpdateClientSchema } from "@/schemas/client/client";
-import {
-  ErrorResponseSchema,
-  ErrorResponseSchemaType,
-} from "@/schemas/standar-response";
 import { GetBrandId } from "./brand/functions";
+import BrandApp from "./brand/routes";
+import {
+  ErrorSchema,
+  ErrorSchemaType,
+  SuccessSchema,
+  SuccessSchemaType,
+} from "@/schemas/standar-response-schema";
 
 export type AppEnv = {
   Variables: {
@@ -125,134 +117,7 @@ app.on(["POST", "GET"], "/api/auth/*", c => {
 app.route("/code-verification", FormUserApp);
 app.route("/user", UserApp);
 app.route("/client", ClientApp);
-
-// endpoint que obtiene la información de la marca
-const getBrandRoute = createRoute({
-  method: "get",
-  path: "/get-self-brand", //QueryGetBrandSchema
-  responses: {
-    200: {
-      description: "Obtiene la información de la marca",
-      content: {
-        "application/json": {
-          schema: BrandSchemaRes,
-        },
-      },
-    },
-  },
-});
-
-app.openapi(getBrandRoute, async c => {
-  const user = c.get("user");
-  const email = user?.email;
-  let res: BrandSchemaResType;
-  if (!email) {
-    res = {
-      error: true,
-      details: "No tienes permisos para obtener la marca",
-    };
-    return c.json(res, 200);
-  }
-
-  try {
-    res = await GetBrand(email);
-  } catch (error) {
-    console.error(error);
-    return c.json({ error: true as true, details: "Server error" }, 200);
-  }
-  return c.json(res, 200);
-});
-
-// endpoint que obtiene la información de la marca con su id
-const getBrandRouteId = createRoute({
-  method: "get",
-  path: "/get-brand", //QueryGetBrandSchema
-  request: {
-    query: QueryGetBrandSchema,
-  },
-  responses: {
-    200: {
-      description: "Obtiene la información de la marca",
-      content: {
-        "application/json": {
-          schema: BrandSchemaRes,
-        },
-      },
-    },
-  },
-});
-
-app.openapi(getBrandRouteId, async c => {
-  const { id } = c.req.valid("query");
-  let res: BrandSchemaResType;
-
-  if (!id) {
-    res = {
-      error: true,
-      details: "Id de la marca no válido",
-    };
-    return c.json(res, 200);
-  }
-
-  const brandEmail = await GetBrandEmail(id);
-  if (!brandEmail) {
-    res = {
-      error: true,
-      details: "Marca no encontrada",
-    };
-    return c.json(res, 200);
-  }
-
-  res = await GetBrand(brandEmail);
-  return c.json(res, 200);
-});
-
-// endpoint que actualiza la información de la marca
-const updateBrandRoute = createRoute({
-  method: "post",
-  path: "/update-brand",
-  request: {
-    body: {
-      content: {
-        "application/json": {
-          schema: UpdateBrandSchema,
-        },
-      },
-    },
-  },
-  responses: {
-    200: {
-      description: "Actualiza la información del usuario",
-      content: {
-        "application/json": {
-          schema: CreateAccountSchemaRes,
-        },
-      },
-    },
-  },
-});
-
-app.openapi(updateBrandRoute, async c => {
-  var { description, url } = c.req.valid("json");
-  const user = c.get("user");
-  const brandEmail = user?.email;
-  let res: CreateAccountSchemaResType;
-  if (!brandEmail) {
-    res = {
-      error: true,
-      details: "No tienes permisos para actualizar la marca",
-    };
-    return c.json(res, 200);
-  }
-  console.log("Updating brand:", description, url);
-  try {
-    res = await UpdateBrand(brandEmail, description, url);
-  } catch (error) {
-    console.error(error);
-    return c.json({ error: true as true, details: "Server error" }, 200);
-  }
-  return c.json(res, 200);
-});
+app.route("/brand", BrandApp);
 
 // endpoint que devuelve los 10 resultados mas personalizados del usuario WIP
 const paginatedRoute = createRoute({
@@ -393,48 +258,41 @@ const sendFormBrandRoute = createRoute({
     200: {
       content: {
         "application/json": {
-          schema: ResCodeVerificationPostSchema,
+          schema: SuccessSchema,
         },
       },
       description:
         "Devuelve un booleano que indica si se pudo enviar el código de verificación",
     },
+    400: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Email no válido",
+    },
   },
 });
 app.openapi(sendFormBrandRoute, async c => {
+  //TODO: ver si se puede mejorar!!!! ver en el front este endpoint mejor
   const { email } = await c.req.valid("json");
   //verifico que no exista ya en la base de datos con verifyEmail
-  let res: ResCodeVerificationPostSchemaType;
-  const emailExists = await verifyEmail(email);
-  console.log("emailExists", emailExists);
-  if (emailExists.error) {
-    res = {
+  const emailExists = await VerifyUserExists(email);
+  if (emailExists.exists) {
+    const res: ErrorSchemaType = {
       error: true,
-      details: "Email already registered",
+      details: "Email ya registrado",
     };
-    return c.json(res, 200);
+    return c.json(res, 400);
   }
 
-  try {
-    const emailSent = await SendEmailBrand(email);
-
-    if (emailSent.error) {
-      res = {
-        error: true,
-        details: "Error al enviar el correo",
-      };
-      return c.json(res, 200);
-    }
-    res = {
-      error: false,
-    };
-  } catch (err) {
-    res = {
-      error: true,
-      details: "Error al enviar el correo",
-    };
+  const emailSent = await SendEmailBrand(email);
+  if (emailSent.error) {
+    return c.json(emailSent, 400);
   }
-  return c.json(res, 200);
+
+  return c.json(emailSent, 200);
 });
 
 // endpoint que inserta items en el catálogo de una marca con datos JSON

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ErrorSchema } from "./standar-response";
+import { SuccessSchema } from "./standar-response-schema";
 
 const QueryVerifyCodeSchema = z.object({
   code: z.string(),
@@ -7,15 +7,10 @@ const QueryVerifyCodeSchema = z.object({
 });
 export { QueryVerifyCodeSchema };
 
-const VerifyCodeResponseSchema = z.union([
-  z.object({
-    error: z.literal(false),
-    isCorrect: z.boolean(),
-  }),
-  z.object({
-    ...ErrorSchema.shape,
-  }),
-]);
+const VerifyCodeResponseSchema = z.object({
+  ...SuccessSchema.shape,
+  isCorrect: z.boolean(),
+});
 export { VerifyCodeResponseSchema };
 export type VerifyCodeResponseSchemaType = z.infer<
   typeof VerifyCodeResponseSchema

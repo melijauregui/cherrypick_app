@@ -1,7 +1,7 @@
-import { ErrorResponseSchemaType } from "@/schemas/standar-response";
+import { ErrorSchemaType } from "@/schemas/standar-response-schema";
 import { db } from "../db.config";
 import logger from "../logger";
-import { ClientSchemaResponseType } from "@/schemas/client/client";
+import { ClientSchemaResponseType } from "@/schemas/client/client-schema";
 
 export async function CreateClient(
   email: string,
@@ -21,8 +21,8 @@ export async function CreateClient(
 
 export async function GetClient(
   email: string
-): Promise<ClientSchemaResponseType> {
-  let res: ClientSchemaResponseType;
+): Promise<ClientSchemaResponseType | ErrorSchemaType> {
+  let res: ClientSchemaResponseType | ErrorSchemaType;
   const user = await db.client.findUnique({
     where: {
       email,
