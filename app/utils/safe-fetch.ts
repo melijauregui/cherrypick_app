@@ -18,9 +18,9 @@ async function safeFetch<T>(opts: SafeFetchOpts<T>) {
     },
   });
 
-  if (!res.ok) {
-    throw new Error("Network response was not ok " + res.statusText);
-  }
+  // if (!res.ok) {
+  //   throw new Error("Network response was not ok " + res.statusText);
+  // }
 
   const data = await res.json();
 

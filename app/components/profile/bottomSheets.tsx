@@ -30,11 +30,8 @@ function CustomBottomSheet({
 }) {
   const queryClient = useQueryClient();
 
-  console.log("CustomBottomSheet lastValue", lastValue);
   const [editInputValue, setEditInputValue] = useState<string>(lastValue);
-  console.log("CustomBottomSheet editInputValue", editInputValue);
   useEffect(() => {
-    console.log("CustomBottomSheet useEffect lastValue", lastValue);
     setEditInputValue(lastValue);
   }, [lastValue, resetKey]);
 

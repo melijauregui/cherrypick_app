@@ -18,6 +18,9 @@ import {
 import { GetBrandByEmail, GetBrandById, UpdateBrand } from "./functions";
 import { QueryIdSchema } from "@/schemas/standar-query-schema";
 import logger from "../logger";
+import { BodyCodeVerificationPostSchema } from "@/schemas/auth/sign-up-schema";
+import { VerifyUserExists } from "../user/functions";
+import { SendEmailBrand } from "../formUser/functions";
 
 const BrandApp = new OpenAPIHono<AppEnv>({
   defaultHook: (result, c) => {
@@ -186,4 +189,57 @@ BrandApp.openapi(updateBrandRoute, async c => {
     error: false,
   };
   return c.json(resSuccess, 200);
+});
+
+// endpoint que publica un nuevo code-verification
+const sendFormBrandRoute = createRoute({
+  method: "post",
+  path: "/form",
+  request: {
+    body: {
+      content: {
+        "application/json": { schema: BodyCodeVerificationPostSchema },
+      },
+    },
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: SuccessSchema,
+        },
+      },
+      description:
+        "Devuelve un booleano que indica si se pudo enviar el código de verificación",
+    },
+    400: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Email no válido",
+    },
+  },
+});
+BrandApp.openapi(sendFormBrandRoute, async c => {
+  const { email } = await c.req.valid("json");
+  logger.info("POST brand/form email:", email);
+  //verifico que no exista ya en la base de datos con verifyEmail
+  const { exists } = await VerifyUserExists(email);
+  if (exists) {
+    logger.warn("Email already exists");
+    const res: ErrorSchemaType = {
+      error: true,
+      details: "Email ya registrado",
+    };
+    return c.json(res, 400);
+  }
+
+  const emailSent = await SendEmailBrand(email);
+  if (emailSent.error) {
+    return c.json(emailSent, 400);
+  }
+  logger.info("Email sent:", emailSent);
+  return c.json(emailSent, 200);
 });

@@ -47,16 +47,12 @@ export const auth = betterAuth({
           new?: boolean;
           userType?: string;
         }) => {
-          const res = await VerifyUserExists(user.email);
-          if (res.error) {
-            console.error("Error verifying user exists", res);
+          const { exists, userType } = await VerifyUserExists(user.email);
+          if (!exists) {
+            console.error("User does not exist");
             return;
           }
-          if (!res.exists) {
-            console.error("User does not exist", res);
-            return;
-          }
-          return { data: { ...user, new: false, userType: res.userType } };
+          return { data: { ...user, new: false, userType: userType } };
         },
       },
     },

@@ -1,9 +1,9 @@
 import { z } from "zod";
+import { SuccessSchema } from "../standar-response-schema";
 
 export const VerifyUserExistsResponseSchema = z.object({
-  error: z.literal(false),
+  ...SuccessSchema.shape,
   exists: z.boolean(),
-  userType: z.enum(["client", "brand"]).nullable(),
 });
 export type VerifyUserExistsResponseSchemaType = z.infer<
   typeof VerifyUserExistsResponseSchema

@@ -9,7 +9,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from "react";
 import LogoCircle from "@/app/components/LogoCircle";
 import safeFetch from "@/app/utils/safe-fetch";
-import { ResCodeVerificationPostSchema } from "@/schemas/auth/sign-up-schema";
 import { useRouter } from "expo-router";
 import { LOCAL_IP } from "../../config/api";
 import { useMutation } from "@tanstack/react-query";
@@ -133,14 +132,14 @@ function useCodeVerification(
       setEmailError(undefined);
       setLoading(true);
       const { data } = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/send-form-brand`,
+        url: `http://${LOCAL_IP}:3000/brand/form`,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email: user.email }),
-        schema: ResCodeVerificationPostSchema,
       });
+      console.log("POST brand/form data:", data);
       if (data.error) {
         throw new Error(data.details);
       }

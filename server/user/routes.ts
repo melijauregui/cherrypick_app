@@ -70,11 +70,12 @@ UserApp.openapi(verifyUserRoute, async c => {
   let res: VerifyUserExistsResponseSchemaType | ErrorSchemaType;
 
   // Buscar primero en users
-  res = await VerifyUserExists(email);
-  logger.info("res!!", res);
-  if (res.error) {
-    return c.json(res, 400);
-  }
+  const { exists } = await VerifyUserExists(email);
+  res = {
+    error: false,
+    exists: exists,
+  };
+
   return c.json(res, 200);
 });
 

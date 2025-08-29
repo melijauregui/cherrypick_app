@@ -1,13 +1,15 @@
 import { db } from "../db.config";
-import { VerifyUserExistsResponseSchemaType } from "@/schemas/user/user-schema";
 import { DeleteFromWeaviate } from "../app/catalogFunctions";
 import { GetBrandId } from "../brand/functions";
 import { NotFoundError } from "../errorHandler";
 
 export async function VerifyUserExists(
   email: string
-): Promise<VerifyUserExistsResponseSchemaType> {
-  let res: VerifyUserExistsResponseSchemaType;
+): Promise<{ exists: boolean; userType: string | null }> {
+  let res: { exists: boolean; userType: string | null } = {
+    exists: false,
+    userType: null,
+  };
 
   // Buscar en clients primero
   const client = await db.client.findUnique({
@@ -15,11 +17,7 @@ export async function VerifyUserExists(
   });
 
   if (client) {
-    res = {
-      error: false,
-      exists: true,
-      userType: "client",
-    };
+    res = { exists: true, userType: "client" };
   } else {
     // Buscar en brands si no se encuentra en clients
     const brand = await db.brand.findUnique({
@@ -27,20 +25,11 @@ export async function VerifyUserExists(
     });
 
     if (brand) {
-      res = {
-        error: false,
-        exists: true,
-        userType: "brand",
-      };
+      res = { exists: true, userType: "brand" };
     } else {
-      res = {
-        error: false,
-        exists: false,
-        userType: null,
-      };
+      res = { exists: false, userType: null };
     }
   }
-
   return res;
 }
 
