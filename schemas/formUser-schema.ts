@@ -15,3 +15,12 @@ export { VerifyCodeResponseSchema };
 export type VerifyCodeResponseSchemaType = z.infer<
   typeof VerifyCodeResponseSchema
 >;
+
+const FormSchemaCodeVerification = z.object({
+  code: z
+    .string({
+      required_error: "Code must ve string",
+    })
+    .length(6, { message: "Code must have 6 digits" }),
+});
+export { FormSchemaCodeVerification };

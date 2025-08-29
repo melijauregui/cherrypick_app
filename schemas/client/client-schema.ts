@@ -43,3 +43,20 @@ const ClientSchemaResponse = z.object({
 });
 export { ClientSchemaResponse };
 export type ClientSchemaResponseType = z.infer<typeof ClientSchemaResponse>;
+
+const ClientFormSchemaSignUp = z.object({
+  name: z
+    .string({
+      required_error: "Name must ve valid",
+    })
+    .min(1, { message: "Name is required" }),
+  email: z
+    .string({
+      required_error: "Email is required",
+    })
+    .email({ message: "Invalid email address" }),
+  dateOfBirth: z.string().transform(val => {
+    return new Date(val);
+  }),
+});
+export { ClientFormSchemaSignUp };

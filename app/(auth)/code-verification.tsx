@@ -16,7 +16,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useEffect, useRef } from "react";
 import React, { useState } from "react";
 import LogoCircle from "@/app/components/LogoCircle";
-import { FormSchemaCodeVerification } from "@/schemas/auth/code-verification-schema";
+import { FormSchemaCodeVerification } from "@/schemas/formUser-schema";
 import { useRouter } from "expo-router";
 import safeFetch from "@/app/utils/safe-fetch";
 import { useLocalSearchParams } from "expo-router";

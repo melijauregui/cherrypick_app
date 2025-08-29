@@ -11,7 +11,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from "react";
 import LogoCircle from "@/app/components/LogoCircle";
 import safeFetch from "@/app/utils/safe-fetch";
-import { FormSchemaSignUp } from "@/schemas/auth/sign-up-schema";
 import DatePicker from "react-native-date-picker";
 import { useRouter } from "expo-router";
 import { LOCAL_IP } from "../../config/api";
@@ -21,6 +20,7 @@ import {
   SuccessSchema,
   SuccessSchemaType,
 } from "@/schemas/standar-response-schema";
+import { ClientFormSchemaSignUp } from "@/schemas/client/client-schema";
 
 const SignIn = () => {
   const router = useRouter();
@@ -34,10 +34,10 @@ const SignIn = () => {
   const [dateError, setDateError] = useState<string | undefined>(undefined);
 
   async function handleSubmit() {
-    const result = FormSchemaSignUp.safeParse({
-      name,
+    const result = ClientFormSchemaSignUp.safeParse({
+      name: name,
       email: email?.toLowerCase(),
-      dateString,
+      dateOfBirth: dateString,
     });
     if (!result.success) {
       //console.log("Validation failed:", result.error);
@@ -48,7 +48,7 @@ const SignIn = () => {
         issue => issue.path[0] === "email"
       );
       const dateError = result.error.issues.find(
-        issue => issue.path[0] === "date"
+        issue => issue.path[0] === "dateOfBirth"
       );
       setNameError(nameError?.message);
       setEmailError(emailError?.message);
@@ -70,7 +70,7 @@ const SignIn = () => {
       "and email:",
       emailValue,
       "and date:",
-      date.toISOString()
+      dateString
     );
 
     router.push({
@@ -78,7 +78,7 @@ const SignIn = () => {
       params: {
         name,
         email,
-        dateBirth: date.toISOString(),
+        dateBirth: dateString,
       },
     });
 
