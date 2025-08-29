@@ -101,7 +101,6 @@ def find_similarities_matrix2(model, processor, description, image_paths, images
     # Opcional: pasarlo a "probabilidad" tipo sigmoidea
     probabilities = similarity_scores.sigmoid()  # entre 0 y 1
 
-    print(f"\n📝 SIMILITUD CON DESCRIPCIÓN: '{description}'\n")
     sorted_indices = np.argsort(probabilities.cpu().numpy())[::-1]
     for rank, img_idx in enumerate(sorted_indices):
         similarity = probabilities[img_idx]
@@ -183,14 +182,12 @@ def test_text_clasification(probabilities, image_paths, has, clasification_img, 
             f"[{clasification_img}] {image_names[i]}: {value:.3f} > {max_no_rotura:.3f}? {status}")
 
     accuracy = (correct / total) * 100 if total > 0 else 0
-    print(f"\n🎯 Porcentaje de acierto: {accuracy:.2f}% ({correct}/{total})")
+    print(f"🎯 Porcentaje de acierto: {accuracy:.2f}% ({correct}/{total})")
     if correct_aprox > correct:
         accuracy = (correct_aprox / total) * 100 if total > 0 else 0
 
         print(
-            f"\n🎯 Porcentaje de acierto incluyendo 🟨: {accuracy:.2f}% ({correct_aprox}/{total})")
-
-    # --- NUEVAS METRICAS ---
+            f"🎯 Porcentaje de acierto incluyendo 🟨: {accuracy:.2f}% ({correct_aprox}/{total})")
 
     # Definir umbral para clasificar predicción positiva
     threshold = max_no_rotura
@@ -210,22 +207,24 @@ def test_text_clasification(probabilities, image_paths, has, clasification_img, 
     FN = len(true_positive.difference(predicted_positive))
     recall = TP / (TP + FN) if (TP + FN) > 0 else 0
 
-    print(f"\n📊 Precision: {precision:.3f}")
+    print(f"📊 Precision: {precision:.3f}")
     print(f"📊 Recall: {recall:.3f}")
 
     # MRR - buscar el primer ranking con imagen real positiva
     sorted_indices = np.argsort(probabilities.cpu().numpy())[::-1]
     mrr = 0
+    first_rank = None
     for rank, idx in enumerate(sorted_indices, start=1):
         if idx in true_positive:
             mrr = 1 / rank
+            first_rank = rank
             break
 
     print(f"📊 MRR (Mean Reciprocal Rank): {mrr:.3f}")
+    if first_rank:
+        print(f"📊 Primer positivo aparece en rank: {first_rank}")
 
-    # imprimo todos los que estan arriba del minimo rotura
-
-    if imprimir_mayores_al_minimo:
+    """ if imprimir_mayores_al_minimo:
         # imprimo la probabilidad mas chica de roturas
         if rotura_imgs:
             min_rotura = min(probabilities[i] for i in rotura_imgs)
@@ -236,3 +235,14 @@ def test_text_clasification(probabilities, image_paths, has, clasification_img, 
             if value > min_rotura and i not in rotura_imgs:
                 print(
                     f"Esta imagen sobrepaso al minimo: {image_names[i]}: {value:.3f}")
+    """
+
+    # --- RESUMEN FINAL ---
+    print("RESUMEN FINAL:")
+    print(f"{'❌' if accuracy < 0.8 else '✅'} Accuracy vs red/yellow flags (>= 0.8)")
+    print(f"{'❌' if precision < 0.7 else '✅'} Precision (>= 0.7)")
+    print(f"{'❌' if recall < 0.6 else '✅'} Recall (>= 0.6)")
+    print(f"{'❌' if mrr < 0.3 else '✅'} MRR (>= 0.3)")
+    if first_rank:
+        print(f"{'❌' if first_rank > 3 else '✅'} Top-3 check")
+    print("==============================")

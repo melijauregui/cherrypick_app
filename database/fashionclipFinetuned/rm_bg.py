@@ -31,8 +31,6 @@ def remove_background(input_folder, output_folder):
     images = [f for f in os.listdir(
         input_folder) if f.lower().endswith(valid_extensions)]
 
-    print(f"Procesando {len(images)} imágenes...")
-
     total_start = time.time()
 
     for img_name in images:
@@ -43,7 +41,7 @@ def remove_background(input_folder, output_folder):
             print(f"Error procesando {img_name}: {e}")
 
     total_elapsed = time.time() - total_start
-    print(f"\nFinalizado. Tiempo total: {total_elapsed:.2f} segundos.")
+    # print(f"\nFinalizado. Tiempo total: {total_elapsed:.2f} segundos.")
 
 
 # remove_background(input_folder, output_folder)
