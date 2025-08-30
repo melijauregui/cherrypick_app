@@ -6,8 +6,8 @@ CREATE TABLE IF NOT EXISTS "user" (
     "image" text, 
     "createdAt" timestamp default CURRENT_TIMESTAMP not null, 
     "updatedAt" timestamp default CURRENT_TIMESTAMP not null, 
-    "new" boolean not null, 
-    "userType" text not null
+    "new" boolean not null default true, 
+    "userType" text not null default 'client'
 );
 
 CREATE TABLE IF NOT EXISTS "session" (

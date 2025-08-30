@@ -5,7 +5,6 @@ import {
   CatalogItemArraySchemaQueryType,
   PaginationSchema,
 } from "../schemas/catalog/catalog-schema";
-import { BodyCodeVerificationPostSchema } from "../schemas/auth/sign-up-schema";
 import {
   UpdateCatalog,
   DeleteFromCatalog,
@@ -63,19 +62,12 @@ import {
   checkIfFavorited,
   getAllLikedFavoritedItems,
 } from "./app/allDatabase";
-import { SendEmailBrand } from "./formUser/functions";
-import { VerifyUserExists } from "./user/functions";
 import FormUserApp from "./formUser/routes";
 import UserApp from "./user/routes";
 import ClientApp from "./client/routes";
 import { GetBrandId } from "./brand/functions";
 import BrandApp from "./brand/routes";
-import {
-  ErrorSchema,
-  ErrorSchemaType,
-  SuccessSchema,
-  SuccessSchemaType,
-} from "@/schemas/standar-response-schema";
+import logger from "./logger";
 
 export type AppEnv = {
   Variables: {
@@ -95,6 +87,7 @@ app.use("*", async (c, next) => {
     if (
       c.req.path.startsWith("/api/auth/") ||
       c.req.path === "/user/verify" ||
+      c.req.path === "/brand/form" ||
       c.req.path.startsWith("/code-verification") ||
       (c.req.path === "/client" && c.req.method === "POST") ||
       c.req.path.startsWith("/insert-catalog-brand2") //TODO NO DEBERIA ESTAR SOLO PARA ENDPOINTS
@@ -241,58 +234,6 @@ app.openapi(paginatedRouteBrandWithId, async c => {
     items: items,
   };
   return c.json(res, 200);
-});
-
-// endpoint que publica un nuevo code-verification
-const sendFormBrandRoute = createRoute({
-  method: "post",
-  path: "/send-form-brand",
-  request: {
-    body: {
-      content: {
-        "application/json": { schema: BodyCodeVerificationPostSchema },
-      },
-    },
-  },
-  responses: {
-    200: {
-      content: {
-        "application/json": {
-          schema: SuccessSchema,
-        },
-      },
-      description:
-        "Devuelve un booleano que indica si se pudo enviar el código de verificación",
-    },
-    400: {
-      content: {
-        "application/json": {
-          schema: ErrorSchema,
-        },
-      },
-      description: "Email no válido",
-    },
-  },
-});
-app.openapi(sendFormBrandRoute, async c => {
-  //TODO: ver si se puede mejorar!!!! ver en el front este endpoint mejor
-  const { email } = await c.req.valid("json");
-  //verifico que no exista ya en la base de datos con verifyEmail
-  const emailExists = await VerifyUserExists(email);
-  if (emailExists.exists) {
-    const res: ErrorSchemaType = {
-      error: true,
-      details: "Email ya registrado",
-    };
-    return c.json(res, 400);
-  }
-
-  const emailSent = await SendEmailBrand(email);
-  if (emailSent.error) {
-    return c.json(emailSent, 400);
-  }
-
-  return c.json(emailSent, 200);
 });
 
 // endpoint que inserta items en el catálogo de una marca con datos JSON
