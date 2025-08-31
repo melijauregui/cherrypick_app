@@ -1,8 +1,6 @@
-import { config } from "../config";
 import {
-  CatalogItemSchemaType,
-  CatalogItemSchema,
   GetItemResponseSchemaType,
+  ItemSchema,
 } from "../../schemas/catalog/catalog-schema";
 import weaviate, { Filters } from "weaviate-client";
 import { getCollection } from "./catalogFunctions";
@@ -10,68 +8,6 @@ import {
   AllBrandItemsSchemaResType,
   AllBrandNamesItemsSchemaType,
 } from "../../schemas/auth/brand-schema";
-
-//funcion para hacer query a pinecone
-async function QueryWeaviateImage(
-  queryVector: number[],
-  page: number,
-  limit: number,
-  brandId: string | undefined
-): Promise<CatalogItemSchemaType[]> {
-  try {
-    const resCollection = await getCollection();
-    if (resCollection.error || !resCollection.collection) {
-      throw new Error(resCollection.details);
-    }
-    const collection = resCollection.collection;
-
-    const filters = collection.filter.byProperty("brandId").equal(brandId);
-
-    let offset = page * limit;
-    const queryOptions: any = {
-      filters: brandId ? filters : undefined,
-      limit: limit,
-      offset: offset,
-      returnProperties: [
-        "name",
-        "description",
-        "image_url",
-        "url",
-        "brandId",
-        "price",
-      ],
-    };
-    const result = await collection.query.fetchObjects(queryOptions);
-
-    const topResults: CatalogItemSchemaType[] = result.objects
-      .map(match => {
-        const item = {
-          name: match.properties?.name || "",
-          description: match.properties?.description || "",
-          image_url: match.properties?.image_url || "",
-          url: match.properties?.url || "",
-          brandId: match.properties?.brandId || "",
-          price: match.properties?.price || 0,
-          uuid: match.uuid || "",
-        };
-
-        // Validar el item usando Zod schema
-        const validationResult = CatalogItemSchema.safeParse(item);
-        if (!validationResult.success) {
-          console.log("Item validation failed:", validationResult.error);
-          return null;
-        }
-        return validationResult.data;
-      })
-      .filter((item): item is CatalogItemSchemaType => item !== null);
-
-    return topResults;
-  } catch (error) {
-    console.error("Error querying Weaviate:", error);
-    return [];
-  }
-}
-export { QueryWeaviateImage };
 
 async function QueryWeaviateAllItems(
   brandId: string,
@@ -184,7 +120,7 @@ async function QueryWeaviateItem(
     };
 
     // Validate the item using Zod schema
-    const validationResult = CatalogItemSchema.safeParse(item);
+    const validationResult = ItemSchema.safeParse(item);
     if (!validationResult.success) {
       console.log("Item validation failed:", validationResult.error);
       return {

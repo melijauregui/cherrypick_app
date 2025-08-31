@@ -12,7 +12,6 @@ import {
 import ClothingItemComponent, {
   ItemPlaceholder,
 } from "./ClothingItemComponent";
-import { CatalogItemSchemaType } from "@/schemas/catalog/catalog-schema";
 import {
   QueryClient,
   useInfiniteQuery,
@@ -21,6 +20,7 @@ import {
 import LoadingPage from "./LoadingPage";
 import { prefetchItemDetail } from "../utils/prefetchs";
 import { useSession } from "@/lib/auth-client";
+import { ItemSchemaType } from "@/schemas/catalog/catalog-schema";
 
 const width = Dimensions.get("window").width;
 
@@ -34,10 +34,7 @@ const ImageGallery = ({
   roundRobin,
 }: {
   queryKey: any[];
-  getClothingItems: (
-    page: number,
-    limit: number
-  ) => Promise<CatalogItemSchemaType[]>;
+  getClothingItems: (page: number, limit: number) => Promise<ItemSchemaType[]>;
   limit: number;
   columnCount: number;
   itemWhenNothingFound?: () => React.ReactElement;
@@ -58,7 +55,7 @@ const ImageGallery = ({
   const [organizedColumns, setOrganizedColumns] = useState<
     Array<
       Array<
-        CatalogItemSchemaType & {
+        ItemSchemaType & {
           renderedHeight: number;
           renderedWidth: number;
         }
@@ -70,7 +67,7 @@ const ImageGallery = ({
   useEffect(() => {
     const organizeItems = async () => {
       if (data && data.pages.flat().length > 0) {
-        const renderData = data.pages.flat() as CatalogItemSchemaType[];
+        const renderData = data.pages.flat() as ItemSchemaType[];
         const columns = await prepareColumns(
           renderData,
           columnCount,
@@ -131,7 +128,7 @@ const ImageGallery = ({
                 <ClothingItemComponent
                   key={item.uuid}
                   i={i * columnCount + columnIndex}
-                  item={item as CatalogItemSchemaType}
+                  item={item as ItemSchemaType}
                   numColumns={columnCount}
                   renderedHeight={item.renderedHeight}
                   renderedWidth={item.renderedWidth}
@@ -188,8 +185,8 @@ const getImageSize = (
 
 function useInfiniteGetItems(
   queryKey: any[],
-  getClothingItems: (pageParam: number) => Promise<CatalogItemSchemaType[]>,
-  prefetchItemDetail: (item: CatalogItemSchemaType) => Promise<void>
+  getClothingItems: (pageParam: number) => Promise<ItemSchemaType[]>,
+  prefetchItemDetail: (item: ItemSchemaType) => Promise<void>
 ): { data: any; fetchNextPage: any; refetch: any } {
   return useInfiniteQuery({
     queryKey: queryKey,
@@ -238,14 +235,12 @@ const resetInfiniteQueryPagination = (
 };
 
 const prepareColumns = async (
-  items: CatalogItemSchemaType[],
+  items: ItemSchemaType[],
   numColumns: number,
   roundRobin: boolean
 ): Promise<
   Array<
-    Array<
-      CatalogItemSchemaType & { renderedHeight: number; renderedWidth: number }
-    >
+    Array<ItemSchemaType & { renderedHeight: number; renderedWidth: number }>
   >
 > => {
   const screenWidth = Dimensions.get("screen").width;
@@ -255,7 +250,7 @@ const prepareColumns = async (
     const itemsWithSizes = await Promise.all(
       items.map(async item => {
         try {
-          const size = await getImageSize(item.image_url);
+          const size = await getImageSize(item.imageUrl);
           const width = size?.width || 1;
           const height = size?.height || 1;
           const scale = widthDetermined / width;
@@ -273,7 +268,7 @@ const prepareColumns = async (
 
     const columns: Array<
       Array<
-        CatalogItemSchemaType & {
+        ItemSchemaType & {
           renderedHeight: number;
           renderedWidth: number;
         }

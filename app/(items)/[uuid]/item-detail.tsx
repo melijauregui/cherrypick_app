@@ -17,7 +17,6 @@ import {
   FontAwesome,
 } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
-import { CatalogItemSchemaType } from "@/schemas/catalog/catalog-schema";
 import Toast from "react-native-toast-message";
 import { useQueryClient } from "@tanstack/react-query";
 import { getClothingItemsSimilar } from "@/app/utils/fetch";
@@ -41,6 +40,8 @@ import LoadingPage from "@/app/components/LoadingPage";
 import { useDeleteItem } from "@/app/utils/update";
 import { prefetchBrandPageItem } from "@/app/utils/prefetchs";
 import List2 from "@/app/components/List2";
+import { ItemSchemaType } from "@/schemas/catalog/catalog-schema";
+import { BrandSchemaPropertiesType } from "@/schemas/brand/brand-schema";
 
 const ItemDetail = () => {
   const params = useLocalSearchParams();
@@ -84,7 +85,7 @@ const ItemDetail = () => {
   const content = (
     <>
       <View className="relative">
-        <ImageComponent imageUrl={item.image_url} url={item.url} />
+        <ImageComponent imageUrl={item.imageUrl} url={item.url} />
       </View>
 
       <View className="px-5 flex flex-col gap-6">
@@ -145,7 +146,7 @@ const ItemDetail = () => {
             name: item.name,
             price: item.price.toString(),
             url: item.url,
-            image_url: item.image_url,
+            image_url: item.imageUrl,
             description: item.description,
           }}
           itemUuid={decodedUuid}
@@ -223,15 +224,8 @@ const ItemDetailComponent = ({
   item,
   brand,
 }: {
-  item: CatalogItemSchemaType;
-  brand:
-    | {
-        id: string;
-        name: string;
-        url: string;
-        logo_url: string;
-      }
-    | undefined;
+  item: ItemSchemaType;
+  brand: BrandSchemaPropertiesType | undefined;
 }) => {
   const [measured, setMeasured] = React.useState(false); // ya medí?
   const [overflows, setOverflows] = React.useState(false); // tiene >1 línea?
@@ -268,7 +262,7 @@ const ItemDetailComponent = ({
         activeOpacity={0.7}
       >
         <Image
-          source={{ uri: brand?.logo_url }}
+          source={{ uri: brand?.logoUrl }}
           className="w-6 h-6 rounded-full"
         />
         <Text className="text-white text-xl font-plight">{brand?.name}</Text>

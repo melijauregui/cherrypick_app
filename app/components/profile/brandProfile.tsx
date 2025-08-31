@@ -167,7 +167,7 @@ const BrandProfilePage = ({ brandId }: { brandId: string }) => {
           </View>
           <List2
             queryKey={["brand-items", data.brand.id]}
-            getClothingItems={(limit, pageParam) =>
+            getClothingItems={(pageParam, limit) =>
               getBrandItems(pageParam, limit, data.brand.id)
             }
             limit={18}

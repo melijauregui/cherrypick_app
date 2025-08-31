@@ -7,7 +7,7 @@ import {
   getBrandProfile,
   getItem,
 } from "./fetch";
-import { CatalogItemSchemaType } from "@/schemas/catalog/catalog-schema";
+import { ItemSchemaType } from "@/schemas/catalog/catalog-schema";
 import { ClientSchemaType } from "@/schemas/client/client-schema";
 import {
   BrandSchemaPropertiesType,
@@ -95,7 +95,7 @@ export function useFetchBrandProfileItem(brandId: string): {
 }
 
 export function useFetchItem(itemUuid: string): {
-  item: CatalogItemSchemaType;
+  item: ItemSchemaType;
 } | null {
   const { data, isLoading, error } = useQuery({
     queryKey: ["item-detail", itemUuid],

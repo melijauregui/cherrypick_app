@@ -3,70 +3,70 @@
     "name": "Remera verde",
     "description": "Remera verde de algodón",
     "price": "29.99",
-    "image_url": "https://i.pinimg.com/736x/ea/4d/bf/ea4dbf3538415b0ea85f62e1e4ac8482.jpg",
+    "imageUrl": "https://i.pinimg.com/736x/ea/4d/bf/ea4dbf3538415b0ea85f62e1e4ac8482.jpg",
     "url": "https://ar.pinterest.com/pin/99501473012502315/"
   },
   {
     "name": "Remera Marrón",
     "description": "Remera Larga Marrón de algodón",
     "price": "29.99",
-    "image_url": "https://i.pinimg.com/736x/cb/b3/08/cbb308be443a379611fac31dd1d6ab6d.jpg",
+    "imageUrl": "https://i.pinimg.com/736x/cb/b3/08/cbb308be443a379611fac31dd1d6ab6d.jpg",
     "url": "https://ar.pinterest.com/pin/1011128553843906145/"
   },
   {
     "name": "Remera Beige",
     "description": "Remera Beige sin mangas de algodón",
     "price": "10.99",
-    "image_url": "https://i.pinimg.com/736x/3c/fa/5b/3cfa5b8d28c35b61b948943657a7e069.jpg",
+    "imageUrl": "https://i.pinimg.com/736x/3c/fa/5b/3cfa5b8d28c35b61b948943657a7e069.jpg",
     "url": "https://ar.pinterest.com/pin/332281278774356667/"
   },
   {
     "name": "Remera Blanca",
     "description": "Remera Blanca de algodón",
     "price": "10.99",
-    "image_url": "https://i.pinimg.com/736x/1b/4c/86/1b4c86378c1f65bf0c28530f0320a78f.jpg",
+    "imageUrl": "https://i.pinimg.com/736x/1b/4c/86/1b4c86378c1f65bf0c28530f0320a78f.jpg",
     "url": "https://ar.pinterest.com/pin/182677328631359582/"
   },
   {
     "name": "Remera una Manga",
     "description": "Remera una Manga de algodón",
     "price": "10.99",
-    "image_url": "https://i.pinimg.com/736x/15/59/f1/1559f11514a207a68cec9a51a3791da9.jpg",
+    "imageUrl": "https://i.pinimg.com/736x/15/59/f1/1559f11514a207a68cec9a51a3791da9.jpg",
     "url": "https://ar.pinterest.com/pin/55943220366818811/"
   },
   {
     "name": "Remera verde lima",
     "description": "Remera verde lima de algodón",
     "price": "10.99",
-    "image_url": "https://i.pinimg.com/736x/9f/4f/4a/9f4f4abb504170e9b8d213aefc59c02b.jpg",
+    "imageUrl": "https://i.pinimg.com/736x/9f/4f/4a/9f4f4abb504170e9b8d213aefc59c02b.jpg",
     "url": "https://ar.pinterest.com/pin/90705379990422160/"
   },
   {
     "name": "Remera gris",
     "description": "Remera gris de algodón",
     "price": "10.99",
-    "image_url": "https://i.pinimg.com/736x/eb/f3/73/ebf373597d8cf5bccc50d089ceeecc7d.jpg",
+    "imageUrl": "https://i.pinimg.com/736x/eb/f3/73/ebf373597d8cf5bccc50d089ceeecc7d.jpg",
     "url": "https://ar.pinterest.com/pin/55943220366818703/"
   },
   {
     "name": "Top Marrón",
     "description": "Top Marrón de algodón",
     "price": "10.99",
-    "image_url": "https://i.pinimg.com/736x/06/08/f0/0608f0dfd06f53f8c5727402aea288ec.jpg",
+    "imageUrl": "https://i.pinimg.com/736x/06/08/f0/0608f0dfd06f53f8c5727402aea288ec.jpg",
     "url": "https://ar.pinterest.com/pin/117797346500072992/"
   },
   {
     "name": "Top Rosa",
     "description": "Top Rosa de algodón",
     "price": "10.99",
-    "image_url": "https://i.pinimg.com/736x/4c/4e/7f/4c4e7ffaaa7b772669fbe8a200ceb635.jpg",
+    "imageUrl": "https://i.pinimg.com/736x/4c/4e/7f/4c4e7ffaaa7b772669fbe8a200ceb635.jpg",
     "url": "https://ar.pinterest.com/pin/128634133101640829/"
   },
   {
     "name": "Top negro",
     "description": "Top negro de algodón",
     "price": "10.99",
-    "image_url": "https://i.pinimg.com/736x/61/96/6e/61966e7c1b855272b334b7fb82c7f836.jpg",
+    "imageUrl": "https://i.pinimg.com/736x/61/96/6e/61966e7c1b855272b334b7fb82c7f836.jpg",
     "url": "https://ar.pinterest.com/pin/505177283221426094/"
   }
 ]

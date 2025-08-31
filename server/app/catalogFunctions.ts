@@ -1,20 +1,16 @@
 import {
-  CatalogItemSchema,
-  CatalogItemSchemaType,
-  CatalogResponseSchemaType,
+  ErrorSchemaType,
+  SuccessSchemaType,
+} from "@/schemas/standar-response-schema";
+import {
   CatalogResponseSchemaDeleteType,
-  InsertItemSchemaType,
   PropertiesItemSchemaType,
   UpdateItemBodySchemaType,
   CatalogPropertiesSchema,
   CatalogPropertiesSchemaType,
 } from "../../schemas/catalog/catalog-schema";
 import { config } from "../config";
-import {
-  BrandSchemaResType,
-  QueryDbSchemaBrand,
-} from "../../schemas/auth/brand-schema";
-import { db } from "../db";
+import { db } from "../db.config";
 import weaviate, { Collection, Filters } from "weaviate-client";
 
 // Función para extraer características de imagen desde URL
@@ -95,7 +91,7 @@ async function getCollection(): Promise<{
           { name: "brandId", dataType: "text" },
           { name: "description", dataType: "text" },
           { name: "price", dataType: "text" },
-          { name: "image_url", dataType: "text" },
+          { name: "imageUrl", dataType: "text" },
           { name: "url", dataType: "text" },
         ],
         vectorizers: [
@@ -122,125 +118,6 @@ async function getCollection(): Promise<{
   }
 }
 export { getCollection };
-
-// Función para validar CSV
-export async function validateCsvFile(
-  file: File,
-  collection: Collection,
-  brand: string
-): Promise<
-  | {
-      error: true;
-      details: string;
-    }
-  | {
-      error: false;
-      catalogItems: CatalogItemSchemaType[];
-    }
-> {
-  try {
-    const csvText = await file.text();
-    const lines = csvText.trim().split("\n");
-    const headers = lines[0]?.split(",");
-
-    if (!headers || headers.length === 0) {
-      return {
-        error: true,
-        details: "Archivo CSV vacío o inválido",
-      };
-    }
-
-    // Validate headers
-    const expectedHeaders = [
-      "name",
-      "description",
-      "price",
-      "image_url",
-      "url",
-    ];
-    const isValidHeaders = expectedHeaders.every(header =>
-      headers.includes(header)
-    );
-
-    if (!isValidHeaders) {
-      return {
-        error: true,
-        details: "Header mal formado o no incluido",
-      };
-    }
-
-    const invalidRows: number[] = [];
-    const duplicateRows: number[] = [];
-    const validItems: CatalogItemSchemaType[] = [];
-
-    // Process each row (skip header)
-    for (let i = 1; i < lines.length; i++) {
-      const line = lines[i]?.trim();
-      if (!line) continue; // Skip empty lines
-
-      const values = line.split(",");
-      if (values.length !== expectedHeaders.length) {
-        invalidRows.push(i + 1);
-        continue;
-      }
-
-      // Create object from CSV row
-      const item: any = {};
-      expectedHeaders.forEach((header, index) => {
-        item[header] = values[index];
-      });
-
-      // Convert price to number
-      const price = parseFloat(item.price);
-      if (isNaN(price)) {
-        invalidRows.push(i + 1);
-        continue;
-      }
-      item.price = price;
-      item.brand = brand;
-
-      // Validate item against schema
-      try {
-        const validatedItem = CatalogItemSchema.parse(item);
-
-        // Check if item already exists in Weaviate with same name and brand
-        const isDuplicate = await checkDuplicateInWeaviate(
-          collection,
-          validatedItem.name,
-          brand
-        );
-        if (isDuplicate) {
-          duplicateRows.push(i + 1);
-          continue;
-        }
-
-        validItems.push(validatedItem);
-      } catch (error) {
-        invalidRows.push(i + 1);
-      }
-    }
-
-    // Check if there are any invalid rows
-    if (invalidRows.length > 0) {
-      const rowNumbers = invalidRows.join(",");
-      return {
-        error: true,
-        details: `línea [${rowNumbers}] mal formadas y línea [${duplicateRows}] con items duplicados`,
-      };
-    }
-
-    // All items are valid
-    return {
-      error: false,
-      catalogItems: validItems,
-    };
-  } catch (error) {
-    return {
-      error: true,
-      details: "Error interno del servidor al procesar el CSV",
-    };
-  }
-}
 
 // Función para validar items JSON
 export async function validateJsonItems(
@@ -310,8 +187,8 @@ export async function validateJsonItems(
 export async function UpdateCatalog(
   items: PropertiesItemSchemaType[],
   brandId: string
-): Promise<CatalogResponseSchemaType> {
-  let res: CatalogResponseSchemaType;
+): Promise<SuccessSchemaType | ErrorSchemaType> {
+  let res: SuccessSchemaType | ErrorSchemaType;
   const collectionRes = await getCollection();
   if (collectionRes.error) {
     return {
@@ -355,62 +232,21 @@ export async function UpdateCatalog(
   return res;
 }
 
-export async function GetBrand(email: string): Promise<BrandSchemaResType> {
-  let res: BrandSchemaResType;
-  const [result]: any = await db.query("SELECT * FROM brands WHERE email = ?", [
-    email,
-  ]);
-
-  if (result.length > 0) {
-    const parsedRows = QueryDbSchemaBrand.parse(result);
-    const { name, description, email, url, logo_url, id } = parsedRows[0];
-    res = {
-      error: false,
-      brand: {
-        id: id,
-        name: name,
-        description: description,
-        email: email,
-        url: url,
-        logo_url: logo_url,
-      },
-    };
-  } else {
-    console.log("brand not found!!!????", email);
-    res = {
-      error: true,
-      details: "Brand not found",
-    };
-  }
-  return res;
-}
-
 export async function VerifyBrand(brand: string): Promise<boolean> {
-  const [result]: any = await db.query("SELECT * FROM brands WHERE email = ?", [
-    brand,
-  ]);
-  return result.length > 0;
-}
-
-export async function GetBrandId(brandEmail: string): Promise<string | null> {
-  const [result]: any = await db.query(
-    "SELECT id FROM brands WHERE email = ?",
-    [brandEmail]
-  );
-  try {
-    return result[0]?.id;
-  } catch (error) {
-    console.log("error", error);
-    return null;
-  }
+  // const [result]: any = await db.query("SELECT * FROM brands WHERE email = ?", [
+  //   brand,
+  // ]);
+  // return result.length > 0;
+  return false;
 }
 
 export async function GetBrandEmail(brandId: string): Promise<string | null> {
-  const [result]: any = await db.query(
-    "SELECT email FROM brands WHERE id = ?",
-    [brandId]
-  );
-  return result[0].email || null;
+  // const [result]: any = await db.query(
+  //   "SELECT email FROM brands WHERE id = ?",
+  //   [brandId]
+  // );
+  // return result[0].email || null;
+  return null;
 }
 
 // Función para insertar items del catálogo en Pinecone
@@ -429,7 +265,7 @@ export async function insertCatalogItemsToWeaviate(
   try {
     for (const item of catalogItems) {
       try {
-        const imageFeatures = await extractImageFeatures(item.image_url);
+        const imageFeatures = await extractImageFeatures(item.imageUrl);
         const textFeatures = await extractTextFeatures(item.description);
 
         if (imageFeatures.length === 0 && textFeatures.length === 0) {
@@ -439,12 +275,8 @@ export async function insertCatalogItemsToWeaviate(
         }
 
         const itemData = {
-          name: item.name,
-          description: item.description,
-          price: item.price,
+          ...item,
           brandId: brandId,
-          image_url: item.image_url,
-          url: item.url,
         };
 
         const result = await collection.data.insert({
@@ -555,32 +387,33 @@ export async function DeleteFromCatalog(
 
 async function deleteFromDatabase(
   itemsUuids: string[]
-): Promise<CatalogResponseSchemaType> {
-  try {
-    // Create placeholders for the IN clause
-    const placeholders = itemsUuids.map(() => "?").join(",");
+): Promise<SuccessSchemaType | ErrorSchemaType> {
+  // try {
+  //   // Create placeholders for the IN clause
+  //   const placeholders = itemsUuids.map(() => "?").join(",");
 
-    // Delete from likes and favorites tables for both clients and brands
-    const queries = [
-      `DELETE FROM item_likes_client WHERE item_uuid IN (${placeholders})`,
-      `DELETE FROM item_favorites_client WHERE item_uuid IN (${placeholders})`,
-      `DELETE FROM item_likes_brand WHERE item_uuid IN (${placeholders})`,
-      `DELETE FROM item_favorites_brand WHERE item_uuid IN (${placeholders})`,
-    ];
-    for (const query of queries) {
-      const result = await db.query(query, itemsUuids);
-    }
+  //   // Delete from likes and favorites tables for both clients and brands
+  //   const queries = [
+  //     `DELETE FROM item_likes_client WHERE item_uuid IN (${placeholders})`,
+  //     `DELETE FROM item_favorites_client WHERE item_uuid IN (${placeholders})`,
+  //     `DELETE FROM item_likes_brand WHERE item_uuid IN (${placeholders})`,
+  //     `DELETE FROM item_favorites_brand WHERE item_uuid IN (${placeholders})`,
+  //   ];
+  //   for (const query of queries) {
+  //     const result = await db.query(query, itemsUuids);
+  //   }
 
-    return {
-      error: false,
-    };
-  } catch (error) {
-    console.error("Error deleting from database:", error);
-    return {
-      error: true,
-      details: `Error deleting from database: ${error}`,
-    };
-  }
+  //   return {
+  //     error: false,
+  //   };
+  // } catch (error) {
+  //   console.error("Error deleting from database:", error);
+  //   return {
+  //     error: true,
+  //     details: `Error deleting from database: ${error}`,
+  //   };
+  // }
+  return { error: false };
 }
 
 async function deleteCatalogItemsFromWeaviate(
@@ -688,14 +521,14 @@ export async function UpdateItem(
       propertiesToUpdate.description = updatedItem.description;
     if (updatedItem.price !== undefined)
       propertiesToUpdate.price = updatedItem.price;
-    if (updatedItem.image_url !== undefined)
-      propertiesToUpdate.image_url = updatedItem.image_url;
+    if (updatedItem.imageUrl !== undefined)
+      propertiesToUpdate.image_url = updatedItem.imageUrl;
     if (updatedItem.url !== undefined) propertiesToUpdate.url = updatedItem.url;
 
     const vectorsToUpdate: any = {};
-    if (updatedItem.image_url) {
+    if (updatedItem.imageUrl) {
       console.log("extracting image features");
-      const imageFeatures = await extractImageFeatures(updatedItem.image_url);
+      const imageFeatures = await extractImageFeatures(updatedItem.imageUrl);
       vectorsToUpdate.image_vector = imageFeatures;
     }
     if (updatedItem.description) {
@@ -726,7 +559,7 @@ export async function UpdateItem(
 
 export async function DeleteFromWeaviate(
   brandId: string
-): Promise<CatalogResponseSchemaType> {
+): Promise<SuccessSchemaType | ErrorSchemaType> {
   try {
     const collectionRes = await getCollection();
     if (collectionRes.error || !collectionRes.collection) {

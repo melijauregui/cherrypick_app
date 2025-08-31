@@ -2,19 +2,15 @@ import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { z } from "zod";
 import {
   CatalogItemArraySchemaQuery,
-  CatalogItemArraySchemaQueryType,
   PaginationSchema,
 } from "../schemas/catalog/catalog-schema";
 import {
   UpdateCatalog,
   DeleteFromCatalog,
   UpdateItem,
-  GetBrandEmail,
 } from "./app/catalogFunctions";
 import {
   CatalogResponseSchema,
-  CatalogResponseSchemaType,
-  PaginationSchemaBrand,
   CatalogResponseSchemaDelete,
   CatalogResponseSchemaDeleteType,
   GetItemQuerySchema,
@@ -24,19 +20,12 @@ import {
   UpdateItemBodySchema,
   UpdateItemResponseSchema,
   UpdateItemResponseSchemaType,
-  CatalogItemArraySchemaResponse,
-  CatalogItemArraySchemaResponseType,
   jsonCatalogUploadSchema2,
   IsMyItemQuerySchema,
   IsMyItemSchema,
   IsMyItemSchemaType,
-  PaginationSchemaBrandWithId,
 } from "../schemas/catalog/catalog-schema";
-import {
-  QueryWeaviateImage,
-  QueryWeaviateAllItems,
-  QueryWeaviateItem,
-} from "./app/routeVector";
+import { QueryWeaviateAllItems, QueryWeaviateItem } from "./app/routeVector";
 import {
   QueryAllBrandItemsSchema,
   AllBrandItemsSchemaRes,
@@ -67,7 +56,11 @@ import UserApp from "./user/routes";
 import ClientApp from "./client/routes";
 import { GetBrandId } from "./brand/functions";
 import BrandApp from "./brand/routes";
-import logger from "./logger";
+import FeedApp from "./feed/routes";
+import {
+  ErrorSchemaType,
+  SuccessSchemaType,
+} from "@/schemas/standar-response-schema";
 
 export type AppEnv = {
   Variables: {
@@ -88,9 +81,9 @@ app.use("*", async (c, next) => {
       c.req.path.startsWith("/api/auth/") ||
       c.req.path === "/user/verify" ||
       c.req.path === "/brand/form" ||
+      c.req.path === "/brand/insert-items2" || //TODO NO DEBERIA ESTAR SOLO PARA ENDPOINTS
       c.req.path.startsWith("/code-verification") ||
-      (c.req.path === "/client" && c.req.method === "POST") ||
-      c.req.path.startsWith("/insert-catalog-brand2") //TODO NO DEBERIA ESTAR SOLO PARA ENDPOINTS
+      (c.req.path === "/client" && c.req.method === "POST")
     ) {
       return next();
     }
@@ -111,130 +104,7 @@ app.route("/code-verification", FormUserApp);
 app.route("/user", UserApp);
 app.route("/client", ClientApp);
 app.route("/brand", BrandApp);
-
-// endpoint que devuelve los 10 resultados mas personalizados del usuario WIP
-const paginatedRoute = createRoute({
-  method: "get",
-  path: "/all",
-  request: {
-    query: PaginationSchema,
-  },
-  responses: {
-    200: {
-      content: {
-        "application/json": {
-          schema: CatalogItemArraySchemaQuery,
-        },
-      },
-      description: "Devuelve los datos de la base de datos de forma paginada",
-    },
-  },
-});
-app.openapi(paginatedRoute, async c => {
-  const { page, limit } = c.req.valid("query");
-  const embedding = Array(768).fill(0.5);
-  let res: CatalogItemArraySchemaQueryType;
-
-  const items = await QueryWeaviateImage(embedding, page, limit, undefined);
-
-  res = {
-    error: false,
-    items: items,
-  };
-  return c.json(res, 200);
-});
-
-// endpoint que devuelve los resultados de los items de una marca
-const paginatedRouteBrand = createRoute({
-  method: "get",
-  path: "/all-self-brand",
-  request: {
-    query: PaginationSchemaBrand,
-  },
-  responses: {
-    200: {
-      content: {
-        "application/json": {
-          schema: CatalogItemArraySchemaResponse,
-        },
-      },
-      description: "Devuelve los datos de la base de datos de forma paginada",
-    },
-  },
-});
-app.openapi(paginatedRouteBrand, async c => {
-  const { page, limit } = c.req.valid("query");
-  let res: CatalogItemArraySchemaResponseType;
-  const user = c.get("user");
-  const brandEmail = user?.email;
-  if (!brandEmail) {
-    res = {
-      error: true,
-      details: "No tienes permisos para obtener los items de la marca",
-    };
-    return c.json(res, 200);
-  }
-
-  const brandId = await GetBrandId(brandEmail);
-
-  if (!brandId) {
-    res = {
-      error: true,
-      details: "Marca no encontrada",
-    };
-    return c.json(res, 200);
-  }
-
-  const embedding = Array(768).fill(0.5);
-
-  const items = await QueryWeaviateImage(embedding, page, limit, brandId);
-
-  res = {
-    error: false,
-    items: items,
-  };
-  return c.json(res, 200);
-});
-
-// endpoint que devuelve los resultados de los items de una marca dado su id
-const paginatedRouteBrandWithId = createRoute({
-  method: "get",
-  path: "/all-brand",
-  request: {
-    query: PaginationSchemaBrandWithId,
-  },
-  responses: {
-    200: {
-      content: {
-        "application/json": {
-          schema: CatalogItemArraySchemaResponse,
-        },
-      },
-      description: "Devuelve los datos de la base de datos de forma paginada",
-    },
-  },
-});
-app.openapi(paginatedRouteBrandWithId, async c => {
-  const { page, limit, id } = c.req.valid("query");
-  let res: CatalogItemArraySchemaResponseType;
-  const brandEmail = await GetBrandEmail(id);
-  if (!brandEmail) {
-    res = {
-      error: true,
-      details: "No tienes permisos para obtener los items de la marca",
-    };
-    return c.json(res, 200);
-  }
-  const embedding = Array(768).fill(0.5);
-
-  const items = await QueryWeaviateImage(embedding, page, limit, id);
-
-  res = {
-    error: false,
-    items: items,
-  };
-  return c.json(res, 200);
-});
+app.route("/feed", FeedApp);
 
 // endpoint que inserta items en el catálogo de una marca con datos JSON
 const updateCatalogRoute = createRoute({
@@ -263,7 +133,7 @@ app.openapi(updateCatalogRoute, async c => {
   const { items } = await c.req.valid("json");
 
   //verifico que la marca exista en la base de datos
-  let res: CatalogResponseSchemaType;
+  let res: SuccessSchemaType | ErrorSchemaType;
 
   const user = c.get("user");
   const brandEmail = user?.email;
@@ -277,56 +147,6 @@ app.openapi(updateCatalogRoute, async c => {
   }
 
   const brandId = await GetBrandId(brandEmail);
-  if (!brandId) {
-    res = {
-      error: true,
-      details: "Marca no encontrada",
-    };
-    return c.json(res, 200);
-  }
-  try {
-    res = await UpdateCatalog(items, brandId);
-    return c.json(res, 200);
-  } catch (error) {
-    res = {
-      error: true,
-      details: `Error interno del servidor ${error}`,
-    };
-    return c.json(res, 200);
-  }
-});
-
-// endpoint que inserta items en el catálogo de una marca con datos JSON
-const updateCatalogRoute2 = createRoute({
-  method: "post",
-  path: "/insert-catalog-brand2",
-  request: {
-    body: {
-      content: {
-        "application/json": { schema: jsonCatalogUploadSchema2 },
-      },
-    },
-  },
-  responses: {
-    200: {
-      content: {
-        "application/json": {
-          schema: CatalogResponseSchema,
-        },
-      },
-      description: "Valida y actualiza el catálogo con datos JSON",
-    },
-  },
-});
-
-app.openapi(updateCatalogRoute2, async c => {
-  const { items, brandEmail } = await c.req.valid("json");
-
-  //verifico que la marca exista en la base de datos
-  let res: CatalogResponseSchemaType;
-
-  const brandId = await GetBrandId(brandEmail);
-  console.log("brandId", brandId);
   if (!brandId) {
     res = {
       error: true,
@@ -817,7 +637,7 @@ const getAllLikedItemsRoute = createRoute({
   method: "get",
   path: "/get-all-liked-items",
   request: {
-    query: PaginationSchemaBrand,
+    query: PaginationSchema,
   },
   responses: {
     200: {
@@ -871,7 +691,7 @@ const getAllFavoritedItemsRoute = createRoute({
   method: "get",
   path: "/get-all-favorited-items",
   request: {
-    query: PaginationSchemaBrand,
+    query: PaginationSchema,
   },
   responses: {
     200: {

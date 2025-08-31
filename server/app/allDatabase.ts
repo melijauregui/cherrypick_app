@@ -3,10 +3,7 @@ import {
   LikeFavoriteResponseSchemaType,
 } from "@/schemas/activity/activity";
 import { db } from "../db.config";
-import {
-  CatalogItemArraySchema,
-  CatalogItemArraySchemaQueryType,
-} from "../../schemas/catalog/catalog-schema";
+import { CatalogItemArraySchemaQueryType } from "../../schemas/catalog/catalog-schema";
 import { getCollection } from "./catalogFunctions";
 
 // Funciones para likes
@@ -153,87 +150,4 @@ export async function getAllLikedFavoritedItems(
   //   return { error: true, details: "Error al obtener los items liked" };
   // }
   return { error: false, items: [] };
-}
-
-async function getItemsFromWeaviate(
-  uuids: string[],
-  limit: number
-): Promise<CatalogItemArraySchemaQueryType> {
-  try {
-    const resCollection = await getCollection();
-    if (resCollection.error || !resCollection.collection) {
-      return {
-        error: true,
-        details: resCollection.details || "Error getting collection",
-      };
-    }
-    const collection = resCollection.collection;
-
-    const filters = collection.filter.byId().containsAny(uuids);
-
-    const queryOptions: any = {
-      filters: filters,
-      limit: limit,
-      returnProperties: [
-        "name",
-        "description",
-        "image_url",
-        "url",
-        "brandId",
-        "price",
-      ],
-    };
-
-    const result = await collection.query.fetchObjects(queryOptions);
-
-    if (result.objects.length === 0) {
-      return {
-        error: true,
-        details: "Items not found",
-      };
-    }
-
-    // Crear un mapa para mantener el orden original de los UUIDs
-    const uuidOrderMap = new Map();
-    uuids.forEach((uuid, index) => {
-      uuidOrderMap.set(uuid, index);
-    });
-
-    const items = result.objects
-      .map(obj => ({
-        name: obj.properties?.name || "",
-        description: obj.properties?.description || "",
-        image_url: obj.properties?.image_url || "",
-        url: obj.properties?.url || "",
-        brandId: obj.properties?.brandId || "",
-        price: obj.properties?.price || 0,
-        uuid: obj.uuid || "",
-      }))
-      .sort((a, b) => {
-        const orderA = uuidOrderMap.get(a.uuid) ?? Number.MAX_SAFE_INTEGER;
-        const orderB = uuidOrderMap.get(b.uuid) ?? Number.MAX_SAFE_INTEGER;
-        return orderA - orderB;
-      });
-
-    // Validate the item using Zod schema
-    const validationResult = CatalogItemArraySchema.safeParse(items);
-    if (!validationResult.success) {
-      console.log("Item validation failed:", validationResult.error);
-      return {
-        error: true,
-        details: "Invalid items data",
-      };
-    }
-
-    return {
-      error: false,
-      items: validationResult.data,
-    };
-  } catch (error) {
-    console.error("Error querying items in Weaviate:", error);
-    return {
-      error: true,
-      details: "Error querying Weaviate: " + error,
-    };
-  }
 }

@@ -15,12 +15,25 @@ import {
   SuccessSchema,
   SuccessSchemaType,
 } from "@/schemas/standar-response-schema";
-import { GetBrandByEmail, GetBrandById, UpdateBrand } from "./functions";
+import {
+  GetBrandByEmail,
+  GetBrandById,
+  GetBrandId,
+  UpdateBrand,
+} from "./functions";
 import { QueryIdSchema } from "@/schemas/standar-query-schema";
 import logger from "../logger";
 import { BodyCodeVerificationPostSchema } from "@/schemas/auth/sign-up-schema";
 import { VerifyUserExists } from "../user/functions";
 import { SendEmailBrand } from "../formUser/functions";
+import {
+  CatalogSchemaResponse,
+  CatalogSchemaResponseType,
+  jsonCatalogUploadSchema2,
+  PaginationSchema,
+} from "@/schemas/catalog/catalog-schema";
+import { GetCatalog } from "../feed/functions";
+import { UpdateCatalog } from "../app/catalogFunctions";
 
 const BrandApp = new OpenAPIHono<AppEnv>({
   defaultHook: (result, c) => {
@@ -84,50 +97,6 @@ BrandApp.openapi(getBrandRoute, async c => {
     return c.json(resError, 401);
   }
   const brand = await GetBrandByEmail(email);
-  if (!brand) {
-    const resError: ErrorSchemaType = {
-      error: true,
-      details: "Marca no encontrada",
-    };
-    return c.json(resError, 404);
-  }
-  res = { error: false, brand: brand };
-  return c.json(res, 200);
-});
-
-// endpoint que obtiene la información de la marca con su id
-const getBrandRouteId = createRoute({
-  method: "get",
-  path: "/{id}",
-  request: {
-    params: QueryIdSchema,
-    required: true,
-  },
-  responses: {
-    200: {
-      description: "Obtiene la información de la marca",
-      content: {
-        "application/json": {
-          schema: BrandSchemaPropertiesResponse,
-        },
-      },
-    },
-    404: {
-      description: "Marca no encontrada",
-      content: {
-        "application/json": {
-          schema: ErrorSchema,
-        },
-      },
-    },
-  },
-});
-
-BrandApp.openapi(getBrandRouteId, async c => {
-  const { id } = c.req.valid("param");
-  let res: BrandSchemaPropertiesResponseType;
-
-  const brand = await GetBrandById(id);
   if (!brand) {
     const resError: ErrorSchemaType = {
       error: true,
@@ -242,4 +211,266 @@ BrandApp.openapi(sendFormBrandRoute, async c => {
   }
   logger.info("Email sent:", emailSent);
   return c.json(emailSent, 200);
+});
+
+// endpoint que devuelve los resultados de los items de una marca
+const paginatedRouteBrand = createRoute({
+  method: "get",
+  path: "/all-items",
+  request: {
+    query: PaginationSchema,
+    required: true,
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: CatalogSchemaResponse,
+        },
+      },
+      description: "Devuelve los datos de la base de datos de forma paginada",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "No tienes permisos para obtener los items de la marca",
+    },
+
+    404: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Marca no encontrada",
+    },
+    500: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Error querying Weaviate",
+    },
+  },
+});
+BrandApp.openapi(paginatedRouteBrand, async c => {
+  const { page, limit } = c.req.valid("query");
+  console.log("page", page);
+  console.log("limit", limit);
+  logger.info("/GET brand/all-items page: %s limit: %s", page, limit);
+  let res: CatalogSchemaResponseType | ErrorSchemaType;
+  const user = c.get("user");
+  const brandEmail = user?.email;
+  if (!brandEmail) {
+    res = {
+      error: true,
+      details: "No tienes permisos para obtener los items de la marca",
+    };
+    return c.json(res, 401);
+  }
+
+  const brandId = await GetBrandId(brandEmail);
+
+  if (!brandId) {
+    res = {
+      error: true,
+      details: "Marca no encontrada",
+    };
+    return c.json(res, 404);
+  }
+
+  const embedding = Array(768).fill(0.5);
+
+  const result = await GetCatalog(embedding, page, limit, brandId);
+
+  if (result.error) {
+    res = {
+      error: true,
+      details: "Error querying Weaviate",
+    };
+    return c.json(res, 500);
+  }
+
+  res = {
+    error: false,
+    items: result.items,
+  };
+  return c.json(res, 200);
+});
+
+// endpoint que obtiene la información de la marca con su id
+const getBrandRouteId = createRoute({
+  method: "get",
+  path: "/{id}",
+  request: {
+    params: QueryIdSchema,
+    required: true,
+  },
+  responses: {
+    200: {
+      description: "Obtiene la información de la marca",
+      content: {
+        "application/json": {
+          schema: BrandSchemaPropertiesResponse,
+        },
+      },
+    },
+    404: {
+      description: "Marca no encontrada",
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+    },
+  },
+});
+
+BrandApp.openapi(getBrandRouteId, async c => {
+  const { id } = c.req.valid("param");
+  logger.info("/GET brand/{id} id: %s", id);
+  let res: BrandSchemaPropertiesResponseType;
+
+  const brand = await GetBrandById(id);
+  if (!brand) {
+    const resError: ErrorSchemaType = {
+      error: true,
+      details: "Marca no encontrada",
+    };
+    return c.json(resError, 404);
+  }
+  res = { error: false, brand: brand };
+  return c.json(res, 200);
+});
+
+// endpoint que devuelve los resultados de los items de una marca dado su id
+const paginatedRouteBrandWithId = createRoute({
+  method: "get",
+  path: "/{id}/all-items",
+  request: {
+    query: PaginationSchema,
+    params: QueryIdSchema,
+    required: true,
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: CatalogSchemaResponse,
+        },
+      },
+      description: "Devuelve los datos de la base de datos de forma paginada",
+    },
+    404: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Marca no encontrada",
+    },
+  },
+});
+BrandApp.openapi(paginatedRouteBrandWithId, async c => {
+  const { page, limit } = c.req.valid("query");
+  const { id } = c.req.valid("param");
+  logger.info(
+    "/GET brand/{id}/all-items id: %s page: %s limit: %s",
+    id,
+    page,
+    limit
+  );
+  let res: CatalogSchemaResponseType | ErrorSchemaType;
+  const brandEmail = await GetBrandById(id);
+  if (!brandEmail) {
+    res = {
+      error: true,
+      details: "Marca no encontrada",
+    };
+    return c.json(res, 404);
+  }
+
+  const embedding = Array(768).fill(0.5);
+
+  const items = await GetCatalog(embedding, page, limit, id);
+
+  logger.info("/GET brand/{id}/all-items result: %s", items.items);
+
+  res = {
+    error: false,
+    items: items.items,
+  };
+  return c.json(res, 200);
+});
+
+// endpoint que inserta items en el catálogo de una marca con datos JSON
+const updateCatalogRoute2 = createRoute({
+  method: "post",
+  path: "/insert-items2",
+  request: {
+    body: {
+      content: {
+        "application/json": { schema: jsonCatalogUploadSchema2 },
+      },
+    },
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: SuccessSchema,
+        },
+      },
+      description: "Valida y actualiza el catálogo con datos JSON",
+    },
+    404: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Marca no encontrada",
+    },
+    500: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Error interno del servidor",
+    },
+  },
+});
+
+BrandApp.openapi(updateCatalogRoute2, async c => {
+  const { items, brandEmail } = await c.req.valid("json");
+
+  //verifico que la marca exista en la base de datos
+  let res: SuccessSchemaType | ErrorSchemaType;
+
+  const brandId = await GetBrandId(brandEmail);
+  if (!brandId) {
+    res = {
+      error: true,
+      details: "Marca no encontrada",
+    };
+    return c.json(res, 404);
+  }
+  try {
+    res = await UpdateCatalog(items, brandId);
+    if (res.error) {
+      return c.json(res, 500);
+    }
+    return c.json(res, 200);
+  } catch (error) {
+    res = {
+      error: true,
+      details: `Error interno del servidor ${error}`,
+    };
+    return c.json(res, 500);
+  }
 });

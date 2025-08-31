@@ -6,10 +6,10 @@ import {
 } from "@/schemas/auth/brand-schema";
 import {
   CatalogItemArraySchemaQuery,
-  CatalogItemArraySchemaResponse,
-  CatalogItemSchemaType,
+  CatalogSchemaResponse,
   GetItemResponseSchema,
   IsMyItemSchema,
+  ItemSchemaType,
 } from "@/schemas/catalog/catalog-schema";
 import {
   CheckLikeFavoriteResponseSchema,
@@ -44,7 +44,6 @@ const handleApiResponse = async <T>(
 
     const parsedData = schema.parse(data);
     const { error, ...dataPart } = parsedData;
-
     return { ...dataPart } as T;
   } catch (error) {
     console.error(`Error in ${errorContext}:`, error);
@@ -90,7 +89,6 @@ export async function getBrandProfile(
   if (!brandId) {
     return null;
   }
-  console.log("getBrandProfileId", brandId);
 
   const res = await handleApiResponse<{
     brand: BrandSchemaPropertiesType;
@@ -111,20 +109,20 @@ export async function getBrandItems(
   page: number,
   limit: number,
   brandId: string | null
-): Promise<CatalogItemSchemaType[]> {
+): Promise<ItemSchemaType[]> {
   if (!brandId) {
     return [];
   }
 
   const res = await handleApiResponse<{
-    items: CatalogItemSchemaType[];
+    items: ItemSchemaType[];
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/all-brand?page=${page}&limit=${limit}&id=${brandId}`,
+        url: `http://${LOCAL_IP}:3000/brand/${brandId}/all-items?page=${page}&limit=${limit}`,
         method: "GET",
       }),
-    CatalogItemArraySchemaResponse,
+    CatalogSchemaResponse,
     "getBrandItems"
   );
   return res?.items || [];
@@ -165,17 +163,17 @@ export async function getSelfClientProfile(): Promise<ClientSchemaType | null> {
 export async function getSelfBrandItems(
   page: number,
   limit: number
-): Promise<CatalogItemSchemaType[]> {
+): Promise<ItemSchemaType[]> {
   console.log("getSelfBrandItems", page, limit);
   const res = await handleApiResponse<{
-    items: CatalogItemSchemaType[];
+    items: ItemSchemaType[];
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/all-self-brand?page=${page}&limit=${limit}`,
+        url: `http://${LOCAL_IP}:3000/brand/all-items?page=${page}&limit=${limit}`,
         method: "GET",
       }),
-    CatalogItemArraySchemaResponse,
+    CatalogSchemaResponse,
     "getSelfBrandItems"
   );
   return res?.items || [];
@@ -184,14 +182,14 @@ export async function getSelfBrandItems(
 export async function getClothingItemsHome(
   page: number,
   limit: number
-): Promise<CatalogItemSchemaType[]> {
+): Promise<ItemSchemaType[]> {
   console.log("getClothingItemsHome", page, limit);
   const res = await handleApiResponse<{
-    items: CatalogItemSchemaType[];
+    items: ItemSchemaType[];
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/all?page=${page}&limit=${limit}`,
+        url: `http://${LOCAL_IP}:3000/feed?page=${page}&limit=${limit}`,
         method: "GET",
       }),
     CatalogItemArraySchemaQuery,
@@ -203,7 +201,7 @@ export async function getClothingItemsHome(
 export async function getClothingItemsSimilar(
   page: number,
   limit: number
-): Promise<CatalogItemSchemaType[]> {
+): Promise<ItemSchemaType[]> {
   return getClothingItemsHome(page, limit);
 }
 
@@ -227,10 +225,10 @@ export const fetchItems = async (
 };
 
 export async function getItem(itemUuid: string): Promise<{
-  item: CatalogItemSchemaType;
+  item: ItemSchemaType;
 } | null> {
   console.log("getting item", itemUuid);
-  return handleApiResponse<{ item: CatalogItemSchemaType }>(
+  return handleApiResponse<{ item: ItemSchemaType }>(
     () =>
       safeFetch({
         url: `http://${LOCAL_IP}:3000/get-item?uuid=${itemUuid}`,
@@ -309,10 +307,10 @@ export const getAllLikedItems = async (
   page: number = 0,
   limit: number = 100,
   brandId: string | null = null
-): Promise<CatalogItemSchemaType[]> => {
+): Promise<ItemSchemaType[]> => {
   console.log("getAllLikedItems", page, limit);
   const res = await handleApiResponse<{
-    items: CatalogItemSchemaType[];
+    items: ItemSchemaType[];
   }>(
     () =>
       safeFetch({
@@ -328,10 +326,10 @@ export const getAllLikedItems = async (
 export const getAllFavoritedItems = async (
   page: number = 0,
   limit: number = 100
-): Promise<CatalogItemSchemaType[]> => {
+): Promise<ItemSchemaType[]> => {
   console.log("getAllFavoritedItems", page, limit);
   const res = await handleApiResponse<{
-    items: CatalogItemSchemaType[];
+    items: ItemSchemaType[];
   }>(
     () =>
       safeFetch({

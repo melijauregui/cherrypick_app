@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { SuccessSchema } from "../standar-response-schema";
 
 export const PropertiesItemSchema = z.object({
   name: z
@@ -19,25 +20,37 @@ export const PropertiesItemSchema = z.object({
     .string()
     .min(1, { message: "URL is required" })
     .url({ message: "Please enter a valid URL" }),
-  image_url: z
+  imageUrl: z
     .string()
     .min(1, { message: "Image URL is required" })
     .url({ message: "Please enter a valid image URL" }),
 });
-
 export type PropertiesItemSchemaType = z.infer<typeof PropertiesItemSchema>;
 
-export const InsertItemSchema = z.object({
+export const ItemSchemaId = z.object({
   ...PropertiesItemSchema.shape,
-  uuid: z.string().min(1, { message: "UUID is required" }),
+  uuid: z.string().uuid({ message: "UUID is required" }),
+});
+export type ItemSchemaIdType = z.infer<typeof ItemSchemaId>;
+
+export const ItemSchema = z.object({
+  ...ItemSchemaId.shape,
+  brandId: z.string().uuid({ message: "El id de la marca es requerido" }),
+});
+export type ItemSchemaType = z.infer<typeof ItemSchema>;
+
+export const CatalogSchemaResponse = z.object({
+  ...SuccessSchema.shape,
+  items: z.array(ItemSchema),
+});
+export type CatalogSchemaResponseType = z.infer<typeof CatalogSchemaResponse>;
+
+export const PaginationSchema = z.object({
+  page: z.preprocess(val => parseInt(val as string) || 0, z.number().min(0)),
+  limit: z.preprocess(val => parseInt(val as string) || 10, z.number().min(1)),
 });
 
-export type InsertItemSchemaType = z.infer<typeof InsertItemSchema>;
-
-export const CatalogItemSchema = z.object({
-  ...InsertItemSchema.shape,
-  brandId: z.string().min(1, "El id de la marca es requerido"),
-});
+//--------------------------------------------
 
 export const CatalogPropertiesSchema = z.object({
   ...PropertiesItemSchema.shape,
@@ -97,53 +110,13 @@ export type CatalogResponseSchemaDeleteType = z.infer<
   typeof CatalogResponseSchemaDelete
 >;
 
-export const CatalogItemArraySchema = z.array(CatalogItemSchema);
-
-export const CatalogItemArraySchemaQuery = z.union([
-  z.object({
-    error: z.literal(true),
-    details: z.string(),
-  }),
-  z.object({
-    error: z.literal(false),
-    items: CatalogItemArraySchema,
-  }),
-]);
+export const CatalogItemArraySchemaQuery = z.object({
+  ...SuccessSchema.shape,
+  items: z.array(ItemSchema),
+});
 export type CatalogItemArraySchemaQueryType = z.infer<
   typeof CatalogItemArraySchemaQuery
 >;
-
-export const CatalogItemArraySchemaResponse = z.union([
-  z.object({
-    error: z.literal(true),
-    details: z.string(),
-  }),
-  z.object({
-    error: z.literal(false),
-    items: CatalogItemArraySchema,
-  }),
-]);
-
-export type CatalogItemArraySchemaResponseType = z.infer<
-  typeof CatalogItemArraySchemaResponse
->;
-
-export type CatalogItem = z.infer<typeof CatalogItemSchema>;
-export type CsvFileUpload = z.infer<typeof csvFileUploadSchema>;
-export type CatalogItemSchemaType = z.infer<typeof CatalogItemSchema>;
-export type CatalogResponseSchemaType = z.infer<typeof CatalogResponseSchema>;
-
-const PaginationSchemaBrand = z.object({
-  page: z.preprocess(val => parseInt(val as string) || 0, z.number().min(0)),
-  limit: z.preprocess(val => parseInt(val as string) || 10, z.number().min(1)),
-});
-export { PaginationSchemaBrand };
-
-const PaginationSchemaBrandWithId = z.object({
-  ...PaginationSchemaBrand.shape,
-  id: z.string().min(1, "El id es requerido"),
-});
-export { PaginationSchemaBrandWithId };
 
 // Schema for JSON catalog upload
 export const jsonCatalogUploadSchema = z.object({
@@ -168,7 +141,7 @@ export const GetItemResponseSchema = z.union([
   }),
   z.object({
     error: z.literal(false),
-    item: CatalogItemSchema,
+    item: ItemSchema,
   }),
 ]);
 
@@ -178,7 +151,7 @@ export type GetItemResponseSchemaType = z.infer<typeof GetItemResponseSchema>;
 export const UpdateItemQuerySchema = z.object({
   uuid: z.string().min(1, "El uuid es requerido"),
 });
-export const UpdateItemBodySchema = InsertItemSchema.partial();
+export const UpdateItemBodySchema = ItemSchema.partial();
 
 export const UpdateItemResponseSchema = z.union([
   z.object({
@@ -215,10 +188,3 @@ export const IsMyItemSchema = z.union([
 
 export type IsMyItemQuerySchemaType = z.infer<typeof IsMyItemQuerySchema>;
 export type IsMyItemSchemaType = z.infer<typeof IsMyItemSchema>;
-
-// Esquema para validar los parámetros de paginación (query string)
-const PaginationSchema = z.object({
-  page: z.preprocess(val => parseInt(val as string) || 0, z.number().min(0)),
-  limit: z.preprocess(val => parseInt(val as string) || 10, z.number().min(1)),
-});
-export { PaginationSchema };

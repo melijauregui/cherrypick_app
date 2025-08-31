@@ -55,32 +55,18 @@ const consoleFormat = winston.format.combine(
   winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss:ms" }),
   winston.format.colorize({ all: true }),
   winston.format.splat(),
-  winston.format.printf(info => {
-    const extra = (info as any)[SPLAT] as unknown[] | undefined;
-    const extraText = extra
-      ? " " +
-        extra
-          .map(v => (typeof v === "string" ? v : JSON.stringify(v)))
-          .join(" ")
-      : "";
-    return `${info.timestamp} ${info.level}: ${info.message}${extraText}`;
-  })
+  winston.format.printf(
+    info => `${info.timestamp} ${info.level}: ${info.message}`
+  )
 );
 
 // Format for files (without colors)
 const fileFormat = winston.format.combine(
   winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss:ms" }),
   winston.format.splat(),
-  winston.format.printf(info => {
-    const extra = (info as any)[SPLAT] as unknown[] | undefined;
-    const extraText = extra
-      ? " " +
-        extra
-          .map(v => (typeof v === "string" ? v : JSON.stringify(v)))
-          .join(" ")
-      : "";
-    return `${info.timestamp} ${info.level}: ${info.message}${extraText}`;
-  })
+  winston.format.printf(
+    info => `${info.timestamp} ${info.level}: ${info.message}`
+  )
 );
 
 // Define transports

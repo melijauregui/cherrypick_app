@@ -1,7 +1,7 @@
 import { View, Image, Dimensions, TouchableOpacity } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import { router } from "expo-router";
-import { CatalogItemSchemaType } from "@/schemas/catalog/catalog-schema";
+import { ItemSchemaType } from "@/schemas/catalog/catalog-schema";
 
 // Componente de placeholder para items que están cargando
 export const ItemPlaceholder = ({
@@ -32,12 +32,12 @@ const ClothingItemComponent = ({
   renderedWidth,
 }: {
   i: number;
-  item: CatalogItemSchemaType;
+  item: ItemSchemaType;
   numColumns: number;
   renderedHeight: number;
   renderedWidth: number;
 }) => {
-  const { image_url } = item;
+  const { imageUrl } = item;
   // const [imageDimensions, setImageDimensions] = useState({
   //   width: 0,
   //   height: 0,
@@ -99,9 +99,9 @@ const ClothingItemComponent = ({
       }}
     >
       <TouchableOpacity onPress={handlePress} activeOpacity={0.9}>
-        {image_url ? (
+        {imageUrl ? (
           <Image
-            source={{ uri: image_url }}
+            source={{ uri: imageUrl }}
             style={{ width: renderedWidth, height: renderedHeight }}
             resizeMode="cover"
           />
