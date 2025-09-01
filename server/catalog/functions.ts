@@ -1,15 +1,16 @@
 import {
+  CatalogResponseSchema,
+  CatalogResponseSchemaType,
   ItemSchema,
   ItemSchemaType,
   ItemUuidNameResponseSchemaType,
   ItemUuidNameSchema,
   ItemUuidNameSchemaType,
-  PropertiesItemSchema,
-  PropertiesItemSchemaType,
 } from "@/schemas/catalog/catalog-schema";
 import weaviate, { Collection, Filters } from "weaviate-client";
 import { ErrorSchemaType } from "@/schemas/standar-response-schema";
 import { config } from "../config";
+import logger from "../logger";
 
 //funcion para hacer query a pinecone
 export async function GetCatalog(
@@ -233,4 +234,79 @@ export async function getCollection(): Promise<
       details: "Error getting collection in Weaviate: " + error,
     };
   }
+}
+
+export async function GetItemsFromWeaviate(
+  uuids: string[],
+  limit: number
+): Promise<CatalogResponseSchemaType | ErrorSchemaType> {
+  const resCollection = await getCollection();
+  if (resCollection.error) {
+    return {
+      error: true,
+      details: resCollection.details || "Error getting collection",
+    };
+  }
+  const collection = resCollection.collection;
+
+  const filters = collection.filter.byId().containsAny(uuids);
+
+  const queryOptions: any = {
+    filters: filters,
+    limit: limit,
+    returnProperties: [
+      "name",
+      "description",
+      "imageUrl",
+      "url",
+      "brandId",
+      "price",
+    ],
+  };
+
+  const result = await collection.query.fetchObjects(queryOptions);
+
+  if (result.objects.length === 0) {
+    return {
+      error: true,
+      details: "Items not found",
+    };
+  }
+
+  // Crear un mapa para mantener el orden original de los UUIDs
+  const uuidOrderMap = new Map();
+  uuids.forEach((uuid, index) => {
+    uuidOrderMap.set(uuid, index);
+  });
+
+  const items = result.objects
+    .map(obj => ({
+      name: obj.properties?.name || "",
+      description: obj.properties?.description || "",
+      imageUrl: obj.properties?.imageUrl || "",
+      url: obj.properties?.url || "",
+      brandId: obj.properties?.brandId || "",
+      price: obj.properties?.price || 0,
+      uuid: obj.uuid || "",
+    }))
+    .sort((a, b) => {
+      const orderA = uuidOrderMap.get(a.uuid) ?? Number.MAX_SAFE_INTEGER;
+      const orderB = uuidOrderMap.get(b.uuid) ?? Number.MAX_SAFE_INTEGER;
+      return orderA - orderB;
+    });
+
+  // Validate the item using Zod schema
+  const validationResult = CatalogResponseSchema.safeParse(items);
+  if (!validationResult.success) {
+    logger.error("Item validation failed:", validationResult.error);
+    return {
+      error: true,
+      details: "Invalid items data" + validationResult.error,
+    };
+  }
+
+  return {
+    error: false,
+    items: validationResult.data.items,
+  };
 }

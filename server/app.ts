@@ -1,4 +1,4 @@
-import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
+import { OpenAPIHono } from "@hono/zod-openapi";
 import { auth } from "../lib/auth";
 import FormUserApp from "./formUser/routes";
 import UserApp from "./user/routes";
