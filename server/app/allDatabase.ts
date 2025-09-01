@@ -2,9 +2,7 @@ import {
   CheckLikeFavoriteResponseSchemaType,
   LikeFavoriteResponseSchemaType,
 } from "@/schemas/activity/activity";
-import { db } from "../db.config";
-import { CatalogItemArraySchemaQueryType } from "../../schemas/catalog/catalog-schema";
-import { getCollection } from "./catalogFunctions";
+import { ItemSchemaType } from "@/schemas/catalog/catalog-schema";
 
 // Funciones para likes
 export async function toggleLike(
@@ -119,7 +117,7 @@ export async function getAllLikedFavoritedItems(
   userType: string,
   page: number = 0,
   limit: number = 100
-): Promise<CatalogItemArraySchemaQueryType> {
+): Promise<ItemSchemaType[]> {
   // try {
   //   const offset = page * limit;
   //   // Primero obtener los UUIDs de los items liked
@@ -131,14 +129,12 @@ export async function getAllLikedFavoritedItems(
   //      LIMIT ? OFFSET ?`,
   //     [userEmail, limit, offset]
   //   );
-
   //   if (
   //     !Array.isArray(likedFavoritedUuids) ||
   //     likedFavoritedUuids.length === 0
   //   ) {
   //     return { error: false, items: [] };
   //   }
-
   //   // Obtener los items de weaviate
   //   const items = await getItemsFromWeaviate(
   //     likedFavoritedUuids.map((row: any) => row.item_uuid),
@@ -149,5 +145,5 @@ export async function getAllLikedFavoritedItems(
   //   console.error("Error getting liked items:", error);
   //   return { error: true, details: "Error al obtener los items liked" };
   // }
-  return { error: false, items: [] };
+  return [];
 }

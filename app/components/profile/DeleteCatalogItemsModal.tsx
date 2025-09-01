@@ -13,8 +13,8 @@ import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { FlashList } from "@shopify/flash-list";
 import { ButtonSubmit } from "./insertNewItems";
 import { useDelete } from "@/app/utils/update";
-import { fetchItems } from "@/app/utils/fetch";
-import { AllBrandNamesItemsSchemaType } from "@/schemas/auth/brand-schema";
+import { getItemsUuidNames } from "@/app/utils/fetch";
+import { ItemUuidNameSchemaType } from "@/schemas/catalog/catalog-schema";
 
 const DeleteCatalogItemsModal = ({
   bottomSheetRef,
@@ -40,7 +40,7 @@ const DeleteCatalogItemsModal = ({
     useInfiniteQuery({
       queryKey: ["delete-catalog-items", brandId, search],
       queryFn: async ({ pageParam }) => {
-        const res = await fetchItems(search, pageParam);
+        const res = await getItemsUuidNames(search, pageParam);
         return res;
       },
       initialPageParam: 0,
@@ -84,7 +84,7 @@ const DeleteCatalogItemsModal = ({
     }
   }, [error]);
 
-  const toggleSelect = (item: AllBrandNamesItemsSchemaType) => {
+  const toggleSelect = (item: ItemUuidNameSchemaType) => {
     setSelected(prev => {
       const newSet = new Set(prev);
       if (newSet.has(item.uuid)) newSet.delete(item.uuid);
@@ -154,9 +154,9 @@ const FormContent = ({
   search: string;
   setSearch: (text: string) => void;
   loading: boolean;
-  filteredItems: AllBrandNamesItemsSchemaType[];
+  filteredItems: ItemUuidNameSchemaType[];
   selected: Set<string>;
-  toggleSelect: (item: AllBrandNamesItemsSchemaType) => void;
+  toggleSelect: (item: ItemUuidNameSchemaType) => void;
   handleDelete: () => void;
   deleting: boolean;
   fetchNextPage: () => void;
@@ -221,8 +221,8 @@ const ItemStyle = ({
   toggleSelect,
   selected,
 }: {
-  item: AllBrandNamesItemsSchemaType;
-  toggleSelect: (item: AllBrandNamesItemsSchemaType) => void;
+  item: ItemUuidNameSchemaType;
+  toggleSelect: (item: ItemUuidNameSchemaType) => void;
   selected: Set<string>;
 }) => {
   return (

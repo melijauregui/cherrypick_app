@@ -1,6 +1,10 @@
 import { BrandSchemaType } from "@/schemas/brand/brand-schema";
 import { db } from "../db.config";
 import logger from "../logger";
+import {
+  ErrorSchemaType,
+  SuccessSchemaType,
+} from "@/schemas/standar-response-schema";
 
 export async function GetBrandId(brandEmail: string): Promise<string | null> {
   const brand = await db.brand.findUnique({

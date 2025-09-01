@@ -27,13 +27,20 @@ import { BodyCodeVerificationPostSchema } from "@/schemas/auth/sign-up-schema";
 import { VerifyUserExists } from "../user/functions";
 import { SendEmailBrand } from "../formUser/functions";
 import {
-  CatalogSchemaResponse,
-  CatalogSchemaResponseType,
+  CatalogResponseSchema,
+  DeleteItemsResponseSchema,
+  CatalogResponseSchemaType,
+  UuidItemsSchema,
+  jsonCatalogUploadSchema,
   jsonCatalogUploadSchema2,
   PaginationSchema,
+  DeleteItemsResponseSchemaType,
+  PaginationFilterSchema,
+  ItemUuidNameResponseSchema,
+  ItemUuidNameResponseSchemaType,
 } from "@/schemas/catalog/catalog-schema";
-import { GetCatalog } from "../feed/functions";
-import { UpdateCatalog } from "../app/catalogFunctions";
+import { GetCatalog, GetItemsUuidNamesFromBrand } from "../catalog/functions";
+import { DeleteFromCatalog, UpdateCatalog } from "../app/catalogFunctions";
 
 const BrandApp = new OpenAPIHono<AppEnv>({
   defaultHook: (result, c) => {
@@ -225,7 +232,7 @@ const paginatedRouteBrand = createRoute({
     200: {
       content: {
         "application/json": {
-          schema: CatalogSchemaResponse,
+          schema: CatalogResponseSchema,
         },
       },
       description: "Devuelve los datos de la base de datos de forma paginada",
@@ -262,7 +269,7 @@ BrandApp.openapi(paginatedRouteBrand, async c => {
   console.log("page", page);
   console.log("limit", limit);
   logger.info("/GET brand/all-items page: %s limit: %s", page, limit);
-  let res: CatalogSchemaResponseType | ErrorSchemaType;
+  let res: CatalogResponseSchemaType | ErrorSchemaType;
   const user = c.get("user");
   const brandEmail = user?.email;
   if (!brandEmail) {
@@ -299,6 +306,91 @@ BrandApp.openapi(paginatedRouteBrand, async c => {
     error: false,
     items: result.items,
   };
+  return c.json(res, 200);
+});
+
+// endpoint que devuelve todos los nombres de los items de una marca
+const allBrandItemsRoute = createRoute({
+  method: "get",
+  path: "/all-names-items",
+  request: {
+    query: PaginationFilterSchema,
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: ItemUuidNameResponseSchema,
+        },
+      },
+      description: "Devuelve los nombres de los items de una marca",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description:
+        "No tienes permisos para obtener los nombres de los items de una marca",
+    },
+    404: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Marca no encontrada",
+    },
+    500: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Error interno del servidor",
+    },
+  },
+});
+BrandApp.openapi(allBrandItemsRoute, async c => {
+  const { filter, page = 0, limit = 10 } = c.req.valid("query");
+  logger.info(
+    "/GET brand/all-names-items filter: %s page: %s limit: %s",
+    filter,
+    page,
+    limit
+  );
+  let res: ItemUuidNameResponseSchemaType | ErrorSchemaType;
+  const user = c.get("user");
+  const brandEmail = user?.email;
+
+  if (!brandEmail) {
+    res = {
+      error: true,
+      details:
+        "No tienes permisos para obtener los nombres de los items de una marca",
+    };
+    return c.json(res, 401);
+  }
+
+  //verifico que el usuario tenga una marca
+  const brandId = await GetBrandId(brandEmail);
+  if (!brandId) {
+    res = {
+      error: true,
+      details: "Marca no encontrada",
+    };
+    return c.json(res, 404);
+  }
+
+  res = await GetItemsUuidNamesFromBrand(brandId, filter, page, limit);
+  if (res.error) {
+    return c.json(res, 500);
+  }
+  logger.info(
+    "/GET brand/all-names-items response: %s",
+    res.items.length.toString()
+  );
   return c.json(res, 200);
 });
 
@@ -360,7 +452,7 @@ const paginatedRouteBrandWithId = createRoute({
     200: {
       content: {
         "application/json": {
-          schema: CatalogSchemaResponse,
+          schema: CatalogResponseSchema,
         },
       },
       description: "Devuelve los datos de la base de datos de forma paginada",
@@ -384,7 +476,7 @@ BrandApp.openapi(paginatedRouteBrandWithId, async c => {
     page,
     limit
   );
-  let res: CatalogSchemaResponseType | ErrorSchemaType;
+  let res: CatalogResponseSchemaType | ErrorSchemaType;
   const brandEmail = await GetBrandById(id);
   if (!brandEmail) {
     res = {
@@ -404,6 +496,86 @@ BrandApp.openapi(paginatedRouteBrandWithId, async c => {
     error: false,
     items: items.items,
   };
+  return c.json(res, 200);
+});
+
+// endpoint que inserta items en el catálogo de una marca con datos JSON
+const updateCatalogRoute = createRoute({
+  method: "post",
+  path: "/insert-items",
+  request: {
+    body: {
+      content: {
+        "application/json": { schema: jsonCatalogUploadSchema },
+      },
+    },
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: SuccessSchema,
+        },
+      },
+      description: "Valida y actualiza el catálogo con datos JSON",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "No tienes permisos para insertar items",
+    },
+    404: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Marca no encontrada",
+    },
+    500: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Error interno del servidor",
+    },
+  },
+});
+
+BrandApp.openapi(updateCatalogRoute, async c => {
+  const { items } = await c.req.valid("json");
+
+  //verifico que la marca exista en la base de datos
+  let res: SuccessSchemaType | ErrorSchemaType;
+
+  const user = c.get("user");
+  const brandEmail = user?.email;
+
+  if (!brandEmail) {
+    res = {
+      error: true,
+      details: "No tienes permisos para insertar items",
+    };
+    return c.json(res, 401);
+  }
+
+  const brandId = await GetBrandId(brandEmail);
+  if (!brandId) {
+    res = {
+      error: true,
+      details: "Marca no encontrada",
+    };
+    return c.json(res, 404);
+  }
+
+  res = await UpdateCatalog(items, brandId);
+  if (res.error) {
+    return c.json(res, 500);
+  }
   return c.json(res, 200);
 });
 
@@ -460,17 +632,90 @@ BrandApp.openapi(updateCatalogRoute2, async c => {
     };
     return c.json(res, 404);
   }
-  try {
-    res = await UpdateCatalog(items, brandId);
-    if (res.error) {
-      return c.json(res, 500);
-    }
-    return c.json(res, 200);
-  } catch (error) {
-    res = {
-      error: true,
-      details: `Error interno del servidor ${error}`,
-    };
+
+  res = await UpdateCatalog(items, brandId);
+  if (res.error) {
     return c.json(res, 500);
   }
+  return c.json(res, 200);
+});
+
+// endpoint que elimina items en el catálogo de una marca con datos JSON
+const deleteCatalogRoute = createRoute({
+  method: "post",
+  path: "/delete-items",
+  request: {
+    body: {
+      content: {
+        "application/json": { schema: UuidItemsSchema },
+      },
+    },
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: DeleteItemsResponseSchema,
+        },
+      },
+      description: "Valida y elimina items del catálogo con datos JSON",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "No tienes permisos para eliminar items",
+    },
+    404: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Marca no encontrada",
+    },
+    500: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Error interno del servidor",
+    },
+  },
+});
+
+BrandApp.openapi(deleteCatalogRoute, async c => {
+  const { items } = c.req.valid("json");
+  logger.info("/POST brand/delete-items items: %s", items);
+  const user = c.get("user");
+  const brandEmail = user?.email;
+  let res: DeleteItemsResponseSchemaType | ErrorSchemaType;
+  if (!brandEmail) {
+    res = {
+      error: true,
+      details: "No tienes permisos para actualizar este item",
+    };
+    return c.json(res, 401);
+  }
+
+  // Extraer los nombres de los items del array de objetos
+  const itemsUuids = items.map(item => item.id);
+
+  //verifico que la marca exista en la base de datos
+  const brandId = await GetBrandId(brandEmail);
+  if (!brandId) {
+    res = {
+      error: true,
+      details: "Marca no encontrada",
+    };
+    return c.json(res, 404);
+  }
+  res = await DeleteFromCatalog(itemsUuids, brandId);
+  if (res.error) {
+    return c.json(res, 500);
+  }
+  return c.json(res, 200);
 });

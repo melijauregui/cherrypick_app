@@ -7,36 +7,27 @@ import {
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
-  KeyboardTypeOptions,
   ScrollView,
-  TextInput,
 } from "react-native";
-import BottomSheet, {
-  BottomSheetTextInput,
-  BottomSheetScrollView,
-} from "@gorhom/bottom-sheet";
-import { z, ZodError } from "zod";
-import BottomSheetSame from "./bottomSheets";
+import BottomSheet from "@gorhom/bottom-sheet";
+import { ZodError } from "zod";
 import { LOCAL_IP } from "@/config/api";
 import Toast from "react-native-toast-message";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import safeFetch from "@/app/utils/safe-fetch";
 import {
-  CatalogResponseSchema,
   UpdateItemResponseSchema,
-  InsertItemSchema,
-  CatalogPropertiesSchema,
+  ItemSchema,
   PropertiesItemSchema,
 } from "@/schemas/catalog/catalog-schema";
 import InputBoxWithName from "./inputBox";
-import { BrandSchema } from "@/schemas/auth/brand-schema";
 
 export type FormData = {
   name: string;
   description: string;
   price: string;
   url: string;
-  image_url: string;
+  imageUrl: string;
 };
 
 type FormErrors = {
@@ -44,7 +35,7 @@ type FormErrors = {
   description?: string;
   price?: string;
   url?: string;
-  image_url?: string;
+  imageUrl?: string;
 };
 
 export const InsertNewItemsModal: React.FC<{
@@ -167,14 +158,14 @@ const ItemsModalDetails: React.FC<{
     formData.name &&
       formData.price &&
       formData.url &&
-      formData.image_url &&
+      formData.imageUrl &&
       formData.description &&
       formData.price &&
       (formData.name !== formDataLastValue.name ||
         formData.description !== formDataLastValue.description ||
         formData.price !== formDataLastValue.price ||
         formData.url !== formDataLastValue.url ||
-        formData.image_url !== formDataLastValue.image_url)
+        formData.imageUrl !== formDataLastValue.imageUrl)
   );
 
   return (
@@ -287,10 +278,10 @@ const FormContent = ({
 
           <InputBoxWithName
             name="Image URL"
-            value={formData.image_url}
-            setValue={text => handleFieldChange("image_url", text)}
-            error={errors.image_url}
-            lastValue={formData.image_url}
+            value={formData.imageUrl}
+            setValue={text => handleFieldChange("imageUrl", text)}
+            error={errors.imageUrl}
+            lastValue={formData.imageUrl}
             isScrollable={false}
             keyboardType="url"
             autoCapitalize="none"
@@ -347,7 +338,7 @@ function useInsertItem(
         name: result.data.name,
         description: result.data.description,
         price: result.data.price,
-        image_url: result.data.image_url,
+        imageUrl: result.data.imageUrl,
         url: result.data.url,
       };
 
@@ -357,20 +348,19 @@ function useInsertItem(
         description: "",
         price: "",
         url: "",
-        image_url: "",
+        imageUrl: "",
       });
 
       const response = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/insert-catalog-brand`,
+        url: `http://${LOCAL_IP}:3000/brand/insert-items`,
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           items: [item],
         }),
-        schema: CatalogResponseSchema,
       });
       if (response.data.error) {
-        throw new Error(response.data.details);
+        throw new Error(response.data.details + "\n" + response.data.info);
       }
       return response.data;
     },
@@ -439,7 +429,7 @@ function useUpdateItem(
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: async (data: { formData: FormData }) => {
-      const result = InsertItemSchema.safeParse({
+      const result = ItemSchema.safeParse({
         ...data.formData,
         uuid: itemUuid,
       });
@@ -464,8 +454,8 @@ function useUpdateItem(
       if (result.data.price !== formDataLastValue.price) {
         itemUpdated.price = result.data.price;
       }
-      if (result.data.image_url !== formDataLastValue.image_url) {
-        itemUpdated.image_url = result.data.image_url;
+      if (result.data.imageUrl !== formDataLastValue.imageUrl) {
+        itemUpdated.imageUrl = result.data.imageUrl;
       }
       if (result.data.url !== formDataLastValue.url) {
         itemUpdated.url = result.data.url;
@@ -481,7 +471,6 @@ function useUpdateItem(
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(itemUpdated),
-        schema: UpdateItemResponseSchema,
       });
       if (response.data.error) {
         throw new Error(response.data.details);

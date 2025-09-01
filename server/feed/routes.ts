@@ -3,15 +3,15 @@ import { Context } from "hono";
 import { errorHandler } from "../errorHandler";
 import { AppEnv } from "../app";
 import {
-  CatalogItemArraySchemaQuery,
-  CatalogItemArraySchemaQueryType,
+  CatalogResponseSchema,
+  CatalogResponseSchemaType,
   PaginationSchema,
 } from "@/schemas/catalog/catalog-schema";
 import {
   ErrorSchema,
   ErrorSchemaType,
 } from "@/schemas/standar-response-schema";
-import { GetCatalog } from "./functions";
+import { GetCatalog } from "../catalog/functions";
 import logger from "../logger";
 
 const FeedApp = new OpenAPIHono<AppEnv>({
@@ -41,7 +41,7 @@ const paginatedRoute = createRoute({
     200: {
       content: {
         "application/json": {
-          schema: CatalogItemArraySchemaQuery,
+          schema: CatalogResponseSchema,
         },
       },
       description: "Devuelve los datos de la base de datos de forma paginada",
@@ -60,7 +60,7 @@ FeedApp.openapi(paginatedRoute, async c => {
   const { page, limit } = c.req.valid("query");
   logger.info("/GET feed page: %s limit: %s", page, limit);
   const embedding = Array(768).fill(0.5);
-  let res: CatalogItemArraySchemaQueryType | ErrorSchemaType;
+  let res: CatalogResponseSchemaType | ErrorSchemaType;
 
   const result = await GetCatalog(embedding, page, limit, undefined);
 

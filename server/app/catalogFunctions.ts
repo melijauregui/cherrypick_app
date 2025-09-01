@@ -3,11 +3,10 @@ import {
   SuccessSchemaType,
 } from "@/schemas/standar-response-schema";
 import {
-  CatalogResponseSchemaDeleteType,
   PropertiesItemSchemaType,
   UpdateItemBodySchemaType,
-  CatalogPropertiesSchema,
-  CatalogPropertiesSchemaType,
+  PropertiesItemSchema,
+  DeleteItemsResponseSchemaType,
 } from "../../schemas/catalog/catalog-schema";
 import { config } from "../config";
 import { db } from "../db.config";
@@ -66,11 +65,16 @@ async function extractTextFeatures(text: string): Promise<number[]> {
 }
 
 // Función para verificar si ya existe un elemento con el mismo nombre y brand en Weaviate
-async function getCollection(): Promise<{
-  error: boolean;
-  details: string;
-  collection: Collection | null;
-}> {
+async function getCollection(): Promise<
+  | {
+      error: true;
+      details: string;
+    }
+  | {
+      error: false;
+      collection: Collection;
+    }
+> {
   try {
     const client = await weaviate.connectToWeaviateCloud(config.WEAVIATE_URL, {
       authCredentials: new weaviate.ApiKey(config.WEAVIATE_API_KEY),
@@ -105,7 +109,6 @@ async function getCollection(): Promise<{
 
     return {
       error: false,
-      details: "",
       collection: collection,
     };
   } catch (error) {
@@ -113,14 +116,13 @@ async function getCollection(): Promise<{
     return {
       error: true,
       details: "Error getting collection in Weaviate: " + error,
-      collection: null,
     };
   }
 }
 export { getCollection };
 
 // Función para validar items JSON
-export async function validateJsonItems(
+async function validateJsonItems(
   items: PropertiesItemSchemaType[],
   collection: Collection,
   brandId: string
@@ -134,53 +136,46 @@ export async function validateJsonItems(
       catalogItems: PropertiesItemSchemaType[];
     }
 > {
-  try {
-    if (!Array.isArray(items) || items.length === 0) {
-      return {
-        error: true,
-        details: "No se han proporcionado items válidos",
-      };
-    }
-    const invalidRows: number[] = [];
-    const duplicateRows: number[] = [];
-    const validItems: CatalogPropertiesSchemaType[] = [];
-    for (let i = 0; i < items.length; i++) {
-      const item = { ...items[i], brandId };
-      try {
-        const validatedItem = CatalogPropertiesSchema.parse(item);
-        // Check if item already exists in Weaviate with same name and brand
-        const isDuplicate = await checkDuplicateInWeaviate(
-          collection,
-          validatedItem.name,
-          brandId
-        );
-        if (isDuplicate) {
-          duplicateRows.push(i + 1);
-          continue;
-        }
-        validItems.push(validatedItem);
-      } catch (error) {
-        console.log("error", error);
-        invalidRows.push(i + 1);
-      }
-    }
-    if (invalidRows.length > 0 || duplicateRows.length > 0) {
-      const rowNumbers = invalidRows.join(",");
-      return {
-        error: true,
-        details: `ítem(s) [${rowNumbers}] mal formados y ítem(s) [${duplicateRows}] duplicados`,
-      };
-    }
-    return {
-      error: false,
-      catalogItems: validItems,
-    };
-  } catch (error) {
+  if (!Array.isArray(items) || items.length === 0) {
     return {
       error: true,
-      details: "Error interno del servidor al procesar los items JSON",
+      details: "No se han proporcionado items válidos",
     };
   }
+  const invalidRows: number[] = [];
+  const duplicateRows: number[] = [];
+  const validItems: PropertiesItemSchemaType[] = [];
+  for (let i = 0; i < items.length; i++) {
+    const item = { ...items[i] };
+    try {
+      const validatedItem = PropertiesItemSchema.parse(item);
+      // Check if item already exists in Weaviate with same name and brand
+      const isDuplicate = await checkDuplicateInWeaviate(
+        collection,
+        validatedItem.name,
+        brandId
+      );
+      if (isDuplicate) {
+        duplicateRows.push(i + 1);
+        continue;
+      }
+      validItems.push(validatedItem);
+    } catch (error) {
+      console.log("error", error);
+      invalidRows.push(i + 1);
+    }
+  }
+  if (invalidRows.length > 0 || duplicateRows.length > 0) {
+    const rowNumbers = invalidRows.join(",");
+    return {
+      error: true,
+      details: `ítem(s) [${rowNumbers}] mal formados y ítem(s) [${duplicateRows}] duplicados`,
+    };
+  }
+  return {
+    error: false,
+    catalogItems: validItems,
+  };
 }
 
 // Cambiado para aceptar items JSON
@@ -197,13 +192,6 @@ export async function UpdateCatalog(
     };
   }
   const collection = collectionRes.collection;
-  if (!collection) {
-    return {
-      error: true,
-      details: "Collection not found",
-    };
-  }
-  console.log("to validate json items", brandId);
   const validationResult = await validateJsonItems(items, collection, brandId);
   if (validationResult.error) {
     res = validationResult;
@@ -337,14 +325,13 @@ async function checkDuplicateInWeaviate(
 export async function DeleteFromCatalog(
   itemsUuids: string[],
   brandId: string
-): Promise<CatalogResponseSchemaDeleteType> {
-  let res: CatalogResponseSchemaDeleteType;
+): Promise<DeleteItemsResponseSchemaType | ErrorSchemaType> {
+  let res: DeleteItemsResponseSchemaType | ErrorSchemaType;
   const collectionRes = await getCollection();
   if (collectionRes.error) {
     return {
       error: true,
       details: collectionRes.details,
-      numberDeleted: 0,
     };
   }
 
@@ -353,14 +340,12 @@ export async function DeleteFromCatalog(
     return {
       error: true,
       details: "Collection not found",
-      numberDeleted: 0,
     };
   }
   if (!itemsUuids || itemsUuids.length === 0) {
     return {
       error: true,
       details: "No se han proporcionado uuids de items",
-      numberDeleted: 0,
     };
   }
 
@@ -379,48 +364,16 @@ export async function DeleteFromCatalog(
     return {
       error: true,
       details: deleteFromDatabaseRes.details,
-      numberDeleted: res.numberDeleted,
     };
   }
   return res;
-}
-
-async function deleteFromDatabase(
-  itemsUuids: string[]
-): Promise<SuccessSchemaType | ErrorSchemaType> {
-  // try {
-  //   // Create placeholders for the IN clause
-  //   const placeholders = itemsUuids.map(() => "?").join(",");
-
-  //   // Delete from likes and favorites tables for both clients and brands
-  //   const queries = [
-  //     `DELETE FROM item_likes_client WHERE item_uuid IN (${placeholders})`,
-  //     `DELETE FROM item_favorites_client WHERE item_uuid IN (${placeholders})`,
-  //     `DELETE FROM item_likes_brand WHERE item_uuid IN (${placeholders})`,
-  //     `DELETE FROM item_favorites_brand WHERE item_uuid IN (${placeholders})`,
-  //   ];
-  //   for (const query of queries) {
-  //     const result = await db.query(query, itemsUuids);
-  //   }
-
-  //   return {
-  //     error: false,
-  //   };
-  // } catch (error) {
-  //   console.error("Error deleting from database:", error);
-  //   return {
-  //     error: true,
-  //     details: `Error deleting from database: ${error}`,
-  //   };
-  // }
-  return { error: false };
 }
 
 async function deleteCatalogItemsFromWeaviate(
   itemsUuids: string[],
   collection: Collection,
   brandId: string
-): Promise<CatalogResponseSchemaDeleteType> {
+): Promise<DeleteItemsResponseSchemaType | ErrorSchemaType> {
   try {
     let numberDeleted = 0;
     const invalidItems: string[] = [];
@@ -451,7 +404,6 @@ async function deleteCatalogItemsFromWeaviate(
       return {
         error: true,
         details: `items [${invalidItems.join(",")}] no encontrados y ${numberDeleted} eliminados correctamente`,
-        numberDeleted: numberDeleted,
       };
     }
     return {
@@ -462,7 +414,55 @@ async function deleteCatalogItemsFromWeaviate(
     return {
       error: true,
       details: `Error deleting from Weaviate: ${error}`,
-      numberDeleted: 0,
+    };
+  }
+}
+
+async function deleteFromDatabase(
+  itemsUuids: string[]
+): Promise<SuccessSchemaType | ErrorSchemaType> {
+  try {
+    // Delete from likes and favorites tables for both clients and brands using Prisma
+    await db.itemLikeClient.deleteMany({
+      where: {
+        itemUuid: {
+          in: itemsUuids,
+        },
+      },
+    });
+
+    await db.itemFavoriteClient.deleteMany({
+      where: {
+        itemUuid: {
+          in: itemsUuids,
+        },
+      },
+    });
+
+    await db.itemLikeBrand.deleteMany({
+      where: {
+        itemUuid: {
+          in: itemsUuids,
+        },
+      },
+    });
+
+    await db.itemFavoriteBrand.deleteMany({
+      where: {
+        itemUuid: {
+          in: itemsUuids,
+        },
+      },
+    });
+
+    return {
+      error: false,
+    };
+  } catch (error) {
+    console.error("Error deleting from database:", error);
+    return {
+      error: true,
+      details: `Error deleting from database: ${error}`,
     };
   }
 }
@@ -562,7 +562,7 @@ export async function DeleteFromWeaviate(
 ): Promise<SuccessSchemaType | ErrorSchemaType> {
   try {
     const collectionRes = await getCollection();
-    if (collectionRes.error || !collectionRes.collection) {
+    if (collectionRes.error) {
       return {
         error: true,
         details: collectionRes.details,

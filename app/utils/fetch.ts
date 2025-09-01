@@ -1,15 +1,13 @@
 import safeFetch from "./safe-fetch";
 import { LOCAL_IP } from "@/config/api";
+import {} from "@/schemas/auth/brand-schema";
 import {
-  AllBrandItemsSchemaRes,
-  AllBrandNamesItemsSchemaType,
-} from "@/schemas/auth/brand-schema";
-import {
-  CatalogItemArraySchemaQuery,
-  CatalogSchemaResponse,
-  GetItemResponseSchema,
+  CatalogResponseSchema,
   IsMyItemSchema,
+  ItemResponseSchema,
   ItemSchemaType,
+  ItemUuidNameResponseSchema,
+  ItemUuidNameSchemaType,
 } from "@/schemas/catalog/catalog-schema";
 import {
   CheckLikeFavoriteResponseSchema,
@@ -122,7 +120,7 @@ export async function getBrandItems(
         url: `http://${LOCAL_IP}:3000/brand/${brandId}/all-items?page=${page}&limit=${limit}`,
         method: "GET",
       }),
-    CatalogSchemaResponse,
+    CatalogResponseSchema,
     "getBrandItems"
   );
   return res?.items || [];
@@ -173,7 +171,7 @@ export async function getSelfBrandItems(
         url: `http://${LOCAL_IP}:3000/brand/all-items?page=${page}&limit=${limit}`,
         method: "GET",
       }),
-    CatalogSchemaResponse,
+    CatalogResponseSchema,
     "getSelfBrandItems"
   );
   return res?.items || [];
@@ -192,7 +190,7 @@ export async function getClothingItemsHome(
         url: `http://${LOCAL_IP}:3000/feed?page=${page}&limit=${limit}`,
         method: "GET",
       }),
-    CatalogItemArraySchemaQuery,
+    CatalogResponseSchema,
     "getClothingItemsHome"
   );
   return res?.items || [];
@@ -205,23 +203,23 @@ export async function getClothingItemsSimilar(
   return getClothingItemsHome(page, limit);
 }
 
-export const fetchItems = async (
+export const getItemsUuidNames = async (
   search: string,
   page: number
-): Promise<AllBrandNamesItemsSchemaType[]> => {
+): Promise<ItemUuidNameSchemaType[]> => {
   const limit = 20;
   const res = await handleApiResponse<{
-    data: AllBrandNamesItemsSchemaType[];
+    items: ItemUuidNameSchemaType[];
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/all-brand-items?filter=${search}&page=${page}&limit=${limit}`,
+        url: `http://${LOCAL_IP}:3000/brand/all-names-items?filter=${search}&page=${page}&limit=${limit}`,
         method: "GET",
       }),
-    AllBrandItemsSchemaRes,
-    "fetchItems"
+    ItemUuidNameResponseSchema,
+    "getItemsUuidNames"
   );
-  return res?.data || [];
+  return res?.items || [];
 };
 
 export async function getItem(itemUuid: string): Promise<{
@@ -231,10 +229,10 @@ export async function getItem(itemUuid: string): Promise<{
   return handleApiResponse<{ item: ItemSchemaType }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/get-item?uuid=${itemUuid}`,
+        url: `http://${LOCAL_IP}:3000/item/${itemUuid}`,
         method: "GET",
       }),
-    GetItemResponseSchema,
+    ItemResponseSchema,
     "getItem"
   );
 }
@@ -317,7 +315,7 @@ export const getAllLikedItems = async (
         url: `http://${LOCAL_IP}:3000/get-all-liked-items?page=${page}&limit=${limit}`,
         method: "GET",
       }),
-    CatalogItemArraySchemaQuery,
+    CatalogResponseSchema,
     "getAllLikedItems"
   );
   return res?.items || [];
@@ -336,7 +334,7 @@ export const getAllFavoritedItems = async (
         url: `http://${LOCAL_IP}:3000/get-all-favorited-items?page=${page}&limit=${limit}`,
         method: "GET",
       }),
-    CatalogItemArraySchemaQuery,
+    CatalogResponseSchema,
     "getAllFavoritedItems"
   );
   return res?.items || [];

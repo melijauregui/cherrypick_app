@@ -93,17 +93,17 @@ export function useDelete(
       await new Promise(resolve => setTimeout(resolve, 1000));
       bottomSheetRef.current?.close();
       const { data } = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/delete-catalog-brand`,
+        url: `http://${LOCAL_IP}:3000/brand/delete-items`,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          items: Array.from(selected).map(uuid => ({ uuid })),
+          items: Array.from(selected).map(uuid => ({ id: uuid })),
         }),
       });
       if (data.error) {
-        throw new Error(data.details);
+        throw new Error(data.details + "\n" + data.info);
       }
       return data;
     },
@@ -120,6 +120,7 @@ export function useDelete(
       onDelete();
     },
     onError: error => {
+      console.log("error", error.message);
       Toast.show({ type: "error", text1: error.message });
     },
     onSettled: () => {
@@ -138,11 +139,11 @@ export function useDeleteItem(itemUuid: string) {
   const mutation = useMutation({
     mutationFn: async () => {
       const response = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/delete-catalog-brand`,
+        url: `http://${LOCAL_IP}:3000/brand/delete-items`,
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          items: [{ uuid: itemUuid }],
+          items: [{ id: itemUuid }],
         }),
       });
       if (response.data.error) {

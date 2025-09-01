@@ -24,9 +24,6 @@ const BrandSchema = z.object({
 export { BrandSchema };
 export type BrandSchemaType = z.infer<typeof BrandSchema>;
 
-// const QueryDbSchemaBrand = z.tuple([BrandSchema]);
-// export { QueryDbSchemaBrand };
-
 const BrandSchemaResponse = z.object({
   ...SuccessSchema.shape,
   brand: BrandSchema,

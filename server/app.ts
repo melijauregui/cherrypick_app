@@ -1,39 +1,13 @@
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
-import { z } from "zod";
+import { UpdateItem } from "./app/catalogFunctions";
 import {
-  CatalogItemArraySchemaQuery,
-  PaginationSchema,
-} from "../schemas/catalog/catalog-schema";
-import {
-  UpdateCatalog,
-  DeleteFromCatalog,
-  UpdateItem,
-} from "./app/catalogFunctions";
-import {
-  CatalogResponseSchema,
-  CatalogResponseSchemaDelete,
-  CatalogResponseSchemaDeleteType,
-  GetItemQuerySchema,
-  GetItemResponseSchema,
-  GetItemResponseSchemaType,
   UpdateItemQuerySchema,
   UpdateItemBodySchema,
   UpdateItemResponseSchema,
   UpdateItemResponseSchemaType,
-  jsonCatalogUploadSchema2,
   IsMyItemQuerySchema,
   IsMyItemSchema,
   IsMyItemSchemaType,
-} from "../schemas/catalog/catalog-schema";
-import { QueryWeaviateAllItems, QueryWeaviateItem } from "./app/routeVector";
-import {
-  QueryAllBrandItemsSchema,
-  AllBrandItemsSchemaRes,
-  AllBrandItemsSchemaResType,
-} from "../schemas/auth/brand-schema";
-import {
-  jsonCatalogUploadSchema,
-  deleteItemsJsonSchema,
 } from "../schemas/catalog/catalog-schema";
 import { auth } from "../lib/auth";
 import {
@@ -44,23 +18,15 @@ import {
   CheckLikeFavoriteResponseSchema,
   CheckLikeFavoriteResponseSchemaType,
 } from "../schemas/activity/activity";
-import {
-  toggleLike,
-  toggleFavorite,
-  checkIfLiked,
-  checkIfFavorited,
-  getAllLikedFavoritedItems,
-} from "./app/allDatabase";
+import { toggleLike, toggleFavorite, checkIfLiked } from "./app/allDatabase";
 import FormUserApp from "./formUser/routes";
 import UserApp from "./user/routes";
 import ClientApp from "./client/routes";
 import { GetBrandId } from "./brand/functions";
 import BrandApp from "./brand/routes";
 import FeedApp from "./feed/routes";
-import {
-  ErrorSchemaType,
-  SuccessSchemaType,
-} from "@/schemas/standar-response-schema";
+import { GetItem } from "./item/functions";
+import ItemApp from "./item/routes";
 
 export type AppEnv = {
   Variables: {
@@ -105,213 +71,7 @@ app.route("/user", UserApp);
 app.route("/client", ClientApp);
 app.route("/brand", BrandApp);
 app.route("/feed", FeedApp);
-
-// endpoint que inserta items en el catálogo de una marca con datos JSON
-const updateCatalogRoute = createRoute({
-  method: "post",
-  path: "/insert-catalog-brand",
-  request: {
-    body: {
-      content: {
-        "application/json": { schema: jsonCatalogUploadSchema },
-      },
-    },
-  },
-  responses: {
-    200: {
-      content: {
-        "application/json": {
-          schema: CatalogResponseSchema,
-        },
-      },
-      description: "Valida y actualiza el catálogo con datos JSON",
-    },
-  },
-});
-
-app.openapi(updateCatalogRoute, async c => {
-  const { items } = await c.req.valid("json");
-
-  //verifico que la marca exista en la base de datos
-  let res: SuccessSchemaType | ErrorSchemaType;
-
-  const user = c.get("user");
-  const brandEmail = user?.email;
-
-  if (!brandEmail) {
-    res = {
-      error: true,
-      details: "No tienes permisos para insertar items",
-    };
-    return c.json(res, 200);
-  }
-
-  const brandId = await GetBrandId(brandEmail);
-  if (!brandId) {
-    res = {
-      error: true,
-      details: "Marca no encontrada",
-    };
-    return c.json(res, 200);
-  }
-  try {
-    res = await UpdateCatalog(items, brandId);
-    return c.json(res, 200);
-  } catch (error) {
-    res = {
-      error: true,
-      details: `Error interno del servidor ${error}`,
-    };
-    return c.json(res, 200);
-  }
-});
-
-// endpoint que elimina items en el catálogo de una marca con datos JSON
-const deleteCatalogRoute = createRoute({
-  method: "post",
-  path: "/delete-catalog-brand",
-  request: {
-    body: {
-      content: {
-        "application/json": { schema: deleteItemsJsonSchema },
-      },
-    },
-  },
-  responses: {
-    200: {
-      content: {
-        "application/json": {
-          schema: CatalogResponseSchemaDelete,
-        },
-      },
-      description: "Valida y elimina items del catálogo con datos JSON",
-    },
-  },
-});
-
-app.openapi(deleteCatalogRoute, async c => {
-  const { items } = c.req.valid("json");
-
-  const user = c.get("user");
-  const brandEmail = user?.email;
-  let res: CatalogResponseSchemaDeleteType;
-  if (!brandEmail) {
-    res = {
-      error: true,
-      details: "No tienes permisos para actualizar este item",
-      numberDeleted: 0,
-    };
-    return c.json(res, 200);
-  }
-
-  // Extraer los nombres de los items del array de objetos
-  const itemsUuids = items.map(item => item.uuid);
-
-  //verifico que la marca exista en la base de datos
-  const brandId = await GetBrandId(brandEmail);
-  if (!brandId) {
-    res = {
-      error: true,
-      details: "Marca no encontrada",
-      numberDeleted: 0,
-    };
-    return c.json(res, 200);
-  }
-  try {
-    res = await DeleteFromCatalog(itemsUuids, brandId);
-    return c.json(res, 200);
-  } catch (error) {
-    res = {
-      error: true,
-      details: `Error interno del servidor ${error}`,
-      numberDeleted: 0,
-    };
-    return c.json(res, 200);
-  }
-});
-
-// endpoint que devuelve todos los nombres de los items de una marca
-const allBrandItemsRoute = createRoute({
-  method: "get",
-  path: "/all-brand-items",
-  request: {
-    query: QueryAllBrandItemsSchema,
-  },
-  responses: {
-    200: {
-      content: {
-        "application/json": {
-          schema: AllBrandItemsSchemaRes,
-        },
-      },
-      description: "Devuelve los nombres de los items de una marca",
-    },
-  },
-});
-app.openapi(allBrandItemsRoute, async c => {
-  const { filter, page = 0, limit = 10 } = c.req.valid("query");
-  let res: AllBrandItemsSchemaResType;
-  const user = c.get("user");
-  const brandEmail = user?.email;
-
-  if (!brandEmail) {
-    res = {
-      error: true,
-      details: "No tienes permisos para actualizar este item",
-    };
-    return c.json(res, 200);
-  }
-
-  //verifico que el usuario tenga una marca
-  const brandId = await GetBrandId(brandEmail);
-  if (!brandId) {
-    res = {
-      error: true,
-      details: "No tienes permisos para actualizar este item",
-    };
-    return c.json(res, 200);
-  }
-
-  res = await QueryWeaviateAllItems(brandId, filter, page, limit);
-  return c.json(res, 200);
-});
-
-// endpoint que busca un item específico por name y brand
-const getItemRoute = createRoute({
-  method: "get",
-  path: "/get-item",
-  request: {
-    query: GetItemQuerySchema,
-  },
-  responses: {
-    200: {
-      content: {
-        "application/json": {
-          schema: GetItemResponseSchema,
-        },
-      },
-      description: "Devuelve un item específico por nombre y marca",
-    },
-  },
-});
-
-app.openapi(getItemRoute, async c => {
-  const { uuid } = c.req.valid("query");
-
-  let res: GetItemResponseSchemaType;
-
-  try {
-    res = await QueryWeaviateItem(uuid);
-  } catch (error) {
-    console.error("Error getting item:", error);
-    res = {
-      error: true,
-      details: "Error interno del servidor",
-    };
-  }
-
-  return c.json(res, 200);
-});
+app.route("/item", ItemApp);
 
 // endpoint que verifica si un item pertenece al usuario autenticado
 const isMyItemRoute = createRoute({
@@ -347,7 +107,7 @@ app.openapi(isMyItemRoute, async c => {
 
   try {
     // Obtener el item de Weaviate para obtener su brandId
-    const itemResult = await QueryWeaviateItem(uuid);
+    const itemResult = await GetItem(uuid);
     if (itemResult.error) {
       res = {
         error: true,
@@ -430,7 +190,7 @@ app.openapi(updateItemRoute, async c => {
     };
     return c.json(res, 200);
   }
-  const itemResult = await QueryWeaviateItem(uuid);
+  const itemResult = await GetItem(uuid);
   if (itemResult.error) {
     res = {
       error: true,
@@ -616,126 +376,126 @@ const checkFavoriteRoute = createRoute({
   },
 });
 
-app.openapi(checkFavoriteRoute, async c => {
-  const { item_uuid } = c.req.valid("query");
-  const user = c.get("user");
-  let res: CheckLikeFavoriteResponseSchemaType;
+// app.openapi(checkFavoriteRoute, async c => {
+//   const { item_uuid } = c.req.valid("query");
+//   const user = c.get("user");
+//   let res: CheckLikeFavoriteResponseSchemaType;
 
-  if (!user?.email) {
-    res = {
-      error: true,
-      details: "Usuario no autenticado",
-    };
-    return c.json(res, 401);
-  }
-  res = await checkIfFavorited(user.email, item_uuid, user.userType);
-  return c.json(res, 200);
-});
+//   if (!user?.email) {
+//     res = {
+//       error: true,
+//       details: "Usuario no autenticado",
+//     };
+//     return c.json(res, 401);
+//   }
+//   res = await checkIfFavorited(user.email, item_uuid, user.userType);
+//   return c.json(res, 200);
+// });
 
-// Endpoint para obtener todos los items liked
-const getAllLikedItemsRoute = createRoute({
-  method: "get",
-  path: "/get-all-liked-items",
-  request: {
-    query: PaginationSchema,
-  },
-  responses: {
-    200: {
-      content: {
-        "application/json": {
-          schema: CatalogItemArraySchemaQuery,
-        },
-      },
-      description: "Obtiene todos los items liked del usuario",
-    },
-    401: {
-      content: {
-        "application/json": {
-          schema: z.object({
-            error: z.boolean(),
-            details: z.string(),
-          }),
-        },
-      },
-      description: "Usuario no autenticado",
-    },
-  },
-});
+// // Endpoint para obtener todos los items liked
+// const getAllLikedItemsRoute = createRoute({
+//   method: "get",
+//   path: "/get-all-liked-items",
+//   request: {
+//     query: PaginationSchema,
+//   },
+//   responses: {
+//     200: {
+//       content: {
+//         "application/json": {
+//           schema: CatalogResponseSchema,
+//         },
+//       },
+//       description: "Obtiene todos los items liked del usuario",
+//     },
+//     401: {
+//       content: {
+//         "application/json": {
+//           schema: z.object({
+//             error: z.boolean(),
+//             details: z.string(),
+//           }),
+//         },
+//       },
+//       description: "Usuario no autenticado",
+//     },
+//   },
+// });
 
-app.openapi(getAllLikedItemsRoute, async c => {
-  const { page, limit } = c.req.valid("query");
-  const user = c.get("user");
+// app.openapi(getAllLikedItemsRoute, async c => {
+//   const { page, limit } = c.req.valid("query");
+//   const user = c.get("user");
 
-  if (!user?.email) {
-    return c.json(
-      {
-        error: true,
-        details: "Usuario no autenticado",
-      },
-      401
-    );
-  }
+//   if (!user?.email) {
+//     return c.json(
+//       {
+//         error: true,
+//         details: "Usuario no autenticado",
+//       },
+//       401
+//     );
+//   }
 
-  const res = await getAllLikedFavoritedItems(
-    "likes",
-    user.email,
-    user.userType,
-    page,
-    limit
-  );
-  return c.json(res, 200);
-});
+//   const res = await getAllLikedFavoritedItems(
+//     "likes",
+//     user.email,
+//     user.userType,
+//     page,
+//     limit
+//   );
+//   return c.json(res, 200);
+// });
 
-// Endpoint para obtener todos los items favorited
-const getAllFavoritedItemsRoute = createRoute({
-  method: "get",
-  path: "/get-all-favorited-items",
-  request: {
-    query: PaginationSchema,
-  },
-  responses: {
-    200: {
-      content: {
-        "application/json": {
-          schema: CatalogItemArraySchemaQuery,
-        },
-      },
-      description: "Obtiene todos los items favorited del usuario",
-    },
-    401: {
-      content: {
-        "application/json": {
-          schema: z.object({
-            error: z.boolean(),
-            details: z.string(),
-          }),
-        },
-      },
-      description: "Usuario no autenticado",
-    },
-  },
-});
+// // Endpoint para obtener todos los items favorited
+// const getAllFavoritedItemsRoute = createRoute({
+//   method: "get",
+//   path: "/get-all-favorited-items",
+//   request: {
+//     query: PaginationSchema,
+//   },
+//   responses: {
+//     200: {
+//       content: {
+//         "application/json": {
+//           schema: CatalogResponseSchema,
+//         },
+//       },
+//       description: "Obtiene todos los items favorited del usuario",
+//     },
+//     401: {
+//       content: {
+//         "application/json": {
+//           schema: z.object({
+//             error: z.boolean(),
+//             details: z.string(),
+//           }),
+//         },
+//       },
+//       description: "Usuario no autenticado",
+//     },
+//   },
+// });
 
-app.openapi(getAllFavoritedItemsRoute, async c => {
-  const { page, limit } = c.req.valid("query");
-  const user = c.get("user");
+// app.openapi(getAllFavoritedItemsRoute, async c => {
+//   const { page, limit } = c.req.valid("query");
+//   const user = c.get("user");
 
-  if (!user?.email) {
-    return c.json(
-      {
-        error: true,
-        details: "Usuario no autenticado",
-      },
-      401
-    );
-  }
+//   if (!user?.email) {
+//     return c.json(
+//       {
+//         error: true,
+//         details: "Usuario no autenticado",
+//       },
+//       401
+//     );
+//   }
 
-  const res = await getAllLikedFavoritedItems(
-    "favorites",
-    user.email,
-    user.userType,
-    page,
-    limit
-  );
-  return c.json(res, 200);
-});
+//   const res = await getAllLikedFavoritedItems(
+//     "favorites",
+//     user.email,
+//     user.userType,
+//     page,
+//     limit
+//   );
+//   return c.json(res, 200);
+// });
