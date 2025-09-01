@@ -22,6 +22,16 @@ import logger from "../logger";
 import { GetBrandId } from "../brand/functions";
 import { AppEnv } from "../app";
 import { UpdateItem } from "./functions";
+import {
+  checkIfFavorited,
+  checkIfLiked,
+  toggleFavorite,
+  toggleLike,
+} from "../catalog/like-favorite";
+import {
+  CheckLikeFavoriteResponseSchema,
+  CheckLikeFavoriteResponseSchemaType,
+} from "@/schemas/catalog/like-favorite-schema.ts";
 
 const ItemApp = new OpenAPIHono<AppEnv>({
   defaultHook: (result, c) => {
@@ -265,11 +275,231 @@ ItemApp.openapi(updateItemRoute, async c => {
       error: true,
       details: updateItemRes.details,
     };
-    return c.json(res, 500);
+    return c.json(res, 404);
   }
 
   res = {
     error: false,
   };
+  return c.json(res, 200);
+});
+
+// Endpoint para toggle like
+const toggleLikeRoute = createRoute({
+  method: "post",
+  path: "/{id}/toggle-like",
+  request: {
+    params: QueryIdSchema,
+    required: true,
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: SuccessSchema,
+        },
+      },
+      description: "Toggle like de un item",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Usuario no autenticado",
+    },
+    404: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Item no encontrado",
+    },
+  },
+});
+
+ItemApp.openapi(toggleLikeRoute, async c => {
+  const { id } = c.req.valid("param");
+  const user = c.get("user");
+  let res: SuccessSchemaType | ErrorSchemaType;
+  if (!user?.email) {
+    res = {
+      error: true,
+      details: "Usuario no autenticado",
+    };
+    return c.json(res, 401);
+  }
+
+  res = await toggleLike(user.email, id);
+  if (res.error) {
+    return c.json(res, 404);
+  }
+  return c.json(res, 200);
+});
+
+// Endpoint para toggle favorite
+const toggleFavoriteRoute = createRoute({
+  method: "post",
+  path: "/{id}/toggle-favorite",
+  request: {
+    params: QueryIdSchema,
+    required: true,
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: SuccessSchema,
+        },
+      },
+      description: "Toggle favorite de un item",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Usuario no autenticado",
+    },
+    404: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Item no encontrado",
+    },
+  },
+});
+
+ItemApp.openapi(toggleFavoriteRoute, async c => {
+  const { id } = c.req.valid("param");
+  const user = c.get("user");
+  let res: SuccessSchemaType | ErrorSchemaType;
+
+  if (!user?.email) {
+    res = {
+      error: true,
+      details: "Usuario no autenticado",
+    };
+    return c.json(res, 401);
+  }
+  res = await toggleFavorite(user.email, id);
+  if (res.error) {
+    return c.json(res, 404);
+  }
+  return c.json(res, 200);
+});
+
+// Endpoint para verificar si un item está liked
+const checkLikeRoute = createRoute({
+  method: "get",
+  path: "/{id}/check-like",
+  request: {
+    params: QueryIdSchema,
+    required: true,
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: CheckLikeFavoriteResponseSchema,
+        },
+      },
+      description: "Verifica si un item está liked",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Usuario no autenticado",
+    },
+    404: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Item no encontrado",
+    },
+  },
+});
+
+ItemApp.openapi(checkLikeRoute, async c => {
+  const { id } = c.req.valid("param");
+  const user = c.get("user");
+  let res: CheckLikeFavoriteResponseSchemaType | ErrorSchemaType;
+
+  if (!user?.email) {
+    res = {
+      error: true,
+      details: "Usuario no autenticado",
+    };
+    return c.json(res, 401);
+  }
+  res = await checkIfLiked(user.email, id);
+  if (res.error) {
+    return c.json(res, 404);
+  }
+  return c.json(res, 200);
+});
+
+// Endpoint para verificar si un item está favorited
+const checkFavoriteRoute = createRoute({
+  method: "get",
+  path: "/{id}/check-favorite",
+  request: {
+    params: QueryIdSchema,
+    required: true,
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: CheckLikeFavoriteResponseSchema,
+        },
+      },
+      description: "Verifica si un item está favorited",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "No autorizado",
+    },
+    404: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Item no encontrado",
+    },
+  },
+});
+
+ItemApp.openapi(checkFavoriteRoute, async c => {
+  const { id } = c.req.valid("param");
+  const user = c.get("user");
+  let res: CheckLikeFavoriteResponseSchemaType | ErrorSchemaType;
+
+  if (!user?.email) {
+    res = {
+      error: true,
+      details: "Usuario no autenticado",
+    };
+    return c.json(res, 401);
+  }
+  res = await checkIfFavorited(user.email, id);
+  if (res.error) {
+    return c.json(res, 404);
+  }
   return c.json(res, 200);
 });

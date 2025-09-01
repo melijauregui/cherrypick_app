@@ -1,78 +1,65 @@
 -- PostgreSQL initialization script for CherryPick
 -- This script creates the database and tables for the CherryPick application
 
--- Create tables
-CREATE TABLE IF NOT EXISTS "Client" (
-    email VARCHAR(50) PRIMARY KEY,
-    name VARCHAR(50) NOT NULL,
-    "dateOfBirth" TIMESTAMP,
-    preferences JSONB
-);
-
+-- Table for register in progress
 CREATE TABLE IF NOT EXISTS "RegisterInProgress" (
     email VARCHAR(50) PRIMARY KEY,
     "verificationCode" VARCHAR(6) NOT NULL,
     "verificationCodeExpiration" VARCHAR(30) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "Brand" (
+-- Create unified users table
+CREATE TABLE IF NOT EXISTS "User" (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     email VARCHAR(50) UNIQUE NOT NULL,
+    "userType" VARCHAR(10) NOT NULL CHECK ("userType" IN ('client', 'brand'))
+);
+
+-- Table for client
+CREATE TABLE IF NOT EXISTS "Client" (
+    "userId" UUID NOT NULL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    "dateOfBirth" TIMESTAMP,
+    preferences JSONB,
+    FOREIGN KEY ("userId") REFERENCES "User"(id) ON DELETE CASCADE
+);
+
+-- Table for brand
+CREATE TABLE IF NOT EXISTS "Brand" (
+    "userId" UUID NOT NULL PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
     description VARCHAR(255) NOT NULL,
     url VARCHAR(255) NOT NULL,
-    "logoUrl" VARCHAR(255) NOT NULL
+    "logoUrl" VARCHAR(255) NOT NULL,
+    FOREIGN KEY ("userId") REFERENCES "User"(id) ON DELETE CASCADE
 );
 
--- Table for client likes
-CREATE TABLE IF NOT EXISTS "ItemLikeClient" (
+-- Table for likes (unified for both clients and brands)
+CREATE TABLE IF NOT EXISTS "ItemLike" (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    "userEmail" VARCHAR(50) NOT NULL,
+    "userId" UUID NOT NULL,
     "itemUuid" VARCHAR(255) NOT NULL,
     "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY ("userEmail") REFERENCES "Client"(email) ON DELETE CASCADE,
-    UNIQUE("userEmail", "itemUuid")
+    FOREIGN KEY ("userId") REFERENCES "User"(id) ON DELETE CASCADE,
+    UNIQUE("userId", "itemUuid")
 );
 
--- Table for client favorites
-CREATE TABLE IF NOT EXISTS "ItemFavoriteClient" (
+-- Table for favorites (unified for both clients and brands)
+CREATE TABLE IF NOT EXISTS "ItemFavorite" (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    "userEmail" VARCHAR(50) NOT NULL,
+    "userId" UUID NOT NULL,
     "itemUuid" VARCHAR(255) NOT NULL,
     "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY ("userEmail") REFERENCES "Client"(email) ON DELETE CASCADE,
-    UNIQUE("userEmail", "itemUuid")
-);
-
--- Table for brand likes
-CREATE TABLE IF NOT EXISTS "ItemLikeBrand" (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    "userEmail" VARCHAR(50) NOT NULL,
-    "itemUuid" VARCHAR(255) NOT NULL,
-    "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY ("userEmail") REFERENCES "Brand"(email) ON DELETE CASCADE,
-    UNIQUE("userEmail", "itemUuid")
-);
-
--- Table for brand favorites
-CREATE TABLE IF NOT EXISTS "ItemFavoriteBrand" (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    "userEmail" VARCHAR(50) NOT NULL,
-    "itemUuid" VARCHAR(255) NOT NULL,
-    "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY ("userEmail") REFERENCES "Brand"(email) ON DELETE CASCADE,
-    UNIQUE("userEmail", "itemUuid")
+    FOREIGN KEY ("userId") REFERENCES "User"(id) ON DELETE CASCADE,
+    UNIQUE("userId", "itemUuid")
 );
 
 -- Create indexes for better performance
-CREATE INDEX IF NOT EXISTS idx_client_email ON "Client"(email);
-CREATE INDEX IF NOT EXISTS idx_brand_email ON "Brand"(email);
-CREATE INDEX IF NOT EXISTS idx_brand_id ON "Brand"(id);
-CREATE INDEX IF NOT EXISTS idx_item_likes_client_user ON "ItemLikeClient"("userEmail");
-CREATE INDEX IF NOT EXISTS idx_item_likes_client_item ON "ItemLikeClient"("itemUuid");
-CREATE INDEX IF NOT EXISTS idx_item_favorites_client_user ON "ItemFavoriteClient"("userEmail");
-CREATE INDEX IF NOT EXISTS idx_item_favorites_client_item ON "ItemFavoriteClient"("itemUuid");
-CREATE INDEX IF NOT EXISTS idx_item_likes_brand_user ON "ItemLikeBrand"("userEmail");
-CREATE INDEX IF NOT EXISTS idx_item_likes_brand_item ON "ItemLikeBrand"("itemUuid");
-CREATE INDEX IF NOT EXISTS idx_item_favorites_brand_user ON "ItemFavoriteBrand"("userEmail");
-CREATE INDEX IF NOT EXISTS idx_item_favorites_brand_item ON "ItemFavoriteBrand"("itemUuid");
+CREATE INDEX IF NOT EXISTS idx_user_email ON "User"(email);
+CREATE INDEX IF NOT EXISTS idx_user_type ON "User"("userType");
+CREATE INDEX IF NOT EXISTS idx_client_user_id ON "Client"("userId");
+CREATE INDEX IF NOT EXISTS idx_brand_user_id ON "Brand"("userId");
+CREATE INDEX IF NOT EXISTS idx_item_likes_user ON "ItemLike"("userId");
+CREATE INDEX IF NOT EXISTS idx_item_likes_item ON "ItemLike"("itemUuid");
+CREATE INDEX IF NOT EXISTS idx_item_favorites_user ON "ItemFavorite"("userId");
+CREATE INDEX IF NOT EXISTS idx_item_favorites_item ON "ItemFavorite"("itemUuid");

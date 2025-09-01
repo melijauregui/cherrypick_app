@@ -23,26 +23,25 @@ export function prefetchProfile(
   },
   queryClient: QueryClient
 ) {
-  if (user.userType === "client") {
-    console.log("prefetching client profile", user.email);
-    queryClient.prefetchQuery({
-      queryKey: ["self-client-profile", user.email],
-      queryFn: () => getSelfClientProfile(),
-    });
-  } else if (user.userType === "brand") {
-    console.log("prefetching brand profile", user.email);
-    queryClient.prefetchQuery({
-      queryKey: ["self-brand-profile", user.email],
-      queryFn: () => getSelfBrandProfile(),
-    });
-
-    prefetchInfiniteQueryIfNeeded(
-      queryClient,
-      ["self-brand-items", user.email],
-      () => getSelfBrandItems(0, 18),
-      user.email
-    );
-  }
+  // if (user.userType === "client") {
+  //   console.log("prefetching client profile", user.email);
+  //   queryClient.prefetchQuery({
+  //     queryKey: ["self-client-profile", user.email],
+  //     queryFn: () => getSelfClientProfile(),
+  //   });
+  // } else if (user.userType === "brand") {
+  //   console.log("prefetching brand profile", user.email);
+  //   queryClient.prefetchQuery({
+  //     queryKey: ["self-brand-profile", user.email],
+  //     queryFn: () => getSelfBrandProfile(),
+  //   });
+  //   prefetchInfiniteQueryIfNeeded(
+  //     queryClient,
+  //     ["self-brand-items", user.email],
+  //     () => getSelfBrandItems(0, 18),
+  //     user.email
+  //   );
+  // }
 }
 
 export default function prefetchHome(
@@ -127,30 +126,27 @@ export async function prefetchItemDetail(
   userEmail: string,
   brandId: string
 ) {
-  prefetchIfNeeded(queryClient, ["item-detail", item.uuid], () =>
-    getItem(item.uuid)
-  );
-
-  if (brandId) {
-    prefetchIfNeeded(queryClient, ["brand-profile-item", brandId], () =>
-      getBrandProfile(brandId)
-    );
-  }
-
-  if (userEmail) {
-    prefetchIfNeeded(queryClient, ["is-liked", item.uuid], () =>
-      checkIfLiked(userEmail, item.uuid)
-    );
-    prefetchIfNeeded(queryClient, ["is-favorited", item.uuid], () =>
-      checkIfFavorited(userEmail, item.uuid)
-    );
-  }
-
-  if (userEmail) {
-    prefetchIfNeeded(queryClient, ["is-my-item", item.uuid], () =>
-      checkIsMyItem(item.uuid, userEmail)
-    );
-  }
+  // prefetchIfNeeded(queryClient, ["item-detail", item.uuid], () =>
+  //   getItem(item.uuid)
+  // );
+  // if (brandId) {
+  //   prefetchIfNeeded(queryClient, ["brand-profile-item", brandId], () =>
+  //     getBrandProfile(brandId)
+  //   );
+  // }
+  // if (userEmail) {
+  //   prefetchIfNeeded(queryClient, ["is-liked", item.uuid], () =>
+  //     checkIfLiked(userEmail, item.uuid)
+  //   );
+  //   prefetchIfNeeded(queryClient, ["is-favorited", item.uuid], () =>
+  //     checkIfFavorited(userEmail, item.uuid)
+  //   );
+  // }
+  // if (userEmail) {
+  //   prefetchIfNeeded(queryClient, ["is-my-item", item.uuid], () =>
+  //     checkIsMyItem(item.uuid, userEmail)
+  //   );
+  // }
 }
 
 export function prefetchBrandPageItem(
@@ -158,32 +154,32 @@ export function prefetchBrandPageItem(
   brandId: string,
   userEmail: string
 ) {
-  prefetchIfNeeded(queryClient, ["brand-profile-item", brandId], () =>
-    getBrandProfile(brandId)
-  );
-  console.log("going to check if prefetching brand page item", brandId);
-  prefetchInfiniteQueryIfNeeded(
-    queryClient,
-    ["brand-items", brandId],
-    () => getBrandItems(0, 6, brandId),
-    userEmail
-  );
+  // prefetchIfNeeded(queryClient, ["brand-profile-item", brandId], () =>
+  //   getBrandProfile(brandId)
+  // );
+  // console.log("going to check if prefetching brand page item", brandId);
+  // prefetchInfiniteQueryIfNeeded(
+  //   queryClient,
+  //   ["brand-items", brandId],
+  //   () => getBrandItems(0, 6, brandId),
+  //   userEmail
+  // );
 }
 
 export function prefetchLikeAndFavoritePage(
   queryClient: QueryClient,
   userEmail: string
 ) {
-  prefetchInfiniteQueryIfNeeded(
-    queryClient,
-    ["all-liked-items", userEmail],
-    () => getAllLikedItems(0, 18),
-    userEmail
-  );
-  prefetchInfiniteQueryIfNeeded(
-    queryClient,
-    ["all-favorited-items", userEmail],
-    () => getAllFavoritedItems(0, 18),
-    userEmail
-  );
+  // prefetchInfiniteQueryIfNeeded(
+  //   queryClient,
+  //   ["all-liked-items", userEmail],
+  //   () => getAllLikedItems(0, 18),
+  //   userEmail
+  // );
+  // prefetchInfiniteQueryIfNeeded(
+  //   queryClient,
+  //   ["all-favorited-items", userEmail],
+  //   () => getAllFavoritedItems(0, 18),
+  //   userEmail
+  // );
 }

@@ -103,13 +103,6 @@ export type IsMyItemSchemaType = z.infer<typeof IsMyItemSchema>;
 export const UpdateItemBodySchema = PropertiesItemSchema.partial();
 export type UpdateItemBodySchemaType = z.infer<typeof UpdateItemBodySchema>;
 
-//--------------------------------------------
-
-export const deleteItemsSchema = z.object({
-  itemsNames: z.array(z.string()).min(1, "Debe tener al menos un nombre"),
-  brand: z.string().min(1, "La marca es requerida"),
-});
-
 // Schema for JSON catalog upload
 export const jsonCatalogUploadSchema = z.object({
   items: z.array(PropertiesItemSchema).min(1, "Debe tener al menos un item"),
@@ -119,10 +112,3 @@ export const jsonCatalogUploadSchema2 = z.object({
   items: z.array(PropertiesItemSchema).min(1, "Debe tener al menos un item"),
   brandEmail: z.string().min(1, "La marca es requerida"),
 });
-
-// Schema for get-item query parameters
-export const GetItemQuerySchema = z.object({
-  uuid: z.string().min(1, "El uuid es requerido"),
-});
-
-export type GetItemQuerySchemaType = z.infer<typeof GetItemQuerySchema>;

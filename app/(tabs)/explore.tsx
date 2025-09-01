@@ -3,10 +3,7 @@ import React, { useEffect, useState } from "react";
 import { TextInput, View, Image } from "react-native";
 import icons from "../../constants/icons";
 import List2 from "@/app/components/List2";
-import {
-  CatalogItemArraySchema,
-  CatalogItemSchemaType,
-} from "@/schemas/catalog/catalog-schema";
+import { CatalogItemSchemaType } from "@/schemas/catalog/catalog-schema";
 import { getClothingItemsHome } from "@/app/utils/fetch";
 
 const Explore = () => {

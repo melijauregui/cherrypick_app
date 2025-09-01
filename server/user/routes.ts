@@ -1,4 +1,4 @@
-import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
+import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import { Context } from "hono";
 import { errorHandler } from "../errorHandler";
 import { VerifyUserExists } from "./functions";
@@ -16,6 +16,12 @@ import {
   SuccessSchemaType,
 } from "@/schemas/standar-response-schema";
 import logger from "../logger";
+import {
+  CatalogResponseSchema,
+  CatalogResponseSchemaType,
+  PaginationSchema,
+} from "@/schemas/catalog/catalog-schema";
+import { getAllLikedFavoritedItems } from "../catalog/like-favorite";
 
 const UserApp = new OpenAPIHono<AppEnv>({
   defaultHook: (result, c) => {
@@ -107,8 +113,7 @@ UserApp.openapi(deleteAccountRoute, async c => {
   let res: SuccessSchemaType | ErrorSchemaType;
   const user = c.get("user");
   const email = user?.email;
-  const userType = user?.userType;
-  if (!email || !userType) {
+  if (!email) {
     logger.error("No tienes permisos para eliminar la cuenta");
     res = {
       error: true,
@@ -116,9 +121,119 @@ UserApp.openapi(deleteAccountRoute, async c => {
     };
     return c.json(res, 404);
   }
-  await DeleteUser(email, userType);
+  await DeleteUser(email);
   res = {
     error: false,
   };
+  return c.json(res, 200);
+});
+
+// Endpoint para obtener todos los items liked
+const getAllLikedItemsRoute = createRoute({
+  method: "get",
+  path: "/all-liked",
+  request: {
+    query: PaginationSchema,
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: CatalogResponseSchema,
+        },
+      },
+      description: "Obtiene todos los items liked del usuario",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Usuario no autenticado",
+    },
+    404: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Usuario no encontrado",
+    },
+  },
+});
+
+UserApp.openapi(getAllLikedItemsRoute, async c => {
+  const { page, limit } = c.req.valid("query");
+  const user = c.get("user");
+  let res: CatalogResponseSchemaType | ErrorSchemaType;
+
+  if (!user?.email) {
+    res = {
+      error: true,
+      details: "Usuario no autenticado",
+    };
+    return c.json(res, 401);
+  }
+
+  res = await getAllLikedFavoritedItems("likes", user.email, page, limit);
+  if (res.error) {
+    return c.json(res, 404);
+  }
+  return c.json(res, 200);
+});
+
+// Endpoint para obtener todos los items favorited
+const getAllFavoritedItemsRoute = createRoute({
+  method: "get",
+  path: "/all-favorited",
+  request: {
+    query: PaginationSchema,
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: CatalogResponseSchema,
+        },
+      },
+      description: "Obtiene todos los items favorited del usuario",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Usuario no autenticado",
+    },
+    404: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Usuario no encontrado",
+    },
+  },
+});
+
+UserApp.openapi(getAllFavoritedItemsRoute, async c => {
+  const { page, limit } = c.req.valid("query");
+  const user = c.get("user");
+  let res: CatalogResponseSchemaType | ErrorSchemaType;
+
+  if (!user?.email) {
+    res = {
+      error: true,
+      details: "Usuario no autenticado",
+    };
+    return c.json(res, 401);
+  }
+
+  res = await getAllLikedFavoritedItems("favorites", user.email, page, limit);
+  if (res.error) {
+    return c.json(res, 404);
+  }
   return c.json(res, 200);
 });

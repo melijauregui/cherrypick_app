@@ -11,41 +11,33 @@ export async function VerifyUserExists(
     userType: null,
   };
 
-  // Buscar en clients primero
-  const client = await db.client.findUnique({
+  const user = await db.user.findUnique({
     where: { email },
   });
 
-  if (client) {
-    res = { exists: true, userType: "client" };
+  if (user) {
+    res = { exists: true, userType: user.userType };
   } else {
-    // Buscar en brands si no se encuentra en clients
-    const brand = await db.brand.findUnique({
-      where: { email },
-    });
-
-    if (brand) {
-      res = { exists: true, userType: "brand" };
-    } else {
-      res = { exists: false, userType: null };
-    }
+    res = { exists: false, userType: null };
   }
+
   return res;
 }
 
-export async function DeleteUser(email: string, userType: string) {
-  if (userType === "brand") {
-    const brandId = await GetBrandId(email);
-    if (!brandId) {
-      throw new NotFoundError("Brand not found", email, "Brand not found");
-    }
-    await DeleteFromWeaviate(brandId);
-    await db.brand.delete({
-      where: { email },
-    });
-  } else {
-    await db.client.delete({
-      where: { email },
-    });
+export async function DeleteUser(email: string) {
+  const user = await db.user.findUnique({
+    where: { email },
+  });
+
+  if (!user) {
+    throw new NotFoundError("User not found", email, "User not found");
   }
+
+  if (user.userType === "brand") {
+    await DeleteFromWeaviate(user.id);
+  }
+
+  await db.user.delete({
+    where: { email },
+  });
 }

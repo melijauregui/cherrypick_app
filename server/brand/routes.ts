@@ -146,6 +146,14 @@ const updateBrandRoute = createRoute({
         },
       },
     },
+    404: {
+      description: "Marca no encontrada",
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+    },
   },
 });
 
@@ -153,19 +161,23 @@ BrandApp.openapi(updateBrandRoute, async c => {
   var { description, url } = c.req.valid("json");
   const user = c.get("user");
   const brandEmail = user?.email;
+  let res: SuccessSchemaType | ErrorSchemaType;
   if (!brandEmail) {
-    const resError: ErrorSchemaType = {
+    res = {
       error: true,
       details: "No tienes permisos para actualizar la marca",
     };
-    return c.json(resError, 401);
+    return c.json(res, 401);
   }
   logger.info("Updating brand:", description, url);
-  await UpdateBrand(brandEmail, description, url);
-  const resSuccess: SuccessSchemaType = {
+  res = await UpdateBrand(brandEmail, description, url);
+  if (res.error) {
+    return c.json(res, 404);
+  }
+  res = {
     error: false,
   };
-  return c.json(resSuccess, 200);
+  return c.json(res, 200);
 });
 
 // endpoint que publica un nuevo code-verification
@@ -478,8 +490,8 @@ BrandApp.openapi(paginatedRouteBrandWithId, async c => {
     limit
   );
   let res: CatalogResponseSchemaType | ErrorSchemaType;
-  const brandEmail = await GetBrandById(id);
-  if (!brandEmail) {
+  const brand = await GetBrandById(id);
+  if (!brand) {
     res = {
       error: true,
       details: "Marca no encontrada",

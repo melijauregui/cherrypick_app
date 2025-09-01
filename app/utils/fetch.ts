@@ -13,7 +13,7 @@ import {
   CheckLikeFavoriteResponseSchema,
   LikeFavoriteResponseSchema,
   LikeFavoriteResponseSchemaType,
-} from "@/schemas/activity/activity";
+} from "@/schemas/catalog/like-favorite-schema.ts";
 import { ZodSchema } from "zod";
 import {
   ClientSchemaResponse,

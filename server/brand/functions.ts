@@ -1,4 +1,7 @@
-import { BrandSchemaType } from "@/schemas/brand/brand-schema";
+import {
+  BrandSchemaPropertiesType,
+  BrandSchemaType,
+} from "@/schemas/brand/brand-schema";
 import { db } from "../db.config";
 import logger from "../logger";
 import {
@@ -7,39 +10,68 @@ import {
 } from "@/schemas/standar-response-schema";
 
 export async function GetBrandId(brandEmail: string): Promise<string | null> {
-  const brand = await db.brand.findUnique({
-    where: { email: brandEmail },
+  const user = await db.user.findUnique({
+    where: { email: brandEmail, userType: "brand" },
   });
-  return brand?.id ?? null;
+  if (!user) {
+    return null;
+  }
+  return user.id;
 }
 
 export async function GetBrandByEmail(
   email: string
 ): Promise<BrandSchemaType | null> {
-  const brand = await db.brand.findUnique({
-    where: { email: email },
+  const user = await db.user.findUnique({
+    where: { email: email, userType: "brand" },
   });
-
-  return brand;
+  if (!user) {
+    return null;
+  }
+  const brand = await db.brand.findUnique({
+    where: { userId: user.id },
+  });
+  if (!brand) {
+    return null;
+  }
+  return { ...brand, email: user.email, id: user.id };
 }
 
 export async function GetBrandById(
   id: string
-): Promise<BrandSchemaType | null> {
+): Promise<BrandSchemaPropertiesType | null> {
   const brand = await db.brand.findUnique({
-    where: { id: id },
+    where: { userId: id },
   });
-  return brand;
+  if (!brand) {
+    return null;
+  }
+  return { ...brand, id: id };
 }
 
 export async function UpdateBrand(
   email: string,
   description: string,
   url: string
-) {
+): Promise<SuccessSchemaType | ErrorSchemaType> {
+  let res: SuccessSchemaType | ErrorSchemaType;
+  const user = await db.user.findUnique({
+    where: { email: email, userType: "brand" },
+  });
+  if (!user) {
+    res = {
+      error: true,
+      details: "User not found",
+    };
+    return res;
+  }
   const brandUpdated = await db.brand.update({
-    where: { email: email },
+    where: { userId: user.id },
     data: { description: description, url: url },
   });
   logger.info("brand updated", brandUpdated);
+  res = {
+    error: false,
+  };
+  return res;
 }

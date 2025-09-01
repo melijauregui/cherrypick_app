@@ -152,6 +152,14 @@ const updateClientRoute = createRoute({
         },
       },
     },
+    404: {
+      description: "Cliente no encontrado",
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+    },
   },
 });
 
@@ -169,8 +177,10 @@ ClientApp.openapi(updateClientRoute, async c => {
     };
     return c.json(res, 401);
   }
-  logger.info("Updating client:", name, email, dateOfBirth, preferences);
-  await UpdateClient(email, name, dateOfBirth, preferences);
+  res = await UpdateClient(email, name, dateOfBirth, preferences);
+  if (res.error) {
+    return c.json(res, 404);
+  }
   res = {
     error: false,
   };

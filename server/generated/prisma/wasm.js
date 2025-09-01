@@ -21,11 +21,11 @@ exports.$Enums = {}
 
 /**
  * Prisma Client JS version: 6.15.0
- * Query Engine version: 605197351a3c8bdd595af2d2a9bc3025bca48ea2
+ * Query Engine version: 85179d7826409ee107a6ba334b5e305ae3fba9fb
  */
 Prisma.prismaVersion = {
   client: "6.15.0",
-  engine: "605197351a3c8bdd595af2d2a9bc3025bca48ea2"
+  engine: "85179d7826409ee107a6ba334b5e305ae3fba9fb"
 }
 
 Prisma.PrismaClientKnownRequestError = () => {
@@ -120,11 +120,33 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.BrandScalarFieldEnum = {
+  userId: 'userId',
+  name: 'name',
+  description: 'description',
+  url: 'url',
+  logoUrl: 'logoUrl'
+};
+
 exports.Prisma.ClientScalarFieldEnum = {
-  email: 'email',
+  userId: 'userId',
   name: 'name',
   dateOfBirth: 'dateOfBirth',
   preferences: 'preferences'
+};
+
+exports.Prisma.ItemFavoriteScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  itemUuid: 'itemUuid',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.ItemLikeScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  itemUuid: 'itemUuid',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.RegisterInProgressScalarFieldEnum = {
@@ -133,41 +155,58 @@ exports.Prisma.RegisterInProgressScalarFieldEnum = {
   verificationCodeExpiration: 'verificationCodeExpiration'
 };
 
-exports.Prisma.BrandScalarFieldEnum = {
+exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   email: 'email',
+  userType: 'userType'
+};
+
+exports.Prisma.AccountScalarFieldEnum = {
+  id: 'id',
+  accountId: 'accountId',
+  providerId: 'providerId',
+  userId: 'userId',
+  accessToken: 'accessToken',
+  refreshToken: 'refreshToken',
+  idToken: 'idToken',
+  accessTokenExpiresAt: 'accessTokenExpiresAt',
+  refreshTokenExpiresAt: 'refreshTokenExpiresAt',
+  scope: 'scope',
+  password: 'password',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SessionScalarFieldEnum = {
+  id: 'id',
+  expiresAt: 'expiresAt',
+  token: 'token',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  ipAddress: 'ipAddress',
+  userAgent: 'userAgent',
+  userId: 'userId'
+};
+
+exports.Prisma.UserScalarFieldEnum = {
+  id: 'id',
   name: 'name',
-  description: 'description',
-  url: 'url',
-  logoUrl: 'logoUrl'
+  email: 'email',
+  emailVerified: 'emailVerified',
+  image: 'image',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  new: 'new',
+  userType: 'userType'
 };
 
-exports.Prisma.ItemLikeClientScalarFieldEnum = {
+exports.Prisma.VerificationScalarFieldEnum = {
   id: 'id',
-  userEmail: 'userEmail',
-  itemUuid: 'itemUuid',
-  createdAt: 'createdAt'
-};
-
-exports.Prisma.ItemFavoriteClientScalarFieldEnum = {
-  id: 'id',
-  userEmail: 'userEmail',
-  itemUuid: 'itemUuid',
-  createdAt: 'createdAt'
-};
-
-exports.Prisma.ItemLikeBrandScalarFieldEnum = {
-  id: 'id',
-  userEmail: 'userEmail',
-  itemUuid: 'itemUuid',
-  createdAt: 'createdAt'
-};
-
-exports.Prisma.ItemFavoriteBrandScalarFieldEnum = {
-  id: 'id',
-  userEmail: 'userEmail',
-  itemUuid: 'itemUuid',
-  createdAt: 'createdAt'
+  identifier: 'identifier',
+  value: 'value',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -198,13 +237,16 @@ exports.Prisma.NullsOrder = {
 
 
 exports.Prisma.ModelName = {
-  Client: 'Client',
-  RegisterInProgress: 'RegisterInProgress',
   Brand: 'Brand',
-  ItemLikeClient: 'ItemLikeClient',
-  ItemFavoriteClient: 'ItemFavoriteClient',
-  ItemLikeBrand: 'ItemLikeBrand',
-  ItemFavoriteBrand: 'ItemFavoriteBrand'
+  Client: 'Client',
+  ItemFavorite: 'ItemFavorite',
+  ItemLike: 'ItemLike',
+  RegisterInProgress: 'RegisterInProgress',
+  User: 'User',
+  account: 'account',
+  session: 'session',
+  user: 'user',
+  verification: 'verification'
 };
 
 /**

@@ -1,4 +1,7 @@
-import { ErrorSchemaType } from "@/schemas/standar-response-schema";
+import {
+  ErrorSchemaType,
+  SuccessSchemaType,
+} from "@/schemas/standar-response-schema";
 import { db } from "../db.config";
 import logger from "../logger";
 import { ClientSchemaResponseType } from "@/schemas/client/client-schema";
@@ -9,9 +12,15 @@ export async function CreateClient(
   dateOfBirth: Date | null,
   preferences: string[]
 ) {
-  await db.client.create({
+  const user = await db.user.create({
     data: {
       email,
+      userType: "client",
+    },
+  });
+  await db.client.create({
+    data: {
+      userId: user.id,
       name,
       dateOfBirth,
       preferences,
@@ -23,17 +32,31 @@ export async function GetClient(
   email: string
 ): Promise<ClientSchemaResponseType | ErrorSchemaType> {
   let res: ClientSchemaResponseType | ErrorSchemaType;
-  const user = await db.client.findUnique({
+
+  const user = await db.user.findUnique({
     where: {
       email,
     },
   });
-  if (user) {
+  if (!user) {
+    res = {
+      error: true,
+      details: "User not found",
+    };
+    return res;
+  }
+  const client = await db.client.findUnique({
+    where: {
+      userId: user?.id,
+    },
+  });
+  if (client) {
     res = {
       error: false,
       user: {
-        ...user,
-        preferences: user.preferences as string[],
+        email: user.email,
+        ...client,
+        preferences: client.preferences as string[],
       },
     };
   } else {
@@ -50,10 +73,23 @@ export async function UpdateClient(
   name: string,
   dateOfBirth: Date | null,
   preferences: string[]
-) {
-  const user = await db.client.update({
+): Promise<SuccessSchemaType | ErrorSchemaType> {
+  let res: SuccessSchemaType | ErrorSchemaType;
+  const user = await db.user.findUnique({
     where: {
       email,
+    },
+  });
+  if (!user) {
+    res = {
+      error: true,
+      details: "User not found",
+    };
+    return res;
+  }
+  const client = await db.client.update({
+    where: {
+      userId: user.id,
     },
     data: {
       name,
@@ -61,5 +97,9 @@ export async function UpdateClient(
       preferences,
     },
   });
-  logger.info("Client updated", user);
+  logger.info("Client updated", client);
+  res = {
+    error: false,
+  };
+  return res;
 }
