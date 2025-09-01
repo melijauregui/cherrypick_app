@@ -280,33 +280,31 @@ export async function GetItemsFromWeaviate(
   });
 
   const items = result.objects
-    .map(obj => ({
-      name: obj.properties?.name || "",
-      description: obj.properties?.description || "",
-      imageUrl: obj.properties?.imageUrl || "",
-      url: obj.properties?.url || "",
-      brandId: obj.properties?.brandId || "",
-      price: obj.properties?.price || 0,
-      uuid: obj.uuid || "",
-    }))
+    .map(obj => {
+      const item = {
+        name: obj.properties?.name || "",
+        description: obj.properties?.description || "",
+        imageUrl: obj.properties?.imageUrl || "",
+        url: obj.properties?.url || "",
+        brandId: obj.properties?.brandId || "",
+        price: obj.properties?.price || 0,
+        uuid: obj.uuid || "",
+      };
+      const validationResult = ItemSchema.safeParse(item);
+      if (!validationResult.success) {
+        console.log("Item validation failed:", validationResult.error);
+        return null;
+      }
+      return validationResult.data;
+    })
+    .filter((item): item is ItemSchemaType => item !== null)
     .sort((a, b) => {
       const orderA = uuidOrderMap.get(a.uuid) ?? Number.MAX_SAFE_INTEGER;
       const orderB = uuidOrderMap.get(b.uuid) ?? Number.MAX_SAFE_INTEGER;
       return orderA - orderB;
     });
-
-  // Validate the item using Zod schema
-  const validationResult = CatalogResponseSchema.safeParse(items);
-  if (!validationResult.success) {
-    logger.error("Item validation failed:", validationResult.error);
-    return {
-      error: true,
-      details: "Invalid items data" + validationResult.error,
-    };
-  }
-
   return {
     error: false,
-    items: validationResult.data.items,
+    items: items,
   };
 }

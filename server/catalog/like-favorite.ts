@@ -8,6 +8,7 @@ import {
 } from "@/schemas/standar-response-schema";
 import { CheckLikeFavoriteResponseSchemaType } from "@/schemas/catalog/like-favorite-schema.ts";
 import { db } from "../db.config";
+import { GetItemsFromWeaviate } from "./functions";
 
 // Funciones para likes
 export async function toggleLike(
@@ -172,30 +173,61 @@ export async function getAllLikedFavoritedItems(
   }
 
   const offset = page * limit;
-  const query = {
-    where: {
-      userId: user.id,
-    },
-    skip: offset,
-    take: limit,
-    select: {
-      itemUuid: true,
-    },
-  };
+  // const query = {
+  //   where: {
+  //     userId: user.id,
+  //   },
+  //   skip: offset,
+  //   take: limit,
+  //   select: {
+  //     itemUuid: true,
+  //   },
+  //   orderBy: {
+  //     createdAt: "desc",
+  //   },
+  // };
 
   // Primero obtener los UUIDs de los items liked
   if (type === "likes") {
-    likedFavoritedUuids = await db.itemLike.findMany(query);
+    likedFavoritedUuids = await db.itemLike.findMany({
+      where: {
+        userId: user.id,
+      },
+      skip: offset,
+      take: limit,
+      select: {
+        itemUuid: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
   } else if (type === "favorites") {
-    likedFavoritedUuids = await db.itemFavorite.findMany(query);
+    likedFavoritedUuids = await db.itemFavorite.findMany({
+      where: {
+        userId: user.id,
+      },
+      skip: offset,
+      take: limit,
+      select: {
+        itemUuid: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
   }
   if (!likedFavoritedUuids || likedFavoritedUuids.length === 0) {
     res = { error: false, items: [] };
     return res;
   }
+  const uuids = likedFavoritedUuids.map(item => item.itemUuid);
   // Obtener los items de weaviate
-  // const items = await getItemsFromWeaviate(likedFavoritedUuids, limit);
-  // res = { error: false, items: items };
-  res = { error: false, items: [] };
+  const itemsRespose = await GetItemsFromWeaviate(uuids, limit);
+  if (itemsRespose.error) {
+    return itemsRespose;
+  }
+  const items = itemsRespose.items;
+  res = { error: false, items: items };
   return res;
 }

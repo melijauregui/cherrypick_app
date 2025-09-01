@@ -6,7 +6,6 @@ import {
   Dimensions,
   SafeAreaView,
 } from "react-native";
-import { useQuery } from "@tanstack/react-query";
 import { getAllLikedItems, getAllFavoritedItems } from "../utils/fetch";
 import { useSession } from "@/lib/auth-client";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";

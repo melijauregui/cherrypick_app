@@ -62,7 +62,13 @@ const createUserRoute = createRoute({
 ClientApp.openapi(createUserRoute, async c => {
   const { name, email, dateOfBirth, preferences } = await c.req.valid("json");
   let res: SuccessSchemaType;
-  logger.info("Creating client:", name, email, dateOfBirth, preferences);
+  logger.info(
+    "Creating client: %s %s %s %s",
+    name,
+    email,
+    dateOfBirth,
+    preferences
+  );
   await CreateClient(email, name, dateOfBirth, preferences);
   res = {
     error: false,

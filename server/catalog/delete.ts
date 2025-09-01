@@ -27,9 +27,11 @@ export async function DeleteFromWeaviate(
 
     const itemsUuids = res.objects.map(obj => obj.id);
 
-    const deleteFromDatabaseRes = await deleteFromDatabase(itemsUuids);
+    await deleteFromDatabase(itemsUuids);
 
-    return deleteFromDatabaseRes;
+    return {
+      error: false,
+    };
   } catch (error) {
     console.error("Error deleting from Weaviate:", error);
     return {
@@ -39,53 +41,23 @@ export async function DeleteFromWeaviate(
   }
 }
 
-async function deleteFromDatabase(
-  itemsUuids: string[]
-): Promise<SuccessSchemaType | ErrorSchemaType> {
-  try {
-    // Delete from likes and favorites tables for both clients and brands using Prisma
-    await db.itemLikeClient.deleteMany({
-      where: {
-        itemUuid: {
-          in: itemsUuids,
-        },
+async function deleteFromDatabase(itemsUuids: string[]) {
+  // Delete from likes and favorites tables for both clients and brands using Prisma
+  await db.itemLike.deleteMany({
+    where: {
+      itemUuid: {
+        in: itemsUuids,
       },
-    });
+    },
+  });
 
-    await db.itemFavoriteClient.deleteMany({
-      where: {
-        itemUuid: {
-          in: itemsUuids,
-        },
+  await db.itemFavorite.deleteMany({
+    where: {
+      itemUuid: {
+        in: itemsUuids,
       },
-    });
-
-    await db.itemLikeBrand.deleteMany({
-      where: {
-        itemUuid: {
-          in: itemsUuids,
-        },
-      },
-    });
-
-    await db.itemFavoriteBrand.deleteMany({
-      where: {
-        itemUuid: {
-          in: itemsUuids,
-        },
-      },
-    });
-
-    return {
-      error: false,
-    };
-  } catch (error) {
-    console.error("Error deleting from database:", error);
-    return {
-      error: true,
-      details: `Error deleting from database: ${error}`,
-    };
-  }
+    },
+  });
 }
 
 async function deleteCatalogItemsFromWeaviate(
@@ -174,12 +146,6 @@ export async function DeleteFromCatalog(
     return res;
   }
 
-  const deleteFromDatabaseRes = await deleteFromDatabase(itemsUuids);
-  if (deleteFromDatabaseRes.error) {
-    return {
-      error: true,
-      details: deleteFromDatabaseRes.details,
-    };
-  }
+  await deleteFromDatabase(itemsUuids);
   return res;
 }

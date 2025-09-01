@@ -9,11 +9,7 @@ import {
   ItemUuidNameResponseSchema,
   ItemUuidNameSchemaType,
 } from "@/schemas/catalog/catalog-schema";
-import {
-  CheckLikeFavoriteResponseSchema,
-  LikeFavoriteResponseSchema,
-  LikeFavoriteResponseSchemaType,
-} from "@/schemas/catalog/like-favorite-schema.ts";
+import { CheckLikeFavoriteResponseSchema } from "@/schemas/catalog/like-favorite-schema.ts";
 import { ZodSchema } from "zod";
 import {
   ClientSchemaResponse,
@@ -25,6 +21,10 @@ import {
   BrandSchemaResponse,
   BrandSchemaType,
 } from "@/schemas/brand/brand-schema";
+import {
+  SuccessSchema,
+  SuccessSchemaType,
+} from "@/schemas/standar-response-schema";
 
 // Helper function to handle API responses consistently
 const handleApiResponse = async <T>(
@@ -242,19 +242,16 @@ const toggleLikeFavorite = async (
   action: "like" | "favorite",
   itemUuid: string
 ) => {
-  const res = await handleApiResponse<LikeFavoriteResponseSchemaType>(
+  const res = await handleApiResponse<SuccessSchemaType>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/toggle-${action}`,
+        url: `http://${LOCAL_IP}:3000/item/${itemUuid}/toggle-${action}`,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          item_uuid: itemUuid,
-        }),
       }),
-    LikeFavoriteResponseSchema,
+    SuccessSchema,
     "toggleLikeFavorite"
   );
   return res;
@@ -269,7 +266,7 @@ const checkLikeFavorite = async (
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/check-${action}?item_uuid=${itemUuid}`,
+        url: `http://${LOCAL_IP}:3000/item/${itemUuid}/check-${action}`,
         method: "GET",
       }),
     CheckLikeFavoriteResponseSchema,
@@ -303,7 +300,7 @@ export const checkIfFavorited = async (userEmail: string, itemUuid: string) => {
 // Funciones para obtener todos los items liked y favorited
 export const getAllLikedItems = async (
   page: number = 0,
-  limit: number = 100,
+  limit: number = 10,
   brandId: string | null = null
 ): Promise<ItemSchemaType[]> => {
   console.log("getAllLikedItems", page, limit);
@@ -312,7 +309,7 @@ export const getAllLikedItems = async (
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/get-all-liked-items?page=${page}&limit=${limit}`,
+        url: `http://${LOCAL_IP}:3000/user/all-liked?page=${page}&limit=${limit}`,
         method: "GET",
       }),
     CatalogResponseSchema,
@@ -323,7 +320,7 @@ export const getAllLikedItems = async (
 
 export const getAllFavoritedItems = async (
   page: number = 0,
-  limit: number = 100
+  limit: number = 10
 ): Promise<ItemSchemaType[]> => {
   console.log("getAllFavoritedItems", page, limit);
   const res = await handleApiResponse<{
@@ -331,7 +328,7 @@ export const getAllFavoritedItems = async (
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/get-all-favorited-items?page=${page}&limit=${limit}`,
+        url: `http://${LOCAL_IP}:3000/user/all-favorited?page=${page}&limit=${limit}`,
         method: "GET",
       }),
     CatalogResponseSchema,

@@ -58,18 +58,12 @@ export const useToggleLike = () => {
       if (!res) {
         throw new Error("No se pudo procesar el like");
       }
-      if (res.error) {
-        throw new Error(res.details);
-      }
       return res;
     },
 
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["is-liked", variables.itemUuid],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["all-liked-items", user?.email],
       });
     },
     onError: error => {
@@ -78,6 +72,11 @@ export const useToggleLike = () => {
         type: "error",
         text1: "No se pudo procesar el like",
         visibilityTime: 3000,
+      });
+    },
+    onSettled: (data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["all-liked-items", user?.email],
       });
     },
   });
@@ -97,18 +96,12 @@ export const useToggleFavorite = () => {
       if (!res) {
         throw new Error("No se pudo procesar el favorito");
       }
-      if (res.error) {
-        throw new Error(res.details);
-      }
       return res;
     },
     onSuccess: (data, variables) => {
       // Actualizar el estado del favorite
       queryClient.invalidateQueries({
         queryKey: ["is-favorited", variables.itemUuid],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["all-favorited-items", user?.email],
       });
     },
     onError: error => {
@@ -117,6 +110,11 @@ export const useToggleFavorite = () => {
         type: "error",
         text1: "No se pudo procesar el favorito",
         visibilityTime: 3000,
+      });
+    },
+    onSettled: (data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["all-favorited-items", user?.email],
       });
     },
   });

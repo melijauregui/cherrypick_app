@@ -166,6 +166,7 @@ const getAllLikedItemsRoute = createRoute({
 UserApp.openapi(getAllLikedItemsRoute, async c => {
   const { page, limit } = c.req.valid("query");
   const user = c.get("user");
+  logger.info("GET /user/all-liked page: %s limit: %s", page, limit);
   let res: CatalogResponseSchemaType | ErrorSchemaType;
 
   if (!user?.email) {
@@ -180,6 +181,7 @@ UserApp.openapi(getAllLikedItemsRoute, async c => {
   if (res.error) {
     return c.json(res, 404);
   }
+  logger.info("GET /user/all-liked result: %s", res.items);
   return c.json(res, 200);
 });
 
@@ -221,6 +223,7 @@ const getAllFavoritedItemsRoute = createRoute({
 UserApp.openapi(getAllFavoritedItemsRoute, async c => {
   const { page, limit } = c.req.valid("query");
   const user = c.get("user");
+  logger.info("GET /user/all-favorited page: %s limit: %s", page, limit);
   let res: CatalogResponseSchemaType | ErrorSchemaType;
 
   if (!user?.email) {

@@ -123,10 +123,10 @@ ItemApp.openapi(isMyItemRoute, async c => {
   const userBrandId = await GetBrandId(user.email);
   if (!userBrandId) {
     res = {
-      error: true,
-      details: "Marca no encontrada",
+      error: false,
+      isMyItem: false,
     };
-    return c.json(res, 404);
+    return c.json(res, 200);
   }
 
   // Comparar si el brandId del item coincide con el brandId del usuario

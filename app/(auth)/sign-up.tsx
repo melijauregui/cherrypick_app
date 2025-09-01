@@ -7,6 +7,7 @@ import {
   TextInput,
   Platform,
 } from "react-native";
+import { format } from "date-fns";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from "react";
 import LogoCircle from "@/app/components/LogoCircle";
@@ -26,8 +27,7 @@ const SignIn = () => {
   const router = useRouter();
   const [name, setName] = useState<string>();
   const [email, setEmail] = useState<string>();
-  const [dateString, setDateString] = useState<string | undefined>(undefined);
-  const [date, setDate] = useState<Date>(new Date());
+  const [date, setDate] = useState<Date | null>(null);
   const [open, setOpen] = useState(false);
   const [nameError, setNameError] = useState<string | undefined>(undefined);
   const [emailError, setEmailError] = useState<string | undefined>(undefined);
@@ -37,7 +37,7 @@ const SignIn = () => {
     const result = ClientFormSchemaSignUp.safeParse({
       name: name,
       email: email?.toLowerCase(),
-      dateOfBirth: dateString,
+      dateOfBirth: date?.toISOString(),
     });
     if (!result.success) {
       //console.log("Validation failed:", result.error);
@@ -70,7 +70,7 @@ const SignIn = () => {
       "and email:",
       emailValue,
       "and date:",
-      dateString
+      date?.toISOString()
     );
 
     router.push({
@@ -78,7 +78,7 @@ const SignIn = () => {
       params: {
         name,
         email,
-        dateBirth: dateString,
+        dateBirth: date?.toISOString(),
       },
     });
 
@@ -125,7 +125,7 @@ const SignIn = () => {
               />
               <DateOfBirthInput
                 placeholder="Date of birth"
-                value={dateString}
+                value={date ? format(date, "dd/MM/yyyy") : undefined}
                 onPress={() => setOpen(true)}
                 error={dateError}
               />
@@ -133,7 +133,7 @@ const SignIn = () => {
               <DatePicker
                 modal
                 open={open}
-                date={date}
+                date={date || new Date()}
                 mode="date"
                 // @ts-ignore
                 androidVariant="nativeAndroid"
@@ -147,17 +147,10 @@ const SignIn = () => {
                   );
                   setDate(justDate);
                   console.log("Selected date:", justDate);
-                  setDateString(
-                    date.toLocaleDateString("es-AR", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    })
-                  );
                 }}
                 onCancel={() => {
                   setOpen(false);
-                  setDateString(undefined);
+                  setDate(null);
                 }}
               />
             </View>
@@ -166,7 +159,7 @@ const SignIn = () => {
             onPress={handleSubmit}
             name={name}
             email={email}
-            date={dateString}
+            date={date?.toISOString()}
           />
         </View>
       </ScrollView>

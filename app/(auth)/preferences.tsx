@@ -245,13 +245,13 @@ function useCreateAccount() {
 
       console.log(
         "Creating account with name:",
-        user.username,
+        client.name,
         "email:",
-        user.email,
+        client.email,
         "date:",
-        user.dateOfBirth,
+        client.dateOfBirth,
         "preferences:",
-        user.preferences
+        client.preferences
       );
 
       const { data } = await safeFetch({

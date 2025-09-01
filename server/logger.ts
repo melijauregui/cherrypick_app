@@ -1,6 +1,5 @@
 import winston, { level } from "winston";
 import path from "path";
-import { config } from "./config";
 
 /**
  * Winston logger configuration
