@@ -35,6 +35,6 @@ España 3012 Florencio varela
 Calle 13 4777 Berazategui
 Brown 509 Quilmes
 Av 844 2509 Solano',
-    'www.charostoreok.com',
+    'https://www.charostoreok.com/',
     'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSvjwlliXGANYoquuhEsRukCFXHeXqJ7TKCGQ&s'
 );
