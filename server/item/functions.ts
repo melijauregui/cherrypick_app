@@ -1,9 +1,17 @@
 import {
   ItemResponseSchemaType,
   ItemSchema,
+  UpdateItemBodySchemaType,
 } from "@/schemas/catalog/catalog-schema";
-import { getCollection } from "../app/catalogFunctions";
-import { ErrorSchemaType } from "@/schemas/standar-response-schema";
+import {
+  ErrorSchemaType,
+  SuccessSchemaType,
+} from "@/schemas/standar-response-schema";
+import {
+  extractImageFeatures,
+  extractTextFeatures,
+  getCollection,
+} from "../catalog/functions";
 
 // Function to query specific item by name and brand in Weaviate
 export async function GetItem(
@@ -69,4 +77,53 @@ export async function GetItem(
     item: validationResult.data,
   };
 }
-export { GetItem as QueryWeaviateItem };
+
+export async function UpdateItem(
+  uuid: string,
+  updatedItem: UpdateItemBodySchemaType
+): Promise<SuccessSchemaType | ErrorSchemaType> {
+  const collectionResult = await getCollection();
+  if (collectionResult.error) {
+    return {
+      error: true,
+      details: "Error getting collection" + collectionResult.details,
+    };
+  }
+
+  const collection = collectionResult.collection!;
+
+  // Prepare properties to update (only include fields that are provided)
+  const propertiesToUpdate: any = {};
+  if (updatedItem.name !== undefined)
+    propertiesToUpdate.name = updatedItem.name;
+  if (updatedItem.description !== undefined)
+    propertiesToUpdate.description = updatedItem.description;
+  if (updatedItem.price !== undefined)
+    propertiesToUpdate.price = updatedItem.price;
+  if (updatedItem.imageUrl !== undefined)
+    propertiesToUpdate.image_url = updatedItem.imageUrl;
+  if (updatedItem.url !== undefined) propertiesToUpdate.url = updatedItem.url;
+
+  const vectorsToUpdate: any = {};
+  if (updatedItem.imageUrl) {
+    console.log("extracting image features");
+    const imageFeatures = await extractImageFeatures(updatedItem.imageUrl);
+    vectorsToUpdate.image_vector = imageFeatures;
+  }
+  if (updatedItem.description) {
+    console.log("extracting text features");
+    const textFeatures = await extractTextFeatures(updatedItem.description);
+    vectorsToUpdate.text_vector = textFeatures;
+  }
+
+  const updateData: any = {
+    id: uuid,
+    properties: propertiesToUpdate,
+    vectors: vectorsToUpdate,
+  };
+  await collection.data.update(updateData);
+
+  return {
+    error: false,
+  };
+}

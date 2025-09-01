@@ -1,7 +1,7 @@
 import { db } from "../db.config";
-import { DeleteFromWeaviate } from "../app/catalogFunctions";
 import { GetBrandId } from "../brand/functions";
 import { NotFoundError } from "../errorHandler";
+import { DeleteFromWeaviate } from "../catalog/delete";
 
 export async function VerifyUserExists(
   email: string

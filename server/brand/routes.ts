@@ -40,7 +40,8 @@ import {
   ItemUuidNameResponseSchemaType,
 } from "@/schemas/catalog/catalog-schema";
 import { GetCatalog, GetItemsUuidNamesFromBrand } from "../catalog/functions";
-import { DeleteFromCatalog, UpdateCatalog } from "../app/catalogFunctions";
+import { UpdateCatalog } from "../catalog/insert";
+import { DeleteFromCatalog } from "../catalog/delete";
 
 const BrandApp = new OpenAPIHono<AppEnv>({
   defaultHook: (result, c) => {
@@ -701,7 +702,7 @@ BrandApp.openapi(deleteCatalogRoute, async c => {
     return c.json(res, 401);
   }
 
-  // Extraer los nombres de los items del array de objetos
+  // Extraer los ids de los items del array de objetos
   const itemsUuids = items.map(item => item.id);
 
   //verifico que la marca exista en la base de datos

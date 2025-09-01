@@ -72,7 +72,7 @@ export async function checkIsMyItem(
   const res = await handleApiResponse<{ isMyItem: boolean }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/is-my-item?uuid=${uuidItem}`,
+        url: `http://${LOCAL_IP}:3000/item/${uuidItem}/is-mine`,
         method: "GET",
       }),
     IsMyItemSchema,

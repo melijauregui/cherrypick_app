@@ -1,14 +1,4 @@
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
-import { UpdateItem } from "./app/catalogFunctions";
-import {
-  UpdateItemQuerySchema,
-  UpdateItemBodySchema,
-  UpdateItemResponseSchema,
-  UpdateItemResponseSchemaType,
-  IsMyItemQuerySchema,
-  IsMyItemSchema,
-  IsMyItemSchemaType,
-} from "../schemas/catalog/catalog-schema";
 import { auth } from "../lib/auth";
 import {
   LikeItemSchema,
@@ -22,10 +12,8 @@ import { toggleLike, toggleFavorite, checkIfLiked } from "./app/allDatabase";
 import FormUserApp from "./formUser/routes";
 import UserApp from "./user/routes";
 import ClientApp from "./client/routes";
-import { GetBrandId } from "./brand/functions";
 import BrandApp from "./brand/routes";
 import FeedApp from "./feed/routes";
-import { GetItem } from "./item/functions";
 import ItemApp from "./item/routes";
 
 export type AppEnv = {
@@ -72,145 +60,6 @@ app.route("/client", ClientApp);
 app.route("/brand", BrandApp);
 app.route("/feed", FeedApp);
 app.route("/item", ItemApp);
-
-// endpoint que verifica si un item pertenece al usuario autenticado
-const isMyItemRoute = createRoute({
-  method: "get",
-  path: "/is-my-item",
-  request: {
-    query: IsMyItemQuerySchema,
-  },
-  responses: {
-    200: {
-      content: {
-        "application/json": {
-          schema: IsMyItemSchema,
-        },
-      },
-      description: "Verifica si un item pertenece al usuario autenticado",
-    },
-  },
-});
-
-app.openapi(isMyItemRoute, async c => {
-  const { uuid } = c.req.valid("query");
-  const user = c.get("user");
-  let res: IsMyItemSchemaType;
-
-  if (!user?.email) {
-    res = {
-      error: true,
-      details: "Usuario no autenticado",
-    };
-    return c.json(res, 200);
-  }
-
-  try {
-    // Obtener el item de Weaviate para obtener su brandId
-    const itemResult = await GetItem(uuid);
-    if (itemResult.error) {
-      res = {
-        error: true,
-        details: itemResult.details,
-      };
-      return c.json(res, 200);
-    }
-
-    const item = itemResult.item;
-
-    // Obtener el brandId del usuario autenticado
-    const userBrandId = await GetBrandId(user.email);
-    if (!userBrandId) {
-      res = {
-        error: false,
-        isMyItem: false,
-      };
-      return c.json(res, 200);
-    }
-
-    // Comparar si el brandId del item coincide con el brandId del usuario
-    const isMyItem = item.brandId === userBrandId;
-
-    res = {
-      error: false,
-      isMyItem,
-    };
-  } catch (error) {
-    console.error("Error checking if item belongs to user:", error);
-    res = {
-      error: true,
-      details: "Error interno del servidor",
-    };
-  }
-
-  return c.json(res, 200);
-});
-
-// endpoint que actualiza un item específico por name y brand
-const updateItemRoute = createRoute({
-  method: "put",
-  path: "/update-item",
-  request: {
-    query: UpdateItemQuerySchema,
-    body: {
-      content: {
-        "application/json": { schema: UpdateItemBodySchema },
-      },
-    },
-  },
-  responses: {
-    200: {
-      content: {
-        "application/json": {
-          schema: UpdateItemResponseSchema,
-        },
-      },
-      description: "Actualiza un item específico por nombre y marca",
-    },
-  },
-});
-
-app.openapi(updateItemRoute, async c => {
-  const { uuid } = c.req.valid("query");
-  const updatedItem = await c.req.valid("json");
-  let res: UpdateItemResponseSchemaType;
-  const user = c.get("user");
-  if (!user?.email) {
-    res = {
-      error: true,
-      details: "Usuario no autenticado",
-    };
-    return c.json(res, 200);
-  }
-  const userBrandId = await GetBrandId(user.email);
-  if (!userBrandId) {
-    res = {
-      error: true,
-      details: "No tienes permisos para actualizar este item",
-    };
-    return c.json(res, 200);
-  }
-  const itemResult = await GetItem(uuid);
-  if (itemResult.error) {
-    res = {
-      error: true,
-      details: itemResult.details,
-    };
-    return c.json(res, 200);
-  }
-
-  if (userBrandId !== itemResult.item.brandId) {
-    res = {
-      error: true,
-      details: "No tienes permisos para actualizar este item",
-    };
-    return c.json(res, 200);
-  }
-
-  res = await UpdateItem(uuid, updatedItem);
-
-  return c.json(res, 200);
-});
 
 // Endpoint para toggle like
 const toggleLikeRoute = createRoute({

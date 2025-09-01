@@ -31,7 +31,7 @@ import {
   useToggleFavorite,
 } from "@/app/utils/likes-favorites";
 import { UpdateItemModal } from "@/app/components/profile/insertNewItems";
-import { FormData } from "@/app/components/profile/insertNewItems";
+import { FormDataItem } from "@/app/utils/update";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useSession } from "@/lib/auth-client";
@@ -74,7 +74,7 @@ const ItemDetail = () => {
     bottomSheetRefAddItem.current?.snapToIndex(0);
   };
 
-  const handleSubmitAddItem = (data: FormData) => {
+  const handleSubmitAddItem = (data: FormDataItem) => {
     // console.log("Form submitted with data:", data);
   };
 
@@ -146,7 +146,7 @@ const ItemDetail = () => {
             name: item.name,
             price: item.price.toString(),
             url: item.url,
-            image_url: item.imageUrl,
+            imageUrl: item.imageUrl,
             description: item.description,
           }}
           itemUuid={decodedUuid}

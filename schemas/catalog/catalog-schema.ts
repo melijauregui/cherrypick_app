@@ -93,6 +93,16 @@ export type ItemUuidNameResponseSchemaType = z.infer<
   typeof ItemUuidNameResponseSchema
 >;
 
+export const IsMyItemSchema = z.object({
+  ...SuccessSchema.shape,
+  isMyItem: z.boolean(),
+});
+
+export type IsMyItemSchemaType = z.infer<typeof IsMyItemSchema>;
+
+export const UpdateItemBodySchema = PropertiesItemSchema.partial();
+export type UpdateItemBodySchemaType = z.infer<typeof UpdateItemBodySchema>;
+
 //--------------------------------------------
 
 export const deleteItemsSchema = z.object({
@@ -116,44 +126,3 @@ export const GetItemQuerySchema = z.object({
 });
 
 export type GetItemQuerySchemaType = z.infer<typeof GetItemQuerySchema>;
-
-export const UpdateItemQuerySchema = z.object({
-  uuid: z.string().min(1, "El uuid es requerido"),
-});
-export const UpdateItemBodySchema = ItemSchema.partial();
-
-export const UpdateItemResponseSchema = z.union([
-  z.object({
-    error: z.literal(true),
-    details: z.string(),
-  }),
-  z.object({
-    error: z.literal(false),
-  }),
-]);
-
-export type UpdateItemQuerySchemaType = z.infer<typeof UpdateItemQuerySchema>;
-export type UpdateItemBodySchemaType = z.infer<typeof UpdateItemBodySchema>;
-export type UpdateItemResponseSchemaType = z.infer<
-  typeof UpdateItemResponseSchema
->;
-
-// Schema for is-my-item query parameters
-export const IsMyItemQuerySchema = z.object({
-  uuid: z.string().min(1, "El uuid es requerido"),
-});
-
-// Response schema for is-my-item
-export const IsMyItemSchema = z.union([
-  z.object({
-    error: z.literal(true),
-    details: z.string(),
-  }),
-  z.object({
-    error: z.literal(false),
-    isMyItem: z.boolean(),
-  }),
-]);
-
-export type IsMyItemQuerySchemaType = z.infer<typeof IsMyItemQuerySchema>;
-export type IsMyItemSchemaType = z.infer<typeof IsMyItemSchema>;

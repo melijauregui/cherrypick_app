@@ -15,36 +15,17 @@ import { LOCAL_IP } from "@/config/api";
 import Toast from "react-native-toast-message";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import safeFetch from "@/app/utils/safe-fetch";
-import {
-  UpdateItemResponseSchema,
-  ItemSchema,
-  PropertiesItemSchema,
-} from "@/schemas/catalog/catalog-schema";
+import { PropertiesItemSchema } from "@/schemas/catalog/catalog-schema";
 import InputBoxWithName from "./inputBox";
-
-export type FormData = {
-  name: string;
-  description: string;
-  price: string;
-  url: string;
-  imageUrl: string;
-};
-
-type FormErrors = {
-  name?: string;
-  description?: string;
-  price?: string;
-  url?: string;
-  imageUrl?: string;
-};
+import { FormDataItem, FormErrors, useUpdateItem } from "@/app/utils/update";
 
 export const InsertNewItemsModal: React.FC<{
   bottomSheetRef: React.RefObject<BottomSheet>;
-  onSubmit: (data: FormData) => void;
+  onSubmit: (data: FormDataItem) => void;
   brandEmail: string;
-  formDataLastValue: FormData;
+  formDataLastValue: FormDataItem;
 }> = ({ bottomSheetRef, onSubmit, brandEmail, formDataLastValue }) => {
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<FormDataItem>({
     ...formDataLastValue,
   });
   const [errors, setErrors] = useState<FormErrors>({});
@@ -76,11 +57,11 @@ export const InsertNewItemsModal: React.FC<{
 
 export const UpdateItemModal: React.FC<{
   bottomSheetRef: React.RefObject<BottomSheet>;
-  onSubmit: (data: FormData) => void;
-  formDataLastValue: FormData;
+  onSubmit: (data: FormDataItem) => void;
+  formDataLastValue: FormDataItem;
   itemUuid: string;
 }> = ({ bottomSheetRef, onSubmit, formDataLastValue, itemUuid }) => {
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<FormDataItem>({
     ...formDataLastValue,
   });
   const [errors, setErrors] = useState<FormErrors>({});
@@ -114,11 +95,11 @@ export const UpdateItemModal: React.FC<{
 
 const ItemsModalDetails: React.FC<{
   bottomSheetRef: React.RefObject<BottomSheet>;
-  onSubmit: (data: FormData) => void;
-  formDataLastValue: FormData;
-  submitMutate: (formData: FormData) => void;
-  setFormData: React.Dispatch<React.SetStateAction<FormData>>;
-  formData: FormData;
+  onSubmit: (data: FormDataItem) => void;
+  formDataLastValue: FormDataItem;
+  submitMutate: (formData: FormDataItem) => void;
+  setFormData: React.Dispatch<React.SetStateAction<FormDataItem>>;
+  formData: FormDataItem;
   setIsSubmitting: (isSubmitting: boolean) => void;
   setErrors: React.Dispatch<React.SetStateAction<FormErrors>>;
   errors: FormErrors;
@@ -137,16 +118,16 @@ const ItemsModalDetails: React.FC<{
   isSubmitting,
   isNewItem,
 }) => {
-  const handleFieldChange = (field: keyof FormData, value: string) => {
+  const handleFieldChange = (field: keyof FormDataItem, value: string) => {
     // Validar que el valor no sea undefined o null para evitar NaN
     const safeValue = value || "";
 
     // Solo para el campo price, convertir comas a puntos
     if (field === "price") {
       const priceValue = safeValue.replace(",", ".");
-      setFormData((prev: FormData) => ({ ...prev, [field]: priceValue }));
+      setFormData((prev: FormDataItem) => ({ ...prev, [field]: priceValue }));
     } else {
-      setFormData((prev: FormData) => ({ ...prev, [field]: safeValue }));
+      setFormData((prev: FormDataItem) => ({ ...prev, [field]: safeValue }));
     }
 
     if (errors[field as keyof FormErrors]) {
@@ -229,8 +210,8 @@ const FormContent = ({
   handleSubmit,
   isNewItem,
 }: {
-  formData: FormData;
-  handleFieldChange: (field: keyof FormData, value: string) => void;
+  formData: FormDataItem;
+  handleFieldChange: (field: keyof FormDataItem, value: string) => void;
   errors: FormErrors;
   isFormValid: boolean;
   isSubmitting: boolean;
@@ -313,15 +294,15 @@ const FormContent = ({
 };
 
 function useInsertItem(
-  setFormData: React.Dispatch<React.SetStateAction<FormData>>,
+  setFormData: React.Dispatch<React.SetStateAction<FormDataItem>>,
   setIsSubmitting: (isSubmitting: boolean) => void,
   setErrors: (errors: FormErrors) => void,
-  onSubmit: (data: FormData) => void,
+  onSubmit: (data: FormDataItem) => void,
   bottomSheetRef: React.RefObject<BottomSheet>
 ) {
   const queryClient = useQueryClient();
   const mutation = useMutation({
-    mutationFn: async (data: { formData: FormData }) => {
+    mutationFn: async (data: { formData: FormDataItem }) => {
       const result = PropertiesItemSchema.safeParse({
         ...data.formData,
       });
@@ -376,7 +357,7 @@ function useInsertItem(
       const newErrors: FormErrors = {};
       if (responseError instanceof ZodError) {
         responseError.errors.forEach(error => {
-          const field = error.path[0] as keyof FormData;
+          const field = error.path[0] as keyof FormDataItem;
           console.log("field", field);
           newErrors[field] = error.message;
         });
@@ -402,122 +383,6 @@ function useInsertItem(
           Toast.show({
             type: "error",
             text1: `Error inserting item ${data.formData.name}: ${responseError.message}`,
-            visibilityTime: 6000,
-          });
-        }
-        setIsSubmitting(false);
-      }
-    },
-    onSettled: () => {
-      setIsSubmitting(false);
-      Keyboard.dismiss();
-    },
-  });
-
-  return mutation;
-}
-
-function useUpdateItem(
-  setFormData: React.Dispatch<React.SetStateAction<FormData>>,
-  setIsSubmitting: (isSubmitting: boolean) => void,
-  setErrors: (errors: FormErrors) => void,
-  onSubmit: (data: FormData) => void,
-  bottomSheetRef: React.RefObject<BottomSheet>,
-  formDataLastValue: FormData,
-  itemUuid: string
-) {
-  const queryClient = useQueryClient();
-  const mutation = useMutation({
-    mutationFn: async (data: { formData: FormData }) => {
-      const result = ItemSchema.safeParse({
-        ...data.formData,
-        uuid: itemUuid,
-      });
-      if (!result.success) {
-        throw new ZodError(result.error.errors);
-      }
-      setErrors({});
-
-      setIsSubmitting(true);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      bottomSheetRef.current?.close();
-
-      // Only include fields that have changed compared to formDataLastValue
-      const itemUpdated: Partial<FormData> = {};
-
-      if (result.data.name !== formDataLastValue.name) {
-        itemUpdated.name = result.data.name;
-      }
-      if (result.data.description !== formDataLastValue.description) {
-        itemUpdated.description = result.data.description;
-      }
-      if (result.data.price !== formDataLastValue.price) {
-        itemUpdated.price = result.data.price;
-      }
-      if (result.data.imageUrl !== formDataLastValue.imageUrl) {
-        itemUpdated.imageUrl = result.data.imageUrl;
-      }
-      if (result.data.url !== formDataLastValue.url) {
-        itemUpdated.url = result.data.url;
-      }
-
-      setFormData({
-        ...formDataLastValue,
-        ...itemUpdated,
-      });
-
-      const response = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/update-item?uuid=${itemUuid}`,
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(itemUpdated),
-      });
-      if (response.data.error) {
-        throw new Error(response.data.details);
-      }
-      return response.data;
-    },
-    onSuccess: (data, variables) => {
-      console.log("itemUuid in useUpdateItem", itemUuid);
-      void queryClient.invalidateQueries({
-        queryKey: ["item-detail", itemUuid],
-      });
-      onSubmit(variables.formData);
-      Toast.show({
-        type: "normal",
-        text1: `The item ${variables.formData.name} has been successfully updated in the catalog!`,
-        visibilityTime: 2000,
-      });
-    },
-    onError: (responseError, data) => {
-      const newErrors: FormErrors = {};
-      if (responseError instanceof ZodError) {
-        responseError.errors.forEach(error => {
-          const field = error.path[0] as keyof FormData;
-          console.log("field", field);
-          newErrors[field] = error.message;
-        });
-        setErrors(newErrors);
-        setIsSubmitting(false);
-        return;
-      }
-      if (responseError instanceof Error) {
-        if (responseError.message.includes("[1] duplicados")) {
-          Toast.show({
-            type: "error",
-            text1: `The item ${data.formData.name} already exists in the catalog.`,
-            visibilityTime: 6000,
-          });
-        } else if (responseError.message.includes("[1] mal formados")) {
-          Toast.show({
-            type: "error",
-            text1: `The item ${data.formData.name} is not valid.`,
-            visibilityTime: 6000,
-          });
-        } else {
-          Toast.show({
-            type: "error",
-            text1: `Error updating item ${data.formData.name}: ${responseError.message}`,
             visibilityTime: 6000,
           });
         }
