@@ -1,15 +1,76 @@
-export default {
+export default ({ config }) => ({
+    ...config,
     expo: {
-        name: "Cherrypick",
+        name: "cherrypick",
         slug: "cherrypick",
-        scheme: "cherrypick",
+        owner: "cherrypickapp",
         version: "1.0.0",
+        orientation: "portrait",
+        icon: "./assets/images/small_logo.png",
+        scheme: "cherrypick",
+        userInterfaceStyle: "automatic",
+        newArchEnabled: true,
+        platforms: ["ios", "android", "web"],
+        ios: {
+            bundleIdentifier: "com.cherrypickapp.googleauthern",
+            supportsTablet: true,
+            infoPlist: {
+                CFBundleURLTypes: [
+                    {
+                        CFBundleURLSchemes: [
+                            "com.googleusercontent.apps.321366117154-gq34d2c6r30i8tl8r45dpte4i0ba8nk9",
+                        ],
+                    },
+                    {
+                        CFBundleURLSchemes: ["cherrypick"],
+                    },
+                ],
+                ITSAppUsesNonExemptEncryption: false,
+            },
+            build: {
+                production: {
+                    ios: { buildType: "archive" },
+                },
+            },
+        },
         android: {
-            package: "com.cherrypickapp.cherrypick",
+            package: "com.cherrypickapp.googleauthern",
+            adaptiveIcon: {
+                foregroundImage: "./assets/images/small_logo.png",
+                backgroundColor: "#ffffff",
+            },
+        },
+        web: {
+            bundler: "metro",
+            output: "server",
+            favicon: "./assets/images/small_logo.png",
+        },
+        plugins: [
+            "expo-router",
+            [
+                "expo-splash-screen",
+                {
+                    image: "./assets/images/small_logo.png",
+                    imageWidth: 200,
+                    resizeMode: "contain",
+                    backgroundColor: "#ffffff",
+                },
+            ],
+            "expo-secure-store",
+        ],
+        experiments: {
+            typedRoutes: true,
         },
         extra: {
+            router: {
+                origin: "cherrypick://",
+            },
             LOCAL_IP: process.env.LOCAL_IP || "localhost",
-            BETTER_AUTH_URL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
+            BETTER_AUTH_URL:
+                process.env.BETTER_AUTH_URL || "http://localhost:3000",
+            eas: {
+                projectId: "e0d221a6-6b38-4601-8549-ca222a510406",
+            },
         },
     },
-};
+});
