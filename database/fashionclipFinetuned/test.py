@@ -90,8 +90,14 @@ def run_tests_roturas(image_paths, images):
 
 
 def run_tests_preferences(image_paths, images):
-    run_test(description="jean boho chic", image_paths=image_paths,
+    run_test(description="boho chic", image_paths=image_paths,
              images=images, has=True, clasification_img="bohochic")
+
+    run_test(description="pantalon boho chic", image_paths=image_paths,
+             images=images, has=True, clasification_img="pantalon bohochic")
+
+    run_test(description="pollera boho chic", image_paths=image_paths,
+             images=images, has=True, clasification_img="pollera bohochic")
 
     run_test(description="jean old money", image_paths=image_paths,
              images=images, has=True, clasification_img="oldmoney")
@@ -172,8 +178,8 @@ if __name__ == "__main__":
 
     input_folder = "images-testing-preferences"
     output_folder = "images-testing-preferences-nobg"
-    # run_tests(input_folder, output_folder, run_tests_preferences)
+    run_tests(input_folder, output_folder, run_tests_preferences)
 
     input_folder = "images_testing_general"
     output_folder = "images-testing-general-nobg"
-    run_tests(input_folder, output_folder, run_tests_general)
+    # run_tests(input_folder, output_folder, run_tests_general)
