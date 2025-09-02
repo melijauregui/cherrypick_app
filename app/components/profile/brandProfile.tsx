@@ -17,7 +17,8 @@ import EditBrandProfile from "./editBrandProfile";
 import splitDescriptionByLinesOrWords, {
   AddAndDeleteItems,
 } from "./brandComponents";
-import { FormData, InsertNewItemsModal } from "./insertNewItems";
+import { InsertNewItemsModal } from "./insertNewItems";
+import { FormDataItem } from "@/app/utils/update";
 import { CustomBottomLogout } from "./bottomSheets";
 import { router } from "expo-router";
 import { getBrandItems, getSelfBrandItems } from "@/app/utils/fetch";
@@ -101,7 +102,7 @@ const BrandProfile = ({
               name: "",
               price: "",
               url: "",
-              image_url: "",
+              imageUrl: "",
               description: "",
             }}
           />
@@ -137,7 +138,7 @@ const BrandProfile = ({
 
 export default BrandProfile;
 
-const handleSubmitAddItem = (data: FormData) => {
+const handleSubmitAddItem = (data: FormDataItem) => {
   // console.log("Form submitted with data:", data);
 };
 

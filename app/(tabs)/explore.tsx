@@ -1,16 +1,29 @@
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import React, { useEffect, useState } from "react";
 import { TextInput, View, Image } from "react-native";
-import icons from "../../constants/icons";
+import { useRouter } from "expo-router";
 import List2 from "@/app/components/List2";
-import { CatalogItemSchemaType } from "@/schemas/catalog/catalog-schema";
+import { ItemSchemaType } from "@/schemas/catalog/catalog-schema";
 import { getClothingItemsHome } from "@/app/utils/fetch";
+import { Ionicons } from "@expo/vector-icons";
 
 const Explore = () => {
-  const [clothingItems, setClothingItems] = useState<CatalogItemSchemaType[]>(
-    []
-  );
+  const [clothingItems, setClothingItems] = useState<ItemSchemaType[]>([]);
   const [searchText, onChangeTextSearch] = React.useState("");
+  const router = useRouter();
+
+  const handleSearch = () => {
+    if (searchText.trim() === "") {
+      return;
+    }
+    router.push({
+      pathname: "/(search)/[query]",
+      params: {
+        query: searchText.trim(),
+      },
+    });
+    onChangeTextSearch("");
+  };
 
   useEffect(() => {
     const fetchClothingItems = async () => {
@@ -24,20 +37,18 @@ const Explore = () => {
   return (
     <SafeAreaProvider>
       <SafeAreaView className="bg-brown-strong w-full flex-1 ">
-        <View className="">
+        <View className="bg-transparent border border-white rounded-full mx-4 px-4 py-5 my-2 flex-row items-center">
+          <Ionicons name="search-outline" size={20} color="#ffffff" />
           <TextInput
-            className="bg-[#212121] rounded-full p-2 mx-4 pl-10 py-5 text-white font-pregular my-2"
+            className="text-lg text-white font-pregular flex-1 mx-3"
             onChangeText={onChangeTextSearch}
             value={searchText}
-            placeholder="Search"
+            placeholder="Search Item"
             placeholderTextColor="#999999"
+            onSubmitEditing={handleSearch}
+            returnKeyType="search"
           />
-          <Image
-            className="absolute  mx-7 my-7 w-5 h-5"
-            tintColor="#999999"
-            source={icons.search}
-            resizeMode="contain"
-          />
+          <Ionicons name="camera-outline" size={21} color="#ffffff" />
         </View>
 
         <List2

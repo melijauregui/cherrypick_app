@@ -252,9 +252,9 @@ const ItemDetailComponent = ({
         className="flex-row items-center gap-2"
         onPress={() => {
           router.push({
-            pathname: "/(brand)/[id]/brand-profile",
+            pathname: "/(brand)/[id]",
             params: {
-              id: brand?.id,
+              id: brand?.id || "",
             },
           });
         }}

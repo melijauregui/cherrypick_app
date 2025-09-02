@@ -83,6 +83,13 @@ const RootLayout = () => {
             animation: "slide_from_right",
           }}
         />
+        <Stack.Screen
+          name="(search)"
+          options={{
+            headerShown: false,
+            animation: "slide_from_right",
+          }}
+        />
       </Stack>
       <Toast config={toastConfig} />
     </QueryClientProvider>
