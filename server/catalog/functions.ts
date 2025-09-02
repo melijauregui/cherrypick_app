@@ -9,7 +9,7 @@ import {
 } from "@/schemas/catalog/catalog-schema";
 import weaviate, { Collection, Filters } from "weaviate-client";
 import { ErrorSchemaType } from "@/schemas/standar-response-schema";
-import { config } from "../config";
+import { config } from "../../config";
 import logger from "../logger";
 
 //funcion para hacer query a pinecone

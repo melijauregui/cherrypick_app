@@ -13,6 +13,8 @@
     "**/*.ts",
     "**/*.tsx",
     "nativewind-env.d.ts",
-    ".eslintrc.json"
+    ".eslintrc.json",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts"
   ]
 }

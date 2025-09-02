@@ -101,7 +101,7 @@ export async function UpdateItem(
   if (updatedItem.price !== undefined)
     propertiesToUpdate.price = updatedItem.price;
   if (updatedItem.imageUrl !== undefined)
-    propertiesToUpdate.image_url = updatedItem.imageUrl;
+    propertiesToUpdate.imageUrl = updatedItem.imageUrl;
   if (updatedItem.url !== undefined) propertiesToUpdate.url = updatedItem.url;
 
   const vectorsToUpdate: any = {};
