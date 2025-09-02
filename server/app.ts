@@ -6,6 +6,7 @@ import ClientApp from "./client/routes";
 import BrandApp from "./brand/routes";
 import FeedApp from "./feed/routes";
 import ItemApp from "./item/routes";
+import SearchApp from "./search/routes";
 
 export type AppEnv = {
   Variables: {
@@ -51,3 +52,4 @@ app.route("/client", ClientApp);
 app.route("/brand", BrandApp);
 app.route("/feed", FeedApp);
 app.route("/item", ItemApp);
+app.route("/search", SearchApp);

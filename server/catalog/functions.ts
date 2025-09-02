@@ -58,7 +58,7 @@ export async function GetCatalog(
         // Validar el item usando Zod schema
         const validationResult = ItemSchema.safeParse(item);
         if (!validationResult.success) {
-          console.log("Item validation failed:", validationResult.error);
+          logger.warn("Item validation failed:", validationResult.error);
           return null;
         }
         return validationResult.data;
@@ -129,7 +129,7 @@ export async function GetItemsUuidNamesFromBrand(
 // Función para extraer características de imagen desde URL
 export async function extractImageFeatures(
   imageUrl: string
-): Promise<number[]> {
+): Promise<{ error: boolean; details: string; features: number[] }> {
   try {
     const response = await fetch(
       "http://127.0.0.1:8000/extract-image-features/",
@@ -147,15 +147,25 @@ export async function extractImageFeatures(
     }
 
     const result = await response.json();
-    return result;
+    return {
+      error: false,
+      details: "Image features extracted successfully",
+      features: result,
+    };
   } catch (error) {
     console.error("Error extracting image features:", error);
-    throw error;
+    return {
+      error: true,
+      details: "Error extracting image features",
+      features: [],
+    };
   }
 }
 
 // Función para extraer características de texto
-export async function extractTextFeatures(text: string): Promise<number[]> {
+export async function extractTextFeatures(
+  text: string
+): Promise<{ error: boolean; details: string; features: number[] }> {
   try {
     const response = await fetch(
       "http://127.0.0.1:8000/extract-text-features/",
@@ -173,10 +183,18 @@ export async function extractTextFeatures(text: string): Promise<number[]> {
     }
 
     const result = await response.json();
-    return result;
+    return {
+      error: false,
+      details: "Text features extracted successfully",
+      features: result,
+    };
   } catch (error) {
     console.error("Error extracting text features:", error);
-    throw error;
+    return {
+      error: true,
+      details: "Error extracting text features",
+      features: [],
+    };
   }
 }
 

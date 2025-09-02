@@ -87,9 +87,18 @@ export async function insertCatalogItemsToWeaviate(
     for (const item of catalogItems) {
       try {
         const imageFeatures = await extractImageFeatures(item.imageUrl);
+        if (imageFeatures.error) {
+          throw new Error(imageFeatures.details);
+        }
         const textFeatures = await extractTextFeatures(item.description);
+        if (textFeatures.error) {
+          throw new Error(textFeatures.details);
+        }
 
-        if (imageFeatures.length === 0 && textFeatures.length === 0) {
+        if (
+          imageFeatures.features.length === 0 &&
+          textFeatures.features.length === 0
+        ) {
           throw new Error(
             "No se pudieron extraer características de la imagen o el texto"
           );

@@ -3,9 +3,12 @@ import { View, TextInput, Text } from "react-native";
 import { useRouter } from "expo-router";
 import { Entypo, Ionicons } from "@expo/vector-icons";
 import List2 from "@/app/components/List2";
-import { getClothingItemsHome } from "@/app/utils/fetch";
+import {
+  getClothingItemsHome,
+  getClothingItemsTextSearch,
+} from "@/app/utils/fetch";
 
-export const PageExplore = ({
+const PageExplore = ({
   query,
   isExplorePage,
 }: {
@@ -33,7 +36,7 @@ export const PageExplore = ({
     onChangeTextSearch(query as string);
   };
   return (
-    <View>
+    <View className="flex-1">
       <View className="flex-row items-center px-4 py-2">
         {!isExplorePage && (
           <Entypo
@@ -59,12 +62,27 @@ export const PageExplore = ({
         </View>
       </View>
 
-      <List2
-        queryKey={["search-results", query]}
-        getClothingItems={getClothingItemsHome}
-        limit={10}
-        columnCount={2}
-      />
+      {isExplorePage && (
+        <List2
+          queryKey={["explore-items"]}
+          getClothingItems={getClothingItemsHome}
+          limit={10}
+          columnCount={2}
+        />
+      )}
+
+      {!isExplorePage && (
+        <List2
+          queryKey={["search-results", query]}
+          getClothingItems={(page, limit) =>
+            getClothingItemsTextSearch(query, page, limit)
+          }
+          limit={10}
+          columnCount={2}
+        />
+      )}
     </View>
   );
 };
+
+export default PageExplore;

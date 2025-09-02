@@ -108,12 +108,24 @@ export async function UpdateItem(
   if (updatedItem.imageUrl) {
     console.log("extracting image features");
     const imageFeatures = await extractImageFeatures(updatedItem.imageUrl);
-    vectorsToUpdate.image_vector = imageFeatures;
+    if (imageFeatures.error) {
+      return {
+        error: true,
+        details: imageFeatures.details,
+      };
+    }
+    vectorsToUpdate.image_vector = imageFeatures.features;
   }
   if (updatedItem.description) {
     console.log("extracting text features");
     const textFeatures = await extractTextFeatures(updatedItem.description);
-    vectorsToUpdate.text_vector = textFeatures;
+    if (textFeatures.error) {
+      return {
+        error: true,
+        details: textFeatures.details,
+      };
+    }
+    vectorsToUpdate.text_vector = textFeatures.features;
   }
 
   const updateData: any = {

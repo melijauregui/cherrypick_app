@@ -336,3 +336,23 @@ export const getAllFavoritedItems = async (
   );
   return res?.items || [];
 };
+
+export const getClothingItemsTextSearch = async (
+  query: string,
+  page: number,
+  limit: number
+): Promise<ItemSchemaType[]> => {
+  console.log("getClothingItemsTextSearch", page, limit);
+  const res = await handleApiResponse<{
+    items: ItemSchemaType[];
+  }>(
+    () =>
+      safeFetch({
+        url: `http://${LOCAL_IP}:3000/search/text/${query}?page=${page}&limit=${limit}`,
+        method: "GET",
+      }),
+    CatalogResponseSchema,
+    "getClothingItemsTextSearch"
+  );
+  return res?.items || [];
+};
