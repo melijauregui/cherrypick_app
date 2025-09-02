@@ -48,7 +48,7 @@ export async function searchItemsByText(
 
   // First try: nearVector with text_vector
   const queryOptions = {
-    limit: 3,
+    limit: limit,
     offset: offset,
     returnProperties: [
       "name",
@@ -59,7 +59,7 @@ export async function searchItemsByText(
       "price",
     ],
     nearVector: {
-      text_vector: emb, // Use the named vector key
+      text_vector: textEmbeddingResponse.features, // Use the named vector key
     },
     targetVector: ["text_vector"], // Specify which vector space to search
   };

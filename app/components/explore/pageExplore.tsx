@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { View, TextInput, Text } from "react-native";
+import {
+  View,
+  TextInput,
+  Text,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
 import { useRouter } from "expo-router";
 import { Entypo, Ionicons } from "@expo/vector-icons";
 import List2 from "@/app/components/List2";
@@ -7,6 +14,67 @@ import {
   getClothingItemsHome,
   getClothingItemsTextSearch,
 } from "@/app/utils/fetch";
+import { useQuery } from "@tanstack/react-query";
+import LoadingPage from "../LoadingPage";
+import { ItemSchemaType } from "@/schemas/catalog/catalog-schema";
+
+// Componente para mostrar ideas de moda
+const FashionIdeasSection = ({ query }: { query: string }) => {
+  const router = useRouter();
+
+  const handleNavigateToSearch = () => {
+    router.push({
+      pathname: "/(search)/[query]",
+      params: {
+        query: query,
+      },
+    });
+  };
+
+  return (
+    <View className="mb-6">
+      <View className="flex-row items-center justify-between px-4 mb-4">
+        <View>
+          <Text className="text-white text-sm font-pregular opacity-80">
+            Ideas para ti
+          </Text>
+          <Text className="text-white text-xl font-pbold">{query}</Text>
+        </View>
+        <TouchableOpacity
+          onPress={handleNavigateToSearch}
+          className="rounded-full p-2"
+        >
+          <Ionicons name="chevron-forward" size={24} color="#ffffff" />
+        </TouchableOpacity>
+      </View>
+
+      <GridImages query={query} />
+    </View>
+  );
+};
+
+const GridImages = ({ query }: { query: string }) => {
+  const { data } = useQuery({
+    queryKey: ["explore-items", query],
+    queryFn: () => getClothingItemsTextSearch(query, 0, 4),
+  });
+  if (!data) {
+    return <LoadingPage alreadyPrefetched={true} />;
+  }
+  return (
+    <View className="flex-row px-1 gap-0.5">
+      {data.map((item: ItemSchemaType, index: number) => (
+        <View className="flex-1">
+          <Image
+            source={{ uri: item.imageUrl }}
+            className={`w-full h-60 ${index === 0 ? "rounded-l-xl" : index === data.length - 1 ? "rounded-r-xl" : ""}`}
+            resizeMode="cover"
+          />
+        </View>
+      ))}
+    </View>
+  );
+};
 
 const PageExplore = ({
   query,
@@ -35,6 +103,7 @@ const PageExplore = ({
     });
     onChangeTextSearch(query as string);
   };
+
   return (
     <View className="flex-1">
       <View className="flex-row items-center px-4 py-2">
@@ -63,12 +132,14 @@ const PageExplore = ({
       </View>
 
       {isExplorePage && (
-        <List2
-          queryKey={["explore-items"]}
-          getClothingItems={getClothingItemsHome}
-          limit={10}
-          columnCount={2}
-        />
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <FashionIdeasSection query={"Minimalist"} />
+          <FashionIdeasSection query={"Coquette"} />
+          <FashionIdeasSection query={"Streetwear"} />
+          <FashionIdeasSection query={"Sporty"} />
+          <FashionIdeasSection query={"Old money"} />
+          <FashionIdeasSection query={"Boho-chic"} />
+        </ScrollView>
       )}
 
       {!isExplorePage && (

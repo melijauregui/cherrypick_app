@@ -3,7 +3,7 @@ import { AppEnv } from "../app";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { Context } from "hono";
 import { errorHandler } from "../errorHandler";
-import { QuerySchema, QuerySchemaType } from "@/schemas/search/search-schema";
+import { QuerySchema } from "@/schemas/search/search-schema";
 import {
   CatalogResponseSchema,
   CatalogResponseSchemaType,
