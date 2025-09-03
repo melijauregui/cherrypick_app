@@ -58,13 +58,13 @@ export async function searchItemsByText(
       "brandId",
       "price",
     ],
-    nearVector: {
-      text_vector: textEmbeddingResponse.features, // Use the named vector key
-    },
-    targetVector: ["text_vector"], // Specify which vector space to search
+    targetVector: ["image_vector"], // Specify which vector space to search
   };
 
-  result = await collection.query.fetchObjects(queryOptions);
+  result = await collection.query.nearVector(
+    textEmbeddingResponse.features,
+    queryOptions
+  );
 
   logger.info(
     "Weaviate search completed, found %s objects",
