@@ -10,10 +10,7 @@ import {
 import { useRouter } from "expo-router";
 import { Entypo, Ionicons } from "@expo/vector-icons";
 import List2 from "@/app/components/List2";
-import {
-  getClothingItemsHome,
-  getClothingItemsTextSearch,
-} from "@/app/utils/fetch";
+import { getClothingItemsTextSearch } from "@/app/utils/fetch";
 import { useQuery } from "@tanstack/react-query";
 import LoadingPage from "../LoadingPage";
 import { ItemSchemaType } from "@/schemas/catalog/catalog-schema";
@@ -69,7 +66,7 @@ const PageExplore = ({
             onSubmitEditing={handleSearch}
             returnKeyType="search"
           />
-          <TouchableOpacity onPress={() => {}}>
+          <TouchableOpacity onPress={() => router.push("/camera")}>
             <Ionicons name="camera-outline" size={21} color="#ffffff" />
           </TouchableOpacity>
         </View>
