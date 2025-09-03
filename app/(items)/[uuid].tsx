@@ -41,6 +41,7 @@ import { prefetchBrandPageItem } from "@/app/utils/prefetchs";
 import List2 from "@/app/components/List2";
 import { ItemSchemaType } from "@/schemas/catalog/catalog-schema";
 import { BrandSchemaPropertiesType } from "@/schemas/brand/brand-schema";
+import ImageComplete from "../components/ImageComplete";
 
 const ItemDetail = () => {
   const params = useLocalSearchParams();
@@ -84,7 +85,7 @@ const ItemDetail = () => {
   const content = (
     <>
       <View className="relative">
-        <ImageComponent imageUrl={item.imageUrl} url={item.url} />
+        <ImageComplete imageUrl={item.imageUrl} url={item.url} />
       </View>
 
       <View className="px-5 flex flex-col gap-6">
@@ -166,58 +167,6 @@ const ItemDetail = () => {
 };
 
 export default ItemDetail;
-
-const ImageComponent = ({
-  imageUrl,
-  url,
-}: {
-  imageUrl: string;
-  url: string;
-}) => {
-  const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
-  const [imageHeight, setImageHeight] = useState(0);
-
-  const calculateImageHeight = (imageWidth: number, imageHeight: number) => {
-    const aspectRatio = imageHeight / imageWidth;
-    return screenWidth * aspectRatio;
-  };
-
-  useEffect(() => {
-    Image.getSize(
-      imageUrl,
-      (width, height) => {
-        const calculatedHeight = calculateImageHeight(width, height);
-        setImageHeight(calculatedHeight);
-      },
-      error => {
-        Toast.show({
-          type: "error",
-          text1: "Error loading image size",
-          text2: error.message,
-          visibilityTime: 4000,
-        });
-        console.error("Error loading image size:", error);
-      }
-    );
-  }, [imageUrl]);
-
-  return (
-    <TouchableOpacity
-      onPress={() => {
-        if (url) {
-          Linking.openURL(url);
-        }
-      }}
-    >
-      <Image
-        className="rounded-3xl"
-        source={{ uri: imageUrl }}
-        style={{ width: screenWidth, height: imageHeight }}
-        resizeMode="cover"
-      />
-    </TouchableOpacity>
-  );
-};
 
 const ItemDetailComponent = ({
   item,

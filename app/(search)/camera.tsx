@@ -4,65 +4,55 @@ import {
   FlashMode,
   useCameraPermissions,
 } from "expo-camera";
-import { useRef, useState } from "react";
-import { Button, Pressable, Text, View, StatusBar } from "react-native";
+import { useCallback, useRef, useState } from "react";
+import {
+  Button,
+  Pressable,
+  Text,
+  View,
+  StatusBar,
+  StyleSheet,
+  Dimensions,
+  ScrollView,
+} from "react-native";
 import { Image } from "expo-image";
-import { Entypo, FontAwesome6, MaterialIcons } from "@expo/vector-icons";
+import {
+  Entypo,
+  Feather,
+  FontAwesome6,
+  MaterialIcons,
+  SimpleLineIcons,
+} from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import * as ImagePicker from "expo-image-picker";
+import { useMediaLibraryPermissions } from "expo-image-picker";
+import ImageComplete from "../components/ImageComplete";
+import BottomSheet, {
+  BottomSheetScrollView,
+  BottomSheetView,
+} from "@gorhom/bottom-sheet";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import EditBrandProfile from "../components/profile/editBrandProfile";
+import BottomSheetSame from "../components/profile/bottomSheets";
+import List2 from "../components/List2";
+import { getClothingItemsSimilar } from "../utils/fetch";
+import { Socket } from "dgram";
 
 const CameraPage = () => {
-  const [permission, requestPermission] = useCameraPermissions();
-  const ref = useRef<CameraView>(null);
   const [uri, setUri] = useState<string | null>(null);
-  const [facing, setFacing] = useState<CameraType>("back");
-  const [showCamera, setShowCamera] = useState(false);
-  const [showGallery, setShowGallery] = useState(false);
-  const [flash, setFlash] = useState<FlashMode>("off");
-
-  if (!permission) {
-    return null;
-  }
-
-  if (!permission.granted) {
-    return (
-      <View className="flex-1 bg-white items-center justify-center">
-        <Text style={{ textAlign: "center" }}>
-          We need your permission to use the camera
-        </Text>
-        <Button onPress={requestPermission} title="Grant permission" />
-      </View>
-    );
-  }
-
-  const takePicture = async () => {
-    const photo = await ref.current?.takePictureAsync();
-    setUri(photo?.uri || null);
-  };
-
-  const toggleFacing = () => {
-    setFacing(prev => (prev === "back" ? "front" : "back"));
-  };
 
   return (
     <>
       <StatusBar hidden={true} />
-      <View style={{ flex: 1, backgroundColor: "black" }}>
+      <GestureHandlerRootView style={{ flex: 1, backgroundColor: "black" }}>
         <View className="flex-1 bg-black w-full">
           {uri ? (
             <RenderPicture uri={uri} setUri={setUri} />
           ) : (
-            <RenderCamera
-              refCamera={ref}
-              facing={facing}
-              flash={flash}
-              setShowCamera={setShowCamera}
-              takePicture={takePicture}
-              toggleFacing={toggleFacing}
-              setFlash={setFlash}
-            />
+            <RenderCamera setImage={setUri} />
           )}
         </View>
-      </View>
+      </GestureHandlerRootView>
     </>
   );
 };
@@ -70,38 +60,31 @@ const CameraPage = () => {
 export default CameraPage;
 
 const RenderCamera = ({
-  refCamera,
-  facing,
-  flash,
-  setShowCamera,
-  takePicture,
-  toggleFacing,
-  setFlash,
+  setImage,
 }: {
-  refCamera: React.RefObject<CameraView>;
-  facing: CameraType;
-  flash: FlashMode;
-  setShowCamera: (show: boolean) => void;
-  takePicture: () => void;
-  toggleFacing: () => void;
-  setFlash: (flash: FlashMode) => void;
+  setImage: (image: string | null) => void;
 }) => {
+  const refCamera = useRef<CameraView>(null);
+  const [facing, setFacing] = useState<CameraType>("back");
+  const [flash, setFlash] = useState<FlashMode>("off");
+  const toggleFacing = () => {
+    setFacing(prev => (prev === "back" ? "front" : "back"));
+  };
+  const takePicture = async () => {
+    const photo = await refCamera.current?.takePictureAsync();
+    setImage(photo?.uri || null);
+  };
   return (
     <View className="flex-1 w-full">
-      <CameraView
-        className="flex-1 w-full"
-        ref={refCamera}
-        mode={"picture"}
+      <CamaraView
+        refCamera={refCamera}
         facing={facing}
-        mute={true}
-        responsiveOrientationWhenOrientationLocked
         flash={flash}
+        setUri={setImage}
       />
       <Controls flash={flash} setFlash={setFlash} />
       <View className="absolute bottom-14 items-center left-0 w-full flex-row justify-between px-16">
-        <Pressable onPress={() => setShowCamera(false)}>
-          <Entypo name="images" size={30} color="white" />
-        </Pressable>
+        <ImagePickerButton setImage={setImage} />
         <Pressable onPress={takePicture}>
           {({ pressed }) => (
             <View
@@ -119,6 +102,151 @@ const RenderCamera = ({
   );
 };
 
+const Controls = ({
+  flash,
+  setFlash,
+  setUri,
+}: {
+  flash?: FlashMode;
+  setFlash?: (flash: FlashMode) => void;
+  setUri?: (uri: string | null) => void;
+}) => {
+  const router = useRouter();
+  return (
+    <View
+      className={`absolute flex-row justify-between items-center w-full ${
+        setUri ? "px-6 top-16" : "px-12 top-20"
+      }`}
+    >
+      <View className="flex-col items-center gap-3">
+        <Pressable
+          className={`${
+            !setFlash
+              ? "bg-black items-center justify-center w-12 h-12 rounded-2xl opacity-80 "
+              : ""
+          }`}
+          onPress={() => router.back()}
+        >
+          <Entypo name="chevron-thin-left" size={22} color="white" />
+        </Pressable>
+        {setUri && (
+          <Pressable
+            className="bg-black items-center justify-center w-12 h-12 rounded-2xl opacity-80"
+            onPress={() => setUri(null)}
+          >
+            <SimpleLineIcons name="camera" size={20} color="white" />
+          </Pressable>
+        )}
+      </View>
+      {setFlash && (
+        <Pressable
+          onPress={() =>
+            setFlash(flash === "off" ? "auto" : flash === "auto" ? "on" : "off")
+          }
+        >
+          <MaterialIcons
+            name={
+              flash === "off"
+                ? "flash-off"
+                : flash === "auto"
+                  ? "flash-auto"
+                  : "flash-on"
+            }
+            size={27}
+            color="white"
+          />
+        </Pressable>
+      )}
+    </View>
+  );
+};
+
+export const ImagePickerButton = ({
+  setImage,
+}: {
+  setImage: (image: string | null) => void;
+}) => {
+  const [mediaLibraryPermission, requestMediaLibraryPermission] =
+    useMediaLibraryPermissions();
+
+  if (!mediaLibraryPermission) {
+    return null;
+  }
+
+  const pickImage = async () => {
+    if (!mediaLibraryPermission?.granted) {
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        alert("Sorry, we need camera roll permissions to make this work!");
+        return;
+      }
+    }
+
+    // Launch image picker with proper configuration for iOS
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: false,
+      quality: 1,
+      allowsMultipleSelection: false,
+      presentationStyle: ImagePicker.UIImagePickerPresentationStyle.FULL_SCREEN,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setImage(result.assets[0]?.uri || null);
+    }
+  };
+
+  return (
+    <Pressable onPress={pickImage}>
+      <Entypo name="images" size={30} color="white" />
+    </Pressable>
+  );
+};
+
+const CamaraView = ({
+  refCamera,
+  facing,
+  flash,
+  setUri,
+}: {
+  refCamera: React.RefObject<CameraView>;
+  facing: CameraType;
+  flash: FlashMode;
+  setUri: (uri: string | null) => void;
+}) => {
+  const [permission, requestPermission] = useCameraPermissions();
+
+  if (!permission) {
+    return null;
+  }
+
+  if (!permission.granted) {
+    return (
+      <View className="flex-1 bg-white items-center justify-center">
+        <Text style={{ textAlign: "center" }}>
+          We need your permission to use the camera
+        </Text>
+        <Button onPress={requestPermission} title="Grant permission" />
+      </View>
+    );
+  }
+
+  return (
+    <CameraView
+      className="flex-1 w-full"
+      ref={refCamera}
+      mode={"picture"}
+      facing={facing}
+      mute={true}
+      responsiveOrientationWhenOrientationLocked
+      flash={flash}
+    />
+  );
+};
+
 const RenderPicture = ({
   uri,
   setUri,
@@ -126,49 +254,169 @@ const RenderPicture = ({
   uri: string | null;
   setUri: (uri: string | null) => void;
 }) => {
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const handleSheetChanges = useCallback((index: number) => {}, []);
+  const { height: screenHeight } = Dimensions.get("window");
+  const [imageHeight, setImageHeight] = useState(0);
   if (!uri) return null;
+
+  const minHeight = Math.max(screenHeight - imageHeight, 400);
+
   return (
-    <View>
-      <Image
-        source={{ uri }}
-        contentFit="contain"
-        style={{ width: 300, aspectRatio: 1 }}
-      />
-      <Button onPress={() => setUri(null)} title="Take another picture" />
-    </View>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <View className="flex-1 w-full bg-brown-strong">
+        <ImageComplete
+          imageUrl={uri}
+          setImageHeighteExternal={setImageHeight}
+        />
+        <Controls setUri={setUri} />
+        <BottomSheet
+          ref={bottomSheetRef}
+          onChange={handleSheetChanges}
+          index={0}
+          enableDynamicSizing={false}
+          snapPoints={[minHeight, "100%"]}
+          enableOverDrag={false}
+          backgroundStyle={{ backgroundColor: "#301c11" }}
+          handleIndicatorStyle={{
+            backgroundColor: "gray",
+            padding: 2,
+            marginTop: 4,
+          }}
+          enablePanDownToClose={false}
+        >
+          <View className="flex flex-row justify-center py-3 px-6">
+            <Text className="text-white text-lg font-psemibold">
+              Items Similares
+            </Text>
+          </View>
+          <List2
+            queryKey={["similar-items", uri]}
+            getClothingItems={getClothingItemsSimilar}
+            limit={6}
+            columnCount={2}
+          />
+        </BottomSheet>
+      </View>
+    </GestureHandlerRootView>
   );
 };
 
-const Controls = ({
-  flash,
-  setFlash,
-}: {
-  flash: FlashMode;
-  setFlash: (flash: FlashMode) => void;
-}) => {
-  const router = useRouter();
+const Texts = () => {
   return (
-    <View className="absolute top-20 px-12 flex-row justify-between items-center w-full">
-      <Pressable className="" onPress={() => router.back()}>
-        <Entypo name="chevron-thin-left" size={22} color="white" />
-      </Pressable>
-      <Pressable
-        onPress={() =>
-          setFlash(flash === "off" ? "auto" : flash === "auto" ? "on" : "off")
-        }
-      >
-        <MaterialIcons
-          name={
-            flash === "off"
-              ? "flash-off"
-              : flash === "auto"
-                ? "flash-auto"
-                : "flash-on"
-          }
-          size={27}
-          color="white"
-        />
-      </Pressable>
-    </View>
+    <ScrollView>
+      <Text>HOOOOLAAA</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>SIIIIIIIIIIIIIIIII</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>dfshjbhjshbjhfsbjgjf</Text>
+      <Text>MELIIIII</Text>
+    </ScrollView>
   );
 };

@@ -5,6 +5,13 @@
 - database: (cd database && source .venv/bin/activate) uvicorn server:app --reload 
 - ejecutar script: node test-endpoints/test-catalog-upload.js
 
+en ios dentro de Info.plist:
+<key>NSCameraUsageDescription</key>
+<string>Necesitamos acceso a la cámara para tomar fotos y grabar videos.</string>
+<key>NSPhotoLibraryUsageDescription</key>
+<string>Permitir que Cherrypick acceda a tus foto.</string>
+
+
 # Ejemplo en endpoint 3000 en server
 http://localhost:3000/images/jean.webp
 

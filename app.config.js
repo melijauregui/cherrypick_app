@@ -30,6 +30,8 @@ export default ({ config }) => ({
           "Esta aplicación necesita acceso a la cámara para tomar fotos y grabar videos.",
         NSMicrophoneUsageDescription:
           "Esta aplicación necesita acceso al micrófono para grabar videos.",
+        NSPhotoLibraryUsageDescription:
+          "Esta aplicación necesita acceso a tu biblioteca de fotos para seleccionar imágenes.",
       },
       build: {
         production: {
@@ -75,6 +77,12 @@ export default ({ config }) => ({
           microphonePermission:
             "Permitir que Cherrypick acceda a tu micrófono para grabar videos.",
           enableMicrophonePermission: true,
+        },
+      ],
+      [
+        "expo-image-picker",
+        {
+          photosPermission: "Permitir que Cherrypick acceda a tus foto.",
         },
       ],
     ],
