@@ -7,7 +7,7 @@ import {
   FlatList,
 } from "react-native";
 import React, { useState } from "react";
-import LogoCircle from "@/app/components/LogoCircle";
+import LogoCircle from "@/app/components/logo/LogoCircle";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import images from "../../constants/images";

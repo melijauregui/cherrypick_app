@@ -1,7 +1,7 @@
 import { ScrollView, Text, View, TouchableOpacity, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useEffect, useState } from "react";
-import LogoCircle from "@/app/components/LogoCircle";
+import LogoCircle from "@/app/components/logo/LogoCircle";
 import { router } from "expo-router";
 import { authClient, useSession } from "@/lib/auth-client";
 

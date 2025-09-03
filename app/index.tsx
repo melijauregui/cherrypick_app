@@ -3,7 +3,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
 import AppName from "@/app/components/AppName";
-import LogoSquareBeige from "@/app/components/LogoSquareBeige";
+import LogoSquareBeige from "@/app/components/logo/LogoSquareBeige";
 import "../global.css";
 import { Redirect } from "expo-router";
 import { authClient } from "@/lib/auth-client";

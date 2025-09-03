@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from "react";
-import LogoCircle from "@/app/components/LogoCircle";
+import LogoCircle from "@/app/components/logo/LogoCircle";
 import safeFetch from "@/app/utils/safe-fetch";
 import { useRouter } from "expo-router";
 import { LOCAL_IP } from "../../config/api";

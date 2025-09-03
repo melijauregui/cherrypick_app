@@ -1,7 +1,7 @@
 import { ScrollView, Text, View, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React from "react";
-import LogoCircle from "@/app/components/LogoCircle";
+import LogoCircle from "@/app/components/logo/LogoCircle";
 import { router } from "expo-router";
 
 const ErrorPage = () => {

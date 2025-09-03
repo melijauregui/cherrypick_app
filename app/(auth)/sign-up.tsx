@@ -10,7 +10,7 @@ import {
 import { format } from "date-fns";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from "react";
-import LogoCircle from "@/app/components/LogoCircle";
+import LogoCircle from "@/app/components/logo/LogoCircle";
 import safeFetch from "@/app/utils/safe-fetch";
 import DatePicker from "react-native-date-picker";
 import { useRouter } from "expo-router";
