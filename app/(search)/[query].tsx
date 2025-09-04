@@ -1,5 +1,4 @@
 import React from "react";
-import { SafeAreaView } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useLocalSearchParams } from "expo-router";
 import PageExplore from "../components/explore/pageExplore";

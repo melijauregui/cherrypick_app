@@ -74,9 +74,6 @@ export default ({ config }) => ({
         {
           cameraPermission:
             "Permitir que Cherrypick acceda a tu cámara para tomar fotos y grabar videos.",
-          microphonePermission:
-            "Permitir que Cherrypick acceda a tu micrófono para grabar videos.",
-          enableMicrophonePermission: true,
         },
       ],
       [

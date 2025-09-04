@@ -3,7 +3,8 @@ import React from "react";
 import { Tabs, router } from "expo-router";
 import icons from "../../constants/icons";
 import { OnlyAuthenticated } from "@/lib/auth-client";
-import { Ionicons, Octicons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
+import { Octicons, Foundation } from "@expo/vector-icons";
 
 const TabsLayout = () => {
   return (
@@ -14,13 +15,12 @@ const TabsLayout = () => {
           title: "Home",
           icon: icons.home,
           iconName: "Home",
-          // Icon: ({ color, focused }) => (
-          //   <Ionicons
-          //     name={focused ? "home" : "home-outline"}
-          //     size={26}
-          //     color={color}
-          //   />
-          // ),
+          Icon: ({ color, focused }) =>
+            focused ? (
+              <Foundation name="home" size={27} color={color} />
+            ) : (
+              <Octicons name="home" size={24} color={color} />
+            ),
         })}
         {Page({
           name: "explore",

@@ -11,14 +11,10 @@ import {
   Text,
   View,
   StatusBar,
-  StyleSheet,
   Dimensions,
-  ScrollView,
 } from "react-native";
-import { Image } from "expo-image";
 import {
   Entypo,
-  Feather,
   FontAwesome6,
   MaterialIcons,
   SimpleLineIcons,
@@ -27,16 +23,10 @@ import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import { useMediaLibraryPermissions } from "expo-image-picker";
 import ImageComplete from "../components/ImageComplete";
-import BottomSheet, {
-  BottomSheetScrollView,
-  BottomSheetView,
-} from "@gorhom/bottom-sheet";
+import BottomSheet from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import EditBrandProfile from "../components/profile/editBrandProfile";
-import BottomSheetSame from "../components/profile/bottomSheets";
 import List2 from "../components/List2";
 import { getClothingItemsSimilar } from "../utils/fetch";
-import { Socket } from "dgram";
 
 const CameraPage = () => {
   const [uri, setUri] = useState<string | null>(null);
