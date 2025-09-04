@@ -25,8 +25,18 @@ print("Model and processor loaded successfully!")
 @app.post("/extract-image-features/")
 async def extract_image_features(request: dict):
     try:
-        image_url = request.get("image_url", "")
-        X = extract_feat_image_url(image_url)
+        # Check if we have image_url or image_base64
+        if "image_url" in request and request["image_url"]:
+            print("Obteniendo features de imagen url")
+            image_url = request.get("image_url", "")
+            X = extract_feat_image_url(image_url)
+        elif "image_base64" in request and request["image_base64"]:
+            print("Obteniendo features de imagen base64")
+            image_base64 = request.get("image_base64", "")
+            X = extract_feat_image_base64(image_base64)
+        else:
+            return {"error": "Either image_url or image_base64 must be provided"}
+        
         return X[0].tolist()
 
     except Exception as e:
@@ -36,6 +46,7 @@ async def extract_image_features(request: dict):
 @app.post("/extract-text-features/")
 async def extract_text_features(request: dict):
     try:
+        print("Obteniendo features de texto")
         text = request.get("text", "")
         X = extract_feat_text(text)
         return X[0].tolist()
@@ -67,6 +78,30 @@ def extract_feat_image_url(image_url: str):
         raise Exception(f"Error downloading image from URL: {str(e)}")
     except Exception as e:
         raise Exception(f"Error processing image from URL: {str(e)}")
+
+
+def extract_feat_image_base64(image_base64: str):
+    """
+    Extrae características de una imagen desde datos base64
+    """
+    try:
+        import base64
+        
+        # Decodificar base64
+        image_data = base64.b64decode(image_base64)
+        
+        # Cargar y procesar imagen
+        image = Image.open(BytesIO(image_data)).convert("RGB")
+        image_inputs = processor(images=image, return_tensors="pt", padding=True, truncation=True).to(device)
+
+        with torch.no_grad():
+            image_features = model.get_image_features(**image_inputs)
+            image_features = image_features / image_features.norm(p=2, dim=-1, keepdim=True) 
+            
+        return image_features
+        
+    except Exception as e:
+        raise Exception(f"Error processing image from base64: {str(e)}")
 
 
 def extract_feat_text(text: str):

@@ -162,6 +162,42 @@ export async function extractImageFeatures(
   }
 }
 
+export async function extractImageFeaturesFromBase64(
+  imageBase64: string
+): Promise<{ error: boolean; details: string; features: number[] }> {
+  try {
+    const response = await fetch(
+      "http://127.0.0.1:8000/extract-image-features/",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ image_base64: imageBase64 }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error. status: ${response.status}`);
+    }
+
+    const result = await response.json();
+
+    return {
+      error: false,
+      details: "Image features extracted successfully",
+      features: result,
+    };
+  } catch (error) {
+    console.error("Error extracting image features from base64:", error);
+    return {
+      error: true,
+      details: "Error extracting image features from base64",
+      features: [],
+    };
+  }
+}
+
 // Función para extraer características de texto
 export async function extractTextFeatures(
   text: string
@@ -189,7 +225,7 @@ export async function extractTextFeatures(
       features: result,
     };
   } catch (error) {
-    console.error("Error extracting text features:", error);
+    logger.error("Error extracting text features: %s", error);
     return {
       error: true,
       details: "Error extracting text features",

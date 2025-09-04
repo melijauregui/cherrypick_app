@@ -4,7 +4,7 @@ import {
   FlashMode,
   useCameraPermissions,
 } from "expo-camera";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Button,
   Pressable,
@@ -26,7 +26,10 @@ import ImageComplete from "../components/ImageComplete";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import List2 from "../components/List2";
-import { getClothingItemsSimilar } from "../utils/fetch";
+import {
+  convertUriToBase64,
+  getClothingItemsSimilarBase64,
+} from "../utils/fetch";
 
 const CameraPage = () => {
   const [uri, setUri] = useState<string | null>(null);
@@ -246,9 +249,22 @@ const RenderPicture = ({
   const handleSheetChanges = useCallback((index: number) => { }, []);
   const { height: screenHeight } = Dimensions.get("window");
   const [imageHeight, setImageHeight] = useState(0);
+  const [imageBase64, setImageBase64] = useState<string | null>(null);
+  const [isLoadingBase64, setIsLoadingBase64] = useState(true);
+
   if (!uri) return null;
 
   const minHeight = Math.max(screenHeight - imageHeight, 400);
+
+  useEffect(() => {
+    const fetchImageBase64 = async () => {
+      setIsLoadingBase64(true);
+      const base64 = await convertUriToBase64(uri);
+      setImageBase64(base64);
+      setIsLoadingBase64(false);
+    };
+    fetchImageBase64();
+  }, [uri]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -278,12 +294,20 @@ const RenderPicture = ({
               Items Similares
             </Text>
           </View>
-          <List2
-            queryKey={["similar-items", uri]}
-            getClothingItems={getClothingItemsSimilar}
-            limit={6}
-            columnCount={2}
-          />
+          {isLoadingBase64 ? (
+            <View className="flex-1 items-center justify-center">
+              <Text className="text-white">Procesando imagen...</Text>
+            </View>
+          ) : (
+            <List2
+              queryKey={["similar-items", uri]}
+              getClothingItems={(page, limit) =>
+                getClothingItemsSimilarBase64(page, limit, imageBase64)
+              }
+              limit={6}
+              columnCount={2}
+            />
+          )}
         </BottomSheet>
       </View>
     </GestureHandlerRootView>

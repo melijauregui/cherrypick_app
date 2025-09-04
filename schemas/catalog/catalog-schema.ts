@@ -57,6 +57,14 @@ export const PaginationSchema = z.object({
   limit: z.preprocess(val => parseInt(val as string) || 10, z.number().min(1)),
 });
 
+export const ImageBase64Schema = z.object({
+  ...PaginationSchema.shape,
+  imageBase64: z.string().min(1, "La imagen es requerida"),
+});
+export const ImageUrlSchema = z.object({
+  imageUrl: z.string().min(1, "La imagen es requerida"),
+});
+
 export const PaginationFilterSchema = z.object({
   ...PaginationSchema.shape,
   filter: z.string().optional(),

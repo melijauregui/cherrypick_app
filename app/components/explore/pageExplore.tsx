@@ -88,7 +88,7 @@ const PageExplore = ({
         <List2
           queryKey={["search-results", query]}
           getClothingItems={(page, limit) =>
-            getClothingItemsTextSearch(query, page, limit)
+            getClothingItemsTextSearch(page, limit, query)
           }
           limit={10}
           columnCount={2}
@@ -137,7 +137,7 @@ const FashionIdeasSection = ({ query }: { query: string }) => {
 const GridImages = ({ query }: { query: string }) => {
   const { data } = useQuery({
     queryKey: ["explore-items", query],
-    queryFn: () => getClothingItemsTextSearch(query, 0, 4),
+    queryFn: () => getClothingItemsTextSearch(0, 4, query),
   });
   if (!data) {
     return <LoadingPage alreadyPrefetched={true} />;

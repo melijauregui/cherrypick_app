@@ -133,7 +133,9 @@ const ItemDetail = () => {
 
         <List2
           queryKey={["similar-items", item.uuid]}
-          getClothingItems={getClothingItemsSimilar}
+          getClothingItems={(page, limit) =>
+            getClothingItemsSimilar(page, limit, item.imageUrl)
+          }
           limit={6}
           columnCount={2}
           contentUp={content}

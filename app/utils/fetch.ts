@@ -1,5 +1,6 @@
 import safeFetch from "./safe-fetch";
 import { LOCAL_IP } from "@/config/api";
+import * as FileSystem from "expo-file-system";
 import {} from "@/schemas/auth/brand-schema";
 import {
   CatalogResponseSchema,
@@ -49,6 +50,21 @@ const handleApiResponse = async <T>(
   }
 };
 export default handleApiResponse;
+
+// Helper function to convert image URI to base64
+export const convertUriToBase64 = async (
+  uri: string
+): Promise<string | null> => {
+  try {
+    const base64 = await FileSystem.readAsStringAsync(uri, {
+      encoding: FileSystem.EncodingType.Base64,
+    });
+    return base64;
+  } catch (error) {
+    console.error("Error converting URI to base64:", error);
+    return null;
+  }
+};
 
 export const handleAuthError = (error: unknown, context: string) => {
   if (
@@ -196,13 +212,6 @@ export async function getClothingItemsHome(
   return res?.items || [];
 }
 
-export async function getClothingItemsSimilar(
-  page: number,
-  limit: number
-): Promise<ItemSchemaType[]> {
-  return getClothingItemsHome(page, limit);
-}
-
 export const getItemsUuidNames = async (
   search: string,
   page: number
@@ -338,11 +347,11 @@ export const getAllFavoritedItems = async (
 };
 
 export const getClothingItemsTextSearch = async (
-  query: string,
   page: number,
-  limit: number
+  limit: number,
+  query: string
 ): Promise<ItemSchemaType[]> => {
-  console.log("getClothingItemsTextSearch", page, limit);
+  console.log("getClothingItemsTextSearch", page, limit, query);
   const res = await handleApiResponse<{
     items: ItemSchemaType[];
   }>(
@@ -356,3 +365,60 @@ export const getClothingItemsTextSearch = async (
   );
   return res?.items || [];
 };
+
+export const getClothingItemsSimilar = async (
+  page: number,
+  limit: number,
+  imageUrl: string
+): Promise<ItemSchemaType[]> => {
+  console.log("getClothingItemsSimilar", page, limit);
+  const res = await handleApiResponse<{
+    items: ItemSchemaType[];
+  }>(
+    () =>
+      safeFetch({
+        url: `http://${LOCAL_IP}:3000/search/image/url?page=${page}&limit=${limit}`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          imageUrl: imageUrl,
+        }),
+      }),
+    CatalogResponseSchema,
+    "getClothingItemsSimilar"
+  );
+  return res?.items || [];
+};
+
+export async function getClothingItemsSimilarBase64(
+  page: number,
+  limit: number,
+  imageBase64?: string | null
+): Promise<ItemSchemaType[]> {
+  // If no image base64 provided, return empty array
+  if (!imageBase64) {
+    console.warn("No image base64 provided in getClothingItemsSimilarBase64");
+    return [];
+  }
+
+  const res = await handleApiResponse<{
+    items: ItemSchemaType[];
+  }>(
+    () =>
+      safeFetch({
+        url: `http://${LOCAL_IP}:3000/search/image/base64?page=${page}&limit=${limit}`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          imageBase64: imageBase64,
+        }),
+      }),
+    CatalogResponseSchema,
+    "getClothingItemsSimilarBase64"
+  );
+  return res?.items || [];
+}
