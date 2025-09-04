@@ -197,3 +197,39 @@ Recall 🔍 recall@5: 0.9245
 Recall 🔍 recall@10: 0.9717
 🔍 MRR: 0.7764
 🔍 Precision@5: 0.9245
+
+#### 10
+
+TRAIN:
+- 🧪 Loss: 0.1237
+- Recall 🔍 recall@1: 0.5694
+- Recall 🔍 recall@5: 0.8611
+- Recall 🔍 recall@10: 0.9405
+- 🔍 MRR: 0.7048
+- 🔍 Precision@5: 0.8631
+
+TEST:
+- 🧪 Loss: 0.2221
+- Recall 🔍 recall@1: 0.6142
+- Recall 🔍 recall@5: 0.9291
+- Recall 🔍 recall@10: 0.9685
+- 🔍 MRR: 0.7483
+- 🔍 Precision@5: 0.9291
+
+#### 11
+
+TRAIN:
+- 🧪 Loss: 0.1802
+- Recall 🔍 recall@1: 0.5656
+- Recall 🔍 recall@5: 0.8936
+- Recall 🔍 recall@10: 0.9415
+- 🔍 MRR: 0.7054
+- 🔍 Precision@5: 0.8936
+
+TEST:
+- 🧪 Loss: 0.4182
+- Recall 🔍 recall@1: 0.5423
+- Recall 🔍 recall@5: 0.8732
+- Recall 🔍 recall@10: 0.9085
+- 🔍 MRR: 0.6984
+- 🔍 Precision@5: 0.8732

@@ -10,7 +10,7 @@ from fashionClipTestingText import test_text_clasification, find_similarities_ma
 
 # --- CONFIGURACIÓN ---
 ORIGINAL_MODEL_NAME = "Marqo/marqo-fashionSigLIP"
-MODEL_NAME_TO_PUSH = "Sofia-gb/cherrypick-sigLip3"
+MODEL_NAME_TO_PUSH = "Sofia-gb/cherrypick-sigLip11"
 
 BATCH_SIZE = 32
 EPOCHS = 30
@@ -99,8 +99,11 @@ def run_tests_preferences(image_paths, images):
     run_test(description="pollera boho chic", image_paths=image_paths,
              images=images, has=True, clasification_img="pollera bohochic")
 
-    run_test(description="jean old money", image_paths=image_paths,
-             images=images, has=True, clasification_img="oldmoney")
+    run_test(description="old money", image_paths=image_paths,
+             images=images, has=True, clasification_img="oldmoney", yellow_flags=["minimalista"])
+
+    run_test(description="pantalon old money", image_paths=image_paths,
+             images=images, has=True, clasification_img="pantalon oldmoney", yellow_flags=["pantalon minimalista"])
 
     run_test(description="short", image_paths=image_paths,
              images=images, has=True, clasification_img="short")
@@ -112,10 +115,13 @@ def run_tests_preferences(image_paths, images):
              images=images, has=True, clasification_img="coquette")
 
     run_test(description="minimalista", image_paths=image_paths,
-             images=images, has=True, clasification_img="minimalista")
+             images=images, has=True, clasification_img="minimalista", yellow_flags=["oldmoney"])
 
     run_test(description="streetwear", image_paths=image_paths,
              images=images, has=True, clasification_img="streetwear")
+
+    run_test(description="night out", image_paths=image_paths,
+             images=images, has=True, clasification_img="night")
 
 
 def run_tests_general(image_paths, images):

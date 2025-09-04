@@ -11,9 +11,9 @@ from sigLip import *
 ORIGINAL_MODEL_NAME = "Marqo/marqo-fashionSigLIP"
 DEVICE = torch.device("mps" if torch.backends.mps.is_available(
 ) else "cuda" if torch.cuda.is_available() else "cpu")
-BATCH_SIZE = 32
-MODEL_NAME = "Sofia-gb/fashionSigLIP-roturas23"
-CSV_PATH = "datasets/roturas-español/con-sin-roturas-v4-nbg.csv"
+BATCH_SIZE = 16
+MODEL_NAME = "Sofia-gb/cherrypick-sigLip11"
+CSV_PATH = "datasets/unificado/roturas-preferencias-v6.csv"
 # CHECKPOINT_PATH = "checkpoints/best_model.pt"
 
 
