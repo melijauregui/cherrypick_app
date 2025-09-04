@@ -14,6 +14,7 @@ import { getClothingItemsTextSearch } from "@/app/utils/fetch";
 import { useQuery } from "@tanstack/react-query";
 import LoadingPage from "../LoadingPage";
 import { ItemSchemaType } from "@/schemas/catalog/catalog-schema";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const PageExplore = ({
   query,
@@ -44,7 +45,7 @@ const PageExplore = ({
   };
 
   return (
-    <View className="flex-1">
+    <SafeAreaView className="flex-1 bg-brown">
       <View className="flex-row items-center px-4 py-2">
         {!isExplorePage && (
           <Entypo
@@ -93,7 +94,7 @@ const PageExplore = ({
           columnCount={2}
         />
       )}
-    </View>
+    </SafeAreaView >
   );
 };
 
