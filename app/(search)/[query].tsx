@@ -9,9 +9,7 @@ const SearchResults = () => {
 
   return (
     <SafeAreaProvider>
-      <SafeAreaView className="bg-brown-strong w-full flex-1">
-        <PageExplore query={query as string} isExplorePage={false} />
-      </SafeAreaView>
+      <PageExplore query={query as string} isExplorePage={false} />
     </SafeAreaProvider>
   );
 };

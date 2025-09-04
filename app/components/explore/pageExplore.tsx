@@ -45,7 +45,7 @@ const PageExplore = ({
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-brown">
+    <SafeAreaView className="flex-1 bg-brown-strong">
       <View className="flex-row items-center px-4 py-2">
         {!isExplorePage && (
           <Entypo
@@ -94,7 +94,7 @@ const PageExplore = ({
           columnCount={2}
         />
       )}
-    </SafeAreaView >
+    </SafeAreaView>
   );
 };
 
