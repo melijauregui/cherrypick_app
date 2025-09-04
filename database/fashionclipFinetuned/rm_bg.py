@@ -10,6 +10,10 @@ def process(input_folder, output_folder, img_name):
     input_path = os.path.join(input_folder, img_name)
     output_path = os.path.join(output_folder, os.path.splitext(img_name)[
         0] + ".png")  # siempre PNG
+    if os.path.exists(output_path):
+        return
+
+    print(f"Procesando {img_name}")
 
     with open(input_path, 'rb') as f:
         input_data = f.read()
@@ -27,22 +31,17 @@ def remove_background(input_folder, output_folder):
     images = [f for f in os.listdir(
         input_folder) if f.lower().endswith(valid_extensions)]
 
-    print(f"Procesando {len(images)} imágenes...")
-
     total_start = time.time()
 
     for img_name in images:
         try:
-            start = time.time()
             process(input_folder, output_folder, img_name)
 
-            elapsed = time.time() - start
-            print(f"{img_name} procesada en {elapsed:.2f}s")
         except Exception as e:
             print(f"Error procesando {img_name}: {e}")
 
     total_elapsed = time.time() - total_start
-    print(f"\nFinalizado. Tiempo total: {total_elapsed:.2f} segundos.")
+    # print(f"\nFinalizado. Tiempo total: {total_elapsed:.2f} segundos.")
 
 
 # remove_background(input_folder, output_folder)

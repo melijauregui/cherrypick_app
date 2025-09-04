@@ -3,8 +3,8 @@ import re
 from collections import Counter
 import pandas as pd
 
-input_file = 'preferencias-nobg2.csv'
-output_file = 'preferencias-nobg3.csv'
+input_file = 'unificado/roturas-preferencias-v2.csv'
+output_file = 'unificado/roturas-preferencias-v3.csv'
 
 
 def __clean_description(texto):
@@ -93,16 +93,51 @@ def transfor_description():
 
 
 def transform_tags(func):
-    df = pd.read_csv(input_file, header=0, names=['image', 'description'])
+    df = pd.read_csv(input_file, header=0, names=[
+                     'image', 'description', 'tags'])
     df['tags'] = df['description'].apply(func)
     df.to_csv(output_file, index=False, header=True)
     print(f"Archivo con tags guardado en {output_file}")
 
 
+def transform_jeans_tags(func):
+    df = pd.read_csv(input_file, header=0, names=[
+                     'image', 'description', 'tags', 'task'])
+    for index, row in df.iterrows():
+        current_tag = row['tags']
+        if 'Tipo jean' in current_tag:
+            df.at[index, 'tags'] = func(row['description'])
+    df.to_csv(output_file, index=False, header=True)
+    print(f"Archivo con tags guardado en {output_file}")
+
+
+def extraer_tipos_jeans_y_roturas(descripcion):
+    tipos = [
+        "wide leg", "recto", "skinny", "palazzo", "cargo", "acampanado", "mom"
+    ]
+
+    descripcion = descripcion.lower()
+
+    tipo_jean = ""
+    roturas = False
+
+    for tipo in tipos:
+        matches = list(re.finditer(
+            rf'{re.escape(tipo)}', descripcion))
+        if matches:
+            tipo_jean = tipo
+            break
+
+    if re.search(r'rotura(s)?', descripcion):
+        roturas = True
+
+    return f" {'roturas' if roturas else 'liso'}, {tipo_jean}".strip()
+
+
 def extraer_estilos(descripcion):
     estilos_posibles = [
         "boho chic", "coquette", "minimalista",
-        "old money", "streetwear", "deportivo"
+        "old money", "streetwear", "deportiv", "salir de noche"
     ]
 
     descripcion = descripcion.lower()
@@ -112,19 +147,38 @@ def extraer_estilos(descripcion):
 
     for estilo in estilos_posibles:
         matches = list(re.finditer(
-            rf'\b{re.escape(estilo)}\b', descripcion))
+            rf'\b{re.escape(estilo)}', descripcion))
         if matches:
-            contador[estilo] = len(matches)
-            primeras_apariciones[estilo] = matches[0].start()
+            clave = estilo
+            if estilo == "deportiv":
+                clave = "deportivo"
+            contador[clave] = len(matches)
+            primeras_apariciones[clave] = matches[0].start()
 
     # Ordenar primero por cantidad (desc), luego por primera aparición (asc)
     estilos_ordenados = sorted(
         contador.items(),
         key=lambda item: (-item[1], primeras_apariciones[item[0]])
     )
-    return ', '.join(estilo for estilo, _ in estilos_ordenados)
+    return 'Estilos: ' + ', '.join(estilo for estilo, _ in estilos_ordenados)
+
+
+def agregar_tasks():
+    df = pd.read_csv(input_file, header=0, names=[
+                     'image', 'description', 'tags'])
+    df['task'] = df['tags'].apply(agregar_task)
+    df.to_csv(output_file, index=False, header=True)
+    print(f"Archivo con tasks guardado en {output_file}")
+
+
+def agregar_task(tag):
+    if re.search(r'Estilos:', tag, re.IGNORECASE):
+        return 'estilos'
+    return 'roturas'
 
 
 if __name__ == "__main__":
     # transform_tags(__extract_tags_ripped_jeans)
-    transform_tags(extraer_estilos)
+    # transform_tags(extraer_estilos)
+    transform_tags(extraer_tipos_jeans_y_roturas)
+    # agregar_tasks()
