@@ -104,17 +104,15 @@ const Controls = ({
   const router = useRouter();
   return (
     <View
-      className={`absolute flex-row justify-between items-center w-full ${
-        setUri ? "px-6 top-16" : "px-12 top-20"
-      }`}
+      className={`absolute flex-row justify-between items-center w-full ${setUri ? "px-6 top-16" : "px-12 top-20"
+        }`}
     >
       <View className="flex-col items-center gap-3">
         <Pressable
-          className={`${
-            !setFlash
-              ? "bg-black items-center justify-center w-12 h-12 rounded-2xl opacity-80 "
-              : ""
-          }`}
+          className={`${!setFlash
+            ? "bg-black items-center justify-center w-12 h-12 rounded-2xl opacity-80 "
+            : ""
+            }`}
           onPress={() => router.back()}
         >
           <Entypo name="chevron-thin-left" size={22} color="white" />
@@ -226,13 +224,13 @@ const CamaraView = ({
 
   return (
     <CameraView
-      className="flex-1 w-full"
       ref={refCamera}
+      style={{ flex: 1 }}
       mode={"picture"}
       facing={facing}
+      flash={flash}
       mute={true}
       responsiveOrientationWhenOrientationLocked
-      flash={flash}
     />
   );
 };
@@ -245,7 +243,7 @@ const RenderPicture = ({
   setUri: (uri: string | null) => void;
 }) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const handleSheetChanges = useCallback((index: number) => {}, []);
+  const handleSheetChanges = useCallback((index: number) => { }, []);
   const { height: screenHeight } = Dimensions.get("window");
   const [imageHeight, setImageHeight] = useState(0);
   if (!uri) return null;
