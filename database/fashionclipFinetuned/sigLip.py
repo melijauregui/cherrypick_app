@@ -204,21 +204,12 @@ def fine_tune(csv_path, original_model_name, model_name, model_name_to_push,
         avg_loss = running_loss / len(train_loader)
         print(f"✅ Epoch {epoch+1} - Train Loss: {avg_loss:.4f}")
 
-        evaluate(model, train_loader, processor, loss_func,
-                 desc=f"Epoch {epoch+1}/{epochs} [Train]")
+        # evaluate(model, train_loader, processor, loss_func,
+        #         desc=f"Epoch {epoch+1}/{epochs} [Train]")
 
         avg_val_loss = evaluate(
             model, val_loader, processor, loss_func, desc=f"Epoch {epoch+1}/{epochs} [Validation]"
         )
-
-        """  df_val = val_df.reset_index(drop=True)
-        class_res = evaluate_by_class(img_emb, txt_emb, df_val, ks=[1, 5, 10])
-        print("=== Recall por has_rips ===")
-        for k, v in class_res.items():
-            print(k, v)
-
-        # confusion analysis plain vs ripped
-        confusion_plain_vs_ripped(img_emb, df_val, model, processor) """
 
         if avg_val_loss < best_loss:
             best_loss = avg_val_loss
@@ -307,9 +298,9 @@ def evaluate(model, loader, processor, loss_func, desc):
 if __name__ == "__main__":
     multiprocessing.freeze_support()
     start_time = time.time()
-    fine_tune(csv_path="datasets/unificado/roturas-preferencias-v5.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
-              model_name_to_push="Marqo/marqo-fashionSigLIP10", data_aug=False,
-              loss_func=contrastive_loss_InfoNCE, batch_size=8, epochs=32, lr=2e-5,
+    fine_tune(csv_path="datasets/unificado/roturas-preferencias-v6.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
+              model_name_to_push="Sofia-gb/cherrypick-sigLip11", data_aug=False,
+              loss_func=contrastive_loss_InfoNCE, batch_size=16, epochs=32, lr=2e-5,
               n_layers=2)
     elapsed_time = time.time() - start_time
     print(f"⏱ Tiempo total de ejecución: {format_time(elapsed_time)}")
