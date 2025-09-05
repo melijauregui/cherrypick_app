@@ -20,13 +20,13 @@ async function validateJsonItems(
   brandId: string
 ): Promise<
   | {
-      error: true;
-      details: string;
-    }
+    error: true;
+    details: string;
+  }
   | {
-      error: false;
-      catalogItems: PropertiesItemSchemaType[];
-    }
+    error: false;
+    catalogItems: PropertiesItemSchemaType[];
+  }
 > {
   if (!Array.isArray(items) || items.length === 0) {
     return {
@@ -114,8 +114,8 @@ export async function insertCatalogItemsToWeaviate(
             ...itemData,
           },
           vectors: {
-            image_vector: imageFeatures,
-            text_vector: textFeatures,
+            image_vector: imageFeatures.features,
+            text_vector: textFeatures.features,
           },
         });
         insertedCount++;

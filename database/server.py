@@ -9,14 +9,16 @@ from pydantic import BaseModel
 
 
 app = FastAPI()
-model_name = "Marqo/marqo-fashionSigLIP"
-pretrained_model_name="Marqo/marqo-fashionSigLIP"
+model_name = "Sofia-gb/cherrypick-sigLip11"
+pretrained_model_name = "Marqo/marqo-fashionSigLIP"
 device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 
 # Load model and processor once at startup
-print("Loading model and processor...")
-model = AutoModel.from_pretrained(model_name, trust_remote_code=True).to(device)
-processor = AutoProcessor.from_pretrained(pretrained_model_name, trust_remote_code=True)
+print(f"Loading model {model_name} and processor...")
+model = AutoModel.from_pretrained(
+    model_name, trust_remote_code=True).to(device)
+processor = AutoProcessor.from_pretrained(
+    pretrained_model_name, trust_remote_code=True)
 model.eval()
 torch.manual_seed(42)
 print("Model and processor loaded successfully!")
@@ -36,7 +38,7 @@ async def extract_image_features(request: dict):
             X = extract_feat_image_base64(image_base64)
         else:
             return {"error": "Either image_url or image_base64 must be provided"}
-        
+
         return X[0].tolist()
 
     except Exception as e:
@@ -63,17 +65,19 @@ def extract_feat_image_url(image_url: str):
         # Descargar imagen desde URL
         response = requests.get(image_url, timeout=30)
         response.raise_for_status()
-        
+
         # Cargar y procesar imagen
         image = Image.open(BytesIO(response.content)).convert("RGB")
-        image_inputs = processor(images=image, return_tensors="pt", padding=True, truncation=True).to(device)
+        image_inputs = processor(
+            images=image, return_tensors="pt", padding=True, truncation=True).to(device)
 
         with torch.no_grad():
             image_features = model.get_image_features(**image_inputs)
-            image_features = image_features / image_features.norm(p=2, dim=-1, keepdim=True) 
-            
+            image_features = image_features / \
+                image_features.norm(p=2, dim=-1, keepdim=True)
+
         return image_features
-        
+
     except requests.RequestException as e:
         raise Exception(f"Error downloading image from URL: {str(e)}")
     except Exception as e:
@@ -86,20 +90,22 @@ def extract_feat_image_base64(image_base64: str):
     """
     try:
         import base64
-        
+
         # Decodificar base64
         image_data = base64.b64decode(image_base64)
-        
+
         # Cargar y procesar imagen
         image = Image.open(BytesIO(image_data)).convert("RGB")
-        image_inputs = processor(images=image, return_tensors="pt", padding=True, truncation=True).to(device)
+        image_inputs = processor(
+            images=image, return_tensors="pt", padding=True, truncation=True).to(device)
 
         with torch.no_grad():
             image_features = model.get_image_features(**image_inputs)
-            image_features = image_features / image_features.norm(p=2, dim=-1, keepdim=True) 
-            
+            image_features = image_features / \
+                image_features.norm(p=2, dim=-1, keepdim=True)
+
         return image_features
-        
+
     except Exception as e:
         raise Exception(f"Error processing image from base64: {str(e)}")
 
@@ -109,10 +115,12 @@ def extract_feat_text(text: str):
     Extrae características de un texto (descripción)
     """
     # Procesar texto con truncation para respetar el límite de 64 tokens
-    text_inputs = processor(text=text, return_tensors="pt", padding=True, truncation=True, max_length=64).to(device)
+    text_inputs = processor(text=text, return_tensors="pt",
+                            padding=True, truncation=True, max_length=64).to(device)
 
     with torch.no_grad():
         text_features = model.get_text_features(**text_inputs)
-        text_features = text_features / text_features.norm(p=2, dim=-1, keepdim=True) 
-        
+        text_features = text_features / \
+            text_features.norm(p=2, dim=-1, keepdim=True)
+
     return text_features
