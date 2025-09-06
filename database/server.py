@@ -1,3 +1,4 @@
+from rembg import remove
 from io import BytesIO
 from fastapi import FastAPI
 from fastapi import FastAPI, File, UploadFile
@@ -6,6 +7,7 @@ import torch
 from transformers import AutoModel, AutoProcessor
 import requests
 from pydantic import BaseModel
+import numpy as np
 
 
 app = FastAPI()
@@ -60,16 +62,20 @@ async def extract_text_features(request: dict):
 def extract_feat_image_url(image_url: str):
     """
     Extrae características de una imagen desde una URL
+    (con fondo eliminado usando rembg)
     """
     try:
-        # Descargar imagen desde URL
         response = requests.get(image_url, timeout=30)
         response.raise_for_status()
 
-        # Cargar y procesar imagen
+        # Convertir a RGB y remover fondo
         image = Image.open(BytesIO(response.content)).convert("RGB")
+        image_no_bg = remove(image)
+
         image_inputs = processor(
-            images=image, return_tensors="pt", padding=True, truncation=True).to(device)
+            images=image_no_bg, return_tensors="pt",
+            padding=True, truncation=True
+        ).to(device)
 
         with torch.no_grad():
             image_features = model.get_image_features(**image_inputs)
@@ -87,17 +93,20 @@ def extract_feat_image_url(image_url: str):
 def extract_feat_image_base64(image_base64: str):
     """
     Extrae características de una imagen desde datos base64
+    (con fondo eliminado usando rembg)
     """
     try:
         import base64
-
-        # Decodificar base64
         image_data = base64.b64decode(image_base64)
 
-        # Cargar y procesar imagen
+        # Convertir a RGB y remover fondo
         image = Image.open(BytesIO(image_data)).convert("RGB")
+        image_no_bg = remove(image)
+
         image_inputs = processor(
-            images=image, return_tensors="pt", padding=True, truncation=True).to(device)
+            images=image_no_bg, return_tensors="pt",
+            padding=True, truncation=True
+        ).to(device)
 
         with torch.no_grad():
             image_features = model.get_image_features(**image_inputs)
@@ -124,3 +133,43 @@ def extract_feat_text(text: str):
             text_features.norm(p=2, dim=-1, keepdim=True)
 
     return text_features
+
+
+@app.post("/search-text/")
+async def similarities_matrix(request: dict):
+    try:
+        if "image_urls" in request and request["image_urls"]:
+            image_urls = request.get("image_urls", [])
+        if "text" in request and request["text"]:
+            text = request.get("text", "")
+        images = []
+        for url in image_urls:
+            response = requests.get(url)
+            img = Image.open(BytesIO(response.content)).convert("RGB")
+            images.append(img)
+
+        processed = processor(
+            text=[text], images=images, padding='max_length', return_tensors="pt")
+
+        with torch.no_grad():
+            image_features = model.get_image_features(
+                processed['pixel_values'], normalize=True)
+            text_features = model.get_text_features(
+                processed['input_ids'], normalize=True)
+
+        # Matriz de similitud: (n imágenes x 1 texto)
+        similarity_scores = (image_features @
+                             text_features.T).squeeze(-1)  # (n imágenes,)
+        # Opcional: pasarlo a "probabilidad" tipo sigmoidea
+        probabilities = similarity_scores.sigmoid()  # entre 0 y 1
+
+        sorted_indices = np.argsort(probabilities.cpu().numpy())[::-1]
+        sorted_results = []
+        for rank, img_idx in enumerate(sorted_indices):
+            # similarity = probabilities[img_idx]
+            sorted_results.append(image_urls[img_idx])
+
+        return sorted_results
+
+    except Exception as e:
+        return {"error": str(e)}

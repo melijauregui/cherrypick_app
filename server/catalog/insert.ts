@@ -17,7 +17,8 @@ import {
 async function validateJsonItems(
   items: PropertiesItemSchemaType[],
   collection: Collection,
-  brandId: string
+  brandId: string,
+  includeDuplicates = false
 ): Promise<
   | {
     error: true;
@@ -42,14 +43,18 @@ async function validateJsonItems(
     try {
       const validatedItem = PropertiesItemSchema.parse(item);
       // Check if item already exists in Weaviate with same name and brand
-      const isDuplicate = await checkDuplicateInWeaviate(
-        collection,
-        validatedItem.name,
-        brandId
-      );
-      if (isDuplicate) {
-        duplicateRows.push(i + 1);
-        continue;
+      if (includeDuplicates) {
+        await deleteIfDuplicateInWeaviate(collection, validatedItem.name, brandId);
+      } else {
+        const isDuplicate = await checkDuplicateInWeaviate(
+          collection,
+          validatedItem.name,
+          brandId
+        );
+        if (isDuplicate) {
+          duplicateRows.push(i + 1);
+          continue;
+        }
       }
       validItems.push(validatedItem);
     } catch (error) {
@@ -69,6 +74,7 @@ async function validateJsonItems(
     catalogItems: validItems,
   };
 }
+
 
 // Función para insertar items del catálogo en Pinecone
 export async function insertCatalogItemsToWeaviate(
@@ -145,6 +151,29 @@ export async function insertCatalogItemsToWeaviate(
   }
 }
 
+export async function deleteIfDuplicateInWeaviate(
+  collection: Collection,
+  name: string,
+  brandId: string
+) {
+  const result = await collection.query.fetchObjects({
+    filters: Filters.and(
+      collection.filter.byProperty("name").equal(name),
+      collection.filter.byProperty("brandId").equal(brandId)
+    ),
+    limit: 1,
+  });
+
+  let exists = result.objects.length > 0;
+
+  if (exists && result.objects[0]) {
+    const id = result.objects[0].uuid;
+    console.log("check duplicate in weaviate for", name, brandId, id, "is", exists);
+    await collection.data.deleteById(id);
+    console.log("deleted duplicate with id", id);
+  }
+}
+
 export async function checkDuplicateInWeaviate(
   collection: Collection,
   name: string,
@@ -178,7 +207,9 @@ export async function UpdateCatalog(
     };
   }
   const collection = collectionRes.collection;
-  const validationResult = await validateJsonItems(items, collection, brandId);
+  const totalCountBefore = await countObjects(collection);
+  console.log(`Total objects in collection before insertion: ${totalCountBefore}`);
+  const validationResult = await validateJsonItems(items, collection, brandId, true);
   if (validationResult.error) {
     res = validationResult;
     return res;
@@ -196,6 +227,10 @@ export async function UpdateCatalog(
     console.log(
       `Successfully inserted ${weaviateResult.insertedCount} vectors into Weaviate`
     );
+
+    const totalCountAfter = await countObjects(collection);
+    console.log(`Total objects in collection after insertion: ${totalCountAfter}`);
+
   } else {
     res = {
       error: true,
@@ -204,4 +239,13 @@ export async function UpdateCatalog(
     console.error("Weaviate insertion errors:", weaviateResult.errors);
   }
   return res;
+}
+
+async function countObjects(collection: Collection) {
+  const agg = await collection.aggregate.overAll();
+
+  const count = agg.totalCount;
+  console.log(`Total objetos en ${collection.name}:`, count);
+
+  return count;
 }
