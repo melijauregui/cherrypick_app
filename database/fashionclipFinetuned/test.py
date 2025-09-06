@@ -35,18 +35,19 @@ model.eval()
 torch.manual_seed(42)
 
 
-def run_test(description, image_paths, images, has, clasification_img, yellow_flags=[]):
+def run_test(description, image_paths, images, has, clasification_img, yellow_flags=[], test=True):
     print("Descripcion:", description)
     probabilities = find_similarities_matrix2(
         model, processor, description, image_paths, images)
-    test_text_clasification(probabilities=probabilities,
-                            image_paths=image_paths, has=has,
-                            clasification_img=clasification_img,
-                            yellow_flags=yellow_flags)
+    if test:
+        test_text_clasification(probabilities=probabilities,
+                                image_paths=image_paths, has=has,
+                                clasification_img=clasification_img,
+                                yellow_flags=yellow_flags)
     print("\n")
 
 
-def run_tests(input_folder, output_folder, run_func):
+def run_tests(input_folder, output_folder, run_func, test=True):
     remove_background(input_folder, output_folder)
 
     image_paths = []
@@ -57,124 +58,124 @@ def run_tests(input_folder, output_folder, run_func):
 
     images = [Image.open(p).convert("RGB") for p in image_paths]
 
-    run_func(image_paths, images)
+    run_func(image_paths, images, test)
 
 
-def run_tests_roturas(image_paths, images):
+def run_tests_roturas(image_paths, images, test):
     run_test(description="jean liso", image_paths=image_paths,
-             images=images, has=False, clasification_img="rotura")
+             images=images, has=False, clasification_img="rotura", test=test)
 
     run_test(description="jean con roturas", image_paths=image_paths,
-             images=images, has=True, clasification_img="rotura")
+             images=images, has=True, clasification_img="rotura", test=test)
 
     run_test(description="jean wide leg", image_paths=image_paths, images=images,
-             has=True, clasification_img="wide", yellow_flags=["palazzo"])
+             has=True, clasification_img="wide", yellow_flags=["palazzo"], test=test)
 
     run_test(description="jean skinny", image_paths=image_paths,
-             images=images, has=True, clasification_img="skinny")
+             images=images, has=True, clasification_img="skinny", test=test)
 
     run_test(description="jean recto", image_paths=image_paths, images=images, has=True, clasification_img="recto",
-             yellow_flags=["mom"])
+             yellow_flags=["mom"], test=test)
 
     run_test(description="jean palazzo", image_paths=image_paths, images=images,
-             has=True, clasification_img="palazzo", yellow_flags=["wide"])
+             has=True, clasification_img="palazzo", yellow_flags=["wide"], test=test)
 
     run_test(description="jean cargo", image_paths=image_paths,
-             images=images, has=True, clasification_img="cargo")
+             images=images, has=True, clasification_img="cargo", test=test)
 
     run_test(description="jean mom", image_paths=image_paths,
-             images=images, has=True, clasification_img="mom", yellow_flags=["recto"])
+             images=images, has=True, clasification_img="mom", yellow_flags=["recto"], test=test)
 
     run_test(description="jean acampanado", image_paths=image_paths,
-             images=images, has=True, clasification_img="flared")
+             images=images, has=True, clasification_img="flared", test=test)
 
 
-def run_tests_preferences(image_paths, images):
+def run_tests_preferences(image_paths, images, test):
     run_test(description="boho chic", image_paths=image_paths,
-             images=images, has=True, clasification_img="bohochic")
+             images=images, has=True, clasification_img="bohochic", test=test)
 
     run_test(description="pantalon boho chic", image_paths=image_paths,
-             images=images, has=True, clasification_img="pantalon bohochic")
+             images=images, has=True, clasification_img="pantalon bohochic", test=test)
 
     run_test(description="pollera boho chic", image_paths=image_paths,
-             images=images, has=True, clasification_img="pollera bohochic")
+             images=images, has=True, clasification_img="pollera bohochic", test=test)
 
     run_test(description="old money", image_paths=image_paths,
-             images=images, has=True, clasification_img="oldmoney", yellow_flags=["minimalista"])
+             images=images, has=True, clasification_img="oldmoney", yellow_flags=["minimalista"], test=test)
 
     run_test(description="pantalon old money", image_paths=image_paths,
-             images=images, has=True, clasification_img="pantalon oldmoney", yellow_flags=["pantalon minimalista"])
+             images=images, has=True, clasification_img="pantalon oldmoney", yellow_flags=["pantalon minimalista"], test=test)
 
     run_test(description="short", image_paths=image_paths,
-             images=images, has=True, clasification_img="short")
+             images=images, has=True, clasification_img="short", test=test)
 
     run_test(description="pollera", image_paths=image_paths,
-             images=images, has=True, clasification_img="pollera")
+             images=images, has=True, clasification_img="pollera", test=test)
 
     run_test(description="coquette", image_paths=image_paths,
-             images=images, has=True, clasification_img="coquette")
+             images=images, has=True, clasification_img="coquette", test=test)
 
     run_test(description="minimalista", image_paths=image_paths,
-             images=images, has=True, clasification_img="minimalista", yellow_flags=["oldmoney"])
+             images=images, has=True, clasification_img="minimalista", yellow_flags=["oldmoney"], test=test)
 
     run_test(description="streetwear", image_paths=image_paths,
-             images=images, has=True, clasification_img="streetwear")
+             images=images, has=True, clasification_img="streetwear", test=test)
 
     run_test(description="night out", image_paths=image_paths,
-             images=images, has=True, clasification_img="night")
+             images=images, has=True, clasification_img="night", test=test)
 
 
-def run_tests_general(image_paths, images):
+def run_tests_general(image_paths, images, test):
     run_test(description="remera", image_paths=image_paths,
-             images=images, has=True, clasification_img="remera")
+             images=images, has=True, clasification_img="remera", yellow_flags=["top"], test=test)
 
     run_test(description="remera celeste", image_paths=image_paths,
-             images=images, has=True, clasification_img="remera celeste", yellow_flags=["camisa celeste"])
+             images=images, has=True, clasification_img="remera celeste", yellow_flags=["camisa celeste"], test=test)
 
     run_test(description="sweater", image_paths=image_paths,
-             images=images, has=True, clasification_img="sweater")
+             images=images, has=True, clasification_img="sweater", test=test)
 
     run_test(description="sweater rosa", image_paths=image_paths,
-             images=images, has=True, clasification_img="sweater rosa")
+             images=images, has=True, clasification_img="sweater rosa", test=test)
 
     run_test(description="vestido", image_paths=image_paths,
-             images=images, has=True, clasification_img="vestido")
+             images=images, has=True, clasification_img="vestido", test=test)
 
     run_test(description="vestido estampado", image_paths=image_paths,
-             images=images, has=True, clasification_img="vestido estampado")
+             images=images, has=True, clasification_img="vestido estampado", test=test)
 
     run_test(description="vestido liso", image_paths=image_paths,
-             images=images, has=True, clasification_img="vestido liso")
+             images=images, has=True, clasification_img="vestido liso", test=test)
 
     run_test(description="vestido rojo", image_paths=image_paths,
-             images=images, has=True, clasification_img="vestido rojo")
+             images=images, has=True, clasification_img="vestido rojo", test=test)
 
     run_test(description="vestido estampado rojo", image_paths=image_paths,
-             images=images, has=True, clasification_img="vestido estampado rojo")
+             images=images, has=True, clasification_img="vestido estampado rojo", test=test)
 
     run_test(description="campera", image_paths=image_paths,
-             images=images, has=True, clasification_img="campera")
+             images=images, has=True, clasification_img="campera", test=test)
 
     run_test(description="campera de cuero", image_paths=image_paths,
-             images=images, has=True, clasification_img="campera cuero")
+             images=images, has=True, clasification_img="campera cuero", test=test)
 
     run_test(description="campera negra", image_paths=image_paths,
-             images=images, has=True, clasification_img="campera negra")
+             images=images, has=True, clasification_img="campera negra", test=test)
 
     run_test(description="campera de jean", image_paths=image_paths,
-             images=images, has=True, clasification_img="campera jean")
+             images=images, has=True, clasification_img="campera jean", test=test)
 
     run_test(description="camisa", image_paths=image_paths,
-             images=images, has=True, clasification_img="camisa")
+             images=images, has=True, clasification_img="camisa", test=test)
 
     run_test(description="camisa celeste", image_paths=image_paths,
-             images=images, has=True, clasification_img="camisa celeste", yellow_flags=["remera celeste"])
+             images=images, has=True, clasification_img="camisa celeste", yellow_flags=["remera celeste"], test=test)
 
     run_test(description="camisa manga larga", image_paths=image_paths,
-             images=images, has=True, clasification_img="camisa manga larga")
+             images=images, has=True, clasification_img="camisa manga larga", test=test)
 
     run_test(description="camisa manga corta", image_paths=image_paths,
-             images=images, has=True, clasification_img="camisa manga corta")
+             images=images, has=True, clasification_img="camisa manga corta", test=test)
 
 
 if __name__ == "__main__":
@@ -184,8 +185,22 @@ if __name__ == "__main__":
 
     input_folder = "images-testing-preferences"
     output_folder = "images-testing-preferences-nobg"
-    run_tests(input_folder, output_folder, run_tests_preferences)
+    # run_tests(input_folder, output_folder, run_tests_preferences)
 
     input_folder = "images_testing_general"
     output_folder = "images-testing-general-nobg"
     # run_tests(input_folder, output_folder, run_tests_general)
+
+    input_folder = "../test-endpoints/images-catalog"
+    output_folder = "../test-endpoints/images-catalog-nobg"
+    # run_tests(input_folder, output_folder, run_tests_roturas, test=False)
+
+    text = "top corto o remera verde claro de algodon con volados en los hombros y fruncido ajustable con cordón en el frente"
+    text_inputs = processor(text=text, return_tensors="pt",
+                            padding=True, truncation=True).to(DEVICE)
+
+    with torch.no_grad():
+        text_features = model.get_text_features(**text_inputs)
+        text_features = text_features / \
+            text_features.norm(p=2, dim=-1, keepdim=True)
+    print(text_features)

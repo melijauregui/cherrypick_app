@@ -96,6 +96,7 @@ export async function insertCatalogItemsToWeaviate(
         if (imageFeatures.error) {
           throw new Error(imageFeatures.details);
         }
+
         const textFeatures = await extractTextFeatures(item.description);
         if (textFeatures.error) {
           throw new Error(textFeatures.details);
@@ -209,6 +210,8 @@ export async function UpdateCatalog(
   const collection = collectionRes.collection;
   const totalCountBefore = await countObjects(collection);
   console.log(`Total objects in collection before insertion: ${totalCountBefore}`);
+  //await clearCollection(collection, brandId); //solo para testing
+
   const validationResult = await validateJsonItems(items, collection, brandId, true);
   if (validationResult.error) {
     res = validationResult;
@@ -241,11 +244,36 @@ export async function UpdateCatalog(
   return res;
 }
 
-async function countObjects(collection: Collection) {
+export async function countObjects(collection: Collection) {
   const agg = await collection.aggregate.overAll();
 
   const count = agg.totalCount;
-  console.log(`Total objetos en ${collection.name}:`, count);
 
   return count;
+}
+
+// Elimina todos los objetos de una colección
+export async function clearCollection(collection: Collection, brandId: string) {
+  const result = await collection.query.fetchObjects({
+    filters: Filters.and(
+      collection.filter.byProperty("brandId").equal(brandId),
+    ),
+    limit: 50 //ToDo
+  });
+  const objects = result.objects;
+
+  // Elimina todos los objetos del batch
+  for (const obj of objects) {
+    if (obj.uuid) {
+      try {
+        await collection.data.deleteById(obj.uuid);
+        console.log("Deleted object", obj.uuid);
+      } catch (err) {
+        console.error("Error deleting object", obj.uuid, err);
+      }
+    }
+
+  }
+
+  console.log(`Cleared collection of brand ${brandId}: ${objects.length} objects deleted.`);
 }

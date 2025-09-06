@@ -125,7 +125,7 @@ def extract_feat_text(text: str):
     """
     # Procesar texto con truncation para respetar el límite de 64 tokens
     text_inputs = processor(text=text, return_tensors="pt",
-                            padding=True, truncation=True, max_length=64).to(device)
+                            padding=True, truncation=True).to(device)
 
     with torch.no_grad():
         text_features = model.get_text_features(**text_inputs)
