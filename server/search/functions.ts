@@ -43,7 +43,7 @@ export async function SearchItems(
 
   let result;
 
-  const preference = Object.values(Preferences).find(
+  /* const preference = Object.values(Preferences).find(
     pref => pref.name.toLowerCase() === query.toLowerCase() || pref.searchName.toLocaleLowerCase() === query.toLocaleLowerCase()
   );
 
@@ -56,35 +56,35 @@ export async function SearchItems(
       returnProperties: returnProperties,
       sort: new Sorting<string>().byProperty(sortProperty, false), // descending order
     });
-  } else {
-    const embeddingResponse =
-      type === "text"
-        ? await extractTextFeatures(query)
-        : type === "image"
-          ? await extractImageFeatures(query)
-          : await extractImageFeaturesFromBase64(query);
-    if (embeddingResponse.error || embeddingResponse.features.length === 0) {
-      logger.error("Error extracting features: %s", embeddingResponse.details);
-      return {
-        error: true,
-        details: embeddingResponse.details,
-      };
-    }
-
-    const queryOptions = {
-      limit: limit,
-      offset: offset,
-      returnProperties: returnProperties,
-      targetVector: type === "text" ? 'text_vector' : 'image_vector', // Specify which vector space to search
-      includeDistance: true,
-      includeMatchDistance: true,
+  } else { */
+  const embeddingResponse =
+    type === "text"
+      ? await extractTextFeatures(query)
+      : type === "image"
+        ? await extractImageFeatures(query)
+        : await extractImageFeaturesFromBase64(query);
+  if (embeddingResponse.error || embeddingResponse.features.length === 0) {
+    logger.error("Error extracting features: %s", embeddingResponse.details);
+    return {
+      error: true,
+      details: embeddingResponse.details,
     };
-
-    result = await collection.query.nearVector(
-      embeddingResponse.features,
-      queryOptions
-    );
   }
+
+  const queryOptions = {
+    limit: limit,
+    offset: offset,
+    returnProperties: returnProperties,
+    targetVector: type === "text" ? 'image_vector' : 'text_vector', // ToDo: ver si con image_vector funciona mejor en ambos casos
+    includeDistance: true,
+    includeMatchDistance: true,
+  };
+
+  result = await collection.query.nearVector(
+    embeddingResponse.features,
+    queryOptions
+  );
+  //}
 
 
   // Map results to ItemSchemaType
@@ -109,7 +109,7 @@ export async function SearchItems(
     })
     .filter((item): item is ItemSchemaType => {
       console.log("item", item?.name);
-      return item !== null;
+      return item !== null && item.imageUrl !== query;
     });
 
   logger.info(

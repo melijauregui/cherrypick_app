@@ -234,6 +234,47 @@ export async function extractTextFeatures(
   }
 }
 
+export async function extractFeatures(
+  text: string,
+  imageUrl: string
+): Promise<{ error: boolean; details: string; features: FeaturesResult }> {
+  try {
+    const response = await fetch(
+      "http://127.0.0.1:8000/extract-features/",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ text: text, image_url: imageUrl }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error. status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    return {
+      error: false,
+      details: "Features extracted successfully",
+      features: result,
+    };
+  } catch (error) {
+    logger.error("Error extracting features: %s", error);
+    return {
+      error: true,
+      details: "Error extracting features",
+      features: { image_features: [], text_features: [] }
+    };
+  }
+}
+
+export type FeaturesResult = {
+  image_features: number[];
+  text_features: number[];
+};
+
 export type PreferencesSimilaritiesResult = {
   preference: string;
   similarity: number;
@@ -262,14 +303,14 @@ export async function getPreferencesSimilarities(
 
     return {
       error: false,
-      details: "Text features extracted successfully",
+      details: "preferences similarities extracted successfully",
       similarities: result.similarities ?? [],
     };
   } catch (error) {
-    logger.error("Error extracting text features: %s", error);
+    logger.error("Error extracting preferences similarities: %s", error);
     return {
       error: true,
-      details: "Error extracting text features",
+      details: "Error extracting preferences similarities",
       similarities: [],
     };
   }
@@ -354,10 +395,10 @@ export async function getCollection(): Promise<
           { name: "price", dataType: "text" },
           { name: "imageUrl", dataType: "text" },
           { name: "url", dataType: "text" },
-          ...Object.values(Preferences).map(pref => ({
+          /* ...Object.values(Preferences).map(pref => ({
             name: pref.property as string,
             dataType: "number" as ObjectDataType,
-          })),
+          })), */
         ],
         vectorizers: [
           weaviate.configure.vectors.selfProvided({ name: "image_vector" }),
@@ -366,16 +407,13 @@ export async function getCollection(): Promise<
       })) as Collection;
     } else {
       collection = client.collections.get("FashionItem") as Collection;
-      const collectionConfig = await collection.config.get()
+      /* const collectionConfig = await collection.config.get()
       const existingProps = collectionConfig.properties.map((p) => p.name);
       Object.values(Preferences)
         .filter(pref => !existingProps.includes(pref.property))
         .forEach(pref => (
           collection.config.addProperty({ name: pref.property as string, dataType: "number" as ObjectDataType }
-          )));
-
-      console.log("Existing collection properties:", collectionConfig.properties);
-
+          ))); */
     }
 
     return {

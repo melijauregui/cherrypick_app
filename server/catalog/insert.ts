@@ -10,6 +10,7 @@ import {
   Preferences,
   PreferencesSimilaritiesResult,
   getPreferencesSimilarities,
+  extractFeatures,
 } from "./functions";
 import {
   ErrorSchemaType,
@@ -96,26 +97,22 @@ export async function insertCatalogItemsToWeaviate(
   try {
     for (const item of catalogItems) {
       try {
-        const imageFeatures = await extractImageFeatures(item.imageUrl);
-        if (imageFeatures.error) {
-          throw new Error(imageFeatures.details);
-        }
-
-        const textFeatures = await extractTextFeatures(item.description);
-        if (textFeatures.error) {
-          throw new Error(textFeatures.details);
-        }
+        const featuresResult = await extractFeatures(
+          item.description,
+          item.imageUrl
+        );
 
         if (
-          imageFeatures.features.length === 0 &&
-          textFeatures.features.length === 0
+          featuresResult.error ||
+          featuresResult.features.image_features.length === 0 ||
+          featuresResult.features.text_features.length === 0
         ) {
           throw new Error(
             "No se pudieron extraer características de la imagen o el texto"
           );
         }
 
-        const resultSimilarities = await getPreferencesSimilarities(item.imageUrl);
+        /* const resultSimilarities = await getPreferencesSimilarities(item.imageUrl);
         if (resultSimilarities.error) {
           throw new Error(resultSimilarities.details);
         }
@@ -123,12 +120,12 @@ export async function insertCatalogItemsToWeaviate(
         const preferenceData = Object.entries(Preferences).reduce((acc, [_, val]) => {
           acc[val.property] = getPreferenceScore(resultSimilarities.similarities, val.searchName) || 0;
           return acc;
-        }, {} as Record<string, number>);
+        }, {} as Record<string, number>); */
 
         const itemData = {
           ...item,
           brandId,
-          ...preferenceData,
+          //...preferenceData,
         };
 
         const result = await collection.data.insert({
@@ -136,8 +133,8 @@ export async function insertCatalogItemsToWeaviate(
             ...itemData,
           },
           vectors: {
-            image_vector: imageFeatures.features,
-            text_vector: textFeatures.features,
+            image_vector: featuresResult.features.image_features,
+            text_vector: featuresResult.features.text_features,
           },
         });
         insertedCount++;

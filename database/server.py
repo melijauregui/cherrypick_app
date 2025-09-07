@@ -78,9 +78,8 @@ def extract_feat_image_url(image_url: str):
         ).to(device)
 
         with torch.no_grad():
-            image_features = model.get_image_features(**image_inputs)
-            image_features = image_features / \
-                image_features.norm(p=2, dim=-1, keepdim=True)
+            image_features = model.get_image_features(
+                pixel_values=image_inputs["pixel_values"], normalize=True)
 
         return image_features
 
@@ -109,9 +108,8 @@ def extract_feat_image_base64(image_base64: str):
         ).to(device)
 
         with torch.no_grad():
-            image_features = model.get_image_features(**image_inputs)
-            image_features = image_features / \
-                image_features.norm(p=2, dim=-1, keepdim=True)
+            image_features = model.get_image_features(
+                pixel_values=image_inputs["pixel_values"], normalize=True)
 
         return image_features
 
@@ -123,16 +121,49 @@ def extract_feat_text(text: str):
     """
     Extrae características de un texto (descripción)
     """
-    # Procesar texto con truncation para respetar el límite de 64 tokens
-    text_inputs = processor(text=text, return_tensors="pt",
-                            padding=True, truncation=True).to(device)
+    text_inputs = processor(
+        text=[text], padding='max_length', return_tensors="pt")
+
+    input_ids = text_inputs["input_ids"]
+    attention_mask = text_inputs["attention_mask"]
 
     with torch.no_grad():
-        text_features = model.get_text_features(**text_inputs)
-        text_features = text_features / \
-            text_features.norm(p=2, dim=-1, keepdim=True)
+        text_features = model.get_text_features(
+            input_ids=input_ids, attention_mask=attention_mask, normalize=True)
 
     return text_features
+
+
+@app.post("/extract-features/")
+async def extract_features(request: dict):
+    try:
+        if "image_url" in request and request["image_url"]:
+            image_url = request.get("image_url", "")
+        if "text" in request and request["text"]:
+            text = request.get("text", "")
+        response = requests.get(image_url)
+        img = Image.open(BytesIO(response.content)).convert("RGB")
+
+        processed = processor(
+            text=[text], images=[img], padding='max_length', return_tensors="pt")
+
+        pixel_values = processed["pixel_values"]
+        input_ids = processed["input_ids"]
+        attention_mask = processed["attention_mask"]
+
+        with torch.no_grad():
+            image_features = model.get_image_features(
+                pixel_values=pixel_values, normalize=True)
+            text_features = model.get_text_features(
+                input_ids=input_ids, attention_mask=attention_mask, normalize=True)
+
+        return {
+            "image_features": image_features[0].tolist(),
+            "text_features": text_features[0].tolist()
+        }
+
+    except Exception as e:
+        return {"error": str(e)}
 
 
 @app.post("/search-text/")
@@ -151,11 +182,15 @@ async def similarities_matrix(request: dict):
         processed = processor(
             text=[text], images=images, padding='max_length', return_tensors="pt")
 
+        pixel_values = processed["pixel_values"]
+        input_ids = processed["input_ids"]
+        attention_mask = processed["attention_mask"]
+
         with torch.no_grad():
             image_features = model.get_image_features(
-                processed['pixel_values'], normalize=True)
+                pixel_values=pixel_values, normalize=True)
             text_features = model.get_text_features(
-                processed['input_ids'], normalize=True)
+                input_ids=input_ids, attention_mask=attention_mask, normalize=True)
 
         # Matriz de similitud: (n imágenes x 1 texto)
         similarity_scores = (image_features @
@@ -179,7 +214,7 @@ async def similarities_matrix(request: dict):
 async def similarities_preferences(request: dict):
     try:
         if "image_url" in request and request["image_url"]:
-            image_url = request.get("image_url", [])
+            image_url = request.get("image_url", "")
         if "preferences" in request and request["preferences"]:
             preferences = request.get("preferences", "")
         response = requests.get(image_url)
@@ -187,11 +222,15 @@ async def similarities_preferences(request: dict):
         processed = processor(
             text=preferences, images=[img], padding='max_length', return_tensors="pt")
 
+        pixel_values = processed["pixel_values"]
+        input_ids = processed["input_ids"]
+        attention_mask = processed["attention_mask"]
+
         with torch.no_grad():
             image_features = model.get_image_features(
-                processed['pixel_values'], normalize=True)
+                pixel_values=pixel_values, normalize=True)
             text_features = model.get_text_features(
-                processed['input_ids'], normalize=True)
+                input_ids=input_ids, attention_mask=attention_mask, normalize=True)
 
         similarity_scores = (image_features @
                              text_features.T).squeeze(0)
