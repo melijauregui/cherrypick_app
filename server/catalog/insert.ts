@@ -7,11 +7,15 @@ import {
   extractImageFeatures,
   extractTextFeatures,
   getCollection,
+  Preferences,
+  PreferencesSimilaritiesResult,
+  getPreferencesSimilarities,
 } from "./functions";
 import {
   ErrorSchemaType,
   SuccessSchemaType,
 } from "@/schemas/standar-response-schema";
+import { get } from "http";
 
 // Función para validar items JSON
 async function validateJsonItems(
@@ -111,9 +115,20 @@ export async function insertCatalogItemsToWeaviate(
           );
         }
 
+        const resultSimilarities = await getPreferencesSimilarities(item.imageUrl);
+        if (resultSimilarities.error) {
+          throw new Error(resultSimilarities.details);
+        }
+
+        const preferenceData = Object.entries(Preferences).reduce((acc, [_, val]) => {
+          acc[val.property] = getPreferenceScore(resultSimilarities.similarities, val.searchName) || 0;
+          return acc;
+        }, {} as Record<string, number>);
+
         const itemData = {
           ...item,
-          brandId: brandId,
+          brandId,
+          ...preferenceData,
         };
 
         const result = await collection.data.insert({
@@ -151,6 +166,14 @@ export async function insertCatalogItemsToWeaviate(
     };
   }
 }
+
+function getPreferenceScore(
+  similarities: PreferencesSimilaritiesResult[],
+  pref: string
+): number {
+  return similarities.find(s => s.preference === pref)?.similarity ?? 0;
+}
+
 
 export async function deleteIfDuplicateInWeaviate(
   collection: Collection,

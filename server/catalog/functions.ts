@@ -7,7 +7,7 @@ import {
   ItemUuidNameSchema,
   ItemUuidNameSchemaType,
 } from "@/schemas/catalog/catalog-schema";
-import weaviate, { Collection, Filters } from "weaviate-client";
+import weaviate, { Collection, Filters, ObjectDataType } from "weaviate-client";
 import { ErrorSchemaType } from "@/schemas/standar-response-schema";
 import { config } from "../../config";
 import logger from "../logger";
@@ -234,16 +234,102 @@ export async function extractTextFeatures(
   }
 }
 
+export type PreferencesSimilaritiesResult = {
+  preference: string;
+  similarity: number;
+};
+
+export async function getPreferencesSimilarities(
+  image_url: string,
+): Promise<{ error: boolean; details: string; similarities: PreferencesSimilaritiesResult[] }> {
+  try {
+    const response = await fetch(
+      "http://127.0.0.1:8000/similarities-preferences/",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ preferences: preferencesRepr, image_url }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error. status: ${response.status}`);
+    }
+
+    const result = await response.json();
+
+    return {
+      error: false,
+      details: "Text features extracted successfully",
+      similarities: result.similarities ?? [],
+    };
+  } catch (error) {
+    logger.error("Error extracting text features: %s", error);
+    return {
+      error: true,
+      details: "Error extracting text features",
+      similarities: [],
+    };
+  }
+}
+
+type TextImageMatchResult = {
+  image_url: string;
+  similarity: number;
+  [key: string]: any;
+};
+
+export async function searchText(
+  text: string,
+  image_urls: string[]
+): Promise<{ error: boolean; details: string; results: string[] }> {
+  try {
+    const response = await fetch(
+      "http://127.0.0.1:8000/search-text/",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ text, image_urls }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error. status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log("searchText result:", result);
+    console.log("searcghText result type:", typeof result);
+    return {
+      error: false,
+      details: "Text search successfull",
+      results: result,
+    };
+  } catch (error) {
+    logger.error("Error during text search: %s", error);
+    return {
+      error: true,
+      details: "Error during text search",
+      results: [],
+    };
+  }
+}
+
+
 // Función para verificar si ya existe un elemento con el mismo nombre y brand en Weaviate
 export async function getCollection(): Promise<
   | {
-      error: true;
-      details: string;
-    }
+    error: true;
+    details: string;
+  }
   | {
-      error: false;
-      collection: Collection;
-    }
+    error: false;
+    collection: Collection;
+  }
 > {
   try {
     const client = await weaviate.connectToWeaviateCloud(config.WEAVIATE_URL, {
@@ -258,6 +344,7 @@ export async function getCollection(): Promise<
     let collection: Collection;
     const exists = await client.collections.exists("FashionItem");
     if (!exists) {
+
       collection = (await client.collections.create({
         name: "FashionItem",
         properties: [
@@ -267,6 +354,10 @@ export async function getCollection(): Promise<
           { name: "price", dataType: "text" },
           { name: "imageUrl", dataType: "text" },
           { name: "url", dataType: "text" },
+          ...Object.values(Preferences).map(pref => ({
+            name: pref.property as string,
+            dataType: "number" as ObjectDataType,
+          })),
         ],
         vectorizers: [
           weaviate.configure.vectors.selfProvided({ name: "image_vector" }),
@@ -275,6 +366,16 @@ export async function getCollection(): Promise<
       })) as Collection;
     } else {
       collection = client.collections.get("FashionItem") as Collection;
+      const collectionConfig = await collection.config.get()
+      const existingProps = collectionConfig.properties.map((p) => p.name);
+      Object.values(Preferences)
+        .filter(pref => !existingProps.includes(pref.property))
+        .forEach(pref => (
+          collection.config.addProperty({ name: pref.property as string, dataType: "number" as ObjectDataType }
+          )));
+
+      console.log("Existing collection properties:", collectionConfig.properties);
+
     }
 
     return {
@@ -289,6 +390,41 @@ export async function getCollection(): Promise<
     };
   }
 }
+
+export const Preferences = {
+  Minimalista: {
+    name: "Minimalist",
+    property: "minimalista",
+    searchName: "minimalista",
+  },
+  Coquette: {
+    name: "Coquette",
+    property: "coquette",
+    searchName: "coquette",
+  },
+  BohoChic: {
+    name: "Boho-Chic",
+    property: "bohoChic",
+    searchName: "boho chic",
+  },
+  OldMoney: {
+    name: "Old Money",
+    property: "oldMoney",
+    searchName: "old money",
+  },
+  Streetwear: {
+    name: "Streetwear",
+    property: "streetwear",
+    searchName: "streetwear",
+  },
+  Deportivo: {
+    name: "Sporty",
+    property: "deportivo",
+    searchName: "deportivo",
+  },
+} as const;
+
+export const preferencesRepr: string[] = Object.values(Preferences).map(pref => pref.searchName); // ["minimalista", "boho chic", ...]
 
 export async function GetItemsFromWeaviate(
   uuids: string[],

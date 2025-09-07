@@ -173,3 +173,37 @@ async def similarities_matrix(request: dict):
 
     except Exception as e:
         return {"error": str(e)}
+
+
+@app.post("/similarities-preferences/")
+async def similarities_preferences(request: dict):
+    try:
+        if "image_url" in request and request["image_url"]:
+            image_url = request.get("image_url", [])
+        if "preferences" in request and request["preferences"]:
+            preferences = request.get("preferences", "")
+        response = requests.get(image_url)
+        img = Image.open(BytesIO(response.content)).convert("RGB")
+        processed = processor(
+            text=preferences, images=[img], padding='max_length', return_tensors="pt")
+
+        with torch.no_grad():
+            image_features = model.get_image_features(
+                processed['pixel_values'], normalize=True)
+            text_features = model.get_text_features(
+                processed['input_ids'], normalize=True)
+
+        similarity_scores = (image_features @
+                             text_features.T).squeeze(0)
+
+        probabilities = similarity_scores.sigmoid().tolist()
+
+        result = [
+            {"preference": pref, "similarity": prob}
+            for pref, prob in zip(preferences, probabilities)
+        ]
+
+        return {"error": False, "details": "Similarities computed successfully", "similarities": result}
+
+    except Exception as e:
+        return {"error": True, "details": str(e), "similarities": []}
