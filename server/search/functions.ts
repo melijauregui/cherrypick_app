@@ -44,7 +44,7 @@ export async function SearchItems(
   let result;
 
   const preference = Object.values(Preferences).find(
-    pref => pref.name.toLowerCase() === query.toLowerCase()
+    pref => pref.name.toLowerCase() === query.toLowerCase() || pref.searchName.toLocaleLowerCase() === query.toLocaleLowerCase()
   );
 
   if (preference) {
