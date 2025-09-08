@@ -17,7 +17,7 @@ import {
   SuccessSchema,
   SuccessSchemaType,
 } from "@/schemas/standar-response-schema";
-import { GetItem } from "./functions";
+import { GetEmbeddingItem, GetItem } from "./functions";
 import logger from "../logger";
 import { GetBrandId } from "../brand/functions";
 import { AppEnv } from "../app";
@@ -32,6 +32,10 @@ import {
   CheckLikeFavoriteResponseSchema,
   CheckLikeFavoriteResponseSchemaType,
 } from "@/schemas/catalog/like-favorite-schema.ts";
+import {
+  EmbbedingResponseSchema,
+  EmbbedingResponseSchemaType,
+} from "@/schemas/search/search-schema";
 
 const ItemApp = new OpenAPIHono<AppEnv>({
   defaultHook: (result, c) => {
@@ -502,4 +506,51 @@ ItemApp.openapi(checkFavoriteRoute, async c => {
     return c.json(res, 404);
   }
   return c.json(res, 200);
+});
+
+// /item get embedding endpoint
+const itemEmbeddingRoute = createRoute({
+  method: "get",
+  path: "/{id}/embedding",
+  request: {
+    params: QueryIdSchema,
+    required: true,
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: EmbbedingResponseSchema,
+        },
+      },
+      description:
+        "Devuelve items que coinciden con la búsqueda de texto usando embeddings vectoriales",
+    },
+    500: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Error interno del servidor o en la búsqueda",
+    },
+  },
+});
+
+ItemApp.openapi(itemEmbeddingRoute, async c => {
+  const { id } = c.req.valid("param");
+  logger.info("GET /search/embedding/image - query: %s", id);
+
+  const result = await GetEmbeddingItem(id);
+
+  if (result.error) {
+    return c.json(result, 500);
+  }
+
+  const successResponse: EmbbedingResponseSchemaType = {
+    error: false,
+    embedding: result.embedding,
+  };
+
+  return c.json(successResponse, 200);
 });

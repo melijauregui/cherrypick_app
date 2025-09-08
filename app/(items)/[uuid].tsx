@@ -22,6 +22,7 @@ import { getClothingItemsSimilar } from "@/app/utils/fetch";
 import useIsMyItem, {
   useFetchBrandProfileItem,
   useFetchItem,
+  useFetchItemEmbedding,
 } from "@/app/utils/use-query";
 import useIsLiked from "@/app/utils/likes-favorites";
 import {
@@ -50,6 +51,10 @@ const ItemDetail = () => {
   const queryClient = useQueryClient();
 
   const itemData = useFetchItem(decodedUuid);
+  const itemEmbeddingData = useFetchItemEmbedding(decodedUuid);
+  if (itemEmbeddingData?.embedding.length === 768) {
+    console.log("itemEmbeddingData", itemEmbeddingData.embedding.length);
+  }
   const item = itemData?.item;
   const brand = useFetchBrandProfileItem(item?.brandId || "");
   const isBrandItem = useIsMyItem(item?.uuid || "") || false;
@@ -132,9 +137,18 @@ const ItemDetail = () => {
         </TouchableOpacity>
 
         <List2
-          queryKey={["similar-items", item.uuid]}
+          queryKey={[
+            "similar-items",
+            item.uuid,
+            itemEmbeddingData?.embedding?.length || 0,
+          ]}
           getClothingItems={(page, limit) =>
-            getClothingItemsSimilar(page, limit, item.imageUrl)
+            getClothingItemsSimilar(
+              page,
+              limit,
+              itemEmbeddingData?.embedding || [],
+              item.imageUrl
+            )
           }
           limit={6}
           columnCount={2}

@@ -29,6 +29,7 @@ import List2 from "../components/List2";
 import {
   convertUriToBase64,
   getClothingItemsSimilarBase64,
+  getEmbedding,
 } from "../utils/fetch";
 
 const CameraPage = () => {
@@ -107,15 +108,17 @@ const Controls = ({
   const router = useRouter();
   return (
     <View
-      className={`absolute flex-row justify-between items-center w-full ${setUri ? "px-6 top-16" : "px-12 top-20"
-        }`}
+      className={`absolute flex-row justify-between items-center w-full ${
+        setUri ? "px-6 top-16" : "px-12 top-20"
+      }`}
     >
       <View className="flex-col items-center gap-3">
         <Pressable
-          className={`${!setFlash
-            ? "bg-black items-center justify-center w-12 h-12 rounded-2xl opacity-80 "
-            : ""
-            }`}
+          className={`${
+            !setFlash
+              ? "bg-black items-center justify-center w-12 h-12 rounded-2xl opacity-80 "
+              : ""
+          }`}
           onPress={() => router.back()}
         >
           <Entypo name="chevron-thin-left" size={22} color="white" />
@@ -246,11 +249,12 @@ const RenderPicture = ({
   setUri: (uri: string | null) => void;
 }) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const handleSheetChanges = useCallback((index: number) => { }, []);
+  const handleSheetChanges = useCallback((index: number) => {}, []);
   const { height: screenHeight } = Dimensions.get("window");
   const [imageHeight, setImageHeight] = useState(0);
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [isLoadingBase64, setIsLoadingBase64] = useState(true);
+  const [embedding, setEmbedding] = useState<number[] | null>(null);
 
   if (!uri) return null;
 
@@ -261,6 +265,8 @@ const RenderPicture = ({
       setIsLoadingBase64(true);
       const base64 = await convertUriToBase64(uri);
       setImageBase64(base64);
+      const embedding = await getEmbedding("image", base64 || "");
+      setEmbedding(embedding ? embedding : null);
       setIsLoadingBase64(false);
     };
     fetchImageBase64();
@@ -300,9 +306,9 @@ const RenderPicture = ({
             </View>
           ) : (
             <List2
-              queryKey={["similar-items", uri]}
+              queryKey={["similar-items", uri, embedding?.length || 0]}
               getClothingItems={(page, limit) =>
-                getClothingItemsSimilarBase64(page, limit, imageBase64)
+                getClothingItemsSimilarBase64(page, limit, embedding || [])
               }
               limit={6}
               columnCount={2}

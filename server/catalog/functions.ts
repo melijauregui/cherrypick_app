@@ -147,6 +147,13 @@ export async function extractImageFeatures(
     }
 
     const result = await response.json();
+    if (!Array.isArray(result)) {
+      const msg =
+        typeof (result as any)?.error === "string"
+          ? (result as any).error
+          : "Non-array features payload";
+      return { error: true, details: msg, features: [] };
+    }
     return {
       error: false,
       details: "Image features extracted successfully",
@@ -182,6 +189,14 @@ export async function extractImageFeaturesFromBase64(
     }
 
     const result = await response.json();
+
+    if (!Array.isArray(result)) {
+      const msg =
+        typeof (result as any)?.error === "string"
+          ? (result as any).error
+          : "Non-array features payload";
+      return { error: true, details: msg, features: [] };
+    }
 
     return {
       error: false,
@@ -219,6 +234,13 @@ export async function extractTextFeatures(
     }
 
     const result = await response.json();
+    if (!Array.isArray(result)) {
+      const msg =
+        typeof result?.error === "string"
+          ? result.error
+          : "Non-array features payload";
+      return { error: true, details: msg, features: [] };
+    }
     return {
       error: false,
       details: "Text features extracted successfully",
@@ -239,16 +261,13 @@ export async function extractFeatures(
   imageUrl: string
 ): Promise<{ error: boolean; details: string; features: FeaturesResult }> {
   try {
-    const response = await fetch(
-      "http://127.0.0.1:8000/extract-features/",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ text: text, image_url: imageUrl }),
-      }
-    );
+    const response = await fetch("http://127.0.0.1:8000/extract-features/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ text: text, image_url: imageUrl }),
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP error. status: ${response.status}`);
@@ -265,7 +284,7 @@ export async function extractFeatures(
     return {
       error: true,
       details: "Error extracting features",
-      features: { image_features: [], text_features: [] }
+      features: { image_features: [], text_features: [] },
     };
   }
 }
@@ -280,9 +299,11 @@ export type PreferencesSimilaritiesResult = {
   similarity: number;
 };
 
-export async function getPreferencesSimilarities(
-  image_url: string,
-): Promise<{ error: boolean; details: string; similarities: PreferencesSimilaritiesResult[] }> {
+export async function getPreferencesSimilarities(image_url: string): Promise<{
+  error: boolean;
+  details: string;
+  similarities: PreferencesSimilaritiesResult[];
+}> {
   try {
     const response = await fetch(
       "http://127.0.0.1:8000/similarities-preferences/",
@@ -327,16 +348,13 @@ export async function searchText(
   image_urls: string[]
 ): Promise<{ error: boolean; details: string; results: string[] }> {
   try {
-    const response = await fetch(
-      "http://127.0.0.1:8000/search-text/",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ text, image_urls }),
-      }
-    );
+    const response = await fetch("http://127.0.0.1:8000/search-text/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ text, image_urls }),
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP error. status: ${response.status}`);
@@ -360,17 +378,16 @@ export async function searchText(
   }
 }
 
-
 // Función para verificar si ya existe un elemento con el mismo nombre y brand en Weaviate
 export async function getCollection(): Promise<
   | {
-    error: true;
-    details: string;
-  }
+      error: true;
+      details: string;
+    }
   | {
-    error: false;
-    collection: Collection;
-  }
+      error: false;
+      collection: Collection;
+    }
 > {
   try {
     const client = await weaviate.connectToWeaviateCloud(config.WEAVIATE_URL, {
@@ -385,7 +402,6 @@ export async function getCollection(): Promise<
     let collection: Collection;
     const exists = await client.collections.exists("FashionItem");
     if (!exists) {
-
       collection = (await client.collections.create({
         name: "FashionItem",
         properties: [
@@ -462,7 +478,9 @@ export const Preferences = {
   },
 } as const;
 
-export const preferencesRepr: string[] = Object.values(Preferences).map(pref => pref.searchName); // ["minimalista", "boho chic", ...]
+export const preferencesRepr: string[] = Object.values(Preferences).map(
+  pref => pref.searchName
+); // ["minimalista", "boho chic", ...]
 
 export async function GetItemsFromWeaviate(
   uuids: string[],

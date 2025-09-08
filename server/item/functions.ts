@@ -12,6 +12,7 @@ import {
   extractTextFeatures,
   getCollection,
 } from "../catalog/functions";
+import { EmbbedingResponseSchemaType } from "@/schemas/search/search-schema";
 
 // Function to query specific item by name and brand in Weaviate
 export async function GetItem(
@@ -137,5 +138,36 @@ export async function UpdateItem(
 
   return {
     error: false,
+  };
+}
+
+export async function GetEmbeddingItem(
+  itemUuid: string
+): Promise<EmbbedingResponseSchemaType | ErrorSchemaType> {
+  const collectionResult = await getCollection();
+  if (collectionResult.error) {
+    return {
+      error: true,
+      details: "Error getting collection" + collectionResult.details,
+    };
+  }
+
+  const collection = collectionResult.collection!;
+  const result = await collection.query.fetchObjects({
+    filters: collection.filter.byId().equal(itemUuid),
+    limit: 1,
+    includeVector: true,
+  });
+  if (result.objects.length === 0 || !result.objects[0]) {
+    return {
+      error: true,
+      details: "Item not found",
+    };
+  }
+  const embedding = result.objects[0].vectors?.image_vector as number[];
+  console.log("embedding", embedding);
+  return {
+    error: false,
+    embedding: embedding,
   };
 }

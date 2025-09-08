@@ -14,12 +14,14 @@ import {
   searchText,
 } from "../catalog/functions";
 import { Sorting } from "weaviate-client";
+import { EmbbedingResponseSchemaType } from "@/schemas/search/search-schema";
 
 export async function SearchItems(
   page: number,
   limit: number,
-  type: "text" | "image" | "image-base64",
-  query: string
+  type: "text" | "image",
+  embedding: number[],
+  imageUrl?: string
 ): Promise<CatalogResponseSchemaType | ErrorSchemaType> {
   // Get Weaviate collection
   const resCollection = await getCollection();
@@ -57,17 +59,28 @@ export async function SearchItems(
       sort: new Sorting<string>().byProperty(sortProperty, false), // descending order
     });
   } else { */
-  const embeddingResponse =
-    type === "text"
-      ? await extractTextFeatures(query)
-      : type === "image"
-        ? await extractImageFeatures(query)
-        : await extractImageFeaturesFromBase64(query);
-  if (embeddingResponse.error || embeddingResponse.features.length === 0) {
-    logger.error("Error extracting features: %s", embeddingResponse.details);
+  // const embeddingResponse =
+  //   type === "text"
+  //     ? await extractTextFeatures(query)
+  //     : type === "image"
+  //       ? await extractImageFeatures(query)
+  //       : await extractImageFeaturesFromBase64(query);
+  // if (
+  //   embeddingResponse.error ||
+  //   !Array.isArray(embeddingResponse.features) ||
+  //   embeddingResponse.features.length === 0
+  // ) {
+  //   logger.error("Error extracting features: %s", embeddingResponse.details);
+  //   return {
+  //     error: true,
+  //     details: embeddingResponse.details,
+  //   };
+  // }
+
+  if (embedding.length !== 768) {
     return {
       error: true,
-      details: embeddingResponse.details,
+      details: "Embedding must be 768 numbers",
     };
   }
 
@@ -75,17 +88,13 @@ export async function SearchItems(
     limit: limit,
     offset: offset,
     returnProperties: returnProperties,
-    targetVector: type === "text" ? 'image_vector' : 'text_vector', // ToDo: ver si con image_vector funciona mejor en ambos casos
+    targetVector: type === "text" ? "image_vector" : "text_vector", // ToDo: ver si con image_vector funciona mejor en ambos casos
     includeDistance: true,
     includeMatchDistance: true,
   };
 
-  result = await collection.query.nearVector(
-    embeddingResponse.features,
-    queryOptions
-  );
+  result = await collection.query.nearVector(embedding, queryOptions);
   //}
-
 
   // Map results to ItemSchemaType
   const items: ItemSchemaType[] = result.objects
@@ -108,8 +117,7 @@ export async function SearchItems(
       return validationResult.data;
     })
     .filter((item): item is ItemSchemaType => {
-      console.log("item", item?.name);
-      return item !== null && item.imageUrl !== query;
+      return item !== null && item.imageUrl !== imageUrl;
     });
 
   logger.info(
@@ -120,5 +128,43 @@ export async function SearchItems(
   return {
     error: false,
     items: items,
+  };
+}
+
+export async function GetEmbedding(
+  type: "text" | "image",
+  query: string
+): Promise<EmbbedingResponseSchemaType | ErrorSchemaType> {
+  const embeddingResponse =
+    type === "text"
+      ? await extractTextFeatures(query)
+      : await extractImageFeaturesFromBase64(query);
+  if (
+    embeddingResponse.error ||
+    !Array.isArray(embeddingResponse.features) ||
+    embeddingResponse.features.length === 0
+  ) {
+    logger.error("Error extracting features: %s", embeddingResponse.details);
+    return {
+      error: true,
+      details: embeddingResponse.details,
+    };
+  }
+
+  if (embeddingResponse.features.length !== 768) {
+    return {
+      error: true,
+      details: "Embedding must be 768 numbers",
+    };
+  }
+
+  logger.info(
+    "Embedding completed successfully, length: %s",
+    embeddingResponse.features.length
+  );
+
+  return {
+    error: false,
+    embedding: embeddingResponse.features,
   };
 }

@@ -6,6 +6,8 @@ import {
   getSelfBrandProfile,
   getBrandProfile,
   getItem,
+  getItemEmbedding,
+  getEmbedding,
 } from "./fetch";
 import { ItemSchemaType } from "@/schemas/catalog/catalog-schema";
 import { ClientSchemaType } from "@/schemas/client/client-schema";
@@ -111,4 +113,42 @@ export function useFetchItem(itemUuid: string): {
   }
 
   return data;
+}
+
+export function useFetchItemEmbedding(itemUuid: string): {
+  embedding: number[];
+} | null {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["item-embedding", itemUuid],
+    queryFn: () => getItemEmbedding(itemUuid),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  if (isLoading) {
+    return null;
+  }
+  if (!data) {
+    return null;
+  }
+  return { embedding: data };
+}
+
+export function useFetchEmbedding(
+  type: "text" | "image",
+  query: string
+): {
+  embedding: number[];
+} | null {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["embedding", type, query],
+    queryFn: () => getEmbedding(type, query),
+  });
+
+  if (isLoading) {
+    return null;
+  }
+  if (!data) {
+    return null;
+  }
+  return { embedding: data };
 }

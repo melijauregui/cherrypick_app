@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { SuccessSchema } from "../standar-response-schema";
 import { QueryIdSchema } from "../standar-query-schema";
+import { EmbbedingSchema } from "../search/search-schema";
 
 export const PropertiesItemSchema = z.object({
   name: z
@@ -62,6 +63,7 @@ export const ImageBase64Schema = z.object({
   imageBase64: z.string().min(1, "La imagen es requerida"),
 });
 export const ImageUrlSchema = z.object({
+  ...EmbbedingSchema.shape,
   imageUrl: z.string().min(1, "La imagen es requerida"),
 });
 

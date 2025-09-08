@@ -15,6 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 import LoadingPage from "../LoadingPage";
 import { ItemSchemaType } from "@/schemas/catalog/catalog-schema";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useFetchEmbedding } from "@/app/utils/use-query";
 
 const PageExplore = ({
   query,
@@ -25,6 +26,7 @@ const PageExplore = ({
 }) => {
   const router = useRouter();
   const [searchText, setSearchText] = useState((query as string) || "");
+  const embeddingData = useFetchEmbedding("text", query);
 
   const onChangeTextSearch = (text: string) => {
     setSearchText(text);
@@ -86,9 +88,17 @@ const PageExplore = ({
 
       {!isExplorePage && (
         <List2
-          queryKey={["search-results", query]}
+          queryKey={[
+            "search-results",
+            query,
+            embeddingData?.embedding?.length || 0,
+          ]}
           getClothingItems={(page, limit) =>
-            getClothingItemsTextSearch(page, limit, query)
+            getClothingItemsTextSearch(
+              page,
+              limit,
+              embeddingData?.embedding || []
+            )
           }
           limit={10}
           columnCount={2}
@@ -135,9 +145,11 @@ const FashionIdeasSection = ({ query }: { query: string }) => {
 };
 
 const GridImages = ({ query }: { query: string }) => {
+  const embeddingData = useFetchEmbedding("text", query);
   const { data } = useQuery({
-    queryKey: ["explore-items", query],
-    queryFn: () => getClothingItemsTextSearch(0, 4, query),
+    queryKey: ["explore-items", query, embeddingData?.embedding?.length || 0],
+    queryFn: () =>
+      getClothingItemsTextSearch(0, 4, embeddingData?.embedding || []),
   });
   if (!data) {
     return <LoadingPage alreadyPrefetched={true} />;

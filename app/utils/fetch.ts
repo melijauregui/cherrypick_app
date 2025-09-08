@@ -26,6 +26,7 @@ import {
   SuccessSchema,
   SuccessSchemaType,
 } from "@/schemas/standar-response-schema";
+import { EmbbedingResponseSchema } from "@/schemas/search/search-schema";
 
 // Helper function to handle API responses consistently
 const handleApiResponse = async <T>(
@@ -349,16 +350,25 @@ export const getAllFavoritedItems = async (
 export const getClothingItemsTextSearch = async (
   page: number,
   limit: number,
-  query: string
+  embedding: number[]
 ): Promise<ItemSchemaType[]> => {
-  console.log("getClothingItemsTextSearch", page, limit, query);
+  if (embedding.length === 0) {
+    return [];
+  }
+  console.log("getClothingItemsTextSearch", page, limit, embedding.length);
   const res = await handleApiResponse<{
     items: ItemSchemaType[];
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/search/text/${query}?page=${page}&limit=${limit}`,
-        method: "GET",
+        url: `http://${LOCAL_IP}:3000/search/text?page=${page}&limit=${limit}`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          embedding: embedding,
+        }),
       }),
     CatalogResponseSchema,
     "getClothingItemsTextSearch"
@@ -369,9 +379,19 @@ export const getClothingItemsTextSearch = async (
 export const getClothingItemsSimilar = async (
   page: number,
   limit: number,
+  embedding: number[],
   imageUrl: string
 ): Promise<ItemSchemaType[]> => {
-  console.log("getClothingItemsSimilar", page, limit);
+  console.log(
+    "getClothingItemsSimilar",
+    page,
+    limit,
+    embedding.length,
+    imageUrl
+  );
+  if (embedding.length === 0) {
+    return [];
+  }
   const res = await handleApiResponse<{
     items: ItemSchemaType[];
   }>(
@@ -383,26 +403,25 @@ export const getClothingItemsSimilar = async (
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          embedding: embedding,
           imageUrl: imageUrl,
         }),
       }),
     CatalogResponseSchema,
     "getClothingItemsSimilar"
   );
+  console.log("getClothingItemsSimilar", res?.items);
   return res?.items || [];
 };
 
 export async function getClothingItemsSimilarBase64(
   page: number,
   limit: number,
-  imageBase64?: string | null
+  embedding: number[]
 ): Promise<ItemSchemaType[]> {
-  // If no image base64 provided, return empty array
-  if (!imageBase64) {
-    console.warn("No image base64 provided in getClothingItemsSimilarBase64");
+  if (embedding.length === 0) {
     return [];
   }
-
   const res = await handleApiResponse<{
     items: ItemSchemaType[];
   }>(
@@ -414,11 +433,52 @@ export async function getClothingItemsSimilarBase64(
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          imageBase64: imageBase64,
+          embedding: embedding,
         }),
       }),
     CatalogResponseSchema,
     "getClothingItemsSimilarBase64"
   );
   return res?.items || [];
+}
+
+export async function getEmbedding(
+  type: "text" | "image",
+  query: string
+): Promise<number[] | null> {
+  const res = await handleApiResponse<{
+    embedding: number[];
+  }>(
+    () =>
+      safeFetch({
+        url: `http://${LOCAL_IP}:3000/search/embedding/${type}`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          query: query,
+        }),
+      }),
+    EmbbedingResponseSchema,
+    "getEmbedding"
+  );
+  return res?.embedding || null;
+}
+
+export async function getItemEmbedding(
+  itemUuid: string
+): Promise<number[] | null> {
+  const res = await handleApiResponse<{
+    embedding: number[];
+  }>(
+    () =>
+      safeFetch({
+        url: `http://${LOCAL_IP}:3000/item/${itemUuid}/embedding`,
+        method: "GET",
+      }),
+    EmbbedingResponseSchema,
+    "getItemEmbedding"
+  );
+  return res?.embedding || null;
 }

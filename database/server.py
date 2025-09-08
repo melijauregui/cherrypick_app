@@ -41,7 +41,7 @@ async def extract_image_features(request: dict):
         else:
             return {"error": "Either image_url or image_base64 must be provided"}
 
-        return X[0].tolist()
+        return X[0].cpu().tolist()
 
     except Exception as e:
         return {"error": str(e)}
@@ -53,9 +53,10 @@ async def extract_text_features(request: dict):
         print("Obteniendo features de texto")
         text = request.get("text", "")
         X = extract_feat_text(text)
-        return X[0].tolist()
+        return X[0].cpu().tolist()
 
     except Exception as e:
+        print(f"Error extracting text features: {str(e)}")
         return {"error": str(e)}
 
 
@@ -122,7 +123,7 @@ def extract_feat_text(text: str):
     Extrae características de un texto (descripción)
     """
     text_inputs = processor(
-        text=[text], padding='max_length', return_tensors="pt")
+        text=[text], padding='max_length', return_tensors="pt").to(device)
 
     input_ids = text_inputs["input_ids"]
     attention_mask = text_inputs["attention_mask"]
@@ -145,7 +146,7 @@ async def extract_features(request: dict):
         img = Image.open(BytesIO(response.content)).convert("RGB")
 
         processed = processor(
-            text=[text], images=[img], padding='max_length', return_tensors="pt")
+            text=[text], images=[img], padding='max_length', return_tensors="pt").to(device)
 
         pixel_values = processed["pixel_values"]
         input_ids = processed["input_ids"]
@@ -158,8 +159,8 @@ async def extract_features(request: dict):
                 input_ids=input_ids, attention_mask=attention_mask, normalize=True)
 
         return {
-            "image_features": image_features[0].tolist(),
-            "text_features": text_features[0].tolist()
+            "image_features": image_features[0].cpu().tolist(),
+            "text_features": text_features[0].cpu().tolist()
         }
 
     except Exception as e:
@@ -180,7 +181,7 @@ async def similarities_matrix(request: dict):
             images.append(img)
 
         processed = processor(
-            text=[text], images=images, padding='max_length', return_tensors="pt")
+            text=[text], images=images, padding='max_length', return_tensors="pt").to(device)
 
         pixel_values = processed["pixel_values"]
         input_ids = processed["input_ids"]
@@ -220,7 +221,7 @@ async def similarities_preferences(request: dict):
         response = requests.get(image_url)
         img = Image.open(BytesIO(response.content)).convert("RGB")
         processed = processor(
-            text=preferences, images=[img], padding='max_length', return_tensors="pt")
+            text=preferences, images=[img], padding='max_length', return_tensors="pt").to(device)
 
         pixel_values = processed["pixel_values"]
         input_ids = processed["input_ids"]
@@ -235,7 +236,7 @@ async def similarities_preferences(request: dict):
         similarity_scores = (image_features @
                              text_features.T).squeeze(0)
 
-        probabilities = similarity_scores.sigmoid().tolist()
+        probabilities = similarity_scores.sigmoid().cpu().tolist()
 
         result = [
             {"preference": pref, "similarity": prob}
