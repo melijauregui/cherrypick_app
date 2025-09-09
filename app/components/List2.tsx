@@ -116,9 +116,8 @@ const ImageGallery = ({
   ) : (
     <>
       <View
-        className={`flex-row ${
-          itemQuantity < columnCount ? `justify-start ` : "justify-between"
-        }`}
+        className={`flex-row ${itemQuantity < columnCount ? `justify-start ` : "justify-between"
+          }`}
         style={{
           gap: itemQuantity < columnCount ? resto : 0,
         }}
@@ -151,7 +150,9 @@ const ImageGallery = ({
   );
 
   return (
-    <ScrollView
+    <ScrollView contentContainerStyle={{
+      paddingTop: 8
+    }}
       // contentContainerStyle={}
       showsVerticalScrollIndicator={false}
       onScroll={handleScroll}
