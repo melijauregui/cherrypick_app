@@ -259,6 +259,9 @@ const RenderPicture = ({
   if (!uri) return null;
 
   const minHeight = Math.max(screenHeight - imageHeight, 400);
+  const snapPoints = [minHeight, 400, 600, 800, 1000].filter(
+    point => point >= minHeight
+  );
 
   useEffect(() => {
     const fetchImageBase64 = async () => {
@@ -285,7 +288,7 @@ const RenderPicture = ({
           onChange={handleSheetChanges}
           index={0}
           enableDynamicSizing={false}
-          snapPoints={[minHeight, "100%"]}
+          snapPoints={snapPoints}
           enableOverDrag={false}
           backgroundStyle={{ backgroundColor: "#301c11" }}
           handleIndicatorStyle={{

@@ -446,6 +446,9 @@ export async function getEmbedding(
   type: "text" | "image",
   query: string
 ): Promise<number[] | null> {
+  if (query.length === 0) {
+    return null;
+  }
   const res = await handleApiResponse<{
     embedding: number[];
   }>(

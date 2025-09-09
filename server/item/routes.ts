@@ -182,8 +182,6 @@ ItemApp.openapi(getItemRoute, async c => {
     return c.json(res, 500);
   }
 
-  logger.info("/GET item/uuid: %s response: %s", res.item.uuid, res);
-
   return c.json(res, 200);
 });
 

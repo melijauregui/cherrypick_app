@@ -45,38 +45,6 @@ export async function SearchItems(
 
   let result;
 
-  /* const preference = Object.values(Preferences).find(
-    pref => pref.name.toLowerCase() === query.toLowerCase() || pref.searchName.toLocaleLowerCase() === query.toLocaleLowerCase()
-  );
-
-  if (preference) {
-    const sortProperty = preference.property;
-
-    result = await collection.query.fetchObjects({
-      limit: limit,
-      offset: offset,
-      returnProperties: returnProperties,
-      sort: new Sorting<string>().byProperty(sortProperty, false), // descending order
-    });
-  } else { */
-  // const embeddingResponse =
-  //   type === "text"
-  //     ? await extractTextFeatures(query)
-  //     : type === "image"
-  //       ? await extractImageFeatures(query)
-  //       : await extractImageFeaturesFromBase64(query);
-  // if (
-  //   embeddingResponse.error ||
-  //   !Array.isArray(embeddingResponse.features) ||
-  //   embeddingResponse.features.length === 0
-  // ) {
-  //   logger.error("Error extracting features: %s", embeddingResponse.details);
-  //   return {
-  //     error: true,
-  //     details: embeddingResponse.details,
-  //   };
-  // }
-
   if (embedding.length !== 768) {
     return {
       error: true,
@@ -120,11 +88,6 @@ export async function SearchItems(
       return item !== null && item.imageUrl !== imageUrl;
     });
 
-  logger.info(
-    "Search completed successfully, returning %s items",
-    items.length
-  );
-
   return {
     error: false,
     items: items,
@@ -157,11 +120,6 @@ export async function GetEmbedding(
       details: "Embedding must be 768 numbers",
     };
   }
-
-  logger.info(
-    "Embedding completed successfully, length: %s",
-    embeddingResponse.features.length
-  );
 
   return {
     error: false,

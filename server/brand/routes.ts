@@ -400,10 +400,6 @@ BrandApp.openapi(allBrandItemsRoute, async c => {
   if (res.error) {
     return c.json(res, 500);
   }
-  logger.info(
-    "/GET brand/all-names-items response: %s",
-    res.items.length.toString()
-  );
   return c.json(res, 200);
 });
 

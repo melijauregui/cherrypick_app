@@ -41,6 +41,7 @@ async def extract_image_features(request: dict):
         else:
             return {"error": "Either image_url or image_base64 must be provided"}
 
+        print("Features de imagen obtenidos")
         return X[0].cpu().tolist()
 
     except Exception as e:
@@ -101,10 +102,10 @@ def extract_feat_image_base64(image_base64: str):
 
         # Convertir a RGB y remover fondo
         image = Image.open(BytesIO(image_data)).convert("RGB")
-        image_no_bg = remove(image)
+        # image_no_bg = remove(image)
 
         image_inputs = processor(
-            images=image_no_bg, return_tensors="pt",
+            images=image, return_tensors="pt",
             padding=True, truncation=True
         ).to(device)
 

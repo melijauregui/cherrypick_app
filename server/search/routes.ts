@@ -301,7 +301,9 @@ SearchApp.openapi(imageBase64EmbeddingRoute, async c => {
   const { query } = await c.req.json();
   logger.info("POST /search/embedding/image");
 
+  logger.warn("TO GET EMBEDDING IMAGE");
   const result = await GetEmbedding("image", query);
+  logger.warn("EMBEDDING IMAGE DONE");
 
   if (result.error) {
     return c.json(result, 500);
