@@ -151,7 +151,8 @@ const GridImages = ({ query }: { query: string }) => {
     queryFn: () =>
       getClothingItemsTextSearch(0, 4, embeddingData?.embedding || []),
   });
-  if (!data) {
+  console.log("data!!!!", data);
+  if (!data || data.length === 0) {
     return <LoadingPage alreadyPrefetched={true} />;
   }
   return (

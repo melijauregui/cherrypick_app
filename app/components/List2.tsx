@@ -32,6 +32,7 @@ const ImageGallery = ({
   itemWhenNothingFound,
   contentUp,
   roundRobin,
+  canRefresh = true,
 }: {
   queryKey: any[];
   getClothingItems: (page: number, limit: number) => Promise<ItemSchemaType[]>;
@@ -40,6 +41,7 @@ const ImageGallery = ({
   itemWhenNothingFound?: () => React.ReactElement;
   contentUp?: React.ReactElement;
   roundRobin?: boolean;
+  canRefresh?: boolean;
 }) => {
   const { user } = useSession();
   const lastTriggeredHeightRef = useRef(0);
@@ -155,12 +157,14 @@ const ImageGallery = ({
       onScroll={handleScroll}
       scrollEventThrottle={16}
       refreshControl={
-        <RefreshControl
-          refreshing={false}
-          onRefresh={onRefresh}
-          tintColor="#ffffff"
-          colors={["#ffffff"]}
-        />
+        canRefresh ? (
+          <RefreshControl
+            refreshing={false}
+            onRefresh={onRefresh}
+            tintColor="#ffffff"
+            colors={["#ffffff"]}
+          />
+        ) : undefined
       }
     >
       {contentUp}

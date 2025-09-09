@@ -249,12 +249,16 @@ const RenderPicture = ({
   setUri: (uri: string | null) => void;
 }) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const handleSheetChanges = useCallback((index: number) => {}, []);
+  const handleSheetChanges = useCallback((index: number) => {
+    console.log("index", index);
+    setSnapIndex(index);
+  }, []);
   const { height: screenHeight } = Dimensions.get("window");
   const [imageHeight, setImageHeight] = useState(0);
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [isLoadingBase64, setIsLoadingBase64] = useState(true);
   const [embedding, setEmbedding] = useState<number[] | null>(null);
+  const [snapIndex, setSnapIndex] = useState(0);
 
   if (!uri) return null;
 
@@ -308,14 +312,21 @@ const RenderPicture = ({
               <Text className="text-white">Procesando imagen...</Text>
             </View>
           ) : (
-            <List2
-              queryKey={["similar-items", uri, embedding?.length || 0]}
-              getClothingItems={(page, limit) =>
-                getClothingItemsSimilarBase64(page, limit, embedding || [])
-              }
-              limit={6}
-              columnCount={2}
-            />
+            <View
+              style={{
+                height: (snapPoints[snapIndex] ?? 1000) - 90,
+              }}
+            >
+              <List2
+                queryKey={["similar-items", uri, embedding?.length || 0]}
+                getClothingItems={(page, limit) =>
+                  getClothingItemsSimilarBase64(page, limit, embedding || [])
+                }
+                limit={6}
+                columnCount={2}
+                canRefresh={false}
+              />
+            </View>
           )}
         </BottomSheet>
       </View>
