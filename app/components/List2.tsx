@@ -116,8 +116,9 @@ const ImageGallery = ({
   ) : (
     <>
       <View
-        className={`flex-row ${itemQuantity < columnCount ? `justify-start ` : "justify-between"
-          }`}
+        className={`flex-row ${
+          itemQuantity < columnCount ? `justify-start ` : "justify-between"
+        }`}
         style={{
           gap: itemQuantity < columnCount ? resto : 0,
         }}
@@ -150,9 +151,10 @@ const ImageGallery = ({
   );
 
   return (
-    <ScrollView contentContainerStyle={{
-      paddingTop: 8
-    }}
+    <ScrollView
+      contentContainerStyle={{
+        paddingTop: 8,
+      }}
       // contentContainerStyle={}
       showsVerticalScrollIndicator={false}
       onScroll={handleScroll}
@@ -300,22 +302,6 @@ const prepareColumns = async (
       columns[minHeightIndex]?.push(item);
       columnHeights[minHeightIndex] =
         (columnHeights[minHeightIndex] ?? 0) + item.renderedHeight;
-    }
-
-    // Reorganizar columnas al final: mover items de columnas más a la derecha hacia columnas más a la izquierda
-    for (let i = numColumns - 1; i > 0; i--) {
-      // Si la columna actual tiene más items que la columna anterior, mover el último item
-      const currentColumn = columns[i];
-      const previousColumn = columns[i - 1];
-
-      if (currentColumn && previousColumn) {
-        while (currentColumn.length > previousColumn.length) {
-          const lastItem = currentColumn.pop();
-          if (lastItem) {
-            previousColumn.push(lastItem);
-          }
-        }
-      }
     }
 
     return columns;
