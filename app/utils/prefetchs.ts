@@ -156,13 +156,6 @@ export function prefetchBrandPageItem(
   prefetchIfNeeded(queryClient, ["brand-profile-item", brandId], () =>
     getBrandProfile(brandId)
   );
-  console.log("going to check if prefetching brand page item", brandId);
-  prefetchInfiniteQueryIfNeeded(
-    queryClient,
-    ["brand-items", brandId],
-    () => getBrandItems(0, 6, brandId),
-    userEmail
-  );
 }
 
 export function prefetchLikeAndFavoritePage(

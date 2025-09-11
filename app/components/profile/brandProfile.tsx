@@ -171,7 +171,7 @@ const BrandProfilePage = ({ brandId }: { brandId: string }) => {
             getClothingItems={(pageParam, limit) =>
               getBrandItems(pageParam, limit, data.brand.id)
             }
-            limit={18}
+            limit={12}
             columnCount={3}
           />
         </SafeAreaView>

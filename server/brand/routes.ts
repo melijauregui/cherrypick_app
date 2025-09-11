@@ -499,8 +499,6 @@ BrandApp.openapi(paginatedRouteBrandWithId, async c => {
 
   const items = await GetCatalog(embedding, page, limit, id);
 
-  logger.info("/GET brand/{id}/all-items result: %s", items.items);
-
   res = {
     error: false,
     items: items.items,
