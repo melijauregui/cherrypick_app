@@ -7,8 +7,9 @@ import LogoSquareBeige from "@/app/components/logo/LogoSquareBeige";
 import "../global.css";
 import { Redirect } from "expo-router";
 import { authClient } from "@/lib/auth-client";
-import { useQueryClient } from "@tanstack/react-query";
+import { QueryClient, useQueryClient } from "@tanstack/react-query";
 import prefetchHome, {
+  prefetchExplorePage,
   prefetchLikeAndFavoritePage,
   prefetchProfile,
 } from "@/app/utils/prefetchs";
@@ -42,6 +43,7 @@ export default function App() {
         prefetchHome(queryClient, user.email);
         prefetchProfile(user, queryClient);
         prefetchLikeAndFavoritePage(queryClient, user.email);
+        prefetchExplorePage(queryClient);
       }, 100);
     }
     return (

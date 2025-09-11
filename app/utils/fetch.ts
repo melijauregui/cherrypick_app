@@ -449,6 +449,7 @@ export async function getEmbedding(
   if (query.length === 0) {
     return null;
   }
+  console.log("getEmbedding", type, query);
   const res = await handleApiResponse<{
     embedding: number[];
   }>(

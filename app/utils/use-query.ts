@@ -142,6 +142,7 @@ export function useFetchEmbedding(
   const { data, isLoading, error } = useQuery({
     queryKey: ["embedding", type, query],
     queryFn: () => getEmbedding(type, query),
+    staleTime: 5 * 60 * 1000,
   });
 
   if (isLoading) {

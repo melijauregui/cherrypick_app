@@ -5,6 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import prefetchHome, {
   prefetchLikeAndFavoritePage,
   prefetchProfile,
+  prefetchExplorePage,
 } from "@/app/utils/prefetchs";
 import { useSession } from "@/lib/auth-client";
 
@@ -37,6 +38,7 @@ const LoadingPage: React.FC<{ alreadyPrefetched?: boolean }> = ({
     prefetchHome(queryClient, user.email);
     prefetchProfile(user, queryClient);
     prefetchLikeAndFavoritePage(queryClient, user.email);
+    prefetchExplorePage(queryClient);
   }
 
   const spin = spinValue.interpolate({

@@ -147,11 +147,15 @@ const FashionIdeasSection = ({ query }: { query: string }) => {
 const GridImages = ({ query }: { query: string }) => {
   const embeddingData = useFetchEmbedding("text", query);
   const { data } = useQuery({
-    queryKey: ["explore-items", query, embeddingData?.embedding?.length || 0],
+    queryKey: [
+      "explore-items",
+      query,
+      String(embeddingData?.embedding?.length || 0),
+    ],
     queryFn: () =>
       getClothingItemsTextSearch(0, 4, embeddingData?.embedding || []),
+    staleTime: 5 * 60 * 1000,
   });
-  console.log("data!!!!", data);
   if (!data || data.length === 0) {
     return <LoadingPage alreadyPrefetched={true} />;
   }

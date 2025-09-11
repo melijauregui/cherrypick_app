@@ -13,6 +13,8 @@ import {
   getClothingItemsHome,
   getAllLikedItems,
   getAllFavoritedItems,
+  getEmbedding,
+  getClothingItemsTextSearch,
 } from "./fetch";
 
 export function prefetchProfile(
@@ -173,5 +175,45 @@ export function prefetchLikeAndFavoritePage(
     ["all-favorited-items", userEmail],
     () => getAllFavoritedItems(0, 18),
     userEmail
+  );
+}
+export async function prefetchExplorePage(queryClient: QueryClient) {
+  console.log("prefetching explore page");
+  prefetchExplorePageQuery(queryClient, "Minimalist");
+  prefetchExplorePageQuery(queryClient, "Coquette");
+  prefetchExplorePageQuery(queryClient, "Streetwear");
+  prefetchExplorePageQuery(queryClient, "Sporty");
+  prefetchExplorePageQuery(queryClient, "Old money");
+  prefetchExplorePageQuery(queryClient, "Boho-chic");
+}
+
+export async function prefetchExplorePageQuery(
+  queryClient: QueryClient,
+  query: string
+) {
+  console.log("prefetching explore page for query: ", query);
+  if (!query || query.trim().length === 0) return;
+
+  const embeddingKey = ["embedding", "text", query];
+  prefetchIfNeeded(queryClient, embeddingKey, () =>
+    getEmbedding("text", query)
+  );
+
+  for (let i = 0; i < 10; i++) {
+    const isEmbeddingFetching = queryClient.isFetching({
+      queryKey: embeddingKey,
+    });
+    if (!isEmbeddingFetching) {
+      break;
+    }
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+
+  const embedding = queryClient.getQueryData<number[] | null>(embeddingKey);
+  if (!embedding || embedding.length === 0) return;
+
+  const itemsKey = ["explore-items", query, String(embedding.length)];
+  await prefetchIfNeeded(queryClient, itemsKey, () =>
+    getClothingItemsTextSearch(0, 4, embedding)
   );
 }
