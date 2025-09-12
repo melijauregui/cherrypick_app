@@ -34,6 +34,13 @@ class TestInfo:
         self.yellow_flags = yellow_flags
 
 
+class TestsInfo:
+    def __init__(self, input_folder, output_folder, test_cases: list[TestInfo]):
+        self.input_folder = input_folder
+        self.output_folder = output_folder
+        self.test_cases = test_cases
+
+
 TEST_CASES_ROTURAS = [
     TestInfo(description="jean liso",
              clasification_img="rotura", has=False),
@@ -100,8 +107,30 @@ TEST_CASES_GRAL = [
              clasification_img="camisa manga corta"),
 ]
 
+TEST_ROTURAS = TestsInfo(
+    input_folder="images-testing-roturas",
+    output_folder="images-testing-roturas-nobg",
+    test_cases=TEST_CASES_ROTURAS
+)
 
-def run_tests(input_folder, output_folder, test_cases, test_img=False, test=True):
+TEST_PREFERENCIAS = TestsInfo(
+    input_folder="images-testing-preferences",
+    output_folder="images-testing-preferences-nobg",
+    test_cases=TEST_CASES_PREF
+)
+
+TEST_GRAL = TestsInfo(
+    input_folder="images_testing_general",
+    output_folder="images-testing-general-nobg",
+    test_cases=TEST_CASES_GRAL
+)
+
+
+def run_tests(tests_info: TestsInfo, test_img=False, test=True):
+    input_folder = tests_info.input_folder
+    output_folder = tests_info.output_folder
+    test_cases = tests_info.test_cases
+
     remove_background(input_folder, output_folder)
 
     image_paths = []
@@ -134,8 +163,6 @@ def _run_test(test_cases, image_paths, images, test_img=False, test=True):
                                clasification_img=test_info.clasification_img,
                                yellow_flags=test_info.yellow_flags)
         print("\n")
-        if test_img:
-            image_paths_test = image_paths.copy()
 
 
 def _find_candidate_img(image_paths, images, clasification_img, has):
@@ -151,17 +178,9 @@ def _find_candidate_img(image_paths, images, clasification_img, has):
 
 
 if __name__ == "__main__":
-    input_folder = "images-testing-roturas"
-    output_folder = "images-testing-roturas-nobg"
-    run_tests(input_folder, output_folder,
-              TEST_CASES_ROTURAS)
+    # -- text->imgs --
+    run_tests(TEST_ROTURAS)
 
-    input_folder = "images-testing-preferences"
-    output_folder = "images-testing-preferences-nobg"
-    run_tests(input_folder, output_folder,
-              TEST_CASES_PREF)
+    run_tests(TEST_PREFERENCIAS)
 
-    input_folder = "images_testing_general"
-    output_folder = "images-testing-general-nobg"
-    run_tests(input_folder, output_folder,
-              TEST_CASES_GRAL)
+    run_tests(TEST_GRAL)
