@@ -25,10 +25,21 @@ processor = AutoProcessor.from_pretrained(
 model.eval()
 torch.manual_seed(42)
 
+INPUT_FOLDER_ROTURAS = "images-testing-roturas"
+OUTPUT_FOLDER_ROTURAS = "images-testing-roturas-nobg"
+INPUT_FOLDER_PREFERENCIAS = "images-testing-preferences"
+OUTPUT_FOLDER_PREFERENCIAS = "images-testing-preferences-nobg"
+INPUT_FOLDER_GRAL = "images_testing_general"
+OUTPUT_FOLDER_GRAL = "images-testing-general-nobg"
+INPUT_FOLDER_COMB = "images_testing_comb"
+OUTPUT_FOLDER_COMB = "images_tesing_comb_nobg"
+FOLDER_REF_COMB = "images_ref_comb"
+
 
 class TestInfo:
-    def __init__(self, description, clasification_img, has=True, yellow_flags=[]):
+    def __init__(self, description="", clasification_img="", img_path=None, has=True, yellow_flags=[]):
         self.description = description
+        self.img_path = img_path
         self.has = has
         self.clasification_img = clasification_img
         self.yellow_flags = yellow_flags
@@ -123,34 +134,58 @@ TEST_CASES_NEG = [
              has=False),  # string random
 ]
 
+
+def _get_test_cases_comb():
+    cases = []
+    for fname in os.listdir(FOLDER_REF_COMB):
+        if fname.lower().endswith((".png", ".jpg", ".jpeg")):
+            # tipoFoto-color1-color2-color3.png
+            name_parts = os.path.splitext(fname)[0].split("-")
+            clasification_img = (" ").join(name_parts[1:])
+            img_path = os.path.join(FOLDER_REF_COMB, fname)
+            cases.append(TestInfo(
+                clasification_img=clasification_img,
+                img_path=img_path
+            ))
+    return cases
+
+
+TEST_CASES_COMB = _get_test_cases_comb()
+
 TEST_ROTURAS = TestsInfo(
-    input_folders=["images-testing-roturas"],
-    output_folders=["images-testing-roturas-nobg"],
+    input_folders=[INPUT_FOLDER_ROTURAS],
+    output_folders=[OUTPUT_FOLDER_ROTURAS],
     test_cases=TEST_CASES_ROTURAS
 )
 
 TEST_PREFERENCIAS = TestsInfo(
-    input_folders=["images-testing-preferences"],
-    output_folders=["images-testing-preferences-nobg"],
+    input_folders=[INPUT_FOLDER_PREFERENCIAS],
+    output_folders=[OUTPUT_FOLDER_PREFERENCIAS],
     test_cases=TEST_CASES_PREF
 )
 
 TEST_GRAL = TestsInfo(
-    input_folders=["images_testing_general"],
-    output_folders=["images-testing-general-nobg"],
+    input_folders=[INPUT_FOLDER_GRAL],
+    output_folders=[OUTPUT_FOLDER_GRAL],
     test_cases=TEST_CASES_GRAL
 )
 
 TEST_NEG = TestsInfo(
-    input_folders=["images_testing_general",
-                   "images-testing-roturas", "images-testing-preferences"],
-    output_folders=["images-testing-general-nobg",
-                    "images-testing-roturas-nobg", "images-testing-preferences-nobg"],
+    input_folders=[INPUT_FOLDER_GRAL,
+                   INPUT_FOLDER_ROTURAS, INPUT_FOLDER_PREFERENCIAS],
+    output_folders=[OUTPUT_FOLDER_GRAL,
+                    OUTPUT_FOLDER_ROTURAS, OUTPUT_FOLDER_PREFERENCIAS],
     test_cases=TEST_CASES_NEG
 )
 
+TEST_COMB = TestsInfo(
+    input_folders=[INPUT_FOLDER_COMB],
+    output_folders=[OUTPUT_FOLDER_COMB],
+    test_cases=TEST_CASES_COMB
+)
 
-def run_tests(tests_info: TestsInfo, test_img=False, test=True, only_show_min_max=False):
+
+def run_tests(tests_info: TestsInfo, test_img=False, test=True, only_show_min_max=False, match_all_words=True):
     input_folders = tests_info.input_folders
     output_folders = tests_info.output_folders
     test_cases = tests_info.test_cases
@@ -168,16 +203,17 @@ def run_tests(tests_info: TestsInfo, test_img=False, test=True, only_show_min_ma
     images = [Image.open(p).convert("RGB") for p in image_paths]
 
     _run_test(test_cases, image_paths, images,
-              test_img, test, only_show_min_max)
+              test_img, test, only_show_min_max, match_all_words)
 
 
-def _run_test(test_cases, image_paths, images, test_img=False, test=True, only_show_min_max=False):
+def _run_test(test_cases, image_paths, images, test_img=False, test=True, only_show_min_max=False, match_all_words=True):
     image_paths_test = image_paths.copy()
     for test_info in test_cases:
         if test_img:
-            path, img, image_paths_test, images_test = _find_candidate_img(
-                image_paths, images, test_info.clasification_img, has=test_info.has)
-            print("Image:", os.path.basename(path))
+            path, img, image_paths_test, images_test = _get_candidate_image(
+                test_info.img_path, image_paths, images, test_info.clasification_img, has=test_info.has)
+            print(
+                f"Image: {os.path.basename(path)}, Clasification: {test_info.clasification_img}")
             probabilities = find_similarities_image2image(
                 model, processor, img, image_paths_test, images_test)
         else:
@@ -188,11 +224,14 @@ def _run_test(test_cases, image_paths, images, test_img=False, test=True, only_s
             test_clasification(probabilities=probabilities,
                                image_paths=image_paths_test, has=test_info.has,
                                clasification_img=test_info.clasification_img,
-                               yellow_flags=test_info.yellow_flags)
+                               yellow_flags=test_info.yellow_flags, match_all_words=match_all_words)
         print("\n")
 
 
-def _find_candidate_img(image_paths, images, clasification_img, has):
+def _get_candidate_image(img_path, image_paths, images, clasification_img, has):
+    if img_path is not None:
+        img = Image.open(img_path).convert("RGB")
+        return img_path, img, image_paths, images
     paths_copy = image_paths.copy()
     images_copy = images.copy()
     for i, path in enumerate(image_paths):
@@ -206,7 +245,10 @@ def _find_candidate_img(image_paths, images, clasification_img, has):
 
 if __name__ == "__main__":
     # -- text->imgs --
-    # run_tests(TEST_ROTURAS)
-    # run_tests(TEST_PREFERENCIAS)
-    # run_tests(TEST_GRAL)
-    run_tests(TEST_NEG, test=False, only_show_min_max=True)
+    run_tests(TEST_ROTURAS)
+    run_tests(TEST_PREFERENCIAS)
+    run_tests(TEST_GRAL)
+    # run_tests(TEST_NEG, test=False, only_show_min_max=True)
+
+    # -- img->imgs --
+    # run_tests(TEST_COMB, test_img=True, match_all_words=False)

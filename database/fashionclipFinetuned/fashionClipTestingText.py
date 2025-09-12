@@ -85,12 +85,17 @@ def find_similarities_matrix_2(model, processor, descriptions, image_paths, imag
     return similarity_matrix
 
 
-def contains(text, img_name):
+def contains(text, img_name, all_words):
+    if not text.strip():
+        return False
+
+    img_name_lower = img_name.lower()
     words = text.lower().split()
-    for word in words:
-        if word not in img_name.lower():
-            return False
-    return True
+
+    if all_words:
+        return all(word in img_name_lower for word in words)
+    else:
+        return any(word in img_name_lower for word in words)
 
 
 def find_similarities_text2images(model, processor, description, image_paths, images, only_show_min_max=False):
@@ -149,7 +154,7 @@ def find_similarities_image2image(model, processor, query_image, candidate_image
     return probabilities
 
 
-def test_clasification(probabilities, image_paths, has, clasification_img, yellow_flags=[]):
+def test_clasification(probabilities, image_paths, has, clasification_img, yellow_flags=[], match_all_words=True):
     # Extraer nombres de archivo
     image_names = [os.path.basename(path) for path in image_paths]
 
@@ -159,12 +164,12 @@ def test_clasification(probabilities, image_paths, has, clasification_img, yello
 
     for i, name in enumerate(image_names):
         if has:
-            if has and contains(clasification_img, name):
+            if has and contains(clasification_img, name, match_all_words):
                 rotura_imgs.append(i)
             else:
                 no_rotura_imgs.append(i)
         else:
-            if contains(clasification_img, name):
+            if contains(clasification_img, name, match_all_words):
                 no_rotura_imgs.append(i)
             else:
                 rotura_imgs.append(i)
@@ -176,7 +181,7 @@ def test_clasification(probabilities, image_paths, has, clasification_img, yello
     best_idx_yellow_flag = None
     for j in no_rotura_imgs:
         if probabilities[j] > max_no_rotura:
-            if any(contains(flag, image_names[j]) for flag in yellow_flags):
+            if any(contains(flag, image_names[j], match_all_words) for flag in yellow_flags):
                 if probabilities[j] > max_yellow_flag:
                     max_yellow_flag = probabilities[j]
                     best_idx_yellow_flag = j

@@ -1,0 +1,315 @@
+Descripcion: puerta
+   1. images-testing-roturas-nobg\skinny-oscuro.png → Similitud: 0.514
+   149. images-testing-preferences-nobg\top-sport2.png → Similitud: 0.485
+
+
+Descripcion: avion
+   1. images-testing-general-nobg\remera-azul1.png → Similitud: 0.517
+   149. images-testing-roturas-nobg\flared5.png → Similitud: 0.489
+
+
+Descripcion: gato
+   1. images-testing-general-nobg\remera-rosa2.png → Similitud: 0.516
+   149. images-testing-roturas-nobg\mom-rotura-desmechada2.png → Similitud: 0.491
+
+
+Descripcion:
+   1. images-testing-general-nobg\remera-celeste2.png → Similitud: 0.513
+   149. images-testing-general-nobg\campera-beige.png → Similitud: 0.487
+
+
+Descripcion:
+   1. images-testing-general-nobg\remera-celeste2.png → Similitud: 0.513
+   149. images-testing-general-nobg\campera-beige.png → Similitud: 0.487
+
+
+Descripcion: .
+   1. images-testing-general-nobg\remera-celeste2.png → Similitud: 0.513
+   149. images-testing-general-nobg\campera-beige.png → Similitud: 0.487
+
+
+Descripcion: !!!???
+   1. images-testing-general-nobg\remera-celeste2.png → Similitud: 0.513
+   149. images-testing-general-nobg\campera-beige.png → Similitud: 0.487
+
+
+Descripcion: asdfghjkl
+   1. images-testing-preferences-nobg\coquette-outfit5-pollera.png → Similitud: 0.517
+   149. images-testing-roturas-nobg\palazzo2.png → Similitud: 0.495
+
+
+Image: coca-rojo-negro.jpg, Clasification: rojo negro
+   1. images_tesing_comb_nobg\rojo-negro3.png → Similitud: 0.567
+   2. images_tesing_comb_nobg\rojo3.png → Similitud: 0.566
+   3. images_tesing_comb_nobg\rojo1.png → Similitud: 0.562
+   4. images_tesing_comb_nobg\rojo-negro1.png → Similitud: 0.558
+   5. images_tesing_comb_nobg\rojo-negro2.png → Similitud: 0.553
+   6. images_tesing_comb_nobg\amarillo3-blanco.png → Similitud: 0.548
+   7. images_tesing_comb_nobg\rojo2.png → Similitud: 0.543
+   8. images_tesing_comb_nobg\negro2.png → Similitud: 0.542
+   9. images_tesing_comb_nobg\violeta2.png → Similitud: 0.539
+   10. images_tesing_comb_nobg\rosa3.png → Similitud: 0.535
+   11. images_tesing_comb_nobg\verde4.png → Similitud: 0.534
+   12. images_tesing_comb_nobg\rosa2.png → Similitud: 0.533
+   13. images_tesing_comb_nobg\verde2.png → Similitud: 0.532
+   14. images_tesing_comb_nobg\violeta3.png → Similitud: 0.532
+   15. images_tesing_comb_nobg\verde1.png → Similitud: 0.532
+   16. images_tesing_comb_nobg\azul1.png → Similitud: 0.529
+   17. images_tesing_comb_nobg\negro1.png → Similitud: 0.527
+   18. images_tesing_comb_nobg\amarillo2.png → Similitud: 0.527
+   19. images_tesing_comb_nobg\negro3.png → Similitud: 0.526
+   20. images_tesing_comb_nobg\amarillo1.png → Similitud: 0.521
+   21. images_tesing_comb_nobg\rosa1.png → Similitud: 0.517
+   22. images_tesing_comb_nobg\violeta1-lila.png → Similitud: 0.517
+   23. images_tesing_comb_nobg\verde5-flores-blanco-amarillo.png → Similitud: 0.515
+   24. images_tesing_comb_nobg\verde3.png → Similitud: 0.514
+   25. images_tesing_comb_nobg\celeste3.png → Similitud: 0.513
+   26. images_tesing_comb_nobg\celeste-blanco.png → Similitud: 0.512
+   27. images_tesing_comb_nobg\azul2.png → Similitud: 0.509
+   28. images_tesing_comb_nobg\celeste1.png → Similitud: 0.504
+   29. images_tesing_comb_nobg\celeste2.png → Similitud: 0.503
+mayor red flag es amarillo3-blanco.png con 0.5481357574462891 de probabilidad
+[rojo negro] negro1.png: 0.527 > 0.548? ❌
+[rojo negro] negro2.png: 0.542 > 0.548? ❌
+[rojo negro] negro3.png: 0.526 > 0.548? ❌
+[rojo negro] rojo-negro1.png: 0.558 > 0.548? ✅
+[rojo negro] rojo-negro2.png: 0.553 > 0.548? ✅
+[rojo negro] rojo-negro3.png: 0.567 > 0.548? ✅
+[rojo negro] rojo1.png: 0.562 > 0.548? ✅
+[rojo negro] rojo2.png: 0.543 > 0.548? ❌
+[rojo negro] rojo3.png: 0.566 > 0.548? ✅
+🎯 Porcentaje de acierto: 55.56% (5/9)
+📊 Precision: 1.000
+📊 Recall: 0.556
+📊 MRR (Mean Reciprocal Rank): 1.000
+📊 Primer positivo aparece en rank: 1
+RESUMEN FINAL:
+✅ Accuracy vs red/yellow flags (>= 0.8)
+✅ Precision (>= 0.7)
+❌ Recall (>= 0.6)
+✅ MRR (>= 0.3)
+✅ Top-3 check
+==============================
+
+
+Image: paisaje-rojo-verde-amarillo-azul.jpeg, Clasification: rojo verde amarillo azul
+   1. images_tesing_comb_nobg\rojo-negro3.png → Similitud: 0.563
+   2. images_tesing_comb_nobg\rojo2.png → Similitud: 0.552
+   3. images_tesing_comb_nobg\verde5-flores-blanco-amarillo.png → Similitud: 0.547
+   4. images_tesing_comb_nobg\rojo1.png → Similitud: 0.544
+   5. images_tesing_comb_nobg\rojo-negro1.png → Similitud: 0.539
+   6. images_tesing_comb_nobg\amarillo3-blanco.png → Similitud: 0.534
+   7. images_tesing_comb_nobg\verde4.png → Similitud: 0.532
+   8. images_tesing_comb_nobg\rojo3.png → Similitud: 0.531
+   9. images_tesing_comb_nobg\rojo-negro2.png → Similitud: 0.529
+   10. images_tesing_comb_nobg\verde2.png → Similitud: 0.525
+   11. images_tesing_comb_nobg\celeste-blanco.png → Similitud: 0.523
+   12. images_tesing_comb_nobg\negro2.png → Similitud: 0.521
+   13. images_tesing_comb_nobg\celeste2.png → Similitud: 0.521
+   14. images_tesing_comb_nobg\azul2.png → Similitud: 0.521
+   15. images_tesing_comb_nobg\negro1.png → Similitud: 0.518
+   16. images_tesing_comb_nobg\rosa2.png → Similitud: 0.517
+   17. images_tesing_comb_nobg\violeta2.png → Similitud: 0.515
+   18. images_tesing_comb_nobg\violeta3.png → Similitud: 0.515
+   19. images_tesing_comb_nobg\celeste3.png → Similitud: 0.515
+   20. images_tesing_comb_nobg\verde1.png → Similitud: 0.515
+   21. images_tesing_comb_nobg\amarillo1.png → Similitud: 0.515
+   22. images_tesing_comb_nobg\azul1.png → Similitud: 0.514
+   23. images_tesing_comb_nobg\negro3.png → Similitud: 0.513
+   24. images_tesing_comb_nobg\verde3.png → Similitud: 0.510
+   25. images_tesing_comb_nobg\violeta1-lila.png → Similitud: 0.510
+   26. images_tesing_comb_nobg\celeste1.png → Similitud: 0.509
+   27. images_tesing_comb_nobg\rosa3.png → Similitud: 0.509
+   28. images_tesing_comb_nobg\amarillo2.png → Similitud: 0.506
+   29. images_tesing_comb_nobg\rosa1.png → Similitud: 0.505
+mayor red flag es celeste-blanco.png con 0.5233875513076782 de probabilidad
+[rojo verde amarillo azul] amarillo1.png: 0.515 > 0.523? ❌
+[rojo verde amarillo azul] amarillo2.png: 0.506 > 0.523? ❌
+[rojo verde amarillo azul] amarillo3-blanco.png: 0.534 > 0.523? ✅
+[rojo verde amarillo azul] azul1.png: 0.514 > 0.523? ❌
+[rojo verde amarillo azul] azul2.png: 0.521 > 0.523? ❌
+[rojo verde amarillo azul] rojo-negro1.png: 0.539 > 0.523? ✅
+[rojo verde amarillo azul] rojo-negro2.png: 0.529 > 0.523? ✅
+[rojo verde amarillo azul] rojo-negro3.png: 0.563 > 0.523? ✅
+[rojo verde amarillo azul] rojo1.png: 0.544 > 0.523? ✅
+[rojo verde amarillo azul] rojo2.png: 0.552 > 0.523? ✅
+[rojo verde amarillo azul] rojo3.png: 0.531 > 0.523? ✅
+[rojo verde amarillo azul] verde1.png: 0.515 > 0.523? ❌
+[rojo verde amarillo azul] verde2.png: 0.525 > 0.523? ✅
+[rojo verde amarillo azul] verde3.png: 0.510 > 0.523? ❌
+[rojo verde amarillo azul] verde4.png: 0.532 > 0.523? ✅
+[rojo verde amarillo azul] verde5-flores-blanco-amarillo.png: 0.547 > 0.523? ✅
+🎯 Porcentaje de acierto: 62.50% (10/16)
+📊 Precision: 1.000
+📊 Recall: 0.625
+📊 MRR (Mean Reciprocal Rank): 1.000
+📊 Primer positivo aparece en rank: 1
+RESUMEN FINAL:
+✅ Accuracy vs red/yellow flags (>= 0.8)
+✅ Precision (>= 0.7)
+✅ Recall (>= 0.6)
+✅ MRR (>= 0.3)
+✅ Top-3 check
+==============================
+
+
+Image: paisaje-verde-celeste-blanco.jpg, Clasification: verde celeste blanco
+   1. images_tesing_comb_nobg\verde4.png → Similitud: 0.544
+   2. images_tesing_comb_nobg\verde5-flores-blanco-amarillo.png → Similitud: 0.535
+   3. images_tesing_comb_nobg\verde2.png → Similitud: 0.534
+   4. images_tesing_comb_nobg\celeste-blanco.png → Similitud: 0.534
+   5. images_tesing_comb_nobg\amarillo3-blanco.png → Similitud: 0.532
+   6. images_tesing_comb_nobg\rojo-negro3.png → Similitud: 0.526
+   7. images_tesing_comb_nobg\rojo1.png → Similitud: 0.525
+   8. images_tesing_comb_nobg\celeste2.png → Similitud: 0.524
+   9. images_tesing_comb_nobg\rojo-negro1.png → Similitud: 0.523
+   10. images_tesing_comb_nobg\azul1.png → Similitud: 0.522
+   11. images_tesing_comb_nobg\amarillo1.png → Similitud: 0.519
+   12. images_tesing_comb_nobg\violeta3.png → Similitud: 0.519
+   13. images_tesing_comb_nobg\rosa2.png → Similitud: 0.519
+   14. images_tesing_comb_nobg\rojo3.png → Similitud: 0.518
+   15. images_tesing_comb_nobg\negro1.png → Similitud: 0.517
+   16. images_tesing_comb_nobg\celeste1.png → Similitud: 0.515
+   17. images_tesing_comb_nobg\violeta1-lila.png → Similitud: 0.515
+   18. images_tesing_comb_nobg\rosa3.png → Similitud: 0.515
+   19. images_tesing_comb_nobg\verde1.png → Similitud: 0.514
+   20. images_tesing_comb_nobg\verde3.png → Similitud: 0.514
+   21. images_tesing_comb_nobg\azul2.png → Similitud: 0.514
+   22. images_tesing_comb_nobg\celeste3.png → Similitud: 0.513
+   23. images_tesing_comb_nobg\rojo2.png → Similitud: 0.510
+   24. images_tesing_comb_nobg\amarillo2.png → Similitud: 0.508
+   25. images_tesing_comb_nobg\rojo-negro2.png → Similitud: 0.508
+   26. images_tesing_comb_nobg\violeta2.png → Similitud: 0.506
+   27. images_tesing_comb_nobg\negro2.png → Similitud: 0.502
+   28. images_tesing_comb_nobg\rosa1.png → Similitud: 0.500
+   29. images_tesing_comb_nobg\negro3.png → Similitud: 0.493
+mayor red flag es rojo-negro3.png con 0.5256087779998779 de probabilidad
+[verde celeste blanco] amarillo3-blanco.png: 0.532 > 0.526? ✅
+[verde celeste blanco] celeste-blanco.png: 0.534 > 0.526? ✅
+[verde celeste blanco] celeste1.png: 0.515 > 0.526? ❌
+[verde celeste blanco] celeste2.png: 0.524 > 0.526? ❌
+[verde celeste blanco] celeste3.png: 0.513 > 0.526? ❌
+[verde celeste blanco] verde1.png: 0.514 > 0.526? ❌
+[verde celeste blanco] verde2.png: 0.534 > 0.526? ✅
+[verde celeste blanco] verde3.png: 0.514 > 0.526? ❌
+[verde celeste blanco] verde4.png: 0.544 > 0.526? ✅
+[verde celeste blanco] verde5-flores-blanco-amarillo.png: 0.535 > 0.526? ✅
+🎯 Porcentaje de acierto: 50.00% (5/10)
+📊 Precision: 1.000
+📊 Recall: 0.500
+📊 MRR (Mean Reciprocal Rank): 1.000
+📊 Primer positivo aparece en rank: 1
+RESUMEN FINAL:
+✅ Accuracy vs red/yellow flags (>= 0.8)
+✅ Precision (>= 0.7)
+❌ Recall (>= 0.6)
+✅ MRR (>= 0.3)
+✅ Top-3 check
+==============================
+
+
+Image: paisaje-verde-celeste-rosa.jpeg, Clasification: verde celeste rosa
+   1. images_tesing_comb_nobg\verde5-flores-blanco-amarillo.png → Similitud: 0.558
+   2. images_tesing_comb_nobg\celeste-blanco.png → Similitud: 0.546
+   3. images_tesing_comb_nobg\rosa2.png → Similitud: 0.544
+   4. images_tesing_comb_nobg\verde4.png → Similitud: 0.536
+   5. images_tesing_comb_nobg\rosa3.png → Similitud: 0.535
+   6. images_tesing_comb_nobg\rojo-negro3.png → Similitud: 0.533
+   7. images_tesing_comb_nobg\amarillo3-blanco.png → Similitud: 0.532
+   8. images_tesing_comb_nobg\verde2.png → Similitud: 0.531
+   9. images_tesing_comb_nobg\rosa1.png → Similitud: 0.529
+   10. images_tesing_comb_nobg\celeste2.png → Similitud: 0.529
+   11. images_tesing_comb_nobg\rojo-negro1.png → Similitud: 0.526
+   12. images_tesing_comb_nobg\rojo1.png → Similitud: 0.522
+   13. images_tesing_comb_nobg\rojo2.png → Similitud: 0.520
+   14. images_tesing_comb_nobg\celeste3.png → Similitud: 0.519
+   15. images_tesing_comb_nobg\amarillo1.png → Similitud: 0.518
+   16. images_tesing_comb_nobg\violeta1-lila.png → Similitud: 0.517
+   17. images_tesing_comb_nobg\negro2.png → Similitud: 0.517
+   18. images_tesing_comb_nobg\celeste1.png → Similitud: 0.516
+   19. images_tesing_comb_nobg\verde3.png → Similitud: 0.516
+   20. images_tesing_comb_nobg\violeta2.png → Similitud: 0.515
+   21. images_tesing_comb_nobg\azul2.png → Similitud: 0.514
+   22. images_tesing_comb_nobg\rojo-negro2.png → Similitud: 0.514
+   23. images_tesing_comb_nobg\amarillo2.png → Similitud: 0.512
+   24. images_tesing_comb_nobg\rojo3.png → Similitud: 0.511
+   25. images_tesing_comb_nobg\azul1.png → Similitud: 0.510
+   26. images_tesing_comb_nobg\verde1.png → Similitud: 0.510
+   27. images_tesing_comb_nobg\negro1.png → Similitud: 0.509
+   28. images_tesing_comb_nobg\violeta3.png → Similitud: 0.504
+   29. images_tesing_comb_nobg\negro3.png → Similitud: 0.494
+mayor red flag es rojo-negro3.png con 0.5327770113945007 de probabilidad
+[verde celeste rosa] celeste-blanco.png: 0.546 > 0.533? ✅
+[verde celeste rosa] celeste1.png: 0.516 > 0.533? ❌
+[verde celeste rosa] celeste2.png: 0.529 > 0.533? ❌
+[verde celeste rosa] celeste3.png: 0.519 > 0.533? ❌
+[verde celeste rosa] rosa1.png: 0.529 > 0.533? ❌
+[verde celeste rosa] rosa2.png: 0.544 > 0.533? ✅
+[verde celeste rosa] rosa3.png: 0.535 > 0.533? ✅
+[verde celeste rosa] verde1.png: 0.510 > 0.533? ❌
+[verde celeste rosa] verde2.png: 0.531 > 0.533? ❌
+[verde celeste rosa] verde3.png: 0.516 > 0.533? ❌
+[verde celeste rosa] verde4.png: 0.536 > 0.533? ✅
+[verde celeste rosa] verde5-flores-blanco-amarillo.png: 0.558 > 0.533? ✅
+🎯 Porcentaje de acierto: 41.67% (5/12)
+📊 Precision: 1.000
+📊 Recall: 0.417
+📊 MRR (Mean Reciprocal Rank): 1.000
+📊 Primer positivo aparece en rank: 1
+RESUMEN FINAL:
+✅ Accuracy vs red/yellow flags (>= 0.8)
+✅ Precision (>= 0.7)
+❌ Recall (>= 0.6)
+✅ MRR (>= 0.3)
+✅ Top-3 check
+==============================
+
+
+Image: paisaje-violeta-azul.jpg, Clasification: violeta azul
+   1. images_tesing_comb_nobg\violeta2.png → Similitud: 0.539
+   2. images_tesing_comb_nobg\violeta3.png → Similitud: 0.539
+   3. images_tesing_comb_nobg\celeste-blanco.png → Similitud: 0.538
+   4. images_tesing_comb_nobg\violeta1-lila.png → Similitud: 0.537
+   5. images_tesing_comb_nobg\rojo-negro3.png → Similitud: 0.532
+   6. images_tesing_comb_nobg\rojo-negro1.png → Similitud: 0.528
+   7. images_tesing_comb_nobg\rojo1.png → Similitud: 0.527
+   8. images_tesing_comb_nobg\verde4.png → Similitud: 0.526
+   9. images_tesing_comb_nobg\rosa3.png → Similitud: 0.526
+   10. images_tesing_comb_nobg\amarillo1.png → Similitud: 0.526
+   11. images_tesing_comb_nobg\verde5-flores-blanco-amarillo.png → Similitud: 0.525
+   12. images_tesing_comb_nobg\rosa2.png → Similitud: 0.523
+   13. images_tesing_comb_nobg\negro2.png → Similitud: 0.523
+   14. images_tesing_comb_nobg\celeste1.png → Similitud: 0.522
+   15. images_tesing_comb_nobg\rosa1.png → Similitud: 0.522
+   16. images_tesing_comb_nobg\verde2.png → Similitud: 0.521
+   17. images_tesing_comb_nobg\celeste3.png → Similitud: 0.521
+   18. images_tesing_comb_nobg\azul2.png → Similitud: 0.519
+   19. images_tesing_comb_nobg\celeste2.png → Similitud: 0.517
+   20. images_tesing_comb_nobg\azul1.png → Similitud: 0.516
+   21. images_tesing_comb_nobg\amarillo3-blanco.png → Similitud: 0.516
+   22. images_tesing_comb_nobg\negro1.png → Similitud: 0.514
+   23. images_tesing_comb_nobg\rojo3.png → Similitud: 0.513
+   24. images_tesing_comb_nobg\rojo2.png → Similitud: 0.512
+   25. images_tesing_comb_nobg\rojo-negro2.png → Similitud: 0.510
+   26. images_tesing_comb_nobg\verde3.png → Similitud: 0.509
+   27. images_tesing_comb_nobg\verde1.png → Similitud: 0.504
+   28. images_tesing_comb_nobg\negro3.png → Similitud: 0.503
+   29. images_tesing_comb_nobg\amarillo2.png → Similitud: 0.503
+mayor red flag es celeste-blanco.png con 0.5377350449562073 de probabilidad
+[violeta azul] azul1.png: 0.516 > 0.538? ❌
+[violeta azul] azul2.png: 0.519 > 0.538? ❌
+[violeta azul] violeta1-lila.png: 0.537 > 0.538? ❌
+[violeta azul] violeta2.png: 0.539 > 0.538? ✅
+[violeta azul] violeta3.png: 0.539 > 0.538? ✅
+🎯 Porcentaje de acierto: 40.00% (2/5)
+📊 Precision: 1.000
+📊 Recall: 0.400
+📊 MRR (Mean Reciprocal Rank): 1.000
+📊 Primer positivo aparece en rank: 1
+RESUMEN FINAL:
+✅ Accuracy vs red/yellow flags (>= 0.8)
+✅ Precision (>= 0.7)
+❌ Recall (>= 0.6)
+✅ MRR (>= 0.3)
+✅ Top-3 check
+==============================
