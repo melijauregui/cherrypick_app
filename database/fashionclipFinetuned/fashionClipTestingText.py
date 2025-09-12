@@ -51,7 +51,7 @@ def find_most_similar_description(model_name, pretrained_model_name, image_path,
     print(f"Descripción más similar: {descriptions[np.argmax(similarities)]}")
 
 
-def find_similarities_matrix(model, processor, descriptions, image_paths, image_inputs):
+def find_similarities_matrix_2(model, processor, descriptions, image_paths, image_inputs):
     # Cargar modelo y processor
     with torch.no_grad():
         image_features = model.get_image_features(**image_inputs)
@@ -85,7 +85,15 @@ def find_similarities_matrix(model, processor, descriptions, image_paths, image_
     return similarity_matrix
 
 
-def find_similarities_matrix2(model, processor, description, image_paths, images):
+def contains(text, img_name):
+    words = text.lower().split()
+    for word in words:
+        if word not in img_name.lower():
+            return False
+    return True
+
+
+def find_similarities_text2images(model, processor, description, image_paths, images):
     processed = processor(
         text=[description], images=images, padding='max_length', return_tensors="pt")
 
@@ -110,15 +118,35 @@ def find_similarities_matrix2(model, processor, description, image_paths, images
     return probabilities
 
 
-def contains(text, img_name):
-    words = text.lower().split()
-    for word in words:
-        if word not in img_name.lower():
-            return False
-    return True
+def find_similarities_image2image(model, processor, query_image, candidate_image_paths, candidate_images):
+    processed = processor(
+        images=[query_image] + candidate_images,
+        return_tensors="pt",
+        padding="max_length"
+    )
+
+    with torch.no_grad():
+        image_features = model.get_image_features(
+            processed["pixel_values"], normalize=True)
+
+    query_features = image_features[0].unsqueeze(0)  # (1, d)
+    candidate_features = image_features[1:]          # (n, d)
+
+    similarity_scores = (candidate_features @
+                         query_features.T).squeeze(-1)  # (n,)
+    probabilities = similarity_scores.sigmoid()
+
+    # Ranking
+    sorted_indices = np.argsort(probabilities.cpu().numpy())[::-1]
+    for rank, img_idx in enumerate(sorted_indices):
+        similarity = probabilities[img_idx]
+        print(
+            f"   {rank+1}. {candidate_image_paths[img_idx]} → Similitud: {similarity:.3f}")
+
+    return probabilities
 
 
-def test_text_clasification(probabilities, image_paths, has, clasification_img, yellow_flags=[], imprimir_mayores_al_minimo=False):
+def test_clasification(probabilities, image_paths, has, clasification_img, yellow_flags=[], imprimir_mayores_al_minimo=False):
     # Extraer nombres de archivo
     image_names = [os.path.basename(path) for path in image_paths]
 

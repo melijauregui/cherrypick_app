@@ -6,7 +6,7 @@ import numpy as np
 from transformers import AutoProcessor, AutoModel
 import torch
 import torch.optim as optim
-from fashionClipTestingText import test_text_clasification, find_similarities_matrix2
+from fashionClipTestingText import test_clasification, find_similarities_text2images, find_similarities_image2image
 
 # --- CONFIGURACIÓN ---
 ORIGINAL_MODEL_NAME = "Marqo/marqo-fashionSigLIP"
@@ -18,15 +18,6 @@ LR = 1e-5
 PATIENCE = 3
 DEVICE = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 
-
-# --- TRAIN ---
-# fine_tune(csv_path=CSV_PATH, original_model_name=ORIGINAL_MODEL_NAME, model_name=MODEL_NAME_TO_FINETUNE,
-#           model_name_to_push=MODEL_NAME_TO_PUSH, batch_size=BATCH_SIZE, epochs=EPOCHS, lr=LR, patience=PATIENCE)
-
-
-# --- TESTS ---
-# print the info of the model
-# print("Model name:", MODEL_NAME_TO_PUSH)
 model = AutoModel.from_pretrained(
     pretrained_model_name_or_path=MODEL_NAME_TO_PUSH, trust_remote_code=True)
 processor = AutoProcessor.from_pretrained(
@@ -35,19 +26,15 @@ model.eval()
 torch.manual_seed(42)
 
 
-def run_test(description, image_paths, images, has, clasification_img, yellow_flags=[], test=True):
-    print("Descripcion:", description)
-    probabilities = find_similarities_matrix2(
-        model, processor, description, image_paths, images)
-    if test:
-        test_text_clasification(probabilities=probabilities,
-                                image_paths=image_paths, has=has,
-                                clasification_img=clasification_img,
-                                yellow_flags=yellow_flags)
-    print("\n")
+class TestInfo:
+    def __init__(self, description, clasification_img, has=True, yellow_flags=[]):
+        self.description = description
+        self.has = has
+        self.clasification_img = clasification_img
+        self.yellow_flags = yellow_flags
 
 
-def run_tests(input_folder, output_folder, run_func, test=True):
+def run_tests(input_folder, output_folder, run_tests_func, test_img=False, test=True):
     remove_background(input_folder, output_folder)
 
     image_paths = []
@@ -58,149 +45,137 @@ def run_tests(input_folder, output_folder, run_func, test=True):
 
     images = [Image.open(p).convert("RGB") for p in image_paths]
 
-    run_func(image_paths, images, test)
+    run_tests_func(image_paths, images, test_img, test)
 
 
-def run_tests_roturas(image_paths, images, test):
-    run_test(description="jean liso", image_paths=image_paths,
-             images=images, has=False, clasification_img="rotura", test=test)
+def run_tests_roturas(image_paths, images, test_img, test):
 
-    run_test(description="jean con roturas", image_paths=image_paths,
-             images=images, has=True, clasification_img="rotura", test=test)
+    test_cases = [
+        TestInfo(description="jean liso",
+                 clasification_img="rotura", has=False),
+        TestInfo(description="jean con roturas", clasification_img="rotura"),
+        TestInfo(description="jean wide leg",
+                 clasification_img="wide", yellow_flags=["palazzo"]),
+        TestInfo(description="jean skinny", clasification_img="skinny"),
+        TestInfo(description="jean recto",
+                 clasification_img="recto", yellow_flags=["mom"]),
+        TestInfo(description="jean palazzo",
+                 clasification_img="palazzo", yellow_flags=["wide"]),
+        TestInfo(description="jean cargo", clasification_img="cargo"),
+        TestInfo(description="jean mom", clasification_img="mom",
+                 yellow_flags=["recto"]),
+        TestInfo(description="jean acampanado", clasification_img="flared"),
+    ]
 
-    run_test(description="jean wide leg", image_paths=image_paths, images=images,
-             has=True, clasification_img="wide", yellow_flags=["palazzo"], test=test)
-
-    run_test(description="jean skinny", image_paths=image_paths,
-             images=images, has=True, clasification_img="skinny", test=test)
-
-    run_test(description="jean recto", image_paths=image_paths, images=images, has=True, clasification_img="recto",
-             yellow_flags=["mom"], test=test)
-
-    run_test(description="jean palazzo", image_paths=image_paths, images=images,
-             has=True, clasification_img="palazzo", yellow_flags=["wide"], test=test)
-
-    run_test(description="jean cargo", image_paths=image_paths,
-             images=images, has=True, clasification_img="cargo", test=test)
-
-    run_test(description="jean mom", image_paths=image_paths,
-             images=images, has=True, clasification_img="mom", yellow_flags=["recto"], test=test)
-
-    run_test(description="jean acampanado", image_paths=image_paths,
-             images=images, has=True, clasification_img="flared", test=test)
+    _run_test(test_cases, image_paths, images, test_img, test)
 
 
-def run_tests_preferences(image_paths, images, test):
-    run_test(description="boho chic", image_paths=image_paths,
-             images=images, has=True, clasification_img="bohochic", test=test)
+def run_tests_preferences(image_paths, images, test_img, test):
 
-    run_test(description="pantalon boho chic", image_paths=image_paths,
-             images=images, has=True, clasification_img="pantalon bohochic", test=test)
+    test_cases = [
+        TestInfo(description="boho chic", clasification_img="bohochic"),
+        TestInfo(description="pantalon boho chic",
+                 clasification_img="pantalon bohochic"),
+        TestInfo(description="pollera boho chic",
+                 clasification_img="pollera bohochic"),
+        TestInfo(description="old money", clasification_img="oldmoney",
+                 yellow_flags=["minimalista"]),
+        TestInfo(description="pantalon old money", clasification_img="pantalon oldmoney",
+                 yellow_flags=["pantalon minimalista"]),
+        TestInfo(description="short", clasification_img="short"),
+        TestInfo(description="pollera", clasification_img="pollera"),
+        TestInfo(description="coquette", clasification_img="coquette"),
+        TestInfo(description="minimalista", clasification_img="minimalista",
+                 yellow_flags=["oldmoney"]),
+        TestInfo(description="streetwear", clasification_img="streetwear"),
+        TestInfo(description="night out", clasification_img="night"),
+    ]
 
-    run_test(description="pollera boho chic", image_paths=image_paths,
-             images=images, has=True, clasification_img="pollera bohochic", test=test)
-
-    run_test(description="old money", image_paths=image_paths,
-             images=images, has=True, clasification_img="oldmoney", yellow_flags=["minimalista"], test=test)
-
-    run_test(description="pantalon old money", image_paths=image_paths,
-             images=images, has=True, clasification_img="pantalon oldmoney", yellow_flags=["pantalon minimalista"], test=test)
-
-    run_test(description="short", image_paths=image_paths,
-             images=images, has=True, clasification_img="short", test=test)
-
-    run_test(description="pollera", image_paths=image_paths,
-             images=images, has=True, clasification_img="pollera", test=test)
-
-    run_test(description="coquette", image_paths=image_paths,
-             images=images, has=True, clasification_img="coquette", test=test)
-
-    run_test(description="minimalista", image_paths=image_paths,
-             images=images, has=True, clasification_img="minimalista", yellow_flags=["oldmoney"], test=test)
-
-    run_test(description="streetwear", image_paths=image_paths,
-             images=images, has=True, clasification_img="streetwear", test=test)
-
-    run_test(description="night out", image_paths=image_paths,
-             images=images, has=True, clasification_img="night", test=test)
+    _run_test(test_cases, image_paths, images, test_img, test)
 
 
-def run_tests_general(image_paths, images, test):
-    run_test(description="remera", image_paths=image_paths,
-             images=images, has=True, clasification_img="remera", yellow_flags=["top"], test=test)
+def run_tests_general(image_paths, images, test_img, test):
 
-    run_test(description="remera celeste", image_paths=image_paths,
-             images=images, has=True, clasification_img="remera celeste", yellow_flags=["camisa celeste"], test=test)
+    test_cases = [
+        TestInfo(description="remera", clasification_img="remera",
+                 yellow_flags=["top"]),
+        TestInfo(description="remera celeste",
+                 clasification_img="remera celeste", yellow_flags=["camisa celeste"]),
+        TestInfo(description="sweater", clasification_img="sweater"),
+        TestInfo(description="sweater rosa", clasification_img="sweater rosa"),
+        TestInfo(description="vestido", clasification_img="vestido"),
+        TestInfo(description="vestido estampado",
+                 clasification_img="vestido estampado"),
+        TestInfo(description="vestido liso", clasification_img="vestido liso"),
+        TestInfo(description="vestido rojo", clasification_img="vestido rojo"),
+        TestInfo(description="vestido estampado rojo",
+                 clasification_img="vestido estampado rojo"),
+        TestInfo(description="campera", clasification_img="campera"),
+        TestInfo(description="campera de cuero",
+                 clasification_img="campera cuero"),
+        TestInfo(description="campera negra",
+                 clasification_img="campera negra"),
+        TestInfo(description="campera de jean",
+                 clasification_img="campera jean"),
+        TestInfo(description="camisa", clasification_img="camisa"),
+        TestInfo(description="camisa celeste",
+                 clasification_img="camisa celeste", yellow_flags=["remera celeste"]),
+        TestInfo(description="camisa manga larga",
+                 clasification_img="camisa manga larga"),
+        TestInfo(description="camisa manga corta",
+                 clasification_img="camisa manga corta"),
+    ]
 
-    run_test(description="sweater", image_paths=image_paths,
-             images=images, has=True, clasification_img="sweater", test=test)
+    _run_test(test_cases, image_paths, images, test_img, test)
 
-    run_test(description="sweater rosa", image_paths=image_paths,
-             images=images, has=True, clasification_img="sweater rosa", test=test)
 
-    run_test(description="vestido", image_paths=image_paths,
-             images=images, has=True, clasification_img="vestido", test=test)
+def _run_test(test_cases, image_paths, images, test_img=False, test=True):
+    image_paths_test = image_paths.copy()
+    for test_info in test_cases:
+        if test_img:
+            path, img, image_paths_test, images_test = _find_candidate_img(
+                image_paths, images, test_info.clasification_img, has=test_info.has)
+            print("Image:", os.path.basename(path))
+            probabilities = find_similarities_image2image(
+                model, processor, img, image_paths_test, images_test)
+        else:
+            print("Descripcion:", test_info.description)
+            probabilities = find_similarities_text2images(
+                model, processor, test_info.description, image_paths, images)
+        if test:
+            test_clasification(probabilities=probabilities,
+                               image_paths=image_paths_test, has=test_info.has,
+                               clasification_img=test_info.clasification_img,
+                               yellow_flags=test_info.yellow_flags)
+        print("\n")
+        if test_img:
+            image_paths_test = image_paths.copy()
 
-    run_test(description="vestido estampado", image_paths=image_paths,
-             images=images, has=True, clasification_img="vestido estampado", test=test)
 
-    run_test(description="vestido liso", image_paths=image_paths,
-             images=images, has=True, clasification_img="vestido liso", test=test)
-
-    run_test(description="vestido rojo", image_paths=image_paths,
-             images=images, has=True, clasification_img="vestido rojo", test=test)
-
-    run_test(description="vestido estampado rojo", image_paths=image_paths,
-             images=images, has=True, clasification_img="vestido estampado rojo", test=test)
-
-    run_test(description="campera", image_paths=image_paths,
-             images=images, has=True, clasification_img="campera", test=test)
-
-    run_test(description="campera de cuero", image_paths=image_paths,
-             images=images, has=True, clasification_img="campera cuero", test=test)
-
-    run_test(description="campera negra", image_paths=image_paths,
-             images=images, has=True, clasification_img="campera negra", test=test)
-
-    run_test(description="campera de jean", image_paths=image_paths,
-             images=images, has=True, clasification_img="campera jean", test=test)
-
-    run_test(description="camisa", image_paths=image_paths,
-             images=images, has=True, clasification_img="camisa", test=test)
-
-    run_test(description="camisa celeste", image_paths=image_paths,
-             images=images, has=True, clasification_img="camisa celeste", yellow_flags=["remera celeste"], test=test)
-
-    run_test(description="camisa manga larga", image_paths=image_paths,
-             images=images, has=True, clasification_img="camisa manga larga", test=test)
-
-    run_test(description="camisa manga corta", image_paths=image_paths,
-             images=images, has=True, clasification_img="camisa manga corta", test=test)
+def _find_candidate_img(image_paths, images, clasification_img, has):
+    paths_copy = image_paths.copy()
+    images_copy = images.copy()
+    for i, path in enumerate(image_paths):
+        candidate = os.path.basename(path).lower()
+        if (has and clasification_img in candidate) or (not has and clasification_img not in candidate):
+            paths_copy.pop(i)
+            images_copy.pop(i)
+            return image_paths[i], images[i], paths_copy, images_copy
+    return None, None, paths_copy, images_copy
 
 
 if __name__ == "__main__":
     input_folder = "images-testing-roturas"
     output_folder = "images-testing-roturas-nobg"
-    # run_tests(input_folder, output_folder, run_tests_roturas)
+    run_tests(input_folder, output_folder,
+              run_tests_roturas)
 
     input_folder = "images-testing-preferences"
     output_folder = "images-testing-preferences-nobg"
-    # run_tests(input_folder, output_folder, run_tests_preferences)
+    # run_tests(input_folder, output_folder,
+    #          run_tests_preferences)
 
     input_folder = "images_testing_general"
     output_folder = "images-testing-general-nobg"
-    # run_tests(input_folder, output_folder, run_tests_general)
-
-    input_folder = "../test-endpoints/images-catalog"
-    output_folder = "../test-endpoints/images-catalog-nobg"
-    # run_tests(input_folder, output_folder, run_tests_roturas, test=False)
-
-    text = "top corto o remera verde claro de algodon con volados en los hombros y fruncido ajustable con cordón en el frente"
-    text_inputs = processor(text=text, return_tensors="pt",
-                            padding=True, truncation=True).to(DEVICE)
-
-    with torch.no_grad():
-        text_features = model.get_text_features(**text_inputs)
-        text_features = text_features / \
-            text_features.norm(p=2, dim=-1, keepdim=True)
-    print(text_features)
+    # run_tests(input_folder, output_folder,
+    #          run_tests_general)
