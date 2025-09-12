@@ -2615,3 +2615,42 @@ RESUMEN FINAL:
 ✅ MRR (>= 0.3)
 ✅ Top-3 check
 ==============================
+
+Descripcion: puerta
+   1. images-testing-roturas-nobg\skinny-oscuro.png → Similitud: 0.514
+   149. images-testing-preferences-nobg\top-sport2.png → Similitud: 0.485
+
+
+Descripcion: avion
+   1. images-testing-general-nobg\remera-azul1.png → Similitud: 0.517
+   149. images-testing-roturas-nobg\flared5.png → Similitud: 0.489
+
+
+Descripcion: gato
+   1. images-testing-general-nobg\remera-rosa2.png → Similitud: 0.516
+   149. images-testing-roturas-nobg\mom-rotura-desmechada2.png → Similitud: 0.491
+
+
+Descripcion:
+   1. images-testing-general-nobg\remera-celeste2.png → Similitud: 0.513
+   149. images-testing-general-nobg\campera-beige.png → Similitud: 0.487
+
+
+Descripcion:
+   1. images-testing-general-nobg\remera-celeste2.png → Similitud: 0.513
+   149. images-testing-general-nobg\campera-beige.png → Similitud: 0.487
+
+
+Descripcion: .
+   1. images-testing-general-nobg\remera-celeste2.png → Similitud: 0.513
+   149. images-testing-general-nobg\campera-beige.png → Similitud: 0.487
+
+
+Descripcion: !!!???
+   1. images-testing-general-nobg\remera-celeste2.png → Similitud: 0.513
+   149. images-testing-general-nobg\campera-beige.png → Similitud: 0.487
+
+
+Descripcion: asdfghjkl
+   1. images-testing-preferences-nobg\coquette-outfit5-pollera.png → Similitud: 0.517
+   149. images-testing-roturas-nobg\palazzo2.png → Similitud: 0.495
