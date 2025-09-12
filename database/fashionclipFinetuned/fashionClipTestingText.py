@@ -93,7 +93,7 @@ def contains(text, img_name):
     return True
 
 
-def find_similarities_text2images(model, processor, description, image_paths, images):
+def find_similarities_text2images(model, processor, description, image_paths, images, only_show_min_max=False):
     processed = processor(
         text=[description], images=images, padding='max_length', return_tensors="pt")
 
@@ -112,6 +112,9 @@ def find_similarities_text2images(model, processor, description, image_paths, im
     sorted_indices = np.argsort(probabilities.cpu().numpy())[::-1]
     for rank, img_idx in enumerate(sorted_indices):
         similarity = probabilities[img_idx]
+        if only_show_min_max and (rank > 0 and rank < len(sorted_indices) - 1):
+            continue
+
         print(
             f"   {rank+1}. {image_paths[img_idx]} → Similitud: {similarity:.3f}")
 

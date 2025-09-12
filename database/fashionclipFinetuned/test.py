@@ -35,9 +35,9 @@ class TestInfo:
 
 
 class TestsInfo:
-    def __init__(self, input_folder, output_folder, test_cases: list[TestInfo]):
-        self.input_folder = input_folder
-        self.output_folder = output_folder
+    def __init__(self, input_folders, output_folders, test_cases: list[TestInfo]):
+        self.input_folders = input_folders
+        self.output_folders = output_folders
         self.test_cases = test_cases
 
 
@@ -107,44 +107,71 @@ TEST_CASES_GRAL = [
              clasification_img="camisa manga corta"),
 ]
 
+TEST_CASES_NEG = [
+    TestInfo(description="puerta", clasification_img="ninguna", has=False),
+    TestInfo(description="avion", clasification_img="ninguna", has=False),
+    TestInfo(description="gato", clasification_img="ninguna", has=False),
+    TestInfo(description="", clasification_img="ninguna",
+             has=False),        # vacío
+    TestInfo(description="   ", clasification_img="ninguna",
+             has=False),     # espacios
+    TestInfo(description=".", clasification_img="ninguna",
+             has=False),       # símbolo suelto
+    TestInfo(description="!!!???", clasification_img="ninguna",
+             has=False),   # solo símbolos
+    TestInfo(description="asdfghjkl", clasification_img="ninguna",
+             has=False),  # string random
+]
+
 TEST_ROTURAS = TestsInfo(
-    input_folder="images-testing-roturas",
-    output_folder="images-testing-roturas-nobg",
+    input_folders=["images-testing-roturas"],
+    output_folders=["images-testing-roturas-nobg"],
     test_cases=TEST_CASES_ROTURAS
 )
 
 TEST_PREFERENCIAS = TestsInfo(
-    input_folder="images-testing-preferences",
-    output_folder="images-testing-preferences-nobg",
+    input_folders=["images-testing-preferences"],
+    output_folders=["images-testing-preferences-nobg"],
     test_cases=TEST_CASES_PREF
 )
 
 TEST_GRAL = TestsInfo(
-    input_folder="images_testing_general",
-    output_folder="images-testing-general-nobg",
+    input_folders=["images_testing_general"],
+    output_folders=["images-testing-general-nobg"],
     test_cases=TEST_CASES_GRAL
 )
 
+TEST_NEG = TestsInfo(
+    input_folders=["images_testing_general",
+                   "images-testing-roturas", "images-testing-preferences"],
+    output_folders=["images-testing-general-nobg",
+                    "images-testing-roturas-nobg", "images-testing-preferences-nobg"],
+    test_cases=TEST_CASES_NEG
+)
 
-def run_tests(tests_info: TestsInfo, test_img=False, test=True):
-    input_folder = tests_info.input_folder
-    output_folder = tests_info.output_folder
+
+def run_tests(tests_info: TestsInfo, test_img=False, test=True, only_show_min_max=False):
+    input_folders = tests_info.input_folders
+    output_folders = tests_info.output_folders
     test_cases = tests_info.test_cases
 
-    remove_background(input_folder, output_folder)
+    for input_folder, output_folder in zip(input_folders, output_folders):
+        remove_background(input_folder, output_folder)
 
     image_paths = []
-    for root, _, files in os.walk(output_folder):
-        for file in files:
-            if file.endswith(('.png', '.jpg', '.jpeg')):
-                image_paths.append(os.path.join(root, file))
+    for output_folder in output_folders:
+        for root, _, files in os.walk(output_folder):
+            for file in files:
+                if file.endswith(('.png', '.jpg', '.jpeg')):
+                    image_paths.append(os.path.join(root, file))
 
     images = [Image.open(p).convert("RGB") for p in image_paths]
 
-    _run_test(test_cases, image_paths, images, test_img, test)
+    _run_test(test_cases, image_paths, images,
+              test_img, test, only_show_min_max)
 
 
-def _run_test(test_cases, image_paths, images, test_img=False, test=True):
+def _run_test(test_cases, image_paths, images, test_img=False, test=True, only_show_min_max=False):
     image_paths_test = image_paths.copy()
     for test_info in test_cases:
         if test_img:
@@ -156,7 +183,7 @@ def _run_test(test_cases, image_paths, images, test_img=False, test=True):
         else:
             print("Descripcion:", test_info.description)
             probabilities = find_similarities_text2images(
-                model, processor, test_info.description, image_paths, images)
+                model, processor, test_info.description, image_paths, images, only_show_min_max)
         if test:
             test_clasification(probabilities=probabilities,
                                image_paths=image_paths_test, has=test_info.has,
@@ -179,8 +206,7 @@ def _find_candidate_img(image_paths, images, clasification_img, has):
 
 if __name__ == "__main__":
     # -- text->imgs --
-    run_tests(TEST_ROTURAS)
-
-    run_tests(TEST_PREFERENCIAS)
-
-    run_tests(TEST_GRAL)
+    # run_tests(TEST_ROTURAS)
+    # run_tests(TEST_PREFERENCIAS)
+    # run_tests(TEST_GRAL)
+    run_tests(TEST_NEG, test=False, only_show_min_max=True)
