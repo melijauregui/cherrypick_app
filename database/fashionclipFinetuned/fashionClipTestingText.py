@@ -146,7 +146,7 @@ def find_similarities_image2image(model, processor, query_image, candidate_image
     return probabilities
 
 
-def test_clasification(probabilities, image_paths, has, clasification_img, yellow_flags=[], imprimir_mayores_al_minimo=False):
+def test_clasification(probabilities, image_paths, has, clasification_img, yellow_flags=[]):
     # Extraer nombres de archivo
     image_names = [os.path.basename(path) for path in image_paths]
 
@@ -251,19 +251,6 @@ def test_clasification(probabilities, image_paths, has, clasification_img, yello
     print(f"📊 MRR (Mean Reciprocal Rank): {mrr:.3f}")
     if first_rank:
         print(f"📊 Primer positivo aparece en rank: {first_rank}")
-
-    """ if imprimir_mayores_al_minimo:
-        # imprimo la probabilidad mas chica de roturas
-        if rotura_imgs:
-            min_rotura = min(probabilities[i] for i in rotura_imgs)
-            print(f"\nProbabilidad más baja: {min_rotura:.3f}")
-
-        print("\nImágenes con probabilidad mayor al mínimo:")
-        for i, value in enumerate(probabilities):
-            if value > min_rotura and i not in rotura_imgs:
-                print(
-                    f"Esta imagen sobrepaso al minimo: {image_names[i]}: {value:.3f}")
-    """
 
     # --- RESUMEN FINAL ---
     print("RESUMEN FINAL:")

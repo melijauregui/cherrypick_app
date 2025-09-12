@@ -34,7 +34,74 @@ class TestInfo:
         self.yellow_flags = yellow_flags
 
 
-def run_tests(input_folder, output_folder, run_tests_func, test_img=False, test=True):
+TEST_CASES_ROTURAS = [
+    TestInfo(description="jean liso",
+             clasification_img="rotura", has=False),
+    TestInfo(description="jean con roturas", clasification_img="rotura"),
+    TestInfo(description="jean wide leg",
+             clasification_img="wide", yellow_flags=["palazzo"]),
+    TestInfo(description="jean skinny", clasification_img="skinny"),
+    TestInfo(description="jean recto",
+             clasification_img="recto", yellow_flags=["mom"]),
+    TestInfo(description="jean palazzo",
+             clasification_img="palazzo", yellow_flags=["wide"]),
+    TestInfo(description="jean cargo", clasification_img="cargo"),
+    TestInfo(description="jean mom", clasification_img="mom",
+             yellow_flags=["recto"]),
+    TestInfo(description="jean acampanado", clasification_img="flared"),
+]
+
+TEST_CASES_PREF = [
+    TestInfo(description="boho chic", clasification_img="bohochic"),
+    TestInfo(description="pantalon boho chic",
+             clasification_img="pantalon bohochic"),
+    TestInfo(description="pollera boho chic",
+             clasification_img="pollera bohochic"),
+    TestInfo(description="old money", clasification_img="oldmoney",
+             yellow_flags=["minimalista"]),
+    TestInfo(description="pantalon old money", clasification_img="pantalon oldmoney",
+             yellow_flags=["pantalon minimalista"]),
+    TestInfo(description="short", clasification_img="short"),
+    TestInfo(description="pollera", clasification_img="pollera"),
+    TestInfo(description="coquette", clasification_img="coquette"),
+    TestInfo(description="minimalista", clasification_img="minimalista",
+             yellow_flags=["oldmoney"]),
+    TestInfo(description="streetwear", clasification_img="streetwear"),
+    TestInfo(description="night out", clasification_img="night"),
+]
+
+TEST_CASES_GRAL = [
+    TestInfo(description="remera", clasification_img="remera",
+             yellow_flags=["top"]),
+    TestInfo(description="remera celeste",
+             clasification_img="remera celeste", yellow_flags=["camisa celeste"]),
+    TestInfo(description="sweater", clasification_img="sweater"),
+    TestInfo(description="sweater rosa", clasification_img="sweater rosa"),
+    TestInfo(description="vestido", clasification_img="vestido"),
+    TestInfo(description="vestido estampado",
+             clasification_img="vestido estampado"),
+    TestInfo(description="vestido liso", clasification_img="vestido liso"),
+    TestInfo(description="vestido rojo", clasification_img="vestido rojo"),
+    TestInfo(description="vestido estampado rojo",
+             clasification_img="vestido estampado rojo"),
+    TestInfo(description="campera", clasification_img="campera"),
+    TestInfo(description="campera de cuero",
+             clasification_img="campera cuero"),
+    TestInfo(description="campera negra",
+             clasification_img="campera negra"),
+    TestInfo(description="campera de jean",
+             clasification_img="campera jean"),
+    TestInfo(description="camisa", clasification_img="camisa"),
+    TestInfo(description="camisa celeste",
+             clasification_img="camisa celeste", yellow_flags=["remera celeste"]),
+    TestInfo(description="camisa manga larga",
+             clasification_img="camisa manga larga"),
+    TestInfo(description="camisa manga corta",
+             clasification_img="camisa manga corta"),
+]
+
+
+def run_tests(input_folder, output_folder, test_cases, test_img=False, test=True):
     remove_background(input_folder, output_folder)
 
     image_paths = []
@@ -44,87 +111,6 @@ def run_tests(input_folder, output_folder, run_tests_func, test_img=False, test=
                 image_paths.append(os.path.join(root, file))
 
     images = [Image.open(p).convert("RGB") for p in image_paths]
-
-    run_tests_func(image_paths, images, test_img, test)
-
-
-def run_tests_roturas(image_paths, images, test_img, test):
-
-    test_cases = [
-        TestInfo(description="jean liso",
-                 clasification_img="rotura", has=False),
-        TestInfo(description="jean con roturas", clasification_img="rotura"),
-        TestInfo(description="jean wide leg",
-                 clasification_img="wide", yellow_flags=["palazzo"]),
-        TestInfo(description="jean skinny", clasification_img="skinny"),
-        TestInfo(description="jean recto",
-                 clasification_img="recto", yellow_flags=["mom"]),
-        TestInfo(description="jean palazzo",
-                 clasification_img="palazzo", yellow_flags=["wide"]),
-        TestInfo(description="jean cargo", clasification_img="cargo"),
-        TestInfo(description="jean mom", clasification_img="mom",
-                 yellow_flags=["recto"]),
-        TestInfo(description="jean acampanado", clasification_img="flared"),
-    ]
-
-    _run_test(test_cases, image_paths, images, test_img, test)
-
-
-def run_tests_preferences(image_paths, images, test_img, test):
-
-    test_cases = [
-        TestInfo(description="boho chic", clasification_img="bohochic"),
-        TestInfo(description="pantalon boho chic",
-                 clasification_img="pantalon bohochic"),
-        TestInfo(description="pollera boho chic",
-                 clasification_img="pollera bohochic"),
-        TestInfo(description="old money", clasification_img="oldmoney",
-                 yellow_flags=["minimalista"]),
-        TestInfo(description="pantalon old money", clasification_img="pantalon oldmoney",
-                 yellow_flags=["pantalon minimalista"]),
-        TestInfo(description="short", clasification_img="short"),
-        TestInfo(description="pollera", clasification_img="pollera"),
-        TestInfo(description="coquette", clasification_img="coquette"),
-        TestInfo(description="minimalista", clasification_img="minimalista",
-                 yellow_flags=["oldmoney"]),
-        TestInfo(description="streetwear", clasification_img="streetwear"),
-        TestInfo(description="night out", clasification_img="night"),
-    ]
-
-    _run_test(test_cases, image_paths, images, test_img, test)
-
-
-def run_tests_general(image_paths, images, test_img, test):
-
-    test_cases = [
-        TestInfo(description="remera", clasification_img="remera",
-                 yellow_flags=["top"]),
-        TestInfo(description="remera celeste",
-                 clasification_img="remera celeste", yellow_flags=["camisa celeste"]),
-        TestInfo(description="sweater", clasification_img="sweater"),
-        TestInfo(description="sweater rosa", clasification_img="sweater rosa"),
-        TestInfo(description="vestido", clasification_img="vestido"),
-        TestInfo(description="vestido estampado",
-                 clasification_img="vestido estampado"),
-        TestInfo(description="vestido liso", clasification_img="vestido liso"),
-        TestInfo(description="vestido rojo", clasification_img="vestido rojo"),
-        TestInfo(description="vestido estampado rojo",
-                 clasification_img="vestido estampado rojo"),
-        TestInfo(description="campera", clasification_img="campera"),
-        TestInfo(description="campera de cuero",
-                 clasification_img="campera cuero"),
-        TestInfo(description="campera negra",
-                 clasification_img="campera negra"),
-        TestInfo(description="campera de jean",
-                 clasification_img="campera jean"),
-        TestInfo(description="camisa", clasification_img="camisa"),
-        TestInfo(description="camisa celeste",
-                 clasification_img="camisa celeste", yellow_flags=["remera celeste"]),
-        TestInfo(description="camisa manga larga",
-                 clasification_img="camisa manga larga"),
-        TestInfo(description="camisa manga corta",
-                 clasification_img="camisa manga corta"),
-    ]
 
     _run_test(test_cases, image_paths, images, test_img, test)
 
@@ -168,14 +154,14 @@ if __name__ == "__main__":
     input_folder = "images-testing-roturas"
     output_folder = "images-testing-roturas-nobg"
     run_tests(input_folder, output_folder,
-              run_tests_roturas)
+              TEST_CASES_ROTURAS)
 
     input_folder = "images-testing-preferences"
     output_folder = "images-testing-preferences-nobg"
-    # run_tests(input_folder, output_folder,
-    #          run_tests_preferences)
+    run_tests(input_folder, output_folder,
+              TEST_CASES_PREF)
 
     input_folder = "images_testing_general"
     output_folder = "images-testing-general-nobg"
-    # run_tests(input_folder, output_folder,
-    #          run_tests_general)
+    run_tests(input_folder, output_folder,
+              TEST_CASES_GRAL)
