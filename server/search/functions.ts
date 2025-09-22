@@ -2,19 +2,18 @@ import {
   CatalogResponseSchemaType,
   ItemSchema,
   ItemSchemaType,
+  UuidNameResponseSchemaType,
+  UuidNameSchemaType,
 } from "@/schemas/catalog/catalog-schema";
 import { ErrorSchemaType } from "@/schemas/standar-response-schema";
 import logger from "../logger";
 import {
-  extractImageFeatures,
   extractImageFeaturesFromBase64,
   extractTextFeatures,
   getCollection,
-  Preferences,
-  searchText,
 } from "../catalog/functions";
-import { Sorting } from "weaviate-client";
 import { EmbbedingResponseSchemaType } from "@/schemas/search/search-schema";
+import { db } from "../db.config";
 
 export async function SearchItems(
   page: number,
@@ -125,4 +124,35 @@ export async function GetEmbedding(
     error: false,
     embedding: embeddingResponse.features,
   };
+}
+
+export async function GetAllBrands(
+  filter: string | undefined,
+  page: number,
+  limit: number
+): Promise<UuidNameSchemaType[]> {
+  //busco en mi bdd de brands
+  const res = await db.brand.findMany({
+    where: {
+      name: {
+        contains: filter ? filter : undefined,
+      },
+    },
+    select: {
+      name: true,
+      userId: true,
+    },
+    skip: page * limit,
+    take: limit,
+    orderBy: {
+      name: "asc",
+    },
+  });
+
+  const data = res.map(brand => ({
+    name: brand.name,
+    uuid: brand.userId,
+  }));
+
+  return data;
 }

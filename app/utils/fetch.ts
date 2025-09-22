@@ -7,8 +7,8 @@ import {
   IsMyItemSchema,
   ItemResponseSchema,
   ItemSchemaType,
-  ItemUuidNameResponseSchema,
-  ItemUuidNameSchemaType,
+  UuidNameResponseSchema,
+  UuidNameSchemaType,
 } from "@/schemas/catalog/catalog-schema";
 import { CheckLikeFavoriteResponseSchema } from "@/schemas/catalog/like-favorite-schema.ts";
 import { ZodSchema } from "zod";
@@ -216,20 +216,39 @@ export async function getClothingItemsHome(
 export const getItemsUuidNames = async (
   search: string,
   page: number
-): Promise<ItemUuidNameSchemaType[]> => {
-  const limit = 20;
+): Promise<UuidNameSchemaType[]> => {
+  const limit = 10;
   const res = await handleApiResponse<{
-    items: ItemUuidNameSchemaType[];
+    data: UuidNameSchemaType[];
   }>(
     () =>
       safeFetch({
         url: `http://${LOCAL_IP}:3000/brand/all-names-items?filter=${search}&page=${page}&limit=${limit}`,
         method: "GET",
       }),
-    ItemUuidNameResponseSchema,
+    UuidNameResponseSchema,
     "getItemsUuidNames"
   );
-  return res?.items || [];
+  return res?.data || [];
+};
+
+export const getAllBrands = async (
+  search: string,
+  page: number
+): Promise<UuidNameSchemaType[]> => {
+  const limit = 10;
+  const res = await handleApiResponse<{
+    data: UuidNameSchemaType[];
+  }>(
+    () =>
+      safeFetch({
+        url: `http://${LOCAL_IP}:3000/search/all-brands?filter=${search}&page=${page}&limit=${limit}`,
+        method: "GET",
+      }),
+    UuidNameResponseSchema,
+    "getAllBrands"
+  );
+  return res?.data || [];
 };
 
 export async function getItem(itemUuid: string): Promise<{

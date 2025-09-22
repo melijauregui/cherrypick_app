@@ -15,12 +15,15 @@ import {
   PaginationSchema,
   ImageBase64Schema,
   ImageUrlSchema,
+  PaginationFilterSchema,
+  UuidNameResponseSchema,
+  UuidNameResponseSchemaType,
 } from "@/schemas/catalog/catalog-schema";
 import {
   ErrorSchema,
   ErrorSchemaType,
 } from "@/schemas/standar-response-schema";
-import { GetEmbedding, SearchItems } from "./functions";
+import { GetAllBrands, GetEmbedding, SearchItems } from "./functions";
 import logger from "../logger";
 
 const SearchApp = new OpenAPIHono<AppEnv>({
@@ -301,9 +304,7 @@ SearchApp.openapi(imageBase64EmbeddingRoute, async c => {
   const { query } = await c.req.json();
   logger.info("POST /search/embedding/image");
 
-  logger.warn("TO GET EMBEDDING IMAGE");
   const result = await GetEmbedding("image", query);
-  logger.warn("EMBEDDING IMAGE DONE");
 
   if (result.error) {
     return c.json(result, 500);
@@ -315,4 +316,62 @@ SearchApp.openapi(imageBase64EmbeddingRoute, async c => {
   };
 
   return c.json(successResponse, 200);
+});
+
+// endpoint que devuelve todas las marcas registradas
+const allBrandItemsRoute = createRoute({
+  method: "get",
+  path: "/all-brands",
+  request: {
+    query: PaginationFilterSchema,
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: UuidNameResponseSchema,
+        },
+      },
+      description: "Devuelve los nombres con sus ids de las marcas registradas",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description:
+        "No tienes permisos para obtener los nombres con sus ids de las marcas registradas",
+    },
+    404: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "No hay marcas registradas",
+    },
+    500: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description:
+        "Error interno del servidor al obtener las marcas registradas",
+    },
+  },
+});
+SearchApp.openapi(allBrandItemsRoute, async c => {
+  const { filter, page = 0, limit = 10 } = c.req.valid("query");
+  logger.info(
+    "/GET search/all-brands filter: %s page: %s limit: %s",
+    filter,
+    page,
+    limit
+  );
+
+  const res = await GetAllBrands(filter, page, limit);
+
+  return c.json({ error: false, data: res }, 200);
 });

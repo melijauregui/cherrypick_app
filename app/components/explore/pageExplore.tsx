@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   View,
   TextInput,
@@ -14,8 +14,12 @@ import { getClothingItemsTextSearch } from "@/app/utils/fetch";
 import { useQuery } from "@tanstack/react-query";
 import LoadingPage from "../LoadingPage";
 import { ItemSchemaType } from "@/schemas/catalog/catalog-schema";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { useFetchEmbedding } from "@/app/utils/use-query";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import BottomSheet from "@gorhom/bottom-sheet";
+import FilterSearchBottomSheet from "./searchBrands";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const PageExplore = ({
   query,
@@ -27,6 +31,7 @@ const PageExplore = ({
   const router = useRouter();
   const [searchText, setSearchText] = useState((query as string) || "");
   const embeddingData = useFetchEmbedding("text", query);
+  const bottomSheetRef = useRef<BottomSheet>(null);
 
   const onChangeTextSearch = (text: string) => {
     setSearchText(text);
@@ -47,64 +52,83 @@ const PageExplore = ({
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-brown-strong">
-      <View className="flex-row items-center px-4 py-2">
-        {!isExplorePage && (
-          <Entypo
-            name="chevron-thin-left"
-            size={22}
-            color="#ffffff"
-            onPress={() => router.back()}
-            style={{ marginRight: 12 }}
-          />
-        )}
-        <View className="bg-transparent border border-white rounded-full flex-1 px-4 py-5 flex-row  items-center ">
-          <Ionicons name="search-outline" size={20} color="#ffffff" />
-          <TextInput
-            className="text-lg text-white font-pregular flex-1 mx-3"
-            onChangeText={onChangeTextSearch}
-            value={searchText}
-            placeholder="Search Item"
-            placeholderTextColor="#999999"
-            onSubmitEditing={handleSearch}
-            returnKeyType="search"
-          />
-          <TouchableOpacity onPress={() => router.push("/camera")}>
-            <Ionicons name="camera-outline" size={21} color="#ffffff" />
-          </TouchableOpacity>
-        </View>
-      </View>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <SafeAreaView className="flex-1 bg-brown-strong">
+          <View className="flex-row items-center px-4 py-2">
+            {!isExplorePage && (
+              <Entypo
+                name="chevron-thin-left"
+                size={22}
+                color="#ffffff"
+                onPress={() => router.back()}
+                style={{ marginRight: 12 }}
+              />
+            )}
+            <View className="bg-transparent border border-white rounded-full flex-1 px-4 py-5 flex-row  items-center ">
+              <Ionicons name="search-outline" size={20} color="#ffffff" />
+              <TextInput
+                className="text-lg text-white font-pregular flex-1 mx-3"
+                onChangeText={onChangeTextSearch}
+                value={searchText}
+                placeholder="Search Item"
+                placeholderTextColor="#999999"
+                onSubmitEditing={handleSearch}
+                returnKeyType="search"
+              />
+              <View className="flex-row items-center gap-2">
+                <TouchableOpacity
+                  onPress={() => bottomSheetRef.current?.expand()}
+                >
+                  <MaterialCommunityIcons
+                    name="tune-vertical-variant"
+                    size={20}
+                    color="#ffffff"
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => router.push("/camera")}>
+                  <Ionicons name="camera-outline" size={21} color="#ffffff" />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
 
-      {isExplorePage && (
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <FashionIdeasSection query={"Minimalist"} />
-          <FashionIdeasSection query={"Coquette"} />
-          <FashionIdeasSection query={"Streetwear"} />
-          <FashionIdeasSection query={"Sporty"} />
-          <FashionIdeasSection query={"Old money"} />
-          <FashionIdeasSection query={"Boho-chic"} />
-        </ScrollView>
-      )}
+          {isExplorePage && (
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <FashionIdeasSection query={"Minimalist"} />
+              <FashionIdeasSection query={"Coquette"} />
+              <FashionIdeasSection query={"Streetwear"} />
+              <FashionIdeasSection query={"Sporty"} />
+              <FashionIdeasSection query={"Old money"} />
+              <FashionIdeasSection query={"Boho-chic"} />
+            </ScrollView>
+          )}
 
-      {!isExplorePage && (
-        <List2
-          queryKey={[
-            "search-results",
-            query,
-            embeddingData?.embedding?.length || 0,
-          ]}
-          getClothingItems={(page, limit) =>
-            getClothingItemsTextSearch(
-              page,
-              limit,
-              embeddingData?.embedding || []
-            )
-          }
-          limit={10}
-          columnCount={2}
-        />
-      )}
-    </SafeAreaView>
+          {!isExplorePage && (
+            <List2
+              queryKey={[
+                "search-results",
+                query,
+                embeddingData?.embedding?.length || 0,
+              ]}
+              getClothingItems={(page, limit) =>
+                getClothingItemsTextSearch(
+                  page,
+                  limit,
+                  embeddingData?.embedding || []
+                )
+              }
+              limit={10}
+              columnCount={2}
+            />
+          )}
+          <FilterSearchBottomSheet
+            bottomSheetRef={bottomSheetRef}
+            onDelete={() => {}}
+          />
+        </SafeAreaView>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 };
 

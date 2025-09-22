@@ -82,7 +82,7 @@ export function useUpdateClient(email: string) {
 }
 
 export function useDelete(
-  setSelected: (selected: Set<string>) => void,
+  setSelected: (selected: Map<string, string>) => void,
   onDelete: () => void,
   bottomSheetRef: React.RefObject<BottomSheet>,
   brandEmail: string,
@@ -118,7 +118,7 @@ export function useDelete(
         type: "success",
         text1: `${data.numberDeleted} productos eliminados correctamente`,
       });
-      setSelected(new Set());
+      setSelected(new Map());
       onDelete();
     },
     onError: error => {

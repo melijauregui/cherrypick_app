@@ -84,7 +84,7 @@ export type DeleteItemsResponseSchemaType = z.infer<
   typeof DeleteItemsResponseSchema
 >;
 
-export const ItemUuidNameSchema = z.object({
+export const UuidNameSchema = z.object({
   name: z
     .string()
     .min(1, { message: "Product name is required" })
@@ -93,15 +93,13 @@ export const ItemUuidNameSchema = z.object({
     }),
   uuid: z.string().uuid({ message: "UUID is required" }),
 });
-export type ItemUuidNameSchemaType = z.infer<typeof ItemUuidNameSchema>;
+export type UuidNameSchemaType = z.infer<typeof UuidNameSchema>;
 
-export const ItemUuidNameResponseSchema = z.object({
+export const UuidNameResponseSchema = z.object({
   ...SuccessSchema.shape,
-  items: z.array(ItemUuidNameSchema),
+  data: z.array(UuidNameSchema),
 });
-export type ItemUuidNameResponseSchemaType = z.infer<
-  typeof ItemUuidNameResponseSchema
->;
+export type UuidNameResponseSchemaType = z.infer<typeof UuidNameResponseSchema>;
 
 export const IsMyItemSchema = z.object({
   ...SuccessSchema.shape,

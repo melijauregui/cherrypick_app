@@ -36,8 +36,8 @@ import {
   PaginationSchema,
   DeleteItemsResponseSchemaType,
   PaginationFilterSchema,
-  ItemUuidNameResponseSchema,
-  ItemUuidNameResponseSchemaType,
+  UuidNameResponseSchema,
+  UuidNameResponseSchemaType,
 } from "@/schemas/catalog/catalog-schema";
 import { GetCatalog, GetItemsUuidNamesFromBrand } from "../catalog/functions";
 import { UpdateCatalog } from "../catalog/insert";
@@ -333,7 +333,7 @@ const allBrandItemsRoute = createRoute({
     200: {
       content: {
         "application/json": {
-          schema: ItemUuidNameResponseSchema,
+          schema: UuidNameResponseSchema,
         },
       },
       description: "Devuelve los nombres de los items de una marca",
@@ -373,7 +373,7 @@ BrandApp.openapi(allBrandItemsRoute, async c => {
     page,
     limit
   );
-  let res: ItemUuidNameResponseSchemaType | ErrorSchemaType;
+  let res: UuidNameResponseSchemaType | ErrorSchemaType;
   const user = c.get("user");
   const brandEmail = user?.email;
 

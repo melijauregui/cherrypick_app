@@ -3,9 +3,9 @@ import {
   CatalogResponseSchemaType,
   ItemSchema,
   ItemSchemaType,
-  ItemUuidNameResponseSchemaType,
-  ItemUuidNameSchema,
-  ItemUuidNameSchemaType,
+  UuidNameResponseSchemaType,
+  UuidNameSchema,
+  UuidNameSchemaType,
 } from "@/schemas/catalog/catalog-schema";
 import weaviate, { Collection, Filters, ObjectDataType } from "weaviate-client";
 import { ErrorSchemaType } from "@/schemas/standar-response-schema";
@@ -77,7 +77,7 @@ export async function GetItemsUuidNamesFromBrand(
   filter?: string,
   page: number = 0,
   limit: number = 10
-): Promise<ItemUuidNameResponseSchemaType | ErrorSchemaType> {
+): Promise<UuidNameResponseSchemaType | ErrorSchemaType> {
   const resCollection = await getCollection();
   if (resCollection.error) {
     return {
@@ -103,12 +103,19 @@ export async function GetItemsUuidNamesFromBrand(
     limit: limit,
     offset: offset,
     returnProperties: ["name"],
+    // sort: [
+    //   {
+    //     path: ["name"],
+    //     order: "asc",
+    //   },
+    // ],
   };
   const result = await collection.query.fetchObjects(queryOptions);
+  console.log("result!!!!!", result);
 
-  const topResults: ItemUuidNameSchemaType[] = result.objects
+  const topResults: UuidNameSchemaType[] = result.objects
     .map(match => {
-      const validationResult = ItemUuidNameSchema.safeParse({
+      const validationResult = UuidNameSchema.safeParse({
         name: match.properties?.name || "",
         uuid: match.uuid || "",
       });
@@ -118,11 +125,11 @@ export async function GetItemsUuidNamesFromBrand(
       }
       return validationResult.data;
     })
-    .filter((item): item is ItemUuidNameSchemaType => item !== null);
+    .filter((item): item is UuidNameSchemaType => item !== null);
 
   return {
     error: false,
-    items: topResults,
+    data: topResults,
   };
 }
 
