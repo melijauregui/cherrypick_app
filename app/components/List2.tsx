@@ -53,6 +53,11 @@ const ImageGallery = ({
       prefetchItemDetail(queryClient, item, user?.email ?? "", item.brandId)
   );
 
+  const serializedQueryKey = JSON.stringify(queryKey);
+  useEffect(() => {
+    lastTriggeredHeightRef.current = 0;
+  }, [serializedQueryKey]);
+
   // State for organized columns with calculated dimensions
   const [organizedColumns, setOrganizedColumns] = useState<
     Array<

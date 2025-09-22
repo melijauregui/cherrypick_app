@@ -71,7 +71,6 @@ const FilterSearchBottomSheet = ({
   };
 
   const handleCancel = () => {
-    console.log("handleCancel");
     bottomSheetRef.current?.close();
     Keyboard.dismiss();
     setBrandsSelected(initialBrandsSelected);

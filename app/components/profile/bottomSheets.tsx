@@ -418,7 +418,6 @@ export function HeaderDoneAndCancel({
       <TouchableOpacity
         className="flex flex-row mr-auto"
         onPress={() => {
-          console.log("onCancel");
           onCancel();
           Keyboard.dismiss();
         }}

@@ -16,6 +16,7 @@ import {
 import {
   Entypo,
   FontAwesome6,
+  MaterialCommunityIcons,
   MaterialIcons,
   SimpleLineIcons,
 } from "@expo/vector-icons";
@@ -31,6 +32,7 @@ import {
   getClothingItemsSimilarBase64,
   getEmbedding,
 } from "../utils/fetch";
+import FilterSearchBottomSheet from "../components/explore/filterSearch";
 
 const CameraPage = () => {
   const [uri, setUri] = useState<string | null>(null);
@@ -76,7 +78,7 @@ const RenderCamera = ({
         flash={flash}
         setUri={setImage}
       />
-      <Controls flash={flash} setFlash={setFlash} />
+      <ControlsCamera flash={flash} setFlash={setFlash} />
       <View className="absolute bottom-14 items-center left-0 w-full flex-row justify-between px-16">
         <ImagePickerButton setImage={setImage} />
         <Pressable onPress={takePicture}>
@@ -96,61 +98,76 @@ const RenderCamera = ({
   );
 };
 
-const Controls = ({
+const ControlsCamera = ({
   flash,
   setFlash,
-  setUri,
 }: {
-  flash?: FlashMode;
-  setFlash?: (flash: FlashMode) => void;
-  setUri?: (uri: string | null) => void;
+  flash: FlashMode;
+  setFlash: (flash: FlashMode) => void;
 }) => {
   const router = useRouter();
   return (
-    <View
-      className={`absolute flex-row justify-between items-center w-full ${
-        setUri ? "px-6 top-16" : "px-12 top-20"
-      }`}
-    >
+    <View className="absolute flex-row justify-between items-center w-full px-12 top-20">
+      <Pressable onPress={() => router.back()} className="items-center ">
+        <Entypo name="chevron-thin-left" size={22} color="white" />
+      </Pressable>
+
+      <Pressable
+        onPress={() =>
+          setFlash(flash === "off" ? "auto" : flash === "auto" ? "on" : "off")
+        }
+      >
+        <MaterialIcons
+          name={
+            flash === "off"
+              ? "flash-off"
+              : flash === "auto"
+                ? "flash-auto"
+                : "flash-on"
+          }
+          size={27}
+          color="white"
+        />
+      </Pressable>
+    </View>
+  );
+};
+
+const ControlsRenderPicture = ({
+  setUri,
+  onPressTune,
+}: {
+  setUri: (uri: string | null) => void;
+  onPressTune: () => void;
+}) => {
+  const router = useRouter();
+  return (
+    <View className="absolute flex-row justify-between items-center w-full px-6 top-16">
       <View className="flex-col items-center gap-3">
         <Pressable
-          className={`${
-            !setFlash
-              ? "bg-black items-center justify-center w-12 h-12 rounded-2xl opacity-80 "
-              : ""
-          }`}
+          className="bg-black items-center justify-center w-12 h-12 rounded-2xl opacity-80"
           onPress={() => router.back()}
         >
           <Entypo name="chevron-thin-left" size={22} color="white" />
         </Pressable>
-        {setUri && (
-          <Pressable
-            className="bg-black items-center justify-center w-12 h-12 rounded-2xl opacity-80"
-            onPress={() => setUri(null)}
-          >
-            <SimpleLineIcons name="camera" size={20} color="white" />
-          </Pressable>
-        )}
-      </View>
-      {setFlash && (
+
         <Pressable
-          onPress={() =>
-            setFlash(flash === "off" ? "auto" : flash === "auto" ? "on" : "off")
-          }
+          className="bg-black items-center justify-center w-12 h-12 rounded-2xl opacity-80"
+          onPress={() => setUri(null)}
         >
-          <MaterialIcons
-            name={
-              flash === "off"
-                ? "flash-off"
-                : flash === "auto"
-                  ? "flash-auto"
-                  : "flash-on"
-            }
-            size={27}
-            color="white"
+          <SimpleLineIcons name="camera" size={20} color="white" />
+        </Pressable>
+        <Pressable
+          className="bg-black items-center justify-center w-12 h-12 rounded-2xl opacity-80"
+          onPress={onPressTune}
+        >
+          <MaterialCommunityIcons
+            name="tune-vertical-variant"
+            size={20}
+            color="#ffffff"
           />
         </Pressable>
-      )}
+      </View>
     </View>
   );
 };
@@ -260,6 +277,13 @@ const RenderPicture = ({
   const [embedding, setEmbedding] = useState<number[] | null>(null);
   const [snapIndex, setSnapIndex] = useState(0);
 
+  const [minPrice, setMinPrice] = useState<string | undefined>(undefined);
+  const [maxPrice, setMaxPrice] = useState<string | undefined>(undefined);
+  const [brandsSelected, setBrandsSelected] = useState<Map<string, string>>(
+    new Map()
+  );
+  const bottomSheetRefFilter = useRef<BottomSheet>(null);
+
   if (!uri) return null;
 
   const minHeight = Math.max(screenHeight - imageHeight, 400);
@@ -286,7 +310,10 @@ const RenderPicture = ({
           imageUrl={uri}
           setImageHeighteExternal={setImageHeight}
         />
-        <Controls setUri={setUri} />
+        <ControlsRenderPicture
+          setUri={setUri}
+          onPressTune={() => bottomSheetRefFilter.current?.expand()}
+        />
         <BottomSheet
           ref={bottomSheetRef}
           onChange={handleSheetChanges}
@@ -296,13 +323,13 @@ const RenderPicture = ({
           enableOverDrag={false}
           backgroundStyle={{ backgroundColor: "#301c11" }}
           handleIndicatorStyle={{
-            backgroundColor: "gray",
-            padding: 2,
-            marginTop: 4,
+            backgroundColor: "#301c11",
+            padding: 0,
+            marginTop: 0,
           }}
           enablePanDownToClose={false}
         >
-          <View className="flex flex-row justify-center py-3 px-6">
+          <View className="flex flex-row justify-center pb-3 px-6">
             <Text className="text-white text-lg font-psemibold">
               Items Similares
             </Text>
@@ -318,9 +345,27 @@ const RenderPicture = ({
               }}
             >
               <List2
-                queryKey={["similar-items", uri, embedding?.length || 0]}
+                queryKey={[
+                  "similar-items",
+                  uri,
+                  embedding?.length || 0,
+                  minPrice,
+                  maxPrice,
+                  brandsSelected.size > 0
+                    ? Array.from(brandsSelected.keys())
+                    : undefined,
+                ]}
                 getClothingItems={(page, limit) =>
-                  getClothingItemsSimilarBase64(page, limit, embedding || [])
+                  getClothingItemsSimilarBase64(
+                    page,
+                    limit,
+                    embedding || [],
+                    minPrice ? parseFloat(minPrice) : undefined,
+                    maxPrice ? parseFloat(maxPrice) : undefined,
+                    brandsSelected.size > 0
+                      ? Array.from(brandsSelected.keys())
+                      : undefined
+                  )
                 }
                 limit={6}
                 columnCount={2}
@@ -329,6 +374,17 @@ const RenderPicture = ({
             </View>
           )}
         </BottomSheet>
+        <FilterSearchBottomSheet
+          bottomSheetRef={bottomSheetRefFilter}
+          onSubmit={(minPrice, maxPrice, brandsSelected) => {
+            setMinPrice(minPrice);
+            setMaxPrice(maxPrice);
+            setBrandsSelected(brandsSelected);
+          }}
+          initialMinPrice={minPrice}
+          initialMaxPrice={maxPrice}
+          initialBrandsSelected={brandsSelected}
+        />
       </View>
     </GestureHandlerRootView>
   );
