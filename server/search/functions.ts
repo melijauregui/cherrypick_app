@@ -14,12 +14,16 @@ import {
 } from "../catalog/functions";
 import { EmbbedingResponseSchemaType } from "@/schemas/search/search-schema";
 import { db } from "../db.config";
+import { Filters } from "weaviate-client";
 
 export async function SearchItems(
   page: number,
   limit: number,
   type: "text" | "image",
   embedding: number[],
+  minPrice?: number,
+  maxPrice?: number,
+  brandIds?: string[],
   imageUrl?: string
 ): Promise<CatalogResponseSchemaType | ErrorSchemaType> {
   // Get Weaviate collection
@@ -50,6 +54,31 @@ export async function SearchItems(
       details: "Embedding must be 768 numbers",
     };
   }
+  // Build filters array
+  const filterConditions = [];
+
+  // Price filters
+  if (minPrice !== undefined) {
+    filterConditions.push(
+      collection.filter.byProperty("price").greaterOrEqual(minPrice)
+    );
+  }
+  if (maxPrice !== undefined) {
+    filterConditions.push(
+      collection.filter.byProperty("price").lessOrEqual(maxPrice)
+    );
+  }
+
+  // Brand filters
+  if (brandIds && brandIds.length > 0) {
+    filterConditions.push(
+      collection.filter.byProperty("brandId").containsAny(brandIds)
+    );
+  }
+
+  // Create combined filter if we have any conditions
+  const filters =
+    filterConditions.length > 0 ? Filters.and(...filterConditions) : undefined;
 
   const queryOptions = {
     limit: limit,
@@ -58,6 +87,7 @@ export async function SearchItems(
     targetVector: type === "text" ? "image_vector" : "text_vector", // ToDo: ver si con image_vector funciona mejor en ambos casos
     includeDistance: true,
     includeMatchDistance: true,
+    filters,
   };
 
   result = await collection.query.nearVector(embedding, queryOptions);

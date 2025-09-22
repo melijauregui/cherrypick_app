@@ -8,6 +8,15 @@ export const EmbbedingSchema = z.object({
     .length(768, { message: "Embedding must be 768 numbers" }),
 });
 
+export const EmbbedingWithFiltersSchema = z.object({
+  embedding: z
+    .array(z.number())
+    .length(768, { message: "Embedding must be 768 numbers" }),
+  minPrice: z.number().optional(),
+  maxPrice: z.number().optional(),
+  brandIds: z.array(z.string().uuid()).optional(),
+});
+
 export const QuerySchema = z.object({
   query: z.string().trim().min(1, { message: "Search query is required" }),
 });

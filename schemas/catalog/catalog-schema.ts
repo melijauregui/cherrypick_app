@@ -11,13 +11,17 @@ export const PropertiesItemSchema = z.object({
       message: "Product name must contain at least one letter or number",
     }),
   description: z.string().min(1, { message: "Description is required" }),
-  price: z
-    .string()
-    .min(1, { message: "Price is required" })
-    .transform(val => val.replace(",", "."))
-    .refine(val => !isNaN(Number(val)) && Number(val) > 0, {
-      message: "Price must be a positive number",
-    }),
+  price: z.preprocess(
+    val => {
+      if (typeof val === "string") {
+        const normalized = val.replace(",", ".").trim();
+        const num = Number(normalized);
+        return isNaN(num) ? val : num;
+      }
+      return val;
+    },
+    z.number().positive({ message: "Price must be a positive number" })
+  ),
   url: z
     .string()
     .min(1, { message: "URL is required" })

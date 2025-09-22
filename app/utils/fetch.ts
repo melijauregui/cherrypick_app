@@ -369,7 +369,10 @@ export const getAllFavoritedItems = async (
 export const getClothingItemsTextSearch = async (
   page: number,
   limit: number,
-  embedding: number[]
+  embedding: number[],
+  minPrice?: number,
+  maxPrice?: number,
+  brandIds?: string[]
 ): Promise<ItemSchemaType[]> => {
   if (embedding.length === 0) {
     return [];
@@ -387,6 +390,9 @@ export const getClothingItemsTextSearch = async (
         },
         body: JSON.stringify({
           embedding: embedding,
+          minPrice: minPrice,
+          maxPrice: maxPrice,
+          brandIds: brandIds,
         }),
       }),
     CatalogResponseSchema,
@@ -429,14 +435,16 @@ export const getClothingItemsSimilar = async (
     CatalogResponseSchema,
     "getClothingItemsSimilar"
   );
-  console.log("getClothingItemsSimilar", res?.items);
   return res?.items || [];
 };
 
 export async function getClothingItemsSimilarBase64(
   page: number,
   limit: number,
-  embedding: number[]
+  embedding: number[],
+  minPrice?: number,
+  maxPrice?: number,
+  brandIds?: string[]
 ): Promise<ItemSchemaType[]> {
   if (embedding.length === 0) {
     return [];
@@ -453,6 +461,9 @@ export async function getClothingItemsSimilarBase64(
         },
         body: JSON.stringify({
           embedding: embedding,
+          minPrice: minPrice,
+          maxPrice: maxPrice,
+          brandIds: brandIds,
         }),
       }),
     CatalogResponseSchema,

@@ -18,20 +18,46 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { useFetchEmbedding } from "@/app/utils/use-query";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import BottomSheet from "@gorhom/bottom-sheet";
-import FilterSearchBottomSheet from "./searchBrands";
+import FilterSearchBottomSheet from "./filterSearch";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const PageExplore = ({
   query,
   isExplorePage,
+  initialMinPrice,
+  initialMaxPrice,
+  initialBrandPairsCsv,
 }: {
   query: string;
   isExplorePage: boolean;
+  initialMinPrice?: string | undefined;
+  initialMaxPrice?: string | undefined;
+  initialBrandPairsCsv?: string | undefined;
 }) => {
   const router = useRouter();
   const [searchText, setSearchText] = useState((query as string) || "");
   const embeddingData = useFetchEmbedding("text", query);
   const bottomSheetRef = useRef<BottomSheet>(null);
+  const [minPrice, setMinPrice] = useState<string | undefined>(initialMinPrice);
+  const [maxPrice, setMaxPrice] = useState<string | undefined>(initialMaxPrice);
+  const [brandsSelected, setBrandsSelected] = useState<Map<string, string>>(
+    () => {
+      const initial = new Map<string, string>();
+      if (initialBrandPairsCsv) {
+        initialBrandPairsCsv
+          .split(";")
+          .map(s => s.trim())
+          .filter(s => s.length > 0)
+          .forEach(pair => {
+            const [uuid, name] = pair.split(",");
+            if (uuid) {
+              initial.set(uuid, name ?? uuid);
+            }
+          });
+      }
+      return initial;
+    }
+  );
 
   const onChangeTextSearch = (text: string) => {
     setSearchText(text);
@@ -46,6 +72,15 @@ const PageExplore = ({
       pathname: "/(search)/[query]",
       params: {
         query: searchText.trim(),
+        ...(minPrice ? { minPrice } : {}),
+        ...(maxPrice ? { maxPrice } : {}),
+        ...(brandsSelected.size > 0
+          ? {
+              brands: Array.from(brandsSelected.entries())
+                .map(([uuid, name]) => `${uuid},${name}`)
+                .join(";"),
+            }
+          : {}),
       },
     });
     onChangeTextSearch(query as string);
@@ -110,12 +145,22 @@ const PageExplore = ({
                 "search-results",
                 query,
                 embeddingData?.embedding?.length || 0,
+                minPrice,
+                maxPrice,
+                brandsSelected.size > 0
+                  ? Array.from(brandsSelected.keys())
+                  : undefined,
               ]}
               getClothingItems={(page, limit) =>
                 getClothingItemsTextSearch(
                   page,
                   limit,
-                  embeddingData?.embedding || []
+                  embeddingData?.embedding || [],
+                  minPrice ? parseFloat(minPrice) : undefined,
+                  maxPrice ? parseFloat(maxPrice) : undefined,
+                  brandsSelected.size > 0
+                    ? Array.from(brandsSelected.keys())
+                    : undefined
                 )
               }
               limit={10}
@@ -124,7 +169,14 @@ const PageExplore = ({
           )}
           <FilterSearchBottomSheet
             bottomSheetRef={bottomSheetRef}
-            onDelete={() => {}}
+            onSubmit={(minPrice, maxPrice, brandsSelected) => {
+              setMinPrice(minPrice);
+              setMaxPrice(maxPrice);
+              setBrandsSelected(brandsSelected);
+            }}
+            initialMinPrice={minPrice}
+            initialMaxPrice={maxPrice}
+            initialBrandsSelected={brandsSelected}
           />
         </SafeAreaView>
       </SafeAreaProvider>

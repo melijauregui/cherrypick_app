@@ -403,3 +403,51 @@ const renderItem2 = ({ item }: { item: ItemData; index: number }) => {
     </View>
   );
 };
+
+export function HeaderDoneAndCancel({
+  onCancel,
+  onSubmit,
+  isEnabledDone,
+}: {
+  onCancel: () => void;
+  onSubmit: () => void;
+  isEnabledDone: boolean;
+}) {
+  return (
+    <View className="flex flex-row justify-between items-center  relative py-3 border-b border-gray-300 px-6">
+      <TouchableOpacity
+        className="flex flex-row mr-auto"
+        onPress={() => {
+          console.log("onCancel");
+          onCancel();
+          Keyboard.dismiss();
+        }}
+      >
+        <Text className="text-xl  font-plight">Cancel</Text>
+      </TouchableOpacity>
+
+      <Text
+        className="text-black font-pmedium text-xl absolute right-0 left-0 text-center"
+        // @ts-ignore
+        pointerEvents="none"
+      >
+        {"Filtrar búsqueda"}
+      </Text>
+
+      <TouchableOpacity
+        className="flex flex-row ml-auto"
+        onPress={onSubmit}
+        disabled={!isEnabledDone}
+      >
+        <Text
+          className={`
+                text-xl  font-pregular
+                ${!isEnabledDone ? "text-black opacity-40" : "text-black"}
+              `}
+        >
+          Aceptar
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+}

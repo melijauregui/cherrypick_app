@@ -26,13 +26,13 @@ async function validateJsonItems(
   includeDuplicates = false
 ): Promise<
   | {
-    error: true;
-    details: string;
-  }
+      error: true;
+      details: string;
+    }
   | {
-    error: false;
-    catalogItems: PropertiesItemSchemaType[];
-  }
+      error: false;
+      catalogItems: PropertiesItemSchemaType[];
+    }
 > {
   if (!Array.isArray(items) || items.length === 0) {
     return {
@@ -49,7 +49,11 @@ async function validateJsonItems(
       const validatedItem = PropertiesItemSchema.parse(item);
       // Check if item already exists in Weaviate with same name and brand
       if (includeDuplicates) {
-        await deleteIfDuplicateInWeaviate(collection, validatedItem.name, brandId);
+        await deleteIfDuplicateInWeaviate(
+          collection,
+          validatedItem.name,
+          brandId
+        );
       } else {
         const isDuplicate = await checkDuplicateInWeaviate(
           collection,
@@ -79,7 +83,6 @@ async function validateJsonItems(
     catalogItems: validItems,
   };
 }
-
 
 // Función para insertar items del catálogo en Pinecone
 export async function insertCatalogItemsToWeaviate(
@@ -112,20 +115,9 @@ export async function insertCatalogItemsToWeaviate(
           );
         }
 
-        /* const resultSimilarities = await getPreferencesSimilarities(item.imageUrl);
-        if (resultSimilarities.error) {
-          throw new Error(resultSimilarities.details);
-        }
-
-        const preferenceData = Object.entries(Preferences).reduce((acc, [_, val]) => {
-          acc[val.property] = getPreferenceScore(resultSimilarities.similarities, val.searchName) || 0;
-          return acc;
-        }, {} as Record<string, number>); */
-
         const itemData = {
           ...item,
           brandId,
-          //...preferenceData,
         };
 
         const result = await collection.data.insert({
@@ -171,7 +163,6 @@ function getPreferenceScore(
   return similarities.find(s => s.preference === pref)?.similarity ?? 0;
 }
 
-
 export async function deleteIfDuplicateInWeaviate(
   collection: Collection,
   name: string,
@@ -189,7 +180,14 @@ export async function deleteIfDuplicateInWeaviate(
 
   if (exists && result.objects[0]) {
     const id = result.objects[0].uuid;
-    console.log("check duplicate in weaviate for", name, brandId, id, "is", exists);
+    console.log(
+      "check duplicate in weaviate for",
+      name,
+      brandId,
+      id,
+      "is",
+      exists
+    );
     await collection.data.deleteById(id);
     console.log("deleted duplicate with id", id);
   }
@@ -229,10 +227,17 @@ export async function UpdateCatalog(
   }
   const collection = collectionRes.collection;
   const totalCountBefore = await countObjects(collection);
-  console.log(`Total objects in collection before insertion: ${totalCountBefore}`);
+  console.log(
+    `Total objects in collection before insertion: ${totalCountBefore}`
+  );
   //await clearCollection(collection, brandId); //solo para testing
 
-  const validationResult = await validateJsonItems(items, collection, brandId, true);
+  const validationResult = await validateJsonItems(
+    items,
+    collection,
+    brandId,
+    true
+  );
   if (validationResult.error) {
     res = validationResult;
     return res;
@@ -252,8 +257,9 @@ export async function UpdateCatalog(
     );
 
     const totalCountAfter = await countObjects(collection);
-    console.log(`Total objects in collection after insertion: ${totalCountAfter}`);
-
+    console.log(
+      `Total objects in collection after insertion: ${totalCountAfter}`
+    );
   } else {
     res = {
       error: true,
@@ -276,9 +282,9 @@ export async function countObjects(collection: Collection) {
 export async function clearCollection(collection: Collection, brandId: string) {
   const result = await collection.query.fetchObjects({
     filters: Filters.and(
-      collection.filter.byProperty("brandId").equal(brandId),
+      collection.filter.byProperty("brandId").equal(brandId)
     ),
-    limit: 50 //ToDo
+    limit: 50, //ToDo
   });
   const objects = result.objects;
 
@@ -292,8 +298,9 @@ export async function clearCollection(collection: Collection, brandId: string) {
         console.error("Error deleting object", obj.uuid, err);
       }
     }
-
   }
 
-  console.log(`Cleared collection of brand ${brandId}: ${objects.length} objects deleted.`);
+  console.log(
+    `Cleared collection of brand ${brandId}: ${objects.length} objects deleted.`
+  );
 }

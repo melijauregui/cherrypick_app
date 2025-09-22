@@ -408,6 +408,7 @@ export async function getCollection(): Promise<
 
     let collection: Collection;
     const exists = await client.collections.exists("FashionItem");
+
     if (!exists) {
       collection = (await client.collections.create({
         name: "FashionItem",
@@ -415,13 +416,9 @@ export async function getCollection(): Promise<
           { name: "name", dataType: "text" },
           { name: "brandId", dataType: "text" },
           { name: "description", dataType: "text" },
-          { name: "price", dataType: "text" },
+          { name: "price", dataType: "number" },
           { name: "imageUrl", dataType: "text" },
           { name: "url", dataType: "text" },
-          /* ...Object.values(Preferences).map(pref => ({
-            name: pref.property as string,
-            dataType: "number" as ObjectDataType,
-          })), */
         ],
         vectorizers: [
           weaviate.configure.vectors.selfProvided({ name: "image_vector" }),
@@ -430,13 +427,6 @@ export async function getCollection(): Promise<
       })) as Collection;
     } else {
       collection = client.collections.get("FashionItem") as Collection;
-      /* const collectionConfig = await collection.config.get()
-      const existingProps = collectionConfig.properties.map((p) => p.name);
-      Object.values(Preferences)
-        .filter(pref => !existingProps.includes(pref.property))
-        .forEach(pref => (
-          collection.config.addProperty({ name: pref.property as string, dataType: "number" as ObjectDataType }
-          ))); */
     }
 
     return {

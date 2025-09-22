@@ -7,6 +7,7 @@ import {
   EmbbedingResponseSchema,
   EmbbedingResponseSchemaType,
   EmbbedingSchema,
+  EmbbedingWithFiltersSchema,
   QuerySchema,
 } from "@/schemas/search/search-schema";
 import {
@@ -51,7 +52,7 @@ const textSearchRoute = createRoute({
     body: {
       content: {
         "application/json": {
-          schema: EmbbedingSchema,
+          schema: EmbbedingWithFiltersSchema,
           required: true,
         },
       },
@@ -79,11 +80,26 @@ const textSearchRoute = createRoute({
 });
 
 SearchApp.openapi(textSearchRoute, async c => {
-  const { embedding } = await c.req.json();
+  const { embedding, minPrice, maxPrice, brandIds } = await c.req.json();
   const { page, limit } = c.req.valid("query");
-  logger.info("GET /search/text - query: %s, page: %s, limit: %s", page, limit);
+  logger.info(
+    "GET /search/text - page: %s, limit: %s, minPrice: %s, maxPrice: %s, brandIds: %s",
+    page,
+    limit,
+    minPrice,
+    maxPrice,
+    brandIds
+  );
 
-  const result = await SearchItems(page, limit, "text", embedding);
+  const result = await SearchItems(
+    page,
+    limit,
+    "text",
+    embedding,
+    minPrice,
+    maxPrice,
+    brandIds
+  );
 
   if (result.error) {
     return c.json(result, 500);
@@ -143,7 +159,16 @@ SearchApp.openapi(imageSearchRoute, async c => {
     limit
   );
 
-  const result = await SearchItems(page, limit, "image", embedding, imageUrl);
+  const result = await SearchItems(
+    page,
+    limit,
+    "image",
+    embedding,
+    undefined,
+    undefined,
+    undefined,
+    imageUrl
+  );
 
   if (result.error) {
     return c.json(result, 500);
@@ -166,7 +191,7 @@ const imageBase64SearchRoute = createRoute({
     body: {
       content: {
         "application/json": {
-          schema: EmbbedingSchema,
+          schema: EmbbedingWithFiltersSchema,
           required: true,
         },
       },
@@ -194,11 +219,26 @@ const imageBase64SearchRoute = createRoute({
 });
 
 SearchApp.openapi(imageBase64SearchRoute, async c => {
-  const { embedding } = await c.req.json();
+  const { embedding, minPrice, maxPrice, brandIds } = await c.req.json();
   const { page, limit } = c.req.valid("query");
-  logger.info("POST /search/image-base64 - page: %s, limit: %s", page, limit);
+  logger.info(
+    "POST /search/image-base64 - page: %s, limit: %s, minPrice: %s, maxPrice: %s, brandIds: %s",
+    page,
+    limit,
+    minPrice,
+    maxPrice,
+    brandIds
+  );
 
-  const result = await SearchItems(page, limit, "image", embedding);
+  const result = await SearchItems(
+    page,
+    limit,
+    "image",
+    embedding,
+    minPrice,
+    maxPrice,
+    brandIds
+  );
 
   if (result.error) {
     return c.json(result, 500);

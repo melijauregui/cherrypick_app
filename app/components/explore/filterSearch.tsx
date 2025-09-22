@@ -12,18 +12,33 @@ import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { getAllBrands } from "@/app/utils/fetch";
 import { UuidNameSchemaType } from "@/schemas/catalog/catalog-schema";
 import ListSearch from "./listSearch";
+import { HeaderDoneAndCancel } from "../profile/bottomSheets";
 
 const FilterSearchBottomSheet = ({
   bottomSheetRef,
-  onDelete,
+  onSubmit,
+  initialMinPrice,
+  initialMaxPrice,
+  initialBrandsSelected,
 }: {
   bottomSheetRef: React.RefObject<BottomSheet>;
-  onDelete: () => void;
+  onSubmit: (
+    minPrice: string | undefined,
+    maxPrice: string | undefined,
+    brandsSelected: Map<string, string>
+  ) => void;
+
+  initialMinPrice: string | undefined;
+  initialMaxPrice: string | undefined;
+  initialBrandsSelected: Map<string, string>;
 }) => {
-  const [selected, setSelected] = useState<Map<string, string>>(new Map());
   const [search, setSearch] = useState("");
-  const [minValue, setMinValue] = useState("");
-  const [maxValue, setMaxValue] = useState("");
+
+  const [minPrice, setMinPrice] = useState<string | undefined>(initialMinPrice);
+  const [maxPrice, setMaxPrice] = useState<string | undefined>(initialMaxPrice);
+  const [brandsSelected, setBrandsSelected] = useState<Map<string, string>>(
+    () => new Map(initialBrandsSelected)
+  );
 
   const { data, fetchNextPage, isLoading, error, isPending, isRefetching } =
     useInfiniteQuery({
@@ -56,10 +71,18 @@ const FilterSearchBottomSheet = ({
   };
 
   const handleCancel = () => {
-    setSelected(new Map());
-    setSearch("");
-    setMinValue("");
-    setMaxValue("");
+    console.log("handleCancel");
+    bottomSheetRef.current?.close();
+    Keyboard.dismiss();
+    setBrandsSelected(initialBrandsSelected);
+    setMinPrice(initialMinPrice);
+    setMaxPrice(initialMaxPrice);
+  };
+
+  const handleSubmit = () => {
+    bottomSheetRef.current?.close();
+    Keyboard.dismiss();
+    onSubmit(minPrice, maxPrice, brandsSelected);
   };
 
   useEffect(() => {
@@ -72,7 +95,7 @@ const FilterSearchBottomSheet = ({
   }, [error]);
 
   const toggleSelect = (item: UuidNameSchemaType) => {
-    setSelected(prev => {
+    setBrandsSelected(prev => {
       const newMap = new Map(prev);
       if (newMap.has(item.uuid)) {
         newMap.delete(item.uuid);
@@ -95,22 +118,11 @@ const FilterSearchBottomSheet = ({
       android_keyboardInputMode="adjustResize"
       enableOverDrag={false}
     >
-      <View className="flex flex-row justify-between items-center  relative py-3 border-b border-gray-300 px-6">
-        <Text className="text-black font-pmedium text-xl absolute right-0 left-0 text-center">
-          {"Filtrar búsqueda"}
-        </Text>
-
-        <TouchableOpacity
-          className="flex flex-row ml-auto"
-          onPress={() => {
-            bottomSheetRef.current?.close();
-            handleCancel();
-            Keyboard.dismiss();
-          }}
-        >
-          <Text className="text-xl  font-plight">Cancel</Text>
-        </TouchableOpacity>
-      </View>
+      <HeaderDoneAndCancel
+        onCancel={handleCancel}
+        onSubmit={handleSubmit}
+        isEnabledDone
+      />
 
       <View className="flex-1 px-6 py-4 gap-4">
         <View>
@@ -119,16 +131,16 @@ const FilterSearchBottomSheet = ({
             <TextInput
               className="flex-1 border border-gray-300 rounded-3xl px-3 py-2 text-center text-lg font-pregular"
               placeholder="Mínimo"
-              value={minValue}
-              onChangeText={setMinValue}
+              value={minPrice}
+              onChangeText={setMinPrice}
               keyboardType="numeric"
             />
             <Text className="text-gray-500 text-lg">-</Text>
             <TextInput
               className="flex-1 border border-gray-300 rounded-3xl px-3 py-2 text-center text-lg font-pregular"
               placeholder="Máximo"
-              value={maxValue}
-              onChangeText={setMaxValue}
+              value={maxPrice}
+              onChangeText={setMaxPrice}
               keyboardType="numeric"
             />
           </View>
@@ -142,7 +154,7 @@ const FilterSearchBottomSheet = ({
             resetInfiniteQueryPagination={resetInfiniteQueryPagination}
             loading={isStillLoading}
             filteredItems={data?.pages.flat() || []}
-            selected={selected}
+            selected={brandsSelected}
             toggleSelect={toggleSelect}
             fetchNextPage={fetchNextPage}
           />
