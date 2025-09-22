@@ -114,12 +114,26 @@ const PageExplore = ({
               <View className="flex-row items-center gap-2">
                 <TouchableOpacity
                   onPress={() => bottomSheetRef.current?.expand()}
+                  className="relative"
                 >
                   <MaterialCommunityIcons
                     name="tune-vertical-variant"
                     size={20}
                     color="#ffffff"
                   />
+                  {(() => {
+                    const filterCount =
+                      (minPrice ? 1 : 0) +
+                      (maxPrice ? 1 : 0) +
+                      brandsSelected.size;
+                    return filterCount > 0 ? (
+                      <View className="absolute -bottom-2 -right-1 bg-brown-light rounded-full w-4 h-4 flex items-center justify-center">
+                        <Text className="text-white text-[10px] font-bold">
+                          {filterCount}
+                        </Text>
+                      </View>
+                    ) : null;
+                  })()}
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => router.push("/camera")}>
                   <Ionicons name="camera-outline" size={21} color="#ffffff" />

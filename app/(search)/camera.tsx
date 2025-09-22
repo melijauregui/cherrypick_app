@@ -136,9 +136,11 @@ const ControlsCamera = ({
 const ControlsRenderPicture = ({
   setUri,
   onPressTune,
+  filterCount,
 }: {
   setUri: (uri: string | null) => void;
   onPressTune: () => void;
+  filterCount: number;
 }) => {
   const router = useRouter();
   return (
@@ -166,6 +168,15 @@ const ControlsRenderPicture = ({
             size={20}
             color="#ffffff"
           />
+          {(() => {
+            return filterCount > 0 ? (
+              <View className="absolute -bottom-1.5 -right-1 bg-brown-light rounded-full w-5 h-5 flex items-center justify-center">
+                <Text className="text-white text-[12px] font-bold">
+                  {filterCount}
+                </Text>
+              </View>
+            ) : null;
+          })()}
         </Pressable>
       </View>
     </View>
@@ -313,6 +324,9 @@ const RenderPicture = ({
         <ControlsRenderPicture
           setUri={setUri}
           onPressTune={() => bottomSheetRefFilter.current?.expand()}
+          filterCount={
+            (minPrice ? 1 : 0) + (maxPrice ? 1 : 0) + brandsSelected.size
+          }
         />
         <BottomSheet
           ref={bottomSheetRef}
