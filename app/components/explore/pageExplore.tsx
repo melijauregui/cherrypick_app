@@ -6,6 +6,7 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
+  ImageBackground,
 } from "react-native";
 import { router, useRouter } from "expo-router";
 import { Entypo, Ionicons } from "@expo/vector-icons";
@@ -14,14 +15,123 @@ import { getClothingItemsTextSearch } from "@/app/utils/fetch";
 import { useQuery } from "@tanstack/react-query";
 import LoadingPage from "../LoadingPage";
 import { ItemSchemaType } from "@/schemas/catalog/catalog-schema";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import {
+  SafeAreaProvider,
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { useFetchEmbedding } from "@/app/utils/use-query";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import BottomSheet from "@gorhom/bottom-sheet";
 import FilterSearchBottomSheet from "./filterSearch";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { StatusBar } from "expo-status-bar";
 
-const PageExploreQuery = ({
+export default function PageExplore({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <SafeAreaView className="flex-1 bg-brown-strong">
+          {children}
+        </SafeAreaView>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
+  );
+}
+
+export function PageExploreStandard({ query }: { query: string }) {
+  const [searchText, setSearchText] = useState((query as string) || "");
+  const [minPrice, setMinPrice] = useState<string | undefined>(undefined);
+  const [maxPrice, setMaxPrice] = useState<string | undefined>(undefined);
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const [brandsSelected, setBrandsSelected] = useState<Map<string, string>>(
+    new Map<string, string>()
+  );
+  const insets = useSafeAreaInsets();
+  const [overHeaderImage, setOverHeaderImage] = useState(true);
+  const HEADER_IMAGE_HEIGHT = 320; // keep in sync with ImageBackgroundComponent
+
+  const onChangeTextSearch = (text: string) => {
+    setSearchText(text);
+  };
+
+  const handleSearch = () => {
+    if (searchText.trim() === "") {
+      return;
+    }
+
+    router.push({
+      pathname: "/(search)/[query]",
+      params: {
+        query: searchText.trim(),
+        ...(minPrice ? { minPrice } : {}),
+        ...(maxPrice ? { maxPrice } : {}),
+        ...(brandsSelected.size > 0
+          ? {
+              brands: Array.from(brandsSelected.entries())
+                .map(([uuid, name]) => `${uuid},${name}`)
+                .join(";"),
+            }
+          : {}),
+      },
+    });
+    onChangeTextSearch(query as string);
+  };
+  // !overHeaderImage
+  return (
+    <>
+      <View
+        className={`absolute left-0 right-0 top-0 z-20 ${!overHeaderImage ? "bg-brown-strong opacity-95" : "bg-transparent"} pt-20 pb-2 px-4`}
+      >
+        <SearchInput
+          onChangeTextSearch={onChangeTextSearch}
+          searchText={searchText}
+          handleSearch={handleSearch}
+          bottomSheetRef={bottomSheetRef}
+          minPrice={minPrice}
+          maxPrice={maxPrice}
+          brandsSelected={brandsSelected}
+        />
+      </View>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        className="absolute top-0 left-0 right-0 bottom-0"
+        onScroll={e => {
+          const y = e.nativeEvent.contentOffset.y;
+          const isOver = y < HEADER_IMAGE_HEIGHT - (insets.top + 48);
+          if (isOver !== overHeaderImage) setOverHeaderImage(isOver);
+        }}
+        scrollEventThrottle={16}
+      >
+        <ImageBackgroundComponent />
+        <FashionIdeasSection query={"Minimalist"} />
+        <FashionIdeasSection query={"Coquette"} />
+        <FashionIdeasSection query={"Streetwear"} />
+        <FashionIdeasSection query={"Sporty"} />
+        <FashionIdeasSection query={"Old money"} />
+        <FashionIdeasSection query={"Boho-chic"} />
+      </ScrollView>
+
+      <FilterSearchBottomSheet
+        bottomSheetRef={bottomSheetRef}
+        onSubmit={(minPrice, maxPrice, brandsSelected) => {
+          setMinPrice(minPrice);
+          setMaxPrice(maxPrice);
+          setBrandsSelected(brandsSelected);
+        }}
+        initialMinPrice={minPrice}
+        initialMaxPrice={maxPrice}
+        initialBrandsSelected={brandsSelected}
+      />
+    </>
+  );
+}
+
+export const PageExploreQuery = ({
   query,
   initialMinPrice,
   initialMaxPrice,
@@ -145,94 +255,30 @@ const PageExploreQuery = ({
   );
 };
 
-export { PageExploreQuery };
-
-export default function PageExplore({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function ImageBackgroundComponent() {
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
-        <SafeAreaView className="flex-1 bg-brown-strong">
-          {children}
-        </SafeAreaView>
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
-  );
-}
-
-export function PageExploreStandard({ query }: { query: string }) {
-  const [searchText, setSearchText] = useState((query as string) || "");
-  const [minPrice, setMinPrice] = useState<string | undefined>(undefined);
-  const [maxPrice, setMaxPrice] = useState<string | undefined>(undefined);
-  const bottomSheetRef = useRef<BottomSheet>(null);
-  const [brandsSelected, setBrandsSelected] = useState<Map<string, string>>(
-    new Map<string, string>()
-  );
-
-  const onChangeTextSearch = (text: string) => {
-    setSearchText(text);
-  };
-
-  const handleSearch = () => {
-    if (searchText.trim() === "") {
-      return;
-    }
-
-    router.push({
-      pathname: "/(search)/[query]",
-      params: {
-        query: searchText.trim(),
-        ...(minPrice ? { minPrice } : {}),
-        ...(maxPrice ? { maxPrice } : {}),
-        ...(brandsSelected.size > 0
-          ? {
-              brands: Array.from(brandsSelected.entries())
-                .map(([uuid, name]) => `${uuid},${name}`)
-                .join(";"),
-            }
-          : {}),
-      },
-    });
-    onChangeTextSearch(query as string);
-  };
-
-  return (
-    <>
-      <View className="flex-row items-center px-4 py-2">
-        <SearchInput
-          onChangeTextSearch={onChangeTextSearch}
-          searchText={searchText}
-          handleSearch={handleSearch}
-          bottomSheetRef={bottomSheetRef}
-          minPrice={minPrice}
-          maxPrice={maxPrice}
-          brandsSelected={brandsSelected}
-        />
-      </View>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <FashionIdeasSection query={"Minimalist"} />
-        <FashionIdeasSection query={"Coquette"} />
-        <FashionIdeasSection query={"Streetwear"} />
-        <FashionIdeasSection query={"Sporty"} />
-        <FashionIdeasSection query={"Old money"} />
-        <FashionIdeasSection query={"Boho-chic"} />
-      </ScrollView>
-
-      <FilterSearchBottomSheet
-        bottomSheetRef={bottomSheetRef}
-        onSubmit={(minPrice, maxPrice, brandsSelected) => {
-          setMinPrice(minPrice);
-          setMaxPrice(maxPrice);
-          setBrandsSelected(brandsSelected);
+    <ImageBackground
+      className="mb-4"
+      source={{
+        uri: "https://acdn-us.mitiendanube.com/stores/001/126/411/products/dsc03922-f0abe17095e0c9731c17260089277172-1024-1024.webp",
+      }}
+      resizeMode="cover"
+      style={{ width: "100%", height: 320 }}
+    >
+      <View
+        style={{
+          backgroundColor: "rgba(0,0,0,0.45)",
         }}
-        initialMinPrice={minPrice}
-        initialMaxPrice={maxPrice}
-        initialBrandsSelected={brandsSelected}
-      />
-    </>
+        className="flex-1 justify-center items-center p-20 pt-36"
+      >
+        <Text className="text-white text-base font-pregular opacity-90">
+          Estilo con frescor
+        </Text>
+        <Text className="text-white text-2xl font-pbold text-center mt-1">
+          Tendencias de moda para primavera
+        </Text>
+      </View>
+    </ImageBackground>
   );
 }
 
@@ -244,6 +290,7 @@ function SearchInput({
   minPrice,
   maxPrice,
   brandsSelected,
+  opacity = false,
 }: {
   onChangeTextSearch: (text: string) => void;
   searchText: string;
@@ -252,10 +299,13 @@ function SearchInput({
   minPrice: string | undefined;
   maxPrice: string | undefined;
   brandsSelected: Map<string, string>;
+  opacity?: boolean;
 }) {
   const router = useRouter();
   return (
-    <View className="bg-transparent border border-white rounded-full flex-1 px-4 py-5 flex-row  items-center ">
+    <View
+      className={` border border-white rounded-full flex-1 px-4 py-5 flex-row  items-center  ${opacity ? " bg-black opacity-50" : "bg-transparent"}`}
+    >
       <Ionicons name="search-outline" size={20} color="#ffffff" />
       <TextInput
         className="text-lg text-white font-pregular flex-1 mx-3"

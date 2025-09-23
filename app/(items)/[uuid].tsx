@@ -1,12 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import {
-  View,
-  Dimensions,
-  TouchableOpacity,
-  Image,
-  Text,
-  Linking,
-} from "react-native";
+import { View, TouchableOpacity, Image, Text } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import {
   EvilIcons,
