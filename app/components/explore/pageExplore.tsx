@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { router, useRouter } from "expo-router";
 import { Entypo, Ionicons } from "@expo/vector-icons";
 import List2 from "@/app/components/List2";
 import { getClothingItemsTextSearch } from "@/app/utils/fetch";
@@ -21,15 +21,13 @@ import BottomSheet from "@gorhom/bottom-sheet";
 import FilterSearchBottomSheet from "./filterSearch";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
-const PageExplore = ({
+const PageExploreQuery = ({
   query,
-  isExplorePage,
   initialMinPrice,
   initialMaxPrice,
   initialBrandPairsCsv,
 }: {
   query: string;
-  isExplorePage: boolean;
   initialMinPrice?: string | undefined;
   initialMaxPrice?: string | undefined;
   initialBrandPairsCsv?: string | undefined;
@@ -87,118 +85,216 @@ const PageExplore = ({
   };
 
   return (
+    <>
+      <View className="flex-row items-center px-4 py-2">
+        <Entypo
+          name="chevron-thin-left"
+          size={22}
+          color="#ffffff"
+          onPress={() => router.back()}
+          style={{ marginRight: 12 }}
+        />
+        <SearchInput
+          onChangeTextSearch={onChangeTextSearch}
+          searchText={searchText}
+          handleSearch={handleSearch}
+          bottomSheetRef={bottomSheetRef}
+          minPrice={minPrice}
+          maxPrice={maxPrice}
+          brandsSelected={brandsSelected}
+        />
+      </View>
+      <List2
+        queryKey={[
+          "search-results",
+          query,
+          embeddingData?.embedding?.length || 0,
+          minPrice,
+          maxPrice,
+          brandsSelected.size > 0
+            ? Array.from(brandsSelected.keys())
+            : undefined,
+        ]}
+        getClothingItems={(page, limit) =>
+          getClothingItemsTextSearch(
+            page,
+            limit,
+            embeddingData?.embedding || [],
+            minPrice ? parseFloat(minPrice) : undefined,
+            maxPrice ? parseFloat(maxPrice) : undefined,
+            brandsSelected.size > 0
+              ? Array.from(brandsSelected.keys())
+              : undefined
+          )
+        }
+        limit={10}
+        columnCount={2}
+      />
+      <FilterSearchBottomSheet
+        bottomSheetRef={bottomSheetRef}
+        onSubmit={(minPrice, maxPrice, brandsSelected) => {
+          setMinPrice(minPrice);
+          setMaxPrice(maxPrice);
+          setBrandsSelected(brandsSelected);
+        }}
+        initialMinPrice={minPrice}
+        initialMaxPrice={maxPrice}
+        initialBrandsSelected={brandsSelected}
+      />
+    </>
+  );
+};
+
+export { PageExploreQuery };
+
+export default function PageExplore({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <SafeAreaView className="flex-1 bg-brown-strong">
-          <View className="flex-row items-center px-4 py-2">
-            {!isExplorePage && (
-              <Entypo
-                name="chevron-thin-left"
-                size={22}
-                color="#ffffff"
-                onPress={() => router.back()}
-                style={{ marginRight: 12 }}
-              />
-            )}
-            <View className="bg-transparent border border-white rounded-full flex-1 px-4 py-5 flex-row  items-center ">
-              <Ionicons name="search-outline" size={20} color="#ffffff" />
-              <TextInput
-                className="text-lg text-white font-pregular flex-1 mx-3"
-                onChangeText={onChangeTextSearch}
-                value={searchText}
-                placeholder="Search Item"
-                placeholderTextColor="#999999"
-                onSubmitEditing={handleSearch}
-                returnKeyType="search"
-              />
-              <View className="flex-row items-center gap-2">
-                <TouchableOpacity
-                  onPress={() => bottomSheetRef.current?.expand()}
-                  className="relative"
-                >
-                  <MaterialCommunityIcons
-                    name="tune-vertical-variant"
-                    size={20}
-                    color="#ffffff"
-                  />
-                  {(() => {
-                    const filterCount =
-                      (minPrice ? 1 : 0) +
-                      (maxPrice ? 1 : 0) +
-                      brandsSelected.size;
-                    return filterCount > 0 ? (
-                      <View className="absolute -bottom-2 -right-1 bg-brown-light rounded-full w-4 h-4 flex items-center justify-center">
-                        <Text className="text-white text-[10px] font-bold">
-                          {filterCount}
-                        </Text>
-                      </View>
-                    ) : null;
-                  })()}
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => router.push("/camera")}>
-                  <Ionicons name="camera-outline" size={21} color="#ffffff" />
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-
-          {isExplorePage && (
-            <ScrollView showsVerticalScrollIndicator={false}>
-              <FashionIdeasSection query={"Minimalist"} />
-              <FashionIdeasSection query={"Coquette"} />
-              <FashionIdeasSection query={"Streetwear"} />
-              <FashionIdeasSection query={"Sporty"} />
-              <FashionIdeasSection query={"Old money"} />
-              <FashionIdeasSection query={"Boho-chic"} />
-            </ScrollView>
-          )}
-
-          {!isExplorePage && (
-            <List2
-              queryKey={[
-                "search-results",
-                query,
-                embeddingData?.embedding?.length || 0,
-                minPrice,
-                maxPrice,
-                brandsSelected.size > 0
-                  ? Array.from(brandsSelected.keys())
-                  : undefined,
-              ]}
-              getClothingItems={(page, limit) =>
-                getClothingItemsTextSearch(
-                  page,
-                  limit,
-                  embeddingData?.embedding || [],
-                  minPrice ? parseFloat(minPrice) : undefined,
-                  maxPrice ? parseFloat(maxPrice) : undefined,
-                  brandsSelected.size > 0
-                    ? Array.from(brandsSelected.keys())
-                    : undefined
-                )
-              }
-              limit={10}
-              columnCount={2}
-            />
-          )}
-          <FilterSearchBottomSheet
-            bottomSheetRef={bottomSheetRef}
-            onSubmit={(minPrice, maxPrice, brandsSelected) => {
-              setMinPrice(minPrice);
-              setMaxPrice(maxPrice);
-              setBrandsSelected(brandsSelected);
-            }}
-            initialMinPrice={minPrice}
-            initialMaxPrice={maxPrice}
-            initialBrandsSelected={brandsSelected}
-          />
+          {children}
         </SafeAreaView>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
-};
+}
 
-export default PageExplore;
+export function PageExploreStandard({ query }: { query: string }) {
+  const [searchText, setSearchText] = useState((query as string) || "");
+  const [minPrice, setMinPrice] = useState<string | undefined>(undefined);
+  const [maxPrice, setMaxPrice] = useState<string | undefined>(undefined);
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const [brandsSelected, setBrandsSelected] = useState<Map<string, string>>(
+    new Map<string, string>()
+  );
+
+  const onChangeTextSearch = (text: string) => {
+    setSearchText(text);
+  };
+
+  const handleSearch = () => {
+    if (searchText.trim() === "") {
+      return;
+    }
+
+    router.push({
+      pathname: "/(search)/[query]",
+      params: {
+        query: searchText.trim(),
+        ...(minPrice ? { minPrice } : {}),
+        ...(maxPrice ? { maxPrice } : {}),
+        ...(brandsSelected.size > 0
+          ? {
+              brands: Array.from(brandsSelected.entries())
+                .map(([uuid, name]) => `${uuid},${name}`)
+                .join(";"),
+            }
+          : {}),
+      },
+    });
+    onChangeTextSearch(query as string);
+  };
+
+  return (
+    <>
+      <View className="flex-row items-center px-4 py-2">
+        <SearchInput
+          onChangeTextSearch={onChangeTextSearch}
+          searchText={searchText}
+          handleSearch={handleSearch}
+          bottomSheetRef={bottomSheetRef}
+          minPrice={minPrice}
+          maxPrice={maxPrice}
+          brandsSelected={brandsSelected}
+        />
+      </View>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <FashionIdeasSection query={"Minimalist"} />
+        <FashionIdeasSection query={"Coquette"} />
+        <FashionIdeasSection query={"Streetwear"} />
+        <FashionIdeasSection query={"Sporty"} />
+        <FashionIdeasSection query={"Old money"} />
+        <FashionIdeasSection query={"Boho-chic"} />
+      </ScrollView>
+
+      <FilterSearchBottomSheet
+        bottomSheetRef={bottomSheetRef}
+        onSubmit={(minPrice, maxPrice, brandsSelected) => {
+          setMinPrice(minPrice);
+          setMaxPrice(maxPrice);
+          setBrandsSelected(brandsSelected);
+        }}
+        initialMinPrice={minPrice}
+        initialMaxPrice={maxPrice}
+        initialBrandsSelected={brandsSelected}
+      />
+    </>
+  );
+}
+
+function SearchInput({
+  onChangeTextSearch,
+  searchText,
+  handleSearch,
+  bottomSheetRef,
+  minPrice,
+  maxPrice,
+  brandsSelected,
+}: {
+  onChangeTextSearch: (text: string) => void;
+  searchText: string;
+  handleSearch: () => void;
+  bottomSheetRef: React.RefObject<BottomSheet>;
+  minPrice: string | undefined;
+  maxPrice: string | undefined;
+  brandsSelected: Map<string, string>;
+}) {
+  const router = useRouter();
+  return (
+    <View className="bg-transparent border border-white rounded-full flex-1 px-4 py-5 flex-row  items-center ">
+      <Ionicons name="search-outline" size={20} color="#ffffff" />
+      <TextInput
+        className="text-lg text-white font-pregular flex-1 mx-3"
+        onChangeText={onChangeTextSearch}
+        value={searchText}
+        placeholder="Search Item"
+        placeholderTextColor="#999999"
+        onSubmitEditing={handleSearch}
+        returnKeyType="search"
+      />
+      <View className="flex-row items-center gap-2">
+        <TouchableOpacity
+          onPress={() => bottomSheetRef.current?.expand()}
+          className="relative"
+        >
+          <MaterialCommunityIcons
+            name="tune-vertical-variant"
+            size={20}
+            color="#ffffff"
+          />
+          {(() => {
+            const filterCount =
+              (minPrice ? 1 : 0) + (maxPrice ? 1 : 0) + brandsSelected.size;
+            return filterCount > 0 ? (
+              <View className="absolute -bottom-2 -right-1 bg-brown-light rounded-full w-4 h-4 flex items-center justify-center">
+                <Text className="text-white text-[10px] font-bold">
+                  {filterCount}
+                </Text>
+              </View>
+            ) : null;
+          })()}
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push("/camera")}>
+          <Ionicons name="camera-outline" size={21} color="#ffffff" />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
 
 const FashionIdeasSection = ({ query }: { query: string }) => {
   const router = useRouter();
