@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -7,8 +7,11 @@ import {
   ImageBackground,
   SafeAreaView,
   Dimensions,
+  TouchableOpacity,
 } from "react-native";
 import { ItemSchemaIdType } from "@/schemas/catalog/catalog-schema";
+import { router } from "expo-router";
+import { Entypo } from "@expo/vector-icons";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
@@ -19,10 +22,19 @@ export default function WeeklyInspo() {
     <SafeAreaView className="flex-1 bg-brown-strong">
       <View className="absolute top-0 left-0 right-0 bottom-0">
         <ImageBackgroundComponent>
-          <View className="absolute top-0 left-0 right-0 z-10 bg-black/40 p-4 pt-16">
-            <Text className="text-3xl font-pbold text-white text-center mb-2">
-              Inspo Semanal
-            </Text>
+          <View className="absolute top-0 left-0 right-0 z-10 bg-black/40 px-6 pt-20">
+            <View className="flex-row items-center justify-between mb-2">
+              <TouchableOpacity
+                onPress={() => router.back()}
+                className="items-center justify-center"
+                activeOpacity={1}
+              >
+                <Entypo name="chevron-thin-left" size={22} color="white" />
+              </TouchableOpacity>
+              <Text className="text-3xl font-pbold text-white text-center flex-1">
+                Inspo Semanal
+              </Text>
+            </View>
             <Text className="text-lg font-pmedium text-white/90 text-center">
               Polleras de encaje, tops minimalistas y esa brisa cálida que nos
               invita a renovar nuestro estilo
