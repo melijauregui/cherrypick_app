@@ -257,28 +257,37 @@ export const PageExploreQuery = ({
 
 function ImageBackgroundComponent() {
   return (
-    <ImageBackground
-      className="mb-4"
-      source={{
-        uri: "https://acdn-us.mitiendanube.com/stores/001/126/411/products/dsc03922-f0abe17095e0c9731c17260089277172-1024-1024.webp",
-      }}
-      resizeMode="cover"
-      style={{ width: "100%", height: 320 }}
+    <TouchableOpacity
+      onPress={() => router.push("/(inspiration)/weekly-inspo")}
     >
-      <View
-        style={{
-          backgroundColor: "rgba(0,0,0,0.45)",
+      <ImageBackground
+        className="mb-4"
+        source={{
+          uri: "https://acdn-us.mitiendanube.com/stores/001/126/411/products/dsc03922-f0abe17095e0c9731c17260089277172-1024-1024.webp",
         }}
-        className="flex-1 justify-center items-center p-20 pt-36"
+        resizeMode="cover"
+        style={{ width: "100%", height: 320 }}
       >
-        <Text className="text-white text-base font-pregular opacity-90">
-          Estilo con frescor
-        </Text>
-        <Text className="text-white text-2xl font-pbold text-center mt-1">
-          Tendencias de moda para primavera
-        </Text>
-      </View>
-    </ImageBackground>
+        <View
+          style={{
+            backgroundColor: "rgba(0,0,0,0.45)",
+          }}
+          className="flex-1 justify-center items-center  px-20 pt-24"
+        >
+          <Text className="text-white text-base font-pregular opacity-90">
+            Estilo con frescor
+          </Text>
+          <Text className="text-white text-2xl font-pbold text-center mt-1">
+            Tendencias de moda para primavera
+          </Text>
+          <View className="items-center mt-6 p-1.5 border border-white rounded-2xl">
+            <Text className="text-white text-xs font-pregular opacity-90">
+              Descubrir
+            </Text>
+          </View>
+        </View>
+      </ImageBackground>
+    </TouchableOpacity>
   );
 }
 
