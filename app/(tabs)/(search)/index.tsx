@@ -2,9 +2,9 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import React from "react";
 import PageExplore, {
   PageExploreStandard,
-} from "../components/explore/pageExplore";
+} from "@/app/components/explore/pageExplore";
 
-const Explore = () => {
+const ExploreAsRoot = () => {
   return (
     <SafeAreaProvider>
       <PageExplore>
@@ -13,4 +13,5 @@ const Explore = () => {
     </SafeAreaProvider>
   );
 };
-export default Explore;
+
+export default ExploreAsRoot;

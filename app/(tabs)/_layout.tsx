@@ -1,15 +1,28 @@
 import { View, Image, ImageSourcePropType } from "react-native";
 import React from "react";
-import { Tabs, router } from "expo-router";
+import { Stack, Tabs, router, useSegments } from "expo-router";
 import icons from "../../constants/icons";
 import { OnlyAuthenticated } from "@/lib/auth-client";
 import { Ionicons } from "@expo/vector-icons";
 import { Octicons, Foundation } from "@expo/vector-icons";
 
 const TabsLayout = () => {
+  const segment = useSegments();
+  // get the current page from the segment
+  const page = segment[segment.length - 1] || "";
+  console.log("page", page);
+  const pagesToHideTabBar = ["camera"];
+  console.log(
+    "pagesToHideTabBar.includes(page)",
+    pagesToHideTabBar.includes(page)
+  );
   return (
     <OnlyAuthenticated>
-      <Tabs screenOptions={{ tabBarShowLabel: false }}>
+      <Tabs
+        screenOptions={{
+          tabBarShowLabel: false,
+        }}
+      >
         {Page({
           name: "home",
           title: "Home",
@@ -22,19 +35,38 @@ const TabsLayout = () => {
               <Octicons name="home" size={24} color={color} />
             ),
         })}
-        {Page({
-          name: "explore",
-          title: "Explore",
-          icon: icons.search,
-          iconName: "Explore",
-          Icon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? "search" : "search-outline"}
-              size={28}
-              color={color}
-            />
-          ),
-        })}
+        <Tabs.Screen
+          name="(search)"
+          options={{
+            title: "Explore",
+            headerShown: false,
+            popToTopOnBlur: true,
+            tabBarStyle: {
+              backgroundColor: "#301c11",
+              height: 60,
+              borderColor: "#301c11",
+              paddingBottom: 12,
+              paddingTop: 6,
+              position: "absolute",
+              bottom: pagesToHideTabBar.includes(page) ? -100 : 0,
+              display: pagesToHideTabBar.includes(page) ? "none" : "flex",
+            },
+            tabBarActiveTintColor: "#FFFFFF",
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons
+                name={focused ? "search" : "search-outline"}
+                size={28}
+                color={color}
+              />
+            ),
+          }}
+          listeners={{
+            tabPress: e => {
+              const canDismiss = router.canDismiss();
+              if (canDismiss) router.dismissAll();
+            },
+          }}
+        />
         {Page({
           name: "likes-favorites",
           title: "Likes & Favorites",

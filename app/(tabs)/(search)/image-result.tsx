@@ -1,52 +1,31 @@
-import {
-  CameraType,
-  CameraView,
-  FlashMode,
-  useCameraPermissions,
-} from "expo-camera";
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  Button,
-  Pressable,
-  Text,
-  View,
-  StatusBar,
-  Dimensions,
-} from "react-native";
+import { Pressable, Text, View, StatusBar, Dimensions } from "react-native";
 import {
   Entypo,
-  FontAwesome6,
   MaterialCommunityIcons,
-  MaterialIcons,
   SimpleLineIcons,
 } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import * as ImagePicker from "expo-image-picker";
-import { useMediaLibraryPermissions } from "expo-image-picker";
-import ImageComplete from "../components/ImageComplete";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import ImageComplete from "@/app/components/ImageComplete";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import List2 from "../components/List2";
+import List2 from "@/app/components/List2";
 import {
   convertUriToBase64,
   getClothingItemsSimilarBase64,
   getEmbedding,
-} from "../utils/fetch";
-import FilterSearchBottomSheet from "../components/explore/filterSearch";
+} from "@/app/utils/fetch";
+import FilterSearchBottomSheet from "@/app/components/explore/filterSearch";
 
 const CameraPage = () => {
-  const [uri, setUri] = useState<string | null>(null);
-
+  const { uri_image } = useLocalSearchParams();
+  console.log("uri_image", uri_image);
   return (
     <>
       <StatusBar hidden={true} />
       <GestureHandlerRootView style={{ flex: 1, backgroundColor: "black" }}>
         <View className="flex-1 bg-black w-full">
-          {uri ? (
-            <RenderPicture uri={uri} setUri={setUri} />
-          ) : (
-            <RenderCamera setImage={setUri} />
-          )}
+          <RenderPicture uri={uri_image as string} />
         </View>
       </GestureHandlerRootView>
     </>
@@ -55,90 +34,10 @@ const CameraPage = () => {
 
 export default CameraPage;
 
-const RenderCamera = ({
-  setImage,
-}: {
-  setImage: (image: string | null) => void;
-}) => {
-  const refCamera = useRef<CameraView>(null);
-  const [facing, setFacing] = useState<CameraType>("back");
-  const [flash, setFlash] = useState<FlashMode>("off");
-  const toggleFacing = () => {
-    setFacing(prev => (prev === "back" ? "front" : "back"));
-  };
-  const takePicture = async () => {
-    const photo = await refCamera.current?.takePictureAsync();
-    setImage(photo?.uri || null);
-  };
-  return (
-    <View className="flex-1 w-full">
-      <CamaraView
-        refCamera={refCamera}
-        facing={facing}
-        flash={flash}
-        setUri={setImage}
-      />
-      <ControlsCamera flash={flash} setFlash={setFlash} />
-      <View className="absolute bottom-14 items-center left-0 w-full flex-row justify-between px-16">
-        <ImagePickerButton setImage={setImage} />
-        <Pressable onPress={takePicture}>
-          {({ pressed }) => (
-            <View
-              className={`bg-black border-2 border-white w-[95px] h-[95px] rounded-full items-center justify-center bottom-0 ${pressed ? "opacity-70" : "opacity-100"}`}
-            >
-              <View className="w-[85px] h-[85px] rounded-full bg-white bottom-0" />
-            </View>
-          )}
-        </Pressable>
-        <Pressable onPress={toggleFacing}>
-          <FontAwesome6 name="camera-rotate" size={28} color="white" />
-        </Pressable>
-      </View>
-    </View>
-  );
-};
-
-const ControlsCamera = ({
-  flash,
-  setFlash,
-}: {
-  flash: FlashMode;
-  setFlash: (flash: FlashMode) => void;
-}) => {
-  const router = useRouter();
-  return (
-    <View className="absolute flex-row justify-between items-center w-full px-12 top-20">
-      <Pressable onPress={() => router.back()} className="items-center ">
-        <Entypo name="chevron-thin-left" size={22} color="white" />
-      </Pressable>
-
-      <Pressable
-        onPress={() =>
-          setFlash(flash === "off" ? "auto" : flash === "auto" ? "on" : "off")
-        }
-      >
-        <MaterialIcons
-          name={
-            flash === "off"
-              ? "flash-off"
-              : flash === "auto"
-                ? "flash-auto"
-                : "flash-on"
-          }
-          size={27}
-          color="white"
-        />
-      </Pressable>
-    </View>
-  );
-};
-
 const ControlsRenderPicture = ({
-  setUri,
   onPressTune,
   filterCount,
 }: {
-  setUri: (uri: string | null) => void;
   onPressTune: () => void;
   filterCount: number;
 }) => {
@@ -153,12 +52,12 @@ const ControlsRenderPicture = ({
           <Entypo name="chevron-thin-left" size={22} color="white" />
         </Pressable>
 
-        <Pressable
+        {/* <Pressable
           className="bg-black items-center justify-center w-12 h-12 rounded-2xl opacity-80"
-          onPress={() => setUri(null)}
+          onPress={() => router.replace("/camera")}
         >
           <SimpleLineIcons name="camera" size={20} color="white" />
-        </Pressable>
+        </Pressable> */}
         <Pressable
           className="bg-black items-center justify-center w-12 h-12 rounded-2xl opacity-80"
           onPress={onPressTune}
@@ -183,99 +82,7 @@ const ControlsRenderPicture = ({
   );
 };
 
-export const ImagePickerButton = ({
-  setImage,
-}: {
-  setImage: (image: string | null) => void;
-}) => {
-  const [mediaLibraryPermission, requestMediaLibraryPermission] =
-    useMediaLibraryPermissions();
-
-  if (!mediaLibraryPermission) {
-    return null;
-  }
-
-  const pickImage = async () => {
-    if (!mediaLibraryPermission?.granted) {
-      const { status } =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== "granted") {
-        alert("Sorry, we need camera roll permissions to make this work!");
-        return;
-      }
-    }
-
-    // Launch image picker with proper configuration for iOS
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
-      allowsEditing: false,
-      quality: 1,
-      allowsMultipleSelection: false,
-      presentationStyle: ImagePicker.UIImagePickerPresentationStyle.FULL_SCREEN,
-    });
-
-    console.log(result);
-
-    if (!result.canceled) {
-      setImage(result.assets[0]?.uri || null);
-    }
-  };
-
-  return (
-    <Pressable onPress={pickImage}>
-      <Entypo name="images" size={30} color="white" />
-    </Pressable>
-  );
-};
-
-const CamaraView = ({
-  refCamera,
-  facing,
-  flash,
-  setUri,
-}: {
-  refCamera: React.RefObject<CameraView>;
-  facing: CameraType;
-  flash: FlashMode;
-  setUri: (uri: string | null) => void;
-}) => {
-  const [permission, requestPermission] = useCameraPermissions();
-
-  if (!permission) {
-    return null;
-  }
-
-  if (!permission.granted) {
-    return (
-      <View className="flex-1 bg-white items-center justify-center">
-        <Text style={{ textAlign: "center" }}>
-          We need your permission to use the camera
-        </Text>
-        <Button onPress={requestPermission} title="Grant permission" />
-      </View>
-    );
-  }
-
-  return (
-    <CameraView
-      ref={refCamera}
-      style={{ flex: 1 }}
-      mode={"picture"}
-      facing={facing}
-      flash={flash}
-      mute={true}
-      responsiveOrientationWhenOrientationLocked
-    />
-  );
-};
-
-const RenderPicture = ({
-  uri,
-  setUri,
-}: {
-  uri: string | null;
-  setUri: (uri: string | null) => void;
-}) => {
+const RenderPicture = ({ uri }: { uri: string }) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const handleSheetChanges = useCallback((index: number) => {
     console.log("index", index);
@@ -294,8 +101,6 @@ const RenderPicture = ({
     new Map()
   );
   const bottomSheetRefFilter = useRef<BottomSheet>(null);
-
-  if (!uri) return null;
 
   const minHeight = Math.max(screenHeight - imageHeight, 400);
   const snapPoints = [minHeight, 400, 600, 800, 1000].filter(
@@ -322,7 +127,6 @@ const RenderPicture = ({
           setImageHeighteExternal={setImageHeight}
         />
         <ControlsRenderPicture
-          setUri={setUri}
           onPressTune={() => bottomSheetRefFilter.current?.expand()}
           filterCount={
             (minPrice ? 1 : 0) + (maxPrice ? 1 : 0) + brandsSelected.size

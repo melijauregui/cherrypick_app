@@ -65,7 +65,8 @@ export function PageExploreStandard({ query }: { query: string }) {
     }
 
     router.push({
-      pathname: "/(search)/[query]",
+      pathname: "/(tabs)/(search)/[query]",
+
       params: {
         query: searchText.trim(),
         ...(minPrice ? { minPrice } : {}),
@@ -177,7 +178,7 @@ export const PageExploreQuery = ({
     }
 
     router.push({
-      pathname: "/(search)/[query]",
+      pathname: "/(tabs)/(search)/[query]",
       params: {
         query: searchText.trim(),
         ...(minPrice ? { minPrice } : {}),
@@ -257,9 +258,7 @@ export const PageExploreQuery = ({
 
 function ImageBackgroundComponent() {
   return (
-    <TouchableOpacity
-      onPress={() => router.push("/(inspiration)/weekly-inspo")}
-    >
+    <TouchableOpacity onPress={() => router.push("/weekly-inspo")}>
       <ImageBackground
         className="mb-4"
         source={{
@@ -347,7 +346,9 @@ function SearchInput({
             ) : null;
           })()}
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.push("/camera")}>
+        <TouchableOpacity
+          onPress={() => router.push("/(tabs)/(search)/camera")}
+        >
           <Ionicons name="camera-outline" size={21} color="#ffffff" />
         </TouchableOpacity>
       </View>
@@ -360,7 +361,7 @@ const FashionIdeasSection = ({ query }: { query: string }) => {
 
   const handleNavigateToSearch = () => {
     router.push({
-      pathname: "/(search)/[query]",
+      pathname: "/(tabs)/(search)/[query]",
       params: {
         query: query,
       },

@@ -3,7 +3,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useLocalSearchParams } from "expo-router";
 import PageExplore, {
   PageExploreQuery,
-} from "../components/explore/pageExplore";
+} from "@/app/components/explore/pageExplore";
 
 const SearchResults = () => {
   const { query, minPrice, maxPrice, brands } = useLocalSearchParams();

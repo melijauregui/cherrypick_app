@@ -71,7 +71,7 @@ export default function WeeklyInspo() {
 function ImageBackgroundComponent({ children }: { children: React.ReactNode }) {
   return (
     <ImageBackground
-      source={require("../../assets/images/inspo.jpeg")}
+      source={require("@/assets/images/inspo.jpeg")}
       style={{ width: screenWidth, height: screenHeight }}
       resizeMode="cover"
       imageStyle={{
