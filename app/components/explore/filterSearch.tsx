@@ -79,10 +79,29 @@ const FilterSearchBottomSheet = ({
   };
 
   const handleSubmit = () => {
+    const min = minPrice ? parseFloat(minPrice) : undefined;
+    const max = maxPrice ? parseFloat(maxPrice) : undefined;
+    console.log("min, max", min, max);
+
+    if (min !== undefined && max !== undefined && min > max) {
+      Toast.show({
+        type: "error",
+        text1: "El precio mínimo no puede ser mayor al máximo",
+      });
+      return;
+    }
+    if (max !== undefined && max === 0) {
+      Toast.show({
+        type: "error",
+        text1: "El precio máximo debe ser mayor a 0",
+      });
+      return;
+    }
     bottomSheetRef.current?.close();
     Keyboard.dismiss();
     onSubmit(minPrice, maxPrice, brandsSelected);
   };
+
 
   useEffect(() => {
     if (error) {
@@ -108,7 +127,7 @@ const FilterSearchBottomSheet = ({
   return (
     <BottomSheet
       ref={bottomSheetRef}
-      onChange={() => {}}
+      onChange={() => { }}
       index={-1}
       enableDynamicSizing={false}
       snapPoints={[450]}
