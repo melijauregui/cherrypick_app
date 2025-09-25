@@ -71,17 +71,16 @@ const FilterSearchBottomSheet = ({
   };
 
   const handleCancel = () => {
-    bottomSheetRef.current?.close();
     Keyboard.dismiss();
     setBrandsSelected(initialBrandsSelected);
     setMinPrice(initialMinPrice);
     setMaxPrice(initialMaxPrice);
+    bottomSheetRef.current?.close();
   };
 
   const handleSubmit = () => {
     const min = minPrice ? parseFloat(minPrice) : undefined;
     const max = maxPrice ? parseFloat(maxPrice) : undefined;
-    console.log("min, max", min, max);
 
     if (min !== undefined && max !== undefined && min > max) {
       Toast.show({

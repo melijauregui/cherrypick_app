@@ -226,7 +226,7 @@ function BottomSheetSame({
   value?: string;
 }) {
   // callbacks
-  const handleSheetChanges = useCallback((index: number) => {}, []);
+  const handleSheetChanges = useCallback((index: number) => { }, []);
   return (
     <BottomSheet
       ref={bottomSheetRef}
@@ -254,9 +254,8 @@ function BottomSheetSame({
           )}
 
           <Text
-            className={`text-black font-pmedium text-xl ${
-              hasDone ? "" : "absolute right-0 left-0 text-center"
-            }`}
+            className={`text-black font-pmedium text-xl ${hasDone ? "" : "absolute right-0 left-0 text-center"
+              }`}
           >
             {value}
           </Text>
@@ -422,11 +421,11 @@ export function HeaderDoneAndCancel({
           Keyboard.dismiss();
         }}
       >
-        <Text className="text-xl  font-plight">Cancel</Text>
+        <Text className="text-xl  font-plight">Cancelar</Text>
       </TouchableOpacity>
 
       <Text
-        className="text-black font-pmedium text-xl absolute right-0 left-0 text-center"
+        className="text-black font-pmedium text-xl flex-1 text-center"
         // @ts-ignore
         pointerEvents="none"
       >
