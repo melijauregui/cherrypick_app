@@ -278,7 +278,7 @@ const RenderPicture = ({
 }) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const handleSheetChanges = useCallback((index: number) => {
-    console.log("index", index);
+    // console.log("index", index);
     setSnapIndex(index);
   }, []);
   const { height: screenHeight } = Dimensions.get("window");

@@ -48,7 +48,7 @@ const RootLayout = () => {
     <QueryClientProvider client={queryClient}>
       <Stack
         screenOptions={{
-          animation: "fade",
+          animation: "none",
         }}
       >
         <Stack.Screen

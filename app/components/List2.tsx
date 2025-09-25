@@ -204,10 +204,10 @@ function useInfiniteGetItems(
     queryKey: queryKey,
     queryFn: async ({ pageParam }) => {
       const items = await getClothingItems(pageParam);
-      console.log(
-        `useInfiniteQuery got ${items.length} items for page ${pageParam}, queryKey:`,
-        queryKey
-      );
+      // console.log(
+      //   `useInfiniteQuery got ${items.length} items for page ${pageParam}, queryKey:`,
+      //   queryKey
+      // );
 
       items.forEach(async item => {
         await prefetchItemDetail(item);

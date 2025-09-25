@@ -1,11 +1,20 @@
-import { Stack } from "expo-router";
+import { Stack, useSegments } from "expo-router";
 import React, { useEffect } from "react";
 import { OnlyAuthenticated } from "@/lib/auth-client";
+import { View } from "react-native";
+import { CustomTabBar } from "../(tabs)/_layout";
 
 const AuthLayout = () => {
+  const segment = useSegments();
+  // get the current page from the segment
+  const page = segment[segment.length - 1] || "";
+  const pagesToHideTabBar = ["camera"];
   return (
     <OnlyAuthenticated>
-      <Stack screenOptions={{ headerShown: false }}></Stack>
+      <View style={{ flex: 1 }}>
+        <Stack screenOptions={{ headerShown: false }}></Stack>
+        {pagesToHideTabBar.includes(page) ? null : <CustomTabBar />}
+      </View>
     </OnlyAuthenticated>
   );
 };

@@ -144,7 +144,7 @@ export async function getBrandItems(
 }
 
 export async function getSelfBrandProfile(): Promise<BrandSchemaType | null> {
-  console.log("getSelfBrandProfile");
+  // console.log("getSelfBrandProfile");
   const res = await handleApiResponse<{
     brand: BrandSchemaType;
   }>(
@@ -160,7 +160,7 @@ export async function getSelfBrandProfile(): Promise<BrandSchemaType | null> {
 }
 
 export async function getSelfClientProfile(): Promise<ClientSchemaType | null> {
-  console.log("getSelfClientProfile");
+  // console.log("getSelfClientProfile");
   const res = await handleApiResponse<{
     user: ClientSchemaType;
   }>(
@@ -179,7 +179,7 @@ export async function getSelfBrandItems(
   page: number,
   limit: number
 ): Promise<ItemSchemaType[]> {
-  console.log("getSelfBrandItems", page, limit);
+  // console.log("getSelfBrandItems", page, limit);
   const res = await handleApiResponse<{
     items: ItemSchemaType[];
   }>(
@@ -198,7 +198,7 @@ export async function getClothingItemsHome(
   page: number,
   limit: number
 ): Promise<ItemSchemaType[]> {
-  console.log("getClothingItemsHome", page, limit);
+  // console.log("getClothingItemsHome", page, limit);
   const res = await handleApiResponse<{
     items: ItemSchemaType[];
   }>(
@@ -254,7 +254,7 @@ export const getAllBrands = async (
 export async function getItem(itemUuid: string): Promise<{
   item: ItemSchemaType;
 } | null> {
-  console.log("getting item", itemUuid);
+  // console.log("getting item", itemUuid);
   return handleApiResponse<{ item: ItemSchemaType }>(
     () =>
       safeFetch({
@@ -332,7 +332,7 @@ export const getAllLikedItems = async (
   limit: number = 10,
   brandId: string | null = null
 ): Promise<ItemSchemaType[]> => {
-  console.log("getAllLikedItems", page, limit);
+  // console.log("getAllLikedItems", page, limit);
   const res = await handleApiResponse<{
     items: ItemSchemaType[];
   }>(
@@ -351,7 +351,7 @@ export const getAllFavoritedItems = async (
   page: number = 0,
   limit: number = 10
 ): Promise<ItemSchemaType[]> => {
-  console.log("getAllFavoritedItems", page, limit);
+  // console.log("getAllFavoritedItems", page, limit);
   const res = await handleApiResponse<{
     items: ItemSchemaType[];
   }>(
@@ -377,7 +377,7 @@ export const getClothingItemsTextSearch = async (
   if (embedding.length === 0) {
     return [];
   }
-  console.log("getClothingItemsTextSearch", page, limit, embedding.length);
+  // console.log("getClothingItemsTextSearch", page, limit, embedding.length);
   const res = await handleApiResponse<{
     items: ItemSchemaType[];
   }>(
@@ -407,13 +407,13 @@ export const getClothingItemsSimilar = async (
   embedding: number[],
   imageUrl: string
 ): Promise<ItemSchemaType[]> => {
-  console.log(
-    "getClothingItemsSimilar",
-    page,
-    limit,
-    embedding.length,
-    imageUrl
-  );
+  // console.log(
+  //   "getClothingItemsSimilar",
+  //   page,
+  //   limit,
+  //   embedding.length,
+  //   imageUrl
+  // );
   if (embedding.length === 0) {
     return [];
   }

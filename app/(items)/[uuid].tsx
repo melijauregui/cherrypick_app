@@ -45,9 +45,7 @@ const ItemDetail = () => {
 
   const itemData = useFetchItem(decodedUuid);
   const itemEmbeddingData = useFetchItemEmbedding(decodedUuid);
-  if (itemEmbeddingData?.embedding.length === 768) {
-    console.log("itemEmbeddingData", itemEmbeddingData.embedding.length);
-  }
+
   const item = itemData?.item;
   const brand = useFetchBrandProfileItem(item?.brandId || "");
   const isBrandItem = useIsMyItem(item?.uuid || "") || false;
