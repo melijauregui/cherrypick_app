@@ -31,7 +31,7 @@ export function prefetchProfile(
       queryFn: () => getSelfClientProfile(),
     });
   } else if (user.userType === "brand") {
-    console.log("prefetching brand profile", user.email);
+    // console.log("prefetching brand profile", user.email);
     queryClient.prefetchQuery({
       queryKey: ["self-brand-profile", user.email],
       queryFn: () => getSelfBrandProfile(),
@@ -49,7 +49,7 @@ export default function prefetchHome(
   queryClient: QueryClient,
   userEmail: string
 ) {
-  console.log("prefetchHome called for user:", userEmail);
+  // console.log("prefetchHome called for user:", userEmail);
   prefetchInfiniteQueryIfNeeded(
     queryClient,
     ["home-items", userEmail],
@@ -90,7 +90,7 @@ function prefetchInfiniteQueryIfNeeded(
   });
 
   if (!existingData && !isPrefetching) {
-    console.log("prefetching infinite query: ", queryKey);
+    // console.log("prefetching infinite query: ", queryKey);
     queryClient.prefetchInfiniteQuery({
       queryKey: queryKey,
       queryFn: async () => {
@@ -114,10 +114,10 @@ function prefetchInfiniteQueryIfNeeded(
       },
     });
   } else {
-    console.log(
-      "skipping prefetch for infinite query (already cached or fetching): ",
-      queryKey
-    );
+    // console.log(
+    //   "skipping prefetch for infinite query (already cached or fetching): ",
+    //   queryKey
+    // );
   }
 }
 
@@ -178,7 +178,7 @@ export function prefetchLikeAndFavoritePage(
   );
 }
 export async function prefetchExplorePage(queryClient: QueryClient) {
-  console.log("prefetching explore page");
+  // console.log("prefetching explore page");
   prefetchExplorePageQuery(queryClient, "Minimalist");
   prefetchExplorePageQuery(queryClient, "Coquette");
   prefetchExplorePageQuery(queryClient, "Streetwear");
@@ -191,7 +191,7 @@ export async function prefetchExplorePageQuery(
   queryClient: QueryClient,
   query: string
 ) {
-  console.log("prefetching explore page for query: ", query);
+  // console.log("prefetching explore page for query: ", query);
   if (!query || query.trim().length === 0) return;
 
   const embeddingKey = ["embedding", "text", query];

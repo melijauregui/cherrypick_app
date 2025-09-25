@@ -1,4 +1,4 @@
-import { View, Image, ImageSourcePropType } from "react-native";
+import { View, Image, ImageSourcePropType, StyleSheet } from "react-native";
 import React from "react";
 import { Stack, Tabs, router, useSegments } from "expo-router";
 import icons from "../../constants/icons";
@@ -10,12 +10,8 @@ const TabsLayout = () => {
   const segment = useSegments();
   // get the current page from the segment
   const page = segment[segment.length - 1] || "";
-  console.log("page", page);
   const pagesToHideTabBar = ["camera"];
-  console.log(
-    "pagesToHideTabBar.includes(page)",
-    pagesToHideTabBar.includes(page)
-  );
+
   return (
     <OnlyAuthenticated>
       <Tabs
@@ -23,18 +19,21 @@ const TabsLayout = () => {
           tabBarShowLabel: false,
         }}
       >
-        {Page({
-          name: "home",
-          title: "Home",
-          icon: icons.home,
-          iconName: "Home",
-          Icon: ({ color, focused }) =>
-            focused ? (
-              <Foundation name="home" size={27} color={color} />
-            ) : (
-              <Octicons name="home" size={24} color={color} />
-            ),
-        })}
+        <Tabs.Screen
+          name="home"
+          options={{
+            title: "Home",
+            headerShown: false,
+            tabBarStyle: tabBarStyle.container,
+            tabBarActiveTintColor: "#FFFFFF",
+            tabBarIcon: ({ color, focused }) =>
+              focused ? (
+                <Foundation name="home" size={27} color={color} />
+              ) : (
+                <Octicons name="home" size={24} color={color} />
+              ),
+          }}
+        />
         <Tabs.Screen
           name="(search)"
           options={{
@@ -42,12 +41,7 @@ const TabsLayout = () => {
             headerShown: false,
             popToTopOnBlur: true,
             tabBarStyle: {
-              backgroundColor: "#301c11",
-              height: 60,
-              borderColor: "#301c11",
-              paddingBottom: 12,
-              paddingTop: 6,
-              position: "absolute",
+              ...tabBarStyle.container,
               bottom: pagesToHideTabBar.includes(page) ? -100 : 0,
               display: pagesToHideTabBar.includes(page) ? "none" : "flex",
             },
@@ -60,39 +54,62 @@ const TabsLayout = () => {
               />
             ),
           }}
-          listeners={{
-            tabPress: e => {
-              const canDismiss = router.canDismiss();
-              if (canDismiss) router.dismissAll();
-            },
+          // listeners={{
+          //   tabPress: e => {
+          //     const canDismiss = router.canDismiss();
+          //     if (canDismiss) router.dismissAll();
+          //   },
+          // }}
+        />
+
+        <Tabs.Screen
+          name="likes-favorites"
+          options={{
+            title: "Likes & Favorites",
+            headerShown: false,
+            tabBarStyle: tabBarStyle.container,
+            tabBarActiveTintColor: "#FFFFFF",
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons
+                name={focused ? "heart" : "heart-outline"}
+                size={24}
+                color={color}
+              />
+            ),
           }}
         />
-        {Page({
-          name: "likes-favorites",
-          title: "Likes & Favorites",
-          icon: icons.profile,
-          iconName: "Likes",
-          Icon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? "heart" : "heart-outline"}
-              size={24}
-              color={color}
-            />
-          ),
-        })}
-        {Page({
-          name: "profile",
-          title: "Profile",
-          icon: icons.profile,
-          iconName: "Profile",
-          Icon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? "person" : "person-outline"}
-              size={26}
-              color={color}
-            />
-          ),
-        })}
+        <Tabs.Screen
+          name="profile"
+          options={{
+            title: "Profile",
+            headerShown: false,
+            tabBarStyle: tabBarStyle.container,
+            tabBarActiveTintColor: "#FFFFFF",
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons
+                name={focused ? "person" : "person-outline"}
+                size={24}
+                color={color}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="(items)"
+          options={{
+            headerShown: false,
+            href: null, // Esto oculta el tab del tab bar pero mantiene la funcionalidad
+            tabBarStyle: tabBarStyle.container,
+            tabBarActiveTintColor: "#FFFFFF",
+          }}
+        />
+        <Tabs.Screen
+          name="(brand)"
+          options={{
+            headerShown: false,
+            href: null, // Esto oculta el tab del tab bar pero mantiene la funcionalidad
+          }}
+        />
       </Tabs>
     </OnlyAuthenticated>
   );
@@ -100,73 +117,13 @@ const TabsLayout = () => {
 
 export default TabsLayout;
 
-const Page = ({
-  name,
-  title,
-  icon,
-  iconName,
-  Icon,
-}: {
-  name: string;
-  title: string;
-  icon: ImageSourcePropType;
-  iconName: string;
-  Icon?: ({
-    color,
-    focused,
-  }: {
-    color: string;
-    focused: boolean;
-  }) => React.ReactNode;
-}) => {
-  return (
-    <Tabs.Screen
-      name={name}
-      options={{
-        title: title,
-        headerShown: false,
-        tabBarStyle: {
-          backgroundColor: "#301c11",
-          height: 60,
-          borderColor: "#301c11",
-          paddingBottom: 12,
-          paddingTop: 6,
-        },
-        tabBarActiveTintColor: "#FFFFFF",
-        tabBarIcon: ({ color, focused }) =>
-          Icon ? (
-            <Icon color={color} focused={focused} />
-          ) : (
-            <TabIcon
-              icon={icon}
-              name={iconName}
-              color={color}
-              focused={focused}
-            />
-          ),
-      }}
-    />
-  );
-};
-
-const TabIcon = ({
-  icon,
-  color,
-  name,
-  focused,
-}: {
-  icon: ImageSourcePropType;
-  color: string;
-  name: string;
-  focused: boolean;
-}) => {
-  return (
-    <View className="items-center justify-center">
-      <Image
-        source={icon}
-        resizeMode="contain"
-        style={{ tintColor: color, width: 24, height: 24 }}
-      />
-    </View>
-  );
-};
+const tabBarStyle = StyleSheet.create({
+  container: {
+    backgroundColor: "#301c11",
+    height: 60,
+    borderColor: "#301c11",
+    paddingBottom: 12,
+    paddingTop: 6,
+    position: "absolute",
+  },
+});

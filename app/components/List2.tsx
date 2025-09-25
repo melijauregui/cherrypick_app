@@ -6,7 +6,6 @@ import {
   NativeSyntheticEvent,
   RefreshControl,
   ScrollView,
-  StyleSheet,
   View,
 } from "react-native";
 import ClothingItemComponent, {

@@ -35,7 +35,7 @@ import { prefetchBrandPageItem } from "@/app/utils/prefetchs";
 import List2 from "@/app/components/List2";
 import { ItemSchemaType } from "@/schemas/catalog/catalog-schema";
 import { BrandSchemaPropertiesType } from "@/schemas/brand/brand-schema";
-import ImageComplete from "../components/ImageComplete";
+import ImageComplete from "@/app/components/ImageComplete";
 
 const ItemDetail = () => {
   const params = useLocalSearchParams();
@@ -45,9 +45,7 @@ const ItemDetail = () => {
 
   const itemData = useFetchItem(decodedUuid);
   const itemEmbeddingData = useFetchItemEmbedding(decodedUuid);
-  if (itemEmbeddingData?.embedding.length === 768) {
-    console.log("itemEmbeddingData", itemEmbeddingData.embedding.length);
-  }
+
   const item = itemData?.item;
   const brand = useFetchBrandProfileItem(item?.brandId || "");
   const isBrandItem = useIsMyItem(item?.uuid || "") || false;
@@ -210,7 +208,7 @@ const ItemDetailComponent = ({
         className="flex-row items-center gap-2"
         onPress={() => {
           router.push({
-            pathname: "/(brand)/[id]",
+            pathname: "/(tabs)/(brand)/[id]",
             params: {
               id: brand?.id || "",
             },

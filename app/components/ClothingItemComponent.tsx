@@ -38,39 +38,6 @@ const ClothingItemComponent = ({
   renderedWidth: number;
 }) => {
   const { imageUrl } = item;
-  // const [imageDimensions, setImageDimensions] = useState({
-  //   width: 0,
-  //   height: 0,
-  // });
-
-  // const { width, height } = Dimensions.get("window");
-  // const widthDetermined = width / numColumns - 6; //width hard coded
-
-  // const imageRef = useRef<View>(null);
-
-  // useEffect(() => {
-  //   Image.getSize(
-  //     image_url,
-  //     (width, height) => {
-  //       setImageDimensions({ width, height });
-  //     },
-  //     error => console.error("Failed to get dimensions for image:", error)
-  //   );
-  // }, [item.uuid]);
-
-  // // Si los valores son inválidos, no renderizar nada
-  // if (
-  //   !imageDimensions.width ||
-  //   !imageDimensions.height ||
-  //   imageDimensions.width <= 0
-  // ) {
-  //   return null;
-  // }
-
-  // const imageHeight =
-  //   (widthDetermined * imageDimensions.height) / imageDimensions.width;
-
-  // Si el cálculo resulta en NaN o valores inválidos, no renderizar nada
   if (
     isNaN(renderedHeight) ||
     !isFinite(renderedHeight) ||

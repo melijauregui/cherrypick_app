@@ -69,7 +69,7 @@ const RootLayout = () => {
             headerShown: false,
           }}
         />
-        <Stack.Screen
+        {/* <Stack.Screen
           name="(items)"
           options={{
             headerShown: false,
@@ -82,7 +82,7 @@ const RootLayout = () => {
             headerShown: false,
             animation: "slide_from_right",
           }}
-        />
+        /> */}
       </Stack>
       <Toast config={toastConfig} />
     </QueryClientProvider>

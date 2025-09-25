@@ -1,7 +1,5 @@
 import { Stack } from "expo-router";
-import React, { useEffect } from "react";
-import { StatusBar } from "expo-status-bar";
-import { Linking } from "react-native";
+import React from "react";
 import { OnlyAuthenticated } from "@/lib/auth-client";
 
 const AuthLayout = () => {
