@@ -404,6 +404,8 @@ const allBrandItemsRoute = createRoute({
 });
 SearchApp.openapi(allBrandItemsRoute, async c => {
   const { filter, page = 0, limit = 10 } = c.req.valid("query");
+  //paso todo a minusculas
+  const filterLower = filter?.toLowerCase();
   logger.info(
     "/GET search/all-brands filter: %s page: %s limit: %s",
     filter,
@@ -411,7 +413,7 @@ SearchApp.openapi(allBrandItemsRoute, async c => {
     limit
   );
 
-  const res = await GetAllBrands(filter, page, limit);
+  const res = await GetAllBrands(filterLower, page, limit);
 
   return c.json({ error: false, data: res }, 200);
 });
