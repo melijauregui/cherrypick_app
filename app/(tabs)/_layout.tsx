@@ -172,6 +172,5 @@ const tabBarStyle = StyleSheet.create({
     borderColor: "#301c11",
     paddingBottom: 12,
     paddingTop: 6,
-    position: "absolute",
   },
 });
