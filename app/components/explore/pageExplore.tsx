@@ -72,10 +72,10 @@ export function PageExploreStandard({ query }: { query: string }) {
         ...(maxPrice ? { maxPrice } : {}),
         ...(brandsSelected.size > 0
           ? {
-              brands: Array.from(brandsSelected.entries())
-                .map(([uuid, name]) => `${uuid},${name}`)
-                .join(";"),
-            }
+            brands: Array.from(brandsSelected.entries())
+              .map(([uuid, name]) => `${uuid},${name}`)
+              .join(";"),
+          }
           : {}),
       },
     });
@@ -184,10 +184,10 @@ export const PageExploreQuery = ({
         ...(maxPrice ? { maxPrice } : {}),
         ...(brandsSelected.size > 0
           ? {
-              brands: Array.from(brandsSelected.entries())
-                .map(([uuid, name]) => `${uuid},${name}`)
-                .join(";"),
-            }
+            brands: Array.from(brandsSelected.entries())
+              .map(([uuid, name]) => `${uuid},${name}`)
+              .join(";"),
+          }
           : {}),
       },
     });
@@ -239,6 +239,13 @@ export const PageExploreQuery = ({
         }
         limit={10}
         columnCount={2}
+        itemWhenNothingFound={() => (
+          <View className="flex-1 items-center justify-center py-10">
+            <Text className="text-gray-400 text-base">
+              No hay ítems que coincidan con tu búsqueda
+            </Text>
+          </View>
+        )}
       />
       <FilterSearchBottomSheet
         bottomSheetRef={bottomSheetRef}
