@@ -47,8 +47,8 @@ Av 844 2509 Solano',
 
 
 -- Insert inspiration items
-INSERT INTO "InspoItems" ("itemUuid", "category")
-VALUES ('b4166c0e-21ea-4864-bc2b-55faf6bae889', 'spring'),
-       ('958a6478-f6a7-4da9-a255-97d852a3e6de', 'spring'),
-       ('15580818-3f2f-46ec-b910-8e8a7735874a', 'spring'),
-       ('46d53a96-e697-4ac9-92f9-f90313cd8931', 'spring');    
+INSERT INTO "InspoItems" ("itemUuid", "category", "index")
+VALUES  ('46d53a96-e697-4ac9-92f9-f90313cd8931', 'spring', 0),   
+        ('958a6478-f6a7-4da9-a255-97d852a3e6de', 'spring', 1),
+        ('b4166c0e-21ea-4864-bc2b-55faf6bae889', 'spring', 2),
+        ('15580818-3f2f-46ec-b910-8e8a7735874a', 'spring', 3);

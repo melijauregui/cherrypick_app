@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   TextInput,
@@ -8,11 +8,11 @@ import {
   ScrollView,
   ImageBackground,
 } from "react-native";
-import { router, useRouter } from "expo-router";
+import { Link, router, useRouter } from "expo-router";
 import { Entypo, Ionicons } from "@expo/vector-icons";
 import List2 from "@/app/components/List2";
 import { getClothingItemsTextSearch } from "@/app/utils/fetch";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import LoadingPage from "../LoadingPage";
 import { ItemSchemaType } from "@/schemas/catalog/catalog-schema";
 import {
@@ -26,6 +26,8 @@ import BottomSheet from "@gorhom/bottom-sheet";
 import FilterSearchBottomSheet from "./filterSearch";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { StatusBar } from "expo-status-bar";
+import { prefetchInspirationItems } from "@/app/utils/prefetchs";
+import { useSession } from "@/lib/auth-client";
 
 export default function PageExplore({
   children,
@@ -54,10 +56,20 @@ export function PageExploreStandard({ query }: { query: string }) {
   const insets = useSafeAreaInsets();
   const [overHeaderImage, setOverHeaderImage] = useState(true);
   const HEADER_IMAGE_HEIGHT = 320; // keep in sync with ImageBackgroundComponent
-
+  const queryClient = useQueryClient();
+  const session = useSession();
   const onChangeTextSearch = (text: string) => {
     setSearchText(text);
   };
+
+  //prefetch inspiration items
+  useEffect(() => {
+    console.log(
+      "prefetching inspiration items for user: ",
+      session.user?.email
+    );
+    prefetchInspirationItems(queryClient, session.user?.email || "");
+  }, []);
 
   const handleSearch = () => {
     if (searchText.trim() === "") {
@@ -72,10 +84,10 @@ export function PageExploreStandard({ query }: { query: string }) {
         ...(maxPrice ? { maxPrice } : {}),
         ...(brandsSelected.size > 0
           ? {
-            brands: Array.from(brandsSelected.entries())
-              .map(([uuid, name]) => `${uuid},${name}`)
-              .join(";"),
-          }
+              brands: Array.from(brandsSelected.entries())
+                .map(([uuid, name]) => `${uuid},${name}`)
+                .join(";"),
+            }
           : {}),
       },
     });
@@ -193,10 +205,10 @@ export const PageExploreQuery = ({
         ...(maxPrice ? { maxPrice } : {}),
         ...(brandsSelected.size > 0
           ? {
-            brands: Array.from(brandsSelected.entries())
-              .map(([uuid, name]) => `${uuid},${name}`)
-              .join(";"),
-          }
+              brands: Array.from(brandsSelected.entries())
+                .map(([uuid, name]) => `${uuid},${name}`)
+                .join(";"),
+            }
           : {}),
       },
     });

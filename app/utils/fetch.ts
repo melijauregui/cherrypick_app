@@ -44,10 +44,6 @@ const handleApiResponse = async <T>(
   try {
     const { data } = await apiCall();
 
-    if (errorContext === "getInspirationItems") {
-      console.log("data!!!!: %s", data);
-    }
-
     // Check if it's an error response
     if (data.error) {
       throw new Error(data.details + (data.info ?? ""));
@@ -265,7 +261,7 @@ export const getAllBrands = async (
 export async function getItem(itemUuid: string): Promise<{
   item: ItemSchemaType;
 } | null> {
-  // console.log("getting item", itemUuid);
+  console.log("getting item", itemUuid);
   return handleApiResponse<{ item: ItemSchemaType }>(
     () =>
       safeFetch({

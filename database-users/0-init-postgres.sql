@@ -58,7 +58,8 @@ CREATE TABLE IF NOT EXISTS "ItemFavorite" (
 CREATE TABLE IF NOT EXISTS "InspoItems" (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     "itemUuid" VARCHAR(255) NOT NULL,
-    "category" VARCHAR(255) NOT NULL
+    "category" VARCHAR(255) NOT NULL,
+    "index" INTEGER NOT NULL
 );
 
 -- Create indexes for better performance

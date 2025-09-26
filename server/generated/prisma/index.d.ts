@@ -6969,46 +6969,70 @@ export namespace Prisma {
 
   export type AggregateInspoItems = {
     _count: InspoItemsCountAggregateOutputType | null
+    _avg: InspoItemsAvgAggregateOutputType | null
+    _sum: InspoItemsSumAggregateOutputType | null
     _min: InspoItemsMinAggregateOutputType | null
     _max: InspoItemsMaxAggregateOutputType | null
+  }
+
+  export type InspoItemsAvgAggregateOutputType = {
+    index: number | null
+  }
+
+  export type InspoItemsSumAggregateOutputType = {
+    index: number | null
   }
 
   export type InspoItemsMinAggregateOutputType = {
     id: string | null
     itemUuid: string | null
     category: string | null
+    index: number | null
   }
 
   export type InspoItemsMaxAggregateOutputType = {
     id: string | null
     itemUuid: string | null
     category: string | null
+    index: number | null
   }
 
   export type InspoItemsCountAggregateOutputType = {
     id: number
     itemUuid: number
     category: number
+    index: number
     _all: number
   }
 
+
+  export type InspoItemsAvgAggregateInputType = {
+    index?: true
+  }
+
+  export type InspoItemsSumAggregateInputType = {
+    index?: true
+  }
 
   export type InspoItemsMinAggregateInputType = {
     id?: true
     itemUuid?: true
     category?: true
+    index?: true
   }
 
   export type InspoItemsMaxAggregateInputType = {
     id?: true
     itemUuid?: true
     category?: true
+    index?: true
   }
 
   export type InspoItemsCountAggregateInputType = {
     id?: true
     itemUuid?: true
     category?: true
+    index?: true
     _all?: true
   }
 
@@ -7050,6 +7074,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: InspoItemsAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: InspoItemsSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: InspoItemsMinAggregateInputType
@@ -7080,6 +7116,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: InspoItemsCountAggregateInputType | true
+    _avg?: InspoItemsAvgAggregateInputType
+    _sum?: InspoItemsSumAggregateInputType
     _min?: InspoItemsMinAggregateInputType
     _max?: InspoItemsMaxAggregateInputType
   }
@@ -7088,7 +7126,10 @@ export namespace Prisma {
     id: string
     itemUuid: string
     category: string
+    index: number
     _count: InspoItemsCountAggregateOutputType | null
+    _avg: InspoItemsAvgAggregateOutputType | null
+    _sum: InspoItemsSumAggregateOutputType | null
     _min: InspoItemsMinAggregateOutputType | null
     _max: InspoItemsMaxAggregateOutputType | null
   }
@@ -7111,27 +7152,31 @@ export namespace Prisma {
     id?: boolean
     itemUuid?: boolean
     category?: boolean
+    index?: boolean
   }, ExtArgs["result"]["inspoItems"]>
 
   export type InspoItemsSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     itemUuid?: boolean
     category?: boolean
+    index?: boolean
   }, ExtArgs["result"]["inspoItems"]>
 
   export type InspoItemsSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     itemUuid?: boolean
     category?: boolean
+    index?: boolean
   }, ExtArgs["result"]["inspoItems"]>
 
   export type InspoItemsSelectScalar = {
     id?: boolean
     itemUuid?: boolean
     category?: boolean
+    index?: boolean
   }
 
-  export type InspoItemsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "itemUuid" | "category", ExtArgs["result"]["inspoItems"]>
+  export type InspoItemsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "itemUuid" | "category" | "index", ExtArgs["result"]["inspoItems"]>
 
   export type $InspoItemsPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "InspoItems"
@@ -7140,6 +7185,7 @@ export namespace Prisma {
       id: string
       itemUuid: string
       category: string
+      index: number
     }, ExtArgs["result"]["inspoItems"]>
     composites: {}
   }
@@ -7566,6 +7612,7 @@ export namespace Prisma {
     readonly id: FieldRef<"InspoItems", 'String'>
     readonly itemUuid: FieldRef<"InspoItems", 'String'>
     readonly category: FieldRef<"InspoItems", 'String'>
+    readonly index: FieldRef<"InspoItems", 'Int'>
   }
     
 
@@ -13492,7 +13539,8 @@ export namespace Prisma {
   export const InspoItemsScalarFieldEnum: {
     id: 'id',
     itemUuid: 'itemUuid',
-    category: 'category'
+    category: 'category',
+    index: 'index'
   };
 
   export type InspoItemsScalarFieldEnum = (typeof InspoItemsScalarFieldEnum)[keyof typeof InspoItemsScalarFieldEnum]
@@ -13656,13 +13704,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Boolean'
-   */
-  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
-    
-
-
-  /**
    * Reference to a field of type 'Int'
    */
   export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -13673,6 +13714,27 @@ export namespace Prisma {
    * Reference to a field of type 'Int[]'
    */
   export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Boolean'
+   */
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+  /**
+   * Reference to a field of type 'Float'
+   */
+  export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+
+
+  /**
+   * Reference to a field of type 'Float[]'
+   */
+  export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
   /**
    * Deep Input Types
@@ -13935,12 +13997,14 @@ export namespace Prisma {
     id?: UuidFilter<"InspoItems"> | string
     itemUuid?: StringFilter<"InspoItems"> | string
     category?: StringFilter<"InspoItems"> | string
+    index?: IntFilter<"InspoItems"> | number
   }
 
   export type InspoItemsOrderByWithRelationInput = {
     id?: SortOrder
     itemUuid?: SortOrder
     category?: SortOrder
+    index?: SortOrder
   }
 
   export type InspoItemsWhereUniqueInput = Prisma.AtLeast<{
@@ -13950,15 +14014,19 @@ export namespace Prisma {
     NOT?: InspoItemsWhereInput | InspoItemsWhereInput[]
     itemUuid?: StringFilter<"InspoItems"> | string
     category?: StringFilter<"InspoItems"> | string
+    index?: IntFilter<"InspoItems"> | number
   }, "id">
 
   export type InspoItemsOrderByWithAggregationInput = {
     id?: SortOrder
     itemUuid?: SortOrder
     category?: SortOrder
+    index?: SortOrder
     _count?: InspoItemsCountOrderByAggregateInput
+    _avg?: InspoItemsAvgOrderByAggregateInput
     _max?: InspoItemsMaxOrderByAggregateInput
     _min?: InspoItemsMinOrderByAggregateInput
+    _sum?: InspoItemsSumOrderByAggregateInput
   }
 
   export type InspoItemsScalarWhereWithAggregatesInput = {
@@ -13968,6 +14036,7 @@ export namespace Prisma {
     id?: UuidWithAggregatesFilter<"InspoItems"> | string
     itemUuid?: StringWithAggregatesFilter<"InspoItems"> | string
     category?: StringWithAggregatesFilter<"InspoItems"> | string
+    index?: IntWithAggregatesFilter<"InspoItems"> | number
   }
 
   export type UserWhereInput = {
@@ -14569,42 +14638,49 @@ export namespace Prisma {
     id?: string
     itemUuid: string
     category: string
+    index: number
   }
 
   export type InspoItemsUncheckedCreateInput = {
     id?: string
     itemUuid: string
     category: string
+    index: number
   }
 
   export type InspoItemsUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     itemUuid?: StringFieldUpdateOperationsInput | string
     category?: StringFieldUpdateOperationsInput | string
+    index?: IntFieldUpdateOperationsInput | number
   }
 
   export type InspoItemsUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     itemUuid?: StringFieldUpdateOperationsInput | string
     category?: StringFieldUpdateOperationsInput | string
+    index?: IntFieldUpdateOperationsInput | number
   }
 
   export type InspoItemsCreateManyInput = {
     id?: string
     itemUuid: string
     category: string
+    index: number
   }
 
   export type InspoItemsUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     itemUuid?: StringFieldUpdateOperationsInput | string
     category?: StringFieldUpdateOperationsInput | string
+    index?: IntFieldUpdateOperationsInput | number
   }
 
   export type InspoItemsUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     itemUuid?: StringFieldUpdateOperationsInput | string
     category?: StringFieldUpdateOperationsInput | string
+    index?: IntFieldUpdateOperationsInput | number
   }
 
   export type UserCreateInput = {
@@ -15264,22 +15340,60 @@ export namespace Prisma {
     verificationCodeExpiration?: SortOrder
   }
 
+  export type IntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
   export type InspoItemsCountOrderByAggregateInput = {
     id?: SortOrder
     itemUuid?: SortOrder
     category?: SortOrder
+    index?: SortOrder
+  }
+
+  export type InspoItemsAvgOrderByAggregateInput = {
+    index?: SortOrder
   }
 
   export type InspoItemsMaxOrderByAggregateInput = {
     id?: SortOrder
     itemUuid?: SortOrder
     category?: SortOrder
+    index?: SortOrder
   }
 
   export type InspoItemsMinOrderByAggregateInput = {
     id?: SortOrder
     itemUuid?: SortOrder
     category?: SortOrder
+    index?: SortOrder
+  }
+
+  export type InspoItemsSumOrderByAggregateInput = {
+    index?: SortOrder
+  }
+
+  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
   }
 
   export type BrandNullableScalarRelationFilter = {
@@ -15632,6 +15746,14 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutItemLikesInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutItemLikesInput, UserUpdateWithoutItemLikesInput>, UserUncheckedUpdateWithoutItemLikesInput>
+  }
+
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
   }
 
   export type BrandCreateNestedOneWithoutUserInput = {
@@ -16030,6 +16152,33 @@ export namespace Prisma {
     gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type NestedFloatFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatFilter<$PrismaModel> | number
   }
 
   export type NestedStringNullableFilter<$PrismaModel = never> = {

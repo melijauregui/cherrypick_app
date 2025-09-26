@@ -70,6 +70,7 @@ model InspoItems {
   id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   itemUuid String @db.VarChar(255)
   category String @db.VarChar(255)
+  index    Int    @db.Integer
 
   @@map("InspoItems")
 }

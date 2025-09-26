@@ -158,7 +158,8 @@ exports.Prisma.RegisterInProgressScalarFieldEnum = {
 exports.Prisma.InspoItemsScalarFieldEnum = {
   id: 'id',
   itemUuid: 'itemUuid',
-  category: 'category'
+  category: 'category',
+  index: 'index'
 };
 
 exports.Prisma.UserScalarFieldEnum = {

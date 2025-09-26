@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,15 +9,15 @@ import {
   Dimensions,
   TouchableOpacity,
 } from "react-native";
-import { ItemSchemaType } from "@/schemas/catalog/catalog-schema";
-import { BrandSchemaPropertiesType } from "@/schemas/brand/brand-schema";
 import { router, useLocalSearchParams } from "expo-router";
 import { Entypo } from "@expo/vector-icons";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getInspirationItems } from "../utils/fetch";
 import LoadingPage from "../components/LoadingPage";
 import ErrorPage from "../(auth)/error";
 import { useFetchBrandProfileItem, useFetchItem } from "../utils/use-query";
+import { prefetchInspirationItems } from "../utils/prefetchs";
+import { useSession } from "@/lib/auth-client";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
@@ -25,6 +25,20 @@ export default function WeeklyInspo() {
   const TITLE_HEIGHT = 160;
   //obtener la categoría de la ruta
   const { category } = useLocalSearchParams();
+  const queryClient = useQueryClient();
+  const session = useSession();
+
+  // Prefetch inspiration items when component mounts
+  useEffect(() => {
+    if (category && session.user?.email) {
+      console.log("Prefetching inspiration items for category:", category);
+      prefetchInspirationItems(
+        queryClient,
+        session.user.email,
+        category as string
+      );
+    }
+  }, [category, session.user?.email, queryClient]);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["inspiration-items", category],
@@ -113,91 +127,131 @@ function ImageBackgroundComponent({ children }: { children: React.ReactNode }) {
   );
 }
 
-// // Componente que maneja los hooks correctamente
-// const ItemWithBrand = ({ itemId }: { itemId: string }) => {
-//   const itemData = useFetchItem(itemId);
-//   const brandData = itemData
-//     ? useFetchBrandProfileItem(itemData.item.brandId)
-//     : null;
-
-//   if (!itemData?.item) {
-//     return null; // O un componente de loading
-//   }
-
-//   return <ProductCard product={itemData.item} brand={brandData?.brand} />;
-// };
-
 const ProductCard = ({ itemId }: { itemId: string }) => {
   const itemData = useFetchItem(itemId);
   const item = itemData?.item;
   const brandData = useFetchBrandProfileItem(item?.brandId || "");
   const brand = brandData?.brand;
+
+  const [titleLines, setTitleLines] = useState(1);
+
   if (!item) {
     return null; // O un componente de loading
   }
-  // const item = itemData.item;
-  // const brand = brandData?.brand;
+
+  const handleTitleLayout = (e: any) => {
+    const lines = e?.nativeEvent?.lines ?? [];
+    setTitleLines(lines.length);
+  };
+
+  // Calculate description lines based on title lines
+  // 1 line title = 5 lines description, 2 lines = 4, 3 lines = 3, etc.
+  const descriptionLines = Math.max(3, 6 - titleLines);
+
   return (
-    <View className="flex-row bg-white/90 w-56 rounded-xl p-3 mb-4 gap-3">
-      <Image
-        source={{ uri: item.imageUrl }}
-        className="w-24 h-36 rounded-lg"
-        resizeMode="cover"
-      />
+    <TouchableOpacity
+      className="flex-row bg-white/90 w-64 rounded-xl p-3 mb-4 gap-3"
+      onPress={() => {
+        router.push({
+          pathname: "/(items)/[uuid]",
+          params: {
+            uuid: item.uuid,
+          },
+        });
+      }}
+    >
+      <View className="flex-col items-center gap-2">
+        <View className="relative">
+          <Image
+            source={{ uri: item.imageUrl }}
+            className="w-24 h-36 rounded-lg"
+            resizeMode="cover"
+          />
+          {/* <View className="absolute bottom-1 left-1 bg-black/60  rounded">
+            <Text className="text-white font-pmedium text-xs">
+              ${item.price}
+            </Text>
+          </View> */}
+        </View>
+        <TouchableOpacity
+          onPress={() => {
+            router.push({
+              pathname: "/(brand)/[id]",
+              params: {
+                id: brand?.id || "",
+              },
+            });
+          }}
+        >
+          <Text className="font-pmedium text-sm text-gray-700 flex-wrap">
+            {brand?.name}
+          </Text>
+        </TouchableOpacity>
+      </View>
       <View className="flex-1">
-        <Text className="font-pbold text-base text-gray-900 mb-1">
+        <Text
+          className="font-pbold text-base text-gray-900 mb-1"
+          onTextLayout={handleTitleLayout}
+        >
           {item.name}
         </Text>
-        <Text className="font-pmedium text-sm text-gray-700 mb-1 flex-wrap">
-          {brand?.name || item.brandId}
-        </Text>
-        <Text className="font-pmedium text-sm text-gray-700 mb-1 flex-wrap">
-          {item.description}
-        </Text>
+        <DescriptionItem
+          description={item.description}
+          numberOfLines={descriptionLines}
+        />
       </View>
-    </View>
+      <TouchableOpacity className="absolute right-3 bottom-3">
+        <Entypo name="chevron-thin-right" size={14} color="black" />
+      </TouchableOpacity>
+    </TouchableOpacity>
   );
 };
 
-// const mockProducts: ItemSchemaType[] = [
-//   {
-//     uuid: "1",
-//     name: "Nora",
-//     description: "Non stretch denim",
-//     imageUrl:
-//       "https://i.pinimg.com/736x/5a/23/7c/5a237c320b9cd5c5bd9d9ed08ac3610b.jpg",
-//     price: 89,
-//     url: "https://ar.pinterest.com/pin/4601060432427917824/",
-//     brandId: "1",
-//   },
-//   {
-//     uuid: "2",
-//     name: "Kana",
-//     description: "Non stretch denim",
-//     imageUrl:
-//       "https://i.pinimg.com/736x/7b/46/dd/7b46ddbde038b6ffe38341ba442480e6.jpg",
-//     url: "https://ar.pinterest.com/pin/687784174380430940/",
-//     price: 79,
-//     brandId: "1",
-//   },
-//   {
-//     uuid: "3",
-//     name: "Vaia",
-//     url: "https://ar.pinterest.com/pin/4601060432427917824/",
-//     description: "Non stretch denim",
-//     imageUrl:
-//       "https://i.pinimg.com/1200x/b3/1d/82/b31d82283cb74a2e0a794a0e0f367b57.jpg",
-//     price: 95,
-//     brandId: "1",
-//   },
-//   {
-//     uuid: "4",
-//     name: "Noelle",
-//     url: "https://ar.pinterest.com/pin/734297914286091569/",
-//     description: "Non stretch denim",
-//     imageUrl:
-//       "https://i.pinimg.com/1200x/1b/6b/d2/1b6bd23f88e7a472a8fc6214546f2c7d.jpg",
-//     price: 120,
-//     brandId: "1",
-//   },
-// ];
+const DescriptionItem = ({
+  description,
+  numberOfLines,
+}: {
+  description: string;
+  numberOfLines: number;
+}) => {
+  const [measured, setMeasured] = React.useState(false); // ya medí?
+  const [overflows, setOverflows] = React.useState(false); // tiene >1 línea?
+  const [lastDescription, setLastDescription] = React.useState(description);
+  const handleTextLayout = React.useCallback(
+    (e: any) => {
+      const lines = e?.nativeEvent?.lines ?? [];
+      // Solo actualizar si la descripción cambió o si no hemos medido aún
+      if (lastDescription !== description || !measured) {
+        setOverflows(lines.length > numberOfLines);
+        setMeasured(true);
+        setLastDescription(description);
+      }
+    },
+    [measured, description, lastDescription]
+  );
+  return (
+    <View className="">
+      {/* Text invisible para medir el número real de líneas */}
+      <Text
+        className="text-neutral-700 text-base font-pregular flex-1 absolute opacity-0"
+        onTextLayout={handleTextLayout}
+      >
+        {description}
+      </Text>
+
+      <Text
+        className="text-neutral-700 font-plight text-base text-start"
+        numberOfLines={numberOfLines}
+        ellipsizeMode="tail"
+      >
+        {description}
+      </Text>
+
+      {overflows && (
+        <Text className="text-neutral-700 font-pregular text-lg -mt-2">
+          ...
+        </Text>
+      )}
+    </View>
+  );
+};

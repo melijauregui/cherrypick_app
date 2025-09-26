@@ -196,6 +196,7 @@ export async function GetAllInspirationItems(
       category: category,
     },
   });
+  res.sort((a, b) => a.index - b.index);
   const data = res.map(inspoItem => ({
     id: inspoItem.itemUuid,
   }));
