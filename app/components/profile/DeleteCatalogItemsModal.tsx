@@ -10,7 +10,6 @@ import {
 import BottomSheet from "@gorhom/bottom-sheet";
 import Toast from "react-native-toast-message";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
-import { FlashList } from "@shopify/flash-list";
 import { ButtonSubmit } from "./insertNewItems";
 import { useDelete } from "@/app/utils/update";
 import { getItemsUuidNames } from "@/app/utils/fetch";

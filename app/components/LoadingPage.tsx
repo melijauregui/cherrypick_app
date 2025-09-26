@@ -9,9 +9,11 @@ import prefetchHome, {
 } from "@/app/utils/prefetchs";
 import { useSession } from "@/lib/auth-client";
 
-const LoadingPage: React.FC<{ alreadyPrefetched?: boolean }> = ({
-  alreadyPrefetched,
-}) => {
+function LoadingPage({
+  alreadyPrefetched = true,
+}: {
+  alreadyPrefetched?: boolean;
+}) {
   const queryClient = useQueryClient();
   const { user } = useSession();
 
@@ -63,6 +65,6 @@ const LoadingPage: React.FC<{ alreadyPrefetched?: boolean }> = ({
       </View>
     </SafeAreaView>
   );
-};
+}
 
 export default LoadingPage;

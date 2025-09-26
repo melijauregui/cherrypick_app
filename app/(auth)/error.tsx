@@ -35,15 +35,6 @@ const ErrorPage = () => {
                     Go back to Sign In
                   </Text>
                 </TouchableOpacity>
-
-                <TouchableOpacity
-                  className="flex flex-row bg-transparent h-[50px] justify-center items-center rounded-full border border-white"
-                  onPress={() => router.push("/sign-up")}
-                >
-                  <Text className="text-white font-psemibold text-[15px]">
-                    Create new account
-                  </Text>
-                </TouchableOpacity>
               </View>
             </View>
           </View>

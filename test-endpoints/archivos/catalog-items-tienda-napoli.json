@@ -159,5 +159,19 @@
     "price": "19.99",
     "imageUrl": "https://i.pinimg.com/1200x/c7/31/46/c73146a32fae16d243ed705541be2631.jpg",
     "url": "https://ar.pinterest.com/pin/3166662224558583/"
+  },
+  {
+    "name": "Cinto country",
+    "description": "Cinturon color rosa viejo con circulos y tachas texano",
+    "price": "3.99",
+    "imageUrl": "https://i.pinimg.com/736x/7b/46/dd/7b46ddbde038b6ffe38341ba442480e6.jpg",
+    "url": "https://ar.pinterest.com/pin/4601060432427917824/"
+  },
+  {
+    "name": "Pollera Tess",
+    "description": "Pollera blanca con volados y estampada media pierna",
+    "price": "20.99",
+    "imageUrl": "https://i.pinimg.com/1200x/b3/1d/82/b31d82283cb74a2e0a794a0e0f367b57.jpg",
+    "url": "https://ar.pinterest.com/pin/4601060432427917824/"
   }
 ]

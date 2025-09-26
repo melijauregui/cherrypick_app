@@ -15,6 +15,7 @@ import {
 import { EmbbedingResponseSchemaType } from "@/schemas/search/search-schema";
 import { db } from "../db.config";
 import { Filters } from "weaviate-client";
+import { QueryIdSchemaType } from "@/schemas/standar-query-schema";
 
 export async function SearchItems(
   page: number,
@@ -182,6 +183,21 @@ export async function GetAllBrands(
   const data = res.map(brand => ({
     name: brand.name,
     uuid: brand.userId,
+  }));
+
+  return data;
+}
+
+export async function GetAllInspirationItems(
+  category: string
+): Promise<QueryIdSchemaType[]> {
+  const res = await db.inspoItems.findMany({
+    where: {
+      category: category,
+    },
+  });
+  const data = res.map(inspoItem => ({
+    id: inspoItem.itemUuid,
   }));
 
   return data;

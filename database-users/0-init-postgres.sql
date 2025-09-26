@@ -54,6 +54,13 @@ CREATE TABLE IF NOT EXISTS "ItemFavorite" (
     UNIQUE("userId", "itemUuid")
 );
 
+-- Table for inspiration items
+CREATE TABLE IF NOT EXISTS "InspoItems" (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "itemUuid" VARCHAR(255) NOT NULL,
+    "category" VARCHAR(255) NOT NULL
+);
+
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_user_email ON "User"(email);
 CREATE INDEX IF NOT EXISTS idx_user_type ON "User"("userType");

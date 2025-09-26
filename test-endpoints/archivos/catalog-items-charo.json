@@ -117,5 +117,19 @@
     "price": "9.99",
     "imageUrl": "https://i.pinimg.com/1200x/af/6c/69/af6c6912150022aa70c88d86cd05e4dd.jpg",
     "url": "http://ar.pinterest.com/pin/955607614668091406/"
+  },
+  {
+    "name": "Kana white",
+    "description": "Top blanco de lycra con cuello recto",
+    "price": "9.99",
+    "imageUrl": "https://i.pinimg.com/736x/5a/23/7c/5a237c320b9cd5c5bd9d9ed08ac3610b.jpg",
+    "url": "https://ar.pinterest.com/pin/4601060432427917824/"
+  },
+  {
+    "name": "Noelle Texanas",
+    "description": "Botas texanas negras con puntas y suela de caucho",
+    "price": "30.99",
+    "imageUrl": "https://i.pinimg.com/1200x/1b/6b/d2/1b6bd23f88e7a472a8fc6214546f2c7d.jpg",
+    "url": "https://ar.pinterest.com/pin/734297914286091569/"
   }
 ]

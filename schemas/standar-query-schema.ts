@@ -5,7 +5,7 @@ const QueryEmailSchema = z.object({
 });
 export { QueryEmailSchema };
 
-const QueryIdSchema = z.object({
+export const QueryIdSchema = z.object({
   id: z.string().uuid().describe("ID"),
 });
-export { QueryIdSchema };
+export type QueryIdSchemaType = z.infer<typeof QueryIdSchema>;

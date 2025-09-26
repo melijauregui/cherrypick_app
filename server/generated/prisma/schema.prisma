@@ -66,6 +66,14 @@ model RegisterInProgress {
   @@map("RegisterInProgress")
 }
 
+model InspoItems {
+  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  itemUuid String @db.VarChar(255)
+  category String @db.VarChar(255)
+
+  @@map("InspoItems")
+}
+
 model User {
   id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   email    String @unique @db.VarChar(50)

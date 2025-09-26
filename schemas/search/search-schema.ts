@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { PaginationSchema } from "../catalog/catalog-schema";
 import { SuccessSchema } from "../standar-response-schema";
+import { QueryIdSchema } from "../standar-query-schema";
 
 export const EmbbedingSchema = z.object({
   embedding: z
@@ -30,3 +31,8 @@ export const EmbbedingResponseSchema = z.object({
 export type EmbbedingResponseSchemaType = z.infer<
   typeof EmbbedingResponseSchema
 >;
+
+export const AllInspirationItemsResponseSchema = z.object({
+  ...SuccessSchema.shape,
+  items: z.array(QueryIdSchema),
+});

@@ -39,6 +39,11 @@ export type ItemLike = $Result.DefaultSelection<Prisma.$ItemLikePayload>
  */
 export type RegisterInProgress = $Result.DefaultSelection<Prisma.$RegisterInProgressPayload>
 /**
+ * Model InspoItems
+ * 
+ */
+export type InspoItems = $Result.DefaultSelection<Prisma.$InspoItemsPayload>
+/**
  * Model User
  * 
  */
@@ -231,6 +236,16 @@ export class PrismaClient<
     * ```
     */
   get registerInProgress(): Prisma.RegisterInProgressDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.inspoItems`: Exposes CRUD operations for the **InspoItems** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more InspoItems
+    * const inspoItems = await prisma.inspoItems.findMany()
+    * ```
+    */
+  get inspoItems(): Prisma.InspoItemsDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.user`: Exposes CRUD operations for the **User** model.
@@ -726,6 +741,7 @@ export namespace Prisma {
     ItemFavorite: 'ItemFavorite',
     ItemLike: 'ItemLike',
     RegisterInProgress: 'RegisterInProgress',
+    InspoItems: 'InspoItems',
     User: 'User',
     account: 'account',
     session: 'session',
@@ -749,7 +765,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "brand" | "client" | "itemFavorite" | "itemLike" | "registerInProgress" | "user" | "account" | "session" | "user" | "verification"
+      modelProps: "brand" | "client" | "itemFavorite" | "itemLike" | "registerInProgress" | "inspoItems" | "user" | "account" | "session" | "user" | "verification"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1120,6 +1136,80 @@ export namespace Prisma {
           count: {
             args: Prisma.RegisterInProgressCountArgs<ExtArgs>
             result: $Utils.Optional<RegisterInProgressCountAggregateOutputType> | number
+          }
+        }
+      }
+      InspoItems: {
+        payload: Prisma.$InspoItemsPayload<ExtArgs>
+        fields: Prisma.InspoItemsFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.InspoItemsFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InspoItemsPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.InspoItemsFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InspoItemsPayload>
+          }
+          findFirst: {
+            args: Prisma.InspoItemsFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InspoItemsPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.InspoItemsFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InspoItemsPayload>
+          }
+          findMany: {
+            args: Prisma.InspoItemsFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InspoItemsPayload>[]
+          }
+          create: {
+            args: Prisma.InspoItemsCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InspoItemsPayload>
+          }
+          createMany: {
+            args: Prisma.InspoItemsCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.InspoItemsCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InspoItemsPayload>[]
+          }
+          delete: {
+            args: Prisma.InspoItemsDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InspoItemsPayload>
+          }
+          update: {
+            args: Prisma.InspoItemsUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InspoItemsPayload>
+          }
+          deleteMany: {
+            args: Prisma.InspoItemsDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.InspoItemsUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.InspoItemsUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InspoItemsPayload>[]
+          }
+          upsert: {
+            args: Prisma.InspoItemsUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InspoItemsPayload>
+          }
+          aggregate: {
+            args: Prisma.InspoItemsAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateInspoItems>
+          }
+          groupBy: {
+            args: Prisma.InspoItemsGroupByArgs<ExtArgs>
+            result: $Utils.Optional<InspoItemsGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.InspoItemsCountArgs<ExtArgs>
+            result: $Utils.Optional<InspoItemsCountAggregateOutputType> | number
           }
         }
       }
@@ -1590,6 +1680,7 @@ export namespace Prisma {
     itemFavorite?: ItemFavoriteOmit
     itemLike?: ItemLikeOmit
     registerInProgress?: RegisterInProgressOmit
+    inspoItems?: InspoItemsOmit
     user?: UserOmit
     account?: accountOmit
     session?: sessionOmit
@@ -6869,6 +6960,975 @@ export namespace Prisma {
      * Omit specific fields from the RegisterInProgress
      */
     omit?: RegisterInProgressOmit<ExtArgs> | null
+  }
+
+
+  /**
+   * Model InspoItems
+   */
+
+  export type AggregateInspoItems = {
+    _count: InspoItemsCountAggregateOutputType | null
+    _min: InspoItemsMinAggregateOutputType | null
+    _max: InspoItemsMaxAggregateOutputType | null
+  }
+
+  export type InspoItemsMinAggregateOutputType = {
+    id: string | null
+    itemUuid: string | null
+    category: string | null
+  }
+
+  export type InspoItemsMaxAggregateOutputType = {
+    id: string | null
+    itemUuid: string | null
+    category: string | null
+  }
+
+  export type InspoItemsCountAggregateOutputType = {
+    id: number
+    itemUuid: number
+    category: number
+    _all: number
+  }
+
+
+  export type InspoItemsMinAggregateInputType = {
+    id?: true
+    itemUuid?: true
+    category?: true
+  }
+
+  export type InspoItemsMaxAggregateInputType = {
+    id?: true
+    itemUuid?: true
+    category?: true
+  }
+
+  export type InspoItemsCountAggregateInputType = {
+    id?: true
+    itemUuid?: true
+    category?: true
+    _all?: true
+  }
+
+  export type InspoItemsAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which InspoItems to aggregate.
+     */
+    where?: InspoItemsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of InspoItems to fetch.
+     */
+    orderBy?: InspoItemsOrderByWithRelationInput | InspoItemsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: InspoItemsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` InspoItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` InspoItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned InspoItems
+    **/
+    _count?: true | InspoItemsCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: InspoItemsMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: InspoItemsMaxAggregateInputType
+  }
+
+  export type GetInspoItemsAggregateType<T extends InspoItemsAggregateArgs> = {
+        [P in keyof T & keyof AggregateInspoItems]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateInspoItems[P]>
+      : GetScalarType<T[P], AggregateInspoItems[P]>
+  }
+
+
+
+
+  export type InspoItemsGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: InspoItemsWhereInput
+    orderBy?: InspoItemsOrderByWithAggregationInput | InspoItemsOrderByWithAggregationInput[]
+    by: InspoItemsScalarFieldEnum[] | InspoItemsScalarFieldEnum
+    having?: InspoItemsScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: InspoItemsCountAggregateInputType | true
+    _min?: InspoItemsMinAggregateInputType
+    _max?: InspoItemsMaxAggregateInputType
+  }
+
+  export type InspoItemsGroupByOutputType = {
+    id: string
+    itemUuid: string
+    category: string
+    _count: InspoItemsCountAggregateOutputType | null
+    _min: InspoItemsMinAggregateOutputType | null
+    _max: InspoItemsMaxAggregateOutputType | null
+  }
+
+  type GetInspoItemsGroupByPayload<T extends InspoItemsGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<InspoItemsGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof InspoItemsGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], InspoItemsGroupByOutputType[P]>
+            : GetScalarType<T[P], InspoItemsGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type InspoItemsSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    itemUuid?: boolean
+    category?: boolean
+  }, ExtArgs["result"]["inspoItems"]>
+
+  export type InspoItemsSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    itemUuid?: boolean
+    category?: boolean
+  }, ExtArgs["result"]["inspoItems"]>
+
+  export type InspoItemsSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    itemUuid?: boolean
+    category?: boolean
+  }, ExtArgs["result"]["inspoItems"]>
+
+  export type InspoItemsSelectScalar = {
+    id?: boolean
+    itemUuid?: boolean
+    category?: boolean
+  }
+
+  export type InspoItemsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "itemUuid" | "category", ExtArgs["result"]["inspoItems"]>
+
+  export type $InspoItemsPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "InspoItems"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      itemUuid: string
+      category: string
+    }, ExtArgs["result"]["inspoItems"]>
+    composites: {}
+  }
+
+  type InspoItemsGetPayload<S extends boolean | null | undefined | InspoItemsDefaultArgs> = $Result.GetResult<Prisma.$InspoItemsPayload, S>
+
+  type InspoItemsCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<InspoItemsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: InspoItemsCountAggregateInputType | true
+    }
+
+  export interface InspoItemsDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['InspoItems'], meta: { name: 'InspoItems' } }
+    /**
+     * Find zero or one InspoItems that matches the filter.
+     * @param {InspoItemsFindUniqueArgs} args - Arguments to find a InspoItems
+     * @example
+     * // Get one InspoItems
+     * const inspoItems = await prisma.inspoItems.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends InspoItemsFindUniqueArgs>(args: SelectSubset<T, InspoItemsFindUniqueArgs<ExtArgs>>): Prisma__InspoItemsClient<$Result.GetResult<Prisma.$InspoItemsPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one InspoItems that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {InspoItemsFindUniqueOrThrowArgs} args - Arguments to find a InspoItems
+     * @example
+     * // Get one InspoItems
+     * const inspoItems = await prisma.inspoItems.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends InspoItemsFindUniqueOrThrowArgs>(args: SelectSubset<T, InspoItemsFindUniqueOrThrowArgs<ExtArgs>>): Prisma__InspoItemsClient<$Result.GetResult<Prisma.$InspoItemsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first InspoItems that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InspoItemsFindFirstArgs} args - Arguments to find a InspoItems
+     * @example
+     * // Get one InspoItems
+     * const inspoItems = await prisma.inspoItems.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends InspoItemsFindFirstArgs>(args?: SelectSubset<T, InspoItemsFindFirstArgs<ExtArgs>>): Prisma__InspoItemsClient<$Result.GetResult<Prisma.$InspoItemsPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first InspoItems that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InspoItemsFindFirstOrThrowArgs} args - Arguments to find a InspoItems
+     * @example
+     * // Get one InspoItems
+     * const inspoItems = await prisma.inspoItems.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends InspoItemsFindFirstOrThrowArgs>(args?: SelectSubset<T, InspoItemsFindFirstOrThrowArgs<ExtArgs>>): Prisma__InspoItemsClient<$Result.GetResult<Prisma.$InspoItemsPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more InspoItems that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InspoItemsFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all InspoItems
+     * const inspoItems = await prisma.inspoItems.findMany()
+     * 
+     * // Get first 10 InspoItems
+     * const inspoItems = await prisma.inspoItems.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const inspoItemsWithIdOnly = await prisma.inspoItems.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends InspoItemsFindManyArgs>(args?: SelectSubset<T, InspoItemsFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InspoItemsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a InspoItems.
+     * @param {InspoItemsCreateArgs} args - Arguments to create a InspoItems.
+     * @example
+     * // Create one InspoItems
+     * const InspoItems = await prisma.inspoItems.create({
+     *   data: {
+     *     // ... data to create a InspoItems
+     *   }
+     * })
+     * 
+     */
+    create<T extends InspoItemsCreateArgs>(args: SelectSubset<T, InspoItemsCreateArgs<ExtArgs>>): Prisma__InspoItemsClient<$Result.GetResult<Prisma.$InspoItemsPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many InspoItems.
+     * @param {InspoItemsCreateManyArgs} args - Arguments to create many InspoItems.
+     * @example
+     * // Create many InspoItems
+     * const inspoItems = await prisma.inspoItems.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends InspoItemsCreateManyArgs>(args?: SelectSubset<T, InspoItemsCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many InspoItems and returns the data saved in the database.
+     * @param {InspoItemsCreateManyAndReturnArgs} args - Arguments to create many InspoItems.
+     * @example
+     * // Create many InspoItems
+     * const inspoItems = await prisma.inspoItems.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many InspoItems and only return the `id`
+     * const inspoItemsWithIdOnly = await prisma.inspoItems.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends InspoItemsCreateManyAndReturnArgs>(args?: SelectSubset<T, InspoItemsCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InspoItemsPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a InspoItems.
+     * @param {InspoItemsDeleteArgs} args - Arguments to delete one InspoItems.
+     * @example
+     * // Delete one InspoItems
+     * const InspoItems = await prisma.inspoItems.delete({
+     *   where: {
+     *     // ... filter to delete one InspoItems
+     *   }
+     * })
+     * 
+     */
+    delete<T extends InspoItemsDeleteArgs>(args: SelectSubset<T, InspoItemsDeleteArgs<ExtArgs>>): Prisma__InspoItemsClient<$Result.GetResult<Prisma.$InspoItemsPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one InspoItems.
+     * @param {InspoItemsUpdateArgs} args - Arguments to update one InspoItems.
+     * @example
+     * // Update one InspoItems
+     * const inspoItems = await prisma.inspoItems.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends InspoItemsUpdateArgs>(args: SelectSubset<T, InspoItemsUpdateArgs<ExtArgs>>): Prisma__InspoItemsClient<$Result.GetResult<Prisma.$InspoItemsPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more InspoItems.
+     * @param {InspoItemsDeleteManyArgs} args - Arguments to filter InspoItems to delete.
+     * @example
+     * // Delete a few InspoItems
+     * const { count } = await prisma.inspoItems.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends InspoItemsDeleteManyArgs>(args?: SelectSubset<T, InspoItemsDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more InspoItems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InspoItemsUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many InspoItems
+     * const inspoItems = await prisma.inspoItems.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends InspoItemsUpdateManyArgs>(args: SelectSubset<T, InspoItemsUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more InspoItems and returns the data updated in the database.
+     * @param {InspoItemsUpdateManyAndReturnArgs} args - Arguments to update many InspoItems.
+     * @example
+     * // Update many InspoItems
+     * const inspoItems = await prisma.inspoItems.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more InspoItems and only return the `id`
+     * const inspoItemsWithIdOnly = await prisma.inspoItems.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends InspoItemsUpdateManyAndReturnArgs>(args: SelectSubset<T, InspoItemsUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InspoItemsPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one InspoItems.
+     * @param {InspoItemsUpsertArgs} args - Arguments to update or create a InspoItems.
+     * @example
+     * // Update or create a InspoItems
+     * const inspoItems = await prisma.inspoItems.upsert({
+     *   create: {
+     *     // ... data to create a InspoItems
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the InspoItems we want to update
+     *   }
+     * })
+     */
+    upsert<T extends InspoItemsUpsertArgs>(args: SelectSubset<T, InspoItemsUpsertArgs<ExtArgs>>): Prisma__InspoItemsClient<$Result.GetResult<Prisma.$InspoItemsPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of InspoItems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InspoItemsCountArgs} args - Arguments to filter InspoItems to count.
+     * @example
+     * // Count the number of InspoItems
+     * const count = await prisma.inspoItems.count({
+     *   where: {
+     *     // ... the filter for the InspoItems we want to count
+     *   }
+     * })
+    **/
+    count<T extends InspoItemsCountArgs>(
+      args?: Subset<T, InspoItemsCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], InspoItemsCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a InspoItems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InspoItemsAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends InspoItemsAggregateArgs>(args: Subset<T, InspoItemsAggregateArgs>): Prisma.PrismaPromise<GetInspoItemsAggregateType<T>>
+
+    /**
+     * Group by InspoItems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InspoItemsGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends InspoItemsGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: InspoItemsGroupByArgs['orderBy'] }
+        : { orderBy?: InspoItemsGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, InspoItemsGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetInspoItemsGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the InspoItems model
+   */
+  readonly fields: InspoItemsFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for InspoItems.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__InspoItemsClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the InspoItems model
+   */
+  interface InspoItemsFieldRefs {
+    readonly id: FieldRef<"InspoItems", 'String'>
+    readonly itemUuid: FieldRef<"InspoItems", 'String'>
+    readonly category: FieldRef<"InspoItems", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * InspoItems findUnique
+   */
+  export type InspoItemsFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InspoItems
+     */
+    select?: InspoItemsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InspoItems
+     */
+    omit?: InspoItemsOmit<ExtArgs> | null
+    /**
+     * Filter, which InspoItems to fetch.
+     */
+    where: InspoItemsWhereUniqueInput
+  }
+
+  /**
+   * InspoItems findUniqueOrThrow
+   */
+  export type InspoItemsFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InspoItems
+     */
+    select?: InspoItemsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InspoItems
+     */
+    omit?: InspoItemsOmit<ExtArgs> | null
+    /**
+     * Filter, which InspoItems to fetch.
+     */
+    where: InspoItemsWhereUniqueInput
+  }
+
+  /**
+   * InspoItems findFirst
+   */
+  export type InspoItemsFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InspoItems
+     */
+    select?: InspoItemsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InspoItems
+     */
+    omit?: InspoItemsOmit<ExtArgs> | null
+    /**
+     * Filter, which InspoItems to fetch.
+     */
+    where?: InspoItemsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of InspoItems to fetch.
+     */
+    orderBy?: InspoItemsOrderByWithRelationInput | InspoItemsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for InspoItems.
+     */
+    cursor?: InspoItemsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` InspoItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` InspoItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of InspoItems.
+     */
+    distinct?: InspoItemsScalarFieldEnum | InspoItemsScalarFieldEnum[]
+  }
+
+  /**
+   * InspoItems findFirstOrThrow
+   */
+  export type InspoItemsFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InspoItems
+     */
+    select?: InspoItemsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InspoItems
+     */
+    omit?: InspoItemsOmit<ExtArgs> | null
+    /**
+     * Filter, which InspoItems to fetch.
+     */
+    where?: InspoItemsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of InspoItems to fetch.
+     */
+    orderBy?: InspoItemsOrderByWithRelationInput | InspoItemsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for InspoItems.
+     */
+    cursor?: InspoItemsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` InspoItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` InspoItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of InspoItems.
+     */
+    distinct?: InspoItemsScalarFieldEnum | InspoItemsScalarFieldEnum[]
+  }
+
+  /**
+   * InspoItems findMany
+   */
+  export type InspoItemsFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InspoItems
+     */
+    select?: InspoItemsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InspoItems
+     */
+    omit?: InspoItemsOmit<ExtArgs> | null
+    /**
+     * Filter, which InspoItems to fetch.
+     */
+    where?: InspoItemsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of InspoItems to fetch.
+     */
+    orderBy?: InspoItemsOrderByWithRelationInput | InspoItemsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing InspoItems.
+     */
+    cursor?: InspoItemsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` InspoItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` InspoItems.
+     */
+    skip?: number
+    distinct?: InspoItemsScalarFieldEnum | InspoItemsScalarFieldEnum[]
+  }
+
+  /**
+   * InspoItems create
+   */
+  export type InspoItemsCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InspoItems
+     */
+    select?: InspoItemsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InspoItems
+     */
+    omit?: InspoItemsOmit<ExtArgs> | null
+    /**
+     * The data needed to create a InspoItems.
+     */
+    data: XOR<InspoItemsCreateInput, InspoItemsUncheckedCreateInput>
+  }
+
+  /**
+   * InspoItems createMany
+   */
+  export type InspoItemsCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many InspoItems.
+     */
+    data: InspoItemsCreateManyInput | InspoItemsCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * InspoItems createManyAndReturn
+   */
+  export type InspoItemsCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InspoItems
+     */
+    select?: InspoItemsSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the InspoItems
+     */
+    omit?: InspoItemsOmit<ExtArgs> | null
+    /**
+     * The data used to create many InspoItems.
+     */
+    data: InspoItemsCreateManyInput | InspoItemsCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * InspoItems update
+   */
+  export type InspoItemsUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InspoItems
+     */
+    select?: InspoItemsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InspoItems
+     */
+    omit?: InspoItemsOmit<ExtArgs> | null
+    /**
+     * The data needed to update a InspoItems.
+     */
+    data: XOR<InspoItemsUpdateInput, InspoItemsUncheckedUpdateInput>
+    /**
+     * Choose, which InspoItems to update.
+     */
+    where: InspoItemsWhereUniqueInput
+  }
+
+  /**
+   * InspoItems updateMany
+   */
+  export type InspoItemsUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update InspoItems.
+     */
+    data: XOR<InspoItemsUpdateManyMutationInput, InspoItemsUncheckedUpdateManyInput>
+    /**
+     * Filter which InspoItems to update
+     */
+    where?: InspoItemsWhereInput
+    /**
+     * Limit how many InspoItems to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * InspoItems updateManyAndReturn
+   */
+  export type InspoItemsUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InspoItems
+     */
+    select?: InspoItemsSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the InspoItems
+     */
+    omit?: InspoItemsOmit<ExtArgs> | null
+    /**
+     * The data used to update InspoItems.
+     */
+    data: XOR<InspoItemsUpdateManyMutationInput, InspoItemsUncheckedUpdateManyInput>
+    /**
+     * Filter which InspoItems to update
+     */
+    where?: InspoItemsWhereInput
+    /**
+     * Limit how many InspoItems to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * InspoItems upsert
+   */
+  export type InspoItemsUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InspoItems
+     */
+    select?: InspoItemsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InspoItems
+     */
+    omit?: InspoItemsOmit<ExtArgs> | null
+    /**
+     * The filter to search for the InspoItems to update in case it exists.
+     */
+    where: InspoItemsWhereUniqueInput
+    /**
+     * In case the InspoItems found by the `where` argument doesn't exist, create a new InspoItems with this data.
+     */
+    create: XOR<InspoItemsCreateInput, InspoItemsUncheckedCreateInput>
+    /**
+     * In case the InspoItems was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<InspoItemsUpdateInput, InspoItemsUncheckedUpdateInput>
+  }
+
+  /**
+   * InspoItems delete
+   */
+  export type InspoItemsDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InspoItems
+     */
+    select?: InspoItemsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InspoItems
+     */
+    omit?: InspoItemsOmit<ExtArgs> | null
+    /**
+     * Filter which InspoItems to delete.
+     */
+    where: InspoItemsWhereUniqueInput
+  }
+
+  /**
+   * InspoItems deleteMany
+   */
+  export type InspoItemsDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which InspoItems to delete
+     */
+    where?: InspoItemsWhereInput
+    /**
+     * Limit how many InspoItems to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * InspoItems without action
+   */
+  export type InspoItemsDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InspoItems
+     */
+    select?: InspoItemsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InspoItems
+     */
+    omit?: InspoItemsOmit<ExtArgs> | null
   }
 
 
@@ -12429,6 +13489,15 @@ export namespace Prisma {
   export type RegisterInProgressScalarFieldEnum = (typeof RegisterInProgressScalarFieldEnum)[keyof typeof RegisterInProgressScalarFieldEnum]
 
 
+  export const InspoItemsScalarFieldEnum: {
+    id: 'id',
+    itemUuid: 'itemUuid',
+    category: 'category'
+  };
+
+  export type InspoItemsScalarFieldEnum = (typeof InspoItemsScalarFieldEnum)[keyof typeof InspoItemsScalarFieldEnum]
+
+
   export const UserScalarFieldEnum: {
     id: 'id',
     email: 'email',
@@ -12857,6 +13926,48 @@ export namespace Prisma {
     email?: StringWithAggregatesFilter<"RegisterInProgress"> | string
     verificationCode?: StringWithAggregatesFilter<"RegisterInProgress"> | string
     verificationCodeExpiration?: StringWithAggregatesFilter<"RegisterInProgress"> | string
+  }
+
+  export type InspoItemsWhereInput = {
+    AND?: InspoItemsWhereInput | InspoItemsWhereInput[]
+    OR?: InspoItemsWhereInput[]
+    NOT?: InspoItemsWhereInput | InspoItemsWhereInput[]
+    id?: UuidFilter<"InspoItems"> | string
+    itemUuid?: StringFilter<"InspoItems"> | string
+    category?: StringFilter<"InspoItems"> | string
+  }
+
+  export type InspoItemsOrderByWithRelationInput = {
+    id?: SortOrder
+    itemUuid?: SortOrder
+    category?: SortOrder
+  }
+
+  export type InspoItemsWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: InspoItemsWhereInput | InspoItemsWhereInput[]
+    OR?: InspoItemsWhereInput[]
+    NOT?: InspoItemsWhereInput | InspoItemsWhereInput[]
+    itemUuid?: StringFilter<"InspoItems"> | string
+    category?: StringFilter<"InspoItems"> | string
+  }, "id">
+
+  export type InspoItemsOrderByWithAggregationInput = {
+    id?: SortOrder
+    itemUuid?: SortOrder
+    category?: SortOrder
+    _count?: InspoItemsCountOrderByAggregateInput
+    _max?: InspoItemsMaxOrderByAggregateInput
+    _min?: InspoItemsMinOrderByAggregateInput
+  }
+
+  export type InspoItemsScalarWhereWithAggregatesInput = {
+    AND?: InspoItemsScalarWhereWithAggregatesInput | InspoItemsScalarWhereWithAggregatesInput[]
+    OR?: InspoItemsScalarWhereWithAggregatesInput[]
+    NOT?: InspoItemsScalarWhereWithAggregatesInput | InspoItemsScalarWhereWithAggregatesInput[]
+    id?: UuidWithAggregatesFilter<"InspoItems"> | string
+    itemUuid?: StringWithAggregatesFilter<"InspoItems"> | string
+    category?: StringWithAggregatesFilter<"InspoItems"> | string
   }
 
   export type UserWhereInput = {
@@ -13452,6 +14563,48 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     verificationCode?: StringFieldUpdateOperationsInput | string
     verificationCodeExpiration?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type InspoItemsCreateInput = {
+    id?: string
+    itemUuid: string
+    category: string
+  }
+
+  export type InspoItemsUncheckedCreateInput = {
+    id?: string
+    itemUuid: string
+    category: string
+  }
+
+  export type InspoItemsUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    itemUuid?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type InspoItemsUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    itemUuid?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type InspoItemsCreateManyInput = {
+    id?: string
+    itemUuid: string
+    category: string
+  }
+
+  export type InspoItemsUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    itemUuid?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type InspoItemsUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    itemUuid?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
   }
 
   export type UserCreateInput = {
@@ -14109,6 +15262,24 @@ export namespace Prisma {
     email?: SortOrder
     verificationCode?: SortOrder
     verificationCodeExpiration?: SortOrder
+  }
+
+  export type InspoItemsCountOrderByAggregateInput = {
+    id?: SortOrder
+    itemUuid?: SortOrder
+    category?: SortOrder
+  }
+
+  export type InspoItemsMaxOrderByAggregateInput = {
+    id?: SortOrder
+    itemUuid?: SortOrder
+    category?: SortOrder
+  }
+
+  export type InspoItemsMinOrderByAggregateInput = {
+    id?: SortOrder
+    itemUuid?: SortOrder
+    category?: SortOrder
   }
 
   export type BrandNullableScalarRelationFilter = {

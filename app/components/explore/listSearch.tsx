@@ -75,20 +75,22 @@ export default function ListSearch({
           </Text>
         </View>
       ) : (
-        <FlashList
-          data={displayItems}
-          renderItem={({ item }) => (
-            <ItemStyle
-              key={item.name}
-              item={item}
-              toggleSelect={toggleSelect}
-              selected={selected}
-            />
-          )}
-          onEndReached={() => fetchNextPage()}
-          onEndReachedThreshold={0.1}
-          estimatedItemSize={30}
-        />
+        <View className="flex-1">
+          <FlashList
+            data={displayItems}
+            renderItem={({ item }) => (
+              <ItemStyle
+                key={item.name}
+                item={item}
+                toggleSelect={toggleSelect}
+                selected={selected}
+              />
+            )}
+            onEndReached={() => fetchNextPage()}
+            onEndReachedThreshold={0.1}
+            estimatedItemSize={30}
+          />
+        </View>
       )}
     </View>
   );

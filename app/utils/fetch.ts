@@ -11,7 +11,7 @@ import {
   UuidNameSchemaType,
 } from "@/schemas/catalog/catalog-schema";
 import { CheckLikeFavoriteResponseSchema } from "@/schemas/catalog/like-favorite-schema.ts";
-import { ZodSchema } from "zod";
+import z, { ZodSchema } from "zod";
 import {
   ClientSchemaResponse,
   ClientSchemaType,
@@ -26,7 +26,14 @@ import {
   SuccessSchema,
   SuccessSchemaType,
 } from "@/schemas/standar-response-schema";
-import { EmbbedingResponseSchema } from "@/schemas/search/search-schema";
+import {
+  AllInspirationItemsResponseSchema,
+  EmbbedingResponseSchema,
+} from "@/schemas/search/search-schema";
+import {
+  QueryIdSchema,
+  QueryIdSchemaType,
+} from "@/schemas/standar-query-schema";
 
 // Helper function to handle API responses consistently
 const handleApiResponse = async <T>(
@@ -36,6 +43,10 @@ const handleApiResponse = async <T>(
 ): Promise<T | null> => {
   try {
     const { data } = await apiCall();
+
+    if (errorContext === "getInspirationItems") {
+      console.log("data!!!!: %s", data);
+    }
 
     // Check if it's an error response
     if (data.error) {
@@ -514,4 +525,21 @@ export async function getItemEmbedding(
     "getItemEmbedding"
   );
   return res?.embedding || null;
+}
+
+export async function getInspirationItems(
+  category: string
+): Promise<QueryIdSchemaType[] | null> {
+  const res = await handleApiResponse<{
+    items: QueryIdSchemaType[];
+  }>(
+    () =>
+      safeFetch({
+        url: `http://${LOCAL_IP}:3000/search/all-inspiration-items?category=${category}`,
+        method: "GET",
+      }),
+    AllInspirationItemsResponseSchema,
+    "getInspirationItems"
+  );
+  return res?.items || null;
 }

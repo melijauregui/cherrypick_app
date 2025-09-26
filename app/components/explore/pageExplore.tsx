@@ -107,7 +107,16 @@ export function PageExploreStandard({ query }: { query: string }) {
         }}
         scrollEventThrottle={16}
       >
-        <ImageBackgroundComponent />
+        <ImageBackgroundComponent
+          onPress={() =>
+            router.push({
+              pathname: "/(inspiration)/weekly-inspo",
+              params: {
+                category: "spring",
+              },
+            })
+          }
+        />
         <FashionIdeasSection query={"Minimalist"} />
         <FashionIdeasSection query={"Coquette"} />
         <FashionIdeasSection query={"Streetwear"} />
@@ -262,11 +271,9 @@ export const PageExploreQuery = ({
   );
 };
 
-function ImageBackgroundComponent() {
+function ImageBackgroundComponent({ onPress }: { onPress: () => void }) {
   return (
-    <TouchableOpacity
-      onPress={() => router.push("/(inspiration)/weekly-inspo")}
-    >
+    <TouchableOpacity onPress={onPress}>
       <ImageBackground
         className="mb-4"
         source={{

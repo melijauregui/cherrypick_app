@@ -1,6 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
-  output   = "../server/generated/prisma"
+  provider      = "prisma-client-js"
+  output        = "../server/generated/prisma"
   binaryTargets = ["native", "windows", "darwin-arm64"]
 }
 
@@ -62,17 +62,26 @@ model RegisterInProgress {
   email                      String @id @db.VarChar(50)
   verificationCode           String @db.VarChar(6)
   verificationCodeExpiration String @db.VarChar(30)
+
   @@map("RegisterInProgress")
 }
 
+model InspoItems {
+  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  itemUuid String @db.VarChar(255)
+  category String @db.VarChar(255)
+
+  @@map("InspoItems")
+}
+
 model User {
-  id           String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email        String         @unique @db.VarChar(50)
-  userType     String         @db.VarChar(10)
-  
+  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email    String @unique @db.VarChar(50)
+  userType String @db.VarChar(10)
+
   // Relations
-  brand        Brand?
-  client       Client?
+  brand         Brand?
+  client        Client?
   itemFavorites ItemFavorite[]
   itemLikes     ItemLike[]
 

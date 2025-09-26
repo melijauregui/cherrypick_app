@@ -155,6 +155,12 @@ exports.Prisma.RegisterInProgressScalarFieldEnum = {
   verificationCodeExpiration: 'verificationCodeExpiration'
 };
 
+exports.Prisma.InspoItemsScalarFieldEnum = {
+  id: 'id',
+  itemUuid: 'itemUuid',
+  category: 'category'
+};
+
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   email: 'email',
@@ -242,6 +248,7 @@ exports.Prisma.ModelName = {
   ItemFavorite: 'ItemFavorite',
   ItemLike: 'ItemLike',
   RegisterInProgress: 'RegisterInProgress',
+  InspoItems: 'InspoItems',
   User: 'User',
   account: 'account',
   session: 'session',

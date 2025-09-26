@@ -1,12 +1,12 @@
-import { createRoute } from "@hono/zod-openapi";
+import { createRoute, z } from "@hono/zod-openapi";
 import { AppEnv } from "../app";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { Context } from "hono";
 import { errorHandler } from "../errorHandler";
 import {
+  AllInspirationItemsResponseSchema,
   EmbbedingResponseSchema,
   EmbbedingResponseSchemaType,
-  EmbbedingSchema,
   EmbbedingWithFiltersSchema,
   QuerySchema,
 } from "@/schemas/search/search-schema";
@@ -14,18 +14,22 @@ import {
   CatalogResponseSchema,
   CatalogResponseSchemaType,
   PaginationSchema,
-  ImageBase64Schema,
   ImageUrlSchema,
   PaginationFilterSchema,
   UuidNameResponseSchema,
-  UuidNameResponseSchemaType,
 } from "@/schemas/catalog/catalog-schema";
+import { ErrorSchema } from "@/schemas/standar-response-schema";
 import {
-  ErrorSchema,
-  ErrorSchemaType,
-} from "@/schemas/standar-response-schema";
-import { GetAllBrands, GetEmbedding, SearchItems } from "./functions";
+  GetAllBrands,
+  GetAllInspirationItems,
+  GetEmbedding,
+  SearchItems,
+} from "./functions";
 import logger from "../logger";
+import {
+  QueryIdSchema,
+  QueryIdSchemaType,
+} from "@/schemas/standar-query-schema";
 
 const SearchApp = new OpenAPIHono<AppEnv>({
   defaultHook: (result, c) => {
@@ -416,4 +420,45 @@ SearchApp.openapi(allBrandItemsRoute, async c => {
   const res = await GetAllBrands(filterLower, page, limit);
 
   return c.json({ error: false, data: res }, 200);
+});
+
+// endpoint que devuelve todos los items de la categoría de inspiración
+const allInspirationItemsRoute = createRoute({
+  method: "get",
+  path: "/all-inspiration-items",
+  request: {
+    query: z.object({
+      category: z.string(),
+    }),
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: AllInspirationItemsResponseSchema,
+        },
+      },
+      description: "Devuelve todos los items de la categoría de inspiración",
+    },
+    500: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description:
+        "Error interno del servidor al obtener los items de la categoría de inspiración",
+    },
+  },
+});
+
+SearchApp.openapi(allInspirationItemsRoute, async c => {
+  const { category } = c.req.valid("query");
+  logger.info("/GET search/all-inspiration-items category: %s", category);
+
+  const result: QueryIdSchemaType[] = await GetAllInspirationItems(category);
+
+  logger.info("result: %s", result);
+
+  return c.json({ error: false, items: result }, 200);
 });
