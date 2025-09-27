@@ -15,7 +15,7 @@ model Brand {
   description String @db.VarChar(255)
   url         String @db.VarChar(255)
   logoUrl     String @db.VarChar(255)
-  User        User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user        user   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@index([userId], map: "idx_brand_user_id")
   @@map("Brand")
@@ -26,7 +26,7 @@ model Client {
   name        String    @db.VarChar(50)
   dateOfBirth DateTime? @db.Timestamp(6)
   preferences Json?
-  User        User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user        user      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@index([userId], map: "idx_client_user_id")
   @@map("Client")
@@ -37,7 +37,7 @@ model ItemFavorite {
   userId    String    @db.Uuid
   itemUuid  String    @db.VarChar(255)
   createdAt DateTime? @default(now()) @db.Timestamp(6)
-  User      User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user      user      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@unique([userId, itemUuid])
   @@index([itemUuid], map: "idx_item_favorites_item")
@@ -50,7 +50,7 @@ model ItemLike {
   userId    String    @db.Uuid
   itemUuid  String    @db.VarChar(255)
   createdAt DateTime? @default(now()) @db.Timestamp(6)
-  User      User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user      user      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@unique([userId, itemUuid])
   @@index([itemUuid], map: "idx_item_likes_item")
@@ -73,22 +73,6 @@ model InspoItems {
   index    Int    @db.Integer
 
   @@map("InspoItems")
-}
-
-model User {
-  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email    String @unique @db.VarChar(50)
-  userType String @db.VarChar(10)
-
-  // Relations
-  brand         Brand?
-  client        Client?
-  itemFavorites ItemFavorite[]
-  itemLikes     ItemLike[]
-
-  @@index([email], map: "idx_user_email")
-  @@index([userType], map: "idx_user_type")
-  @@map("User")
 }
 
 model account {
@@ -128,10 +112,15 @@ model user {
   image         String?
   createdAt     DateTime  @default(now()) @db.Timestamp(6)
   updatedAt     DateTime  @default(now()) @db.Timestamp(6)
-  new           Boolean   @default(true)
   userType      String    @default("client")
   account       account[]
   session       session[]
+
+  // Relations
+  brand         Brand?
+  client        Client?
+  itemFavorites ItemFavorite[]
+  itemLikes     ItemLike[]
 }
 
 model verification {

@@ -28,9 +28,6 @@ export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL,
   user: {
     additionalFields: {
-      new: {
-        type: "boolean",
-      },
       userType: {
         type: "string",
       },
@@ -42,17 +39,13 @@ export const auth = betterAuth({
   databaseHooks: {
     user: {
       create: {
-        before: async (user: {
-          email: string;
-          new?: boolean;
-          userType?: string;
-        }) => {
+        before: async (user: { email: string; userType?: string }) => {
           const { exists, userType } = await VerifyUserExists(user.email);
           if (!exists) {
             console.error("User does not exist");
             return;
           }
-          return { data: { ...user, new: false, userType: userType } };
+          return { data: { ...user, userType: userType } };
         },
       },
     },

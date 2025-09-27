@@ -159,7 +159,7 @@ export function useDeleteItem(itemUuid: string) {
       });
 
       Toast.show({
-        type: "normal",
+        type: "success",
         text1: `Producto eliminado correctamente`,
       });
       router.back();
@@ -253,8 +253,8 @@ export function useUpdateItem(
       if (result.data.description !== formDataLastValue.description) {
         itemUpdated.description = result.data.description;
       }
-      if (result.data.price !== formDataLastValue.price) {
-        itemUpdated.price = result.data.price;
+      if (result.data.price.toString() !== formDataLastValue.price) {
+        itemUpdated.price = result.data.price.toString();
       }
       if (result.data.imageUrl !== formDataLastValue.imageUrl) {
         itemUpdated.imageUrl = result.data.imageUrl;
@@ -285,7 +285,7 @@ export function useUpdateItem(
       });
       onSubmit(variables.formData);
       Toast.show({
-        type: "normal",
+        type: "success",
         text1: `The item ${variables.formData.name} has been successfully updated in the catalog!`,
         visibilityTime: 2000,
       });

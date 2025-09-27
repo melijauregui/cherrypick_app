@@ -10,7 +10,7 @@ export const UpdateBrandSchema = z.object({
 });
 export type UpdateBrandSchemaType = z.infer<typeof UpdateBrandSchema>;
 
-export const BrandSchemaProperties = z.object({
+export const BrandSchema = z.object({
   ...UpdateBrandSchema.shape,
   id: z.string().describe("ID de la marca"),
   name: z.string().describe("Nombre de la marca"),
@@ -19,13 +19,12 @@ export const BrandSchemaProperties = z.object({
     .url({ message: "URL del logo de la marca debe ser una URL válida" })
     .describe("URL del logo de la marca"),
 });
-export type BrandSchemaPropertiesType = z.infer<typeof BrandSchemaProperties>;
-
-export const BrandSchema = z.object({
-  ...BrandSchemaProperties.shape,
-  email: z.string().email().describe("Email de la marca"),
-});
 export type BrandSchemaType = z.infer<typeof BrandSchema>;
+
+// export const BrandSchema = z.object({
+//   ...BrandSchemaProperties.shape,
+// });
+// export type BrandSchemaType = z.infer<typeof BrandSchema>;
 
 export const BrandSchemaResponse = z.object({
   ...SuccessSchema.shape,
@@ -35,7 +34,7 @@ export type BrandSchemaResponseType = z.infer<typeof BrandSchemaResponse>;
 
 export const BrandSchemaPropertiesResponse = z.object({
   ...SuccessSchema.shape,
-  brand: BrandSchemaProperties,
+  brand: BrandSchema,
 });
 export type BrandSchemaPropertiesResponseType = z.infer<
   typeof BrandSchemaPropertiesResponse

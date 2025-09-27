@@ -11,10 +11,7 @@ import {
 } from "./fetch";
 import { ItemSchemaType } from "@/schemas/catalog/catalog-schema";
 import { ClientSchemaType } from "@/schemas/client/client-schema";
-import {
-  BrandSchemaPropertiesType,
-  BrandSchemaType,
-} from "@/schemas/brand/brand-schema";
+import { BrandSchemaType } from "@/schemas/brand/brand-schema";
 
 export default function useIsMyItem(uuidItem: string): boolean | null {
   const { user } = useSession();
@@ -76,7 +73,7 @@ export function useFetchBrandProfile(email: string): {
 }
 
 export function useFetchBrandProfileItem(brandId: string): {
-  brand: BrandSchemaPropertiesType;
+  brand: BrandSchemaType;
 } | null {
   const { data, isLoading, error } = useQuery({
     queryKey: ["brand-profile-item", brandId],

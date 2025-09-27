@@ -18,9 +18,8 @@ import {
 } from "@/schemas/client/client-schema";
 import {
   BrandSchemaPropertiesResponse,
-  BrandSchemaPropertiesType,
-  BrandSchemaResponse,
   BrandSchemaType,
+  BrandSchemaResponse,
 } from "@/schemas/brand/brand-schema";
 import {
   SuccessSchema,
@@ -107,13 +106,13 @@ export async function checkIsMyItem(
 
 export async function getBrandProfile(
   brandId: string
-): Promise<BrandSchemaPropertiesType | null> {
+): Promise<BrandSchemaType | null> {
   if (!brandId) {
     return null;
   }
 
   const res = await handleApiResponse<{
-    brand: BrandSchemaPropertiesType;
+    brand: BrandSchemaType;
   }>(
     () =>
       safeFetch({

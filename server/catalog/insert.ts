@@ -4,19 +4,14 @@ import {
 } from "@/schemas/catalog/catalog-schema";
 import { Collection, Filters } from "weaviate-client";
 import {
-  extractImageFeatures,
-  extractTextFeatures,
   getCollection,
-  Preferences,
   PreferencesSimilaritiesResult,
-  getPreferencesSimilarities,
   extractFeatures,
 } from "./functions";
 import {
   ErrorSchemaType,
   SuccessSchemaType,
 } from "@/schemas/standar-response-schema";
-import { get } from "http";
 
 // Función para validar items JSON
 async function validateJsonItems(

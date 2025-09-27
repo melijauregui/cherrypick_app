@@ -162,12 +162,6 @@ exports.Prisma.InspoItemsScalarFieldEnum = {
   index: 'index'
 };
 
-exports.Prisma.UserScalarFieldEnum = {
-  id: 'id',
-  email: 'email',
-  userType: 'userType'
-};
-
 exports.Prisma.AccountScalarFieldEnum = {
   id: 'id',
   accountId: 'accountId',
@@ -203,7 +197,6 @@ exports.Prisma.UserScalarFieldEnum = {
   image: 'image',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  new: 'new',
   userType: 'userType'
 };
 
@@ -250,7 +243,6 @@ exports.Prisma.ModelName = {
   ItemLike: 'ItemLike',
   RegisterInProgress: 'RegisterInProgress',
   InspoItems: 'InspoItems',
-  User: 'User',
   account: 'account',
   session: 'session',
   user: 'user',

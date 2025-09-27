@@ -105,40 +105,22 @@ const RootLayout = () => {
 
 export default RootLayout;
 
-const CustomToast = ({ type, text1, text2, onHide }: any) => {
-  if (type === "error") {
-    console.log("error: ", text1);
-  }
-  const isSuccess = type === "success";
+const CustomToast = ({ text1, text2, onHide, type }: any) => {
   return (
-    <View
-      className="flex-row items-center bg-white rounded-2xl py-4 px-[18px] mx-2 min-h-[70px] border-l-brown-light"
-      style={{
-        borderLeftWidth: 6,
-      }}
-    >
+    <View className="flex-row items-center rounded-2xl py-4 px-[18px] mx-2 min-h-[70px] bg-white">
       <View style={{ flex: 1 }}>
         <Text
-          className={`${isSuccess ? "text-green-600" : "text-red-500"} font-semibold text-xl mb-0.5`}
+          className={`text-black text-xl mb-0.5 ${type === "success" ? "text-black font-plight" : "text-red-500 font-pregular"}`}
         >
-          {isSuccess ? "Success" : "Error"}
+          {text1}
         </Text>
-        {text1 ? (
-          <Text className="text-black font-pregular text-lg">{text1}</Text>
-        ) : null}
-      </View>
-      <TouchableOpacity onPress={onHide} style={{ marginLeft: 10 }}>
-        <Ionicons name="close" size={22} color="#888" />
-      </TouchableOpacity>
-    </View>
-  );
-};
-
-const NormalToast = ({ text1, onHide }: any) => {
-  return (
-    <View className="flex-row items-center bg-white rounded-2xl py-4 px-[18px] mx-2 min-h-[70px]">
-      <View style={{ flex: 1 }}>
-        <Text className={`text-black font-plight text-xl mb-0.5`}>{text1}</Text>
+        {text2 && (
+          <Text
+            className={`text-black text-xl mb-0.5 ${type === "success" ? "text-black font-plight" : "text-red-500 font-pregular"}`}
+          >
+            {text2}
+          </Text>
+        )}
       </View>
       <TouchableOpacity onPress={onHide} style={{ marginLeft: 10 }}>
         <Ionicons name="close" size={22} color="#888" />
@@ -153,8 +135,5 @@ export const toastConfig = {
   ),
   error: (props: any) => (
     <CustomToast {...props} type="error" onHide={() => Toast.hide()} />
-  ),
-  normal: (props: any) => (
-    <NormalToast {...props} type="normal" onHide={() => Toast.hide()} />
   ),
 };

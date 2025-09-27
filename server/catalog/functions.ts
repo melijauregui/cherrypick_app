@@ -1,5 +1,4 @@
 import {
-  CatalogResponseSchema,
   CatalogResponseSchemaType,
   ItemSchema,
   ItemSchemaType,
@@ -7,7 +6,7 @@ import {
   UuidNameSchema,
   UuidNameSchemaType,
 } from "@/schemas/catalog/catalog-schema";
-import weaviate, { Collection, Filters, ObjectDataType } from "weaviate-client";
+import weaviate, { Collection, Filters } from "weaviate-client";
 import { ErrorSchemaType } from "@/schemas/standar-response-schema";
 import { config } from "../../config";
 import logger from "../logger";
@@ -111,7 +110,6 @@ export async function GetItemsUuidNamesFromBrand(
     // ],
   };
   const result = await collection.query.fetchObjects(queryOptions);
-  console.log("result!!!!!", result);
 
   const topResults: UuidNameSchemaType[] = result.objects
     .map(match => {

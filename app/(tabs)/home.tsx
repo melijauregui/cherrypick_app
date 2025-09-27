@@ -14,7 +14,7 @@ const Home = () => {
   const params = useLocalSearchParams();
 
   // Puedes acceder al parámetro prefetch así:
-  const alreadyPrefetched = params.prefetch === "true" || user?.new;
+  const alreadyPrefetched = params.prefetch === "true";
 
   useEffect(() => {
     // Check immediately first

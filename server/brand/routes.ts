@@ -15,12 +15,7 @@ import {
   SuccessSchema,
   SuccessSchemaType,
 } from "@/schemas/standar-response-schema";
-import {
-  GetBrandByEmail,
-  GetBrandById,
-  GetBrandId,
-  UpdateBrand,
-} from "./functions";
+import { GetBrandById, GetBrandId, UpdateBrand } from "./functions";
 import { QueryIdSchema } from "@/schemas/standar-query-schema";
 import logger from "../logger";
 import { BodyCodeVerificationPostSchema } from "@/schemas/auth/sign-up-schema";
@@ -94,17 +89,17 @@ const getBrandRoute = createRoute({
 
 BrandApp.openapi(getBrandRoute, async c => {
   const user = c.get("user");
-  const email = user?.email;
-  logger.info("/GET BRAND email:", email);
+  const userId = user?.id;
+  logger.info("/GET BRAND userId:", userId);
   let res: BrandSchemaResponseType;
-  if (!email) {
+  if (!userId) {
     const resError: ErrorSchemaType = {
       error: true,
       details: "No tienes permisos para obtener la marca",
     };
     return c.json(resError, 401);
   }
-  const brand = await GetBrandByEmail(email);
+  const brand = await GetBrandById(userId);
   if (!brand) {
     const resError: ErrorSchemaType = {
       error: true,
@@ -284,23 +279,13 @@ BrandApp.openapi(paginatedRouteBrand, async c => {
   logger.info("/GET brand/all-items page: %s limit: %s", page, limit);
   let res: CatalogResponseSchemaType | ErrorSchemaType;
   const user = c.get("user");
-  const brandEmail = user?.email;
-  if (!brandEmail) {
+  const brandId = user?.id;
+  if (!brandId) {
     res = {
       error: true,
       details: "No tienes permisos para obtener los items de la marca",
     };
     return c.json(res, 401);
-  }
-
-  const brandId = await GetBrandId(brandEmail);
-
-  if (!brandId) {
-    res = {
-      error: true,
-      details: "Marca no encontrada",
-    };
-    return c.json(res, 404);
   }
 
   const embedding = Array(768).fill(0.5);
@@ -375,25 +360,15 @@ BrandApp.openapi(allBrandItemsRoute, async c => {
   );
   let res: UuidNameResponseSchemaType | ErrorSchemaType;
   const user = c.get("user");
-  const brandEmail = user?.email;
+  const brandId = user?.id;
 
-  if (!brandEmail) {
+  if (!brandId) {
     res = {
       error: true,
       details:
         "No tienes permisos para obtener los nombres de los items de una marca",
     };
     return c.json(res, 401);
-  }
-
-  //verifico que el usuario tenga una marca
-  const brandId = await GetBrandId(brandEmail);
-  if (!brandId) {
-    res = {
-      error: true,
-      details: "Marca no encontrada",
-    };
-    return c.json(res, 404);
   }
 
   res = await GetItemsUuidNamesFromBrand(brandId, filter, page, limit);
@@ -560,23 +535,14 @@ BrandApp.openapi(updateCatalogRoute, async c => {
   let res: SuccessSchemaType | ErrorSchemaType;
 
   const user = c.get("user");
-  const brandEmail = user?.email;
+  const brandId = user?.id;
 
-  if (!brandEmail) {
+  if (!brandId) {
     res = {
       error: true,
       details: "No tienes permisos para insertar items",
     };
     return c.json(res, 401);
-  }
-
-  const brandId = await GetBrandId(brandEmail);
-  if (!brandId) {
-    res = {
-      error: true,
-      details: "Marca no encontrada",
-    };
-    return c.json(res, 404);
   }
 
   res = await UpdateCatalog(items, brandId);

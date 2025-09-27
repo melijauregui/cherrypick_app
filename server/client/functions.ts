@@ -10,17 +10,12 @@ export async function CreateClient(
   email: string,
   name: string,
   dateOfBirth: Date | null,
-  preferences: string[]
+  preferences: string[],
+  userId: string
 ) {
-  const user = await db.user.create({
-    data: {
-      email,
-      userType: "client",
-    },
-  });
   await db.client.create({
     data: {
-      userId: user.id,
+      userId,
       name,
       dateOfBirth,
       preferences,

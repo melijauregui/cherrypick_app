@@ -2,25 +2,16 @@
 -- This script inserts initial data for testing
 
 -- Insert users first
-INSERT INTO "User" (id, email, "userType")
+INSERT INTO "user" (id, name, email, "emailVerified", "userType")
 VALUES 
-    ('550e8400-e29b-41d4-a716-446655440001'::uuid, 'p@gmail.com', 'client'),
-    ('ca8cce7e-792a-11f0-b577-0242ac120002'::uuid, 'cherrypick.brand.example@gmail.com', 'brand'),
-    ('ca8ce0ae-792a-11f0-b577-0242ac120002'::uuid, 'charostoreok@gmail.com', 'brand');
+    ('ca8cce7e-792a-11f0-b577-0242ac120002', 'Tienda Napoli', 'cherrypick.brand.example@gmail.com', false, 'brand'),
+    ('ca8ce0ae-792a-11f0-b577-0242ac120002', 'Charo Store', 'charostoreok@gmail.com', false, 'brand');
 
--- Insert client data
-INSERT INTO "Client" ("userId", name, "dateOfBirth", preferences)
-VALUES (
-    '550e8400-e29b-41d4-a716-446655440001'::uuid,
-    'Pedro Pérez',
-    '1990-01-01'::timestamp,
-    '["minimalist", "sporty"]'::jsonb
-);
 
 -- Insert brand data
 INSERT INTO "Brand" ("userId", name, description, url, "logoUrl")
 VALUES (
-    'ca8cce7e-792a-11f0-b577-0242ac120002'::uuid,
+    'ca8cce7e-792a-11f0-b577-0242ac120002',
     'tienda napoli',
     '10% off abonando con transferencia
 3 cuotas sin interés con tarj bancarias
@@ -33,7 +24,7 @@ Lun a sab: 11 a 19 hs',
 
 INSERT INTO "Brand" ("userId", name, description, url, "logoUrl")
 VALUES (
-    'ca8ce0ae-792a-11f0-b577-0242ac120002'::uuid,
+    'ca8ce0ae-792a-11f0-b577-0242ac120002',
     'charo',
     'Info vía WhatsApp 📲 1161428031
 Stores:

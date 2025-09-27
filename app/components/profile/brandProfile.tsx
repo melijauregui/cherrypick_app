@@ -24,7 +24,7 @@ import { router } from "expo-router";
 import { getBrandItems, getSelfBrandItems } from "@/app/utils/fetch";
 import React from "react";
 import List2 from "../../components/List2";
-import { BrandSchemaPropertiesType } from "@/schemas/brand/brand-schema";
+import { BrandSchemaType } from "@/schemas/brand/brand-schema";
 
 const BrandProfile = ({
   user,
@@ -232,7 +232,7 @@ const BrandDetails = ({
   brand,
   openUsernameSheetLogout,
 }: {
-  brand: BrandSchemaPropertiesType;
+  brand: BrandSchemaType;
   openUsernameSheetLogout?: () => void;
 }) => {
   return (

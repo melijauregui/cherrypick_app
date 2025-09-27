@@ -1,7 +1,4 @@
-import {
-  CatalogResponseSchemaType,
-  ItemSchemaType,
-} from "@/schemas/catalog/catalog-schema";
+import { CatalogResponseSchemaType } from "@/schemas/catalog/catalog-schema";
 import {
   ErrorSchemaType,
   SuccessSchemaType,
