@@ -24,6 +24,7 @@ def process(input_folder, output_folder, img_name):
 
 
 def remove_background(input_folder, output_folder):
+
     os.makedirs(output_folder, exist_ok=True)
 
     # Filtrar archivos de imagen

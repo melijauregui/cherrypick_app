@@ -51,7 +51,7 @@ def find_most_similar_description(model_name, pretrained_model_name, image_path,
     print(f"Descripción más similar: {descriptions[np.argmax(similarities)]}")
 
 
-def find_similarities_matrix(model, processor, descriptions, image_paths, image_inputs):
+def find_similarities_matrix_2(model, processor, descriptions, image_paths, image_inputs):
     # Cargar modelo y processor
     with torch.no_grad():
         image_features = model.get_image_features(**image_inputs)
@@ -85,7 +85,20 @@ def find_similarities_matrix(model, processor, descriptions, image_paths, image_
     return similarity_matrix
 
 
-def find_similarities_matrix2(model, processor, description, image_paths, images):
+def contains(text, img_name, all_words):
+    if not text.strip():
+        return False
+
+    img_name_lower = img_name.lower()
+    words = text.lower().split()
+
+    if all_words:
+        return all(word in img_name_lower for word in words)
+    else:
+        return any(word in img_name_lower for word in words)
+
+
+def find_similarities_text2images(model, processor, description, image_paths, images, only_show_min_max=False):
     processed = processor(
         text=[description], images=images, padding='max_length', return_tensors="pt")
 
@@ -104,21 +117,44 @@ def find_similarities_matrix2(model, processor, description, image_paths, images
     sorted_indices = np.argsort(probabilities.cpu().numpy())[::-1]
     for rank, img_idx in enumerate(sorted_indices):
         similarity = probabilities[img_idx]
+        if only_show_min_max and (rank > 0 and rank < len(sorted_indices) - 1):
+            continue
+
         print(
             f"   {rank+1}. {image_paths[img_idx]} → Similitud: {similarity:.3f}")
 
     return probabilities
 
 
-def contains(text, img_name):
-    words = text.lower().split()
-    for word in words:
-        if word not in img_name.lower():
-            return False
-    return True
+def find_similarities_image2image(model, processor, query_image, candidate_image_paths, candidate_images):
+    processed = processor(
+        images=[query_image] + candidate_images,
+        return_tensors="pt",
+        padding="max_length"
+    )
+
+    with torch.no_grad():
+        image_features = model.get_image_features(
+            processed["pixel_values"], normalize=True)
+
+    query_features = image_features[0].unsqueeze(0)  # (1, d)
+    candidate_features = image_features[1:]          # (n, d)
+
+    similarity_scores = (candidate_features @
+                         query_features.T).squeeze(-1)  # (n,)
+    probabilities = similarity_scores.sigmoid()
+
+    # Ranking
+    sorted_indices = np.argsort(probabilities.cpu().numpy())[::-1]
+    for rank, img_idx in enumerate(sorted_indices):
+        similarity = probabilities[img_idx]
+        print(
+            f"   {rank+1}. {candidate_image_paths[img_idx]} → Similitud: {similarity:.3f}")
+
+    return probabilities
 
 
-def test_text_clasification(probabilities, image_paths, has, clasification_img, yellow_flags=[], imprimir_mayores_al_minimo=False):
+def test_clasification(probabilities, image_paths, has, clasification_img, yellow_flags=[], match_all_words=True):
     # Extraer nombres de archivo
     image_names = [os.path.basename(path) for path in image_paths]
 
@@ -128,12 +164,12 @@ def test_text_clasification(probabilities, image_paths, has, clasification_img, 
 
     for i, name in enumerate(image_names):
         if has:
-            if has and contains(clasification_img, name):
+            if has and contains(clasification_img, name, match_all_words):
                 rotura_imgs.append(i)
             else:
                 no_rotura_imgs.append(i)
         else:
-            if contains(clasification_img, name):
+            if contains(clasification_img, name, match_all_words):
                 no_rotura_imgs.append(i)
             else:
                 rotura_imgs.append(i)
@@ -145,7 +181,7 @@ def test_text_clasification(probabilities, image_paths, has, clasification_img, 
     best_idx_yellow_flag = None
     for j in no_rotura_imgs:
         if probabilities[j] > max_no_rotura:
-            if any(contains(flag, image_names[j]) for flag in yellow_flags):
+            if any(contains(flag, image_names[j], match_all_words) for flag in yellow_flags):
                 if probabilities[j] > max_yellow_flag:
                     max_yellow_flag = probabilities[j]
                     best_idx_yellow_flag = j
@@ -223,19 +259,6 @@ def test_text_clasification(probabilities, image_paths, has, clasification_img, 
     print(f"📊 MRR (Mean Reciprocal Rank): {mrr:.3f}")
     if first_rank:
         print(f"📊 Primer positivo aparece en rank: {first_rank}")
-
-    """ if imprimir_mayores_al_minimo:
-        # imprimo la probabilidad mas chica de roturas
-        if rotura_imgs:
-            min_rotura = min(probabilities[i] for i in rotura_imgs)
-            print(f"\nProbabilidad más baja: {min_rotura:.3f}")
-
-        print("\nImágenes con probabilidad mayor al mínimo:")
-        for i, value in enumerate(probabilities):
-            if value > min_rotura and i not in rotura_imgs:
-                print(
-                    f"Esta imagen sobrepaso al minimo: {image_names[i]}: {value:.3f}")
-    """
 
     # --- RESUMEN FINAL ---
     print("RESUMEN FINAL:")
