@@ -27,6 +27,7 @@ export default function WeeklyInspo() {
   const { category } = useLocalSearchParams();
   const queryClient = useQueryClient();
   const session = useSession();
+  const [headerHeight, setHeaderHeight] = useState(0);
 
   // Prefetch inspiration items when component mounts
   useEffect(() => {
@@ -63,7 +64,9 @@ export default function WeeklyInspo() {
     <SafeAreaView className="flex-1 bg-brown-strong">
       <View className="absolute top-0 left-0 right-0 bottom-0">
         <ImageBackgroundComponent>
-          <View className="absolute top-0 left-0 right-0 z-10 bg-black/40 px-6 pt-20">
+          <View className="absolute top-0 left-0 right-0 z-10 bg-black/40 px-6 pt-20 pb-4"
+            onLayout={e => setHeaderHeight(e.nativeEvent.layout.height)}
+          >
             <View className="flex-row items-center justify-between mb-2">
               <TouchableOpacity
                 onPress={() => router.back()}
@@ -87,12 +90,10 @@ export default function WeeklyInspo() {
             scrollEventThrottle={16}
             contentContainerStyle={{
               flexGrow: 1,
-            }}
-            style={{
-              marginTop: TITLE_HEIGHT,
+              paddingTop: headerHeight,
             }}
           >
-            <View className="flex-col gap-1 justify-center flex-1 px-4">
+            <View className="flex-col gap-1 justify-center flex-1 px-4 mt-4">
               {data?.map(item => (
                 <ProductCard key={item.id} itemId={item.id} />
               ))}
