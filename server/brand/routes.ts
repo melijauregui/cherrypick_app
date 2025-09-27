@@ -155,9 +155,9 @@ const updateBrandRoute = createRoute({
 BrandApp.openapi(updateBrandRoute, async c => {
   var { description, url } = c.req.valid("json");
   const user = c.get("user");
-  const brandEmail = user?.email;
+  const brandId = user?.id;
   let res: SuccessSchemaType | ErrorSchemaType;
-  if (!brandEmail) {
+  if (!brandId) {
     res = {
       error: true,
       details: "No tienes permisos para actualizar la marca",
@@ -165,7 +165,7 @@ BrandApp.openapi(updateBrandRoute, async c => {
     return c.json(res, 401);
   }
   logger.info("Updating brand:", description, url);
-  res = await UpdateBrand(brandEmail, description, url);
+  res = await UpdateBrand(brandId, description, url);
   if (res.error) {
     return c.json(res, 404);
   }

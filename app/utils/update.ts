@@ -28,9 +28,19 @@ export default function useUpdateBrand(brandEmail: string) {
       }
       SuccessSchema.parse(data);
     },
-    onSuccess: () => {},
+    onSuccess: () => {
+      Toast.show({
+        type: "success",
+        text1: `Brand updated successfully`,
+        visibilityTime: 4000,
+      });
+    },
     onError: error => {
-      // TODO PUSH TOAST
+      Toast.show({
+        type: "error",
+        text1: `could not update user:`,
+        visibilityTime: 4000,
+      });
       console.log(`could not update user:`, error);
     },
     onSettled: () => {
