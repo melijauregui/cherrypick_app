@@ -5,13 +5,14 @@ import { AppEnv } from "../app";
 import {
   CatalogResponseSchema,
   CatalogResponseSchemaType,
+  PaginationPreferencesSchema,
   PaginationSchema,
 } from "@/schemas/catalog/catalog-schema";
 import {
   ErrorSchema,
   ErrorSchemaType,
 } from "@/schemas/standar-response-schema";
-import { GetCatalog } from "../catalog/functions";
+import { GetCatalog, GetPreferencesFeed } from "../catalog/functions";
 import logger from "../logger";
 
 const FeedApp = new OpenAPIHono<AppEnv>({
@@ -76,4 +77,52 @@ FeedApp.openapi(paginatedRoute, async c => {
     items: result.items,
   };
   return c.json(res, 200);
+});
+
+
+const getPreferencesFeedRoute = createRoute({
+  method: "get",
+  path: "/preferences",
+  request: {
+    query: PaginationPreferencesSchema,
+  },
+  responses: {
+    200: {
+      description: "Obtiene el feed personalizado del cliente",
+      content: {
+        "application/json": {
+          schema: CatalogResponseSchema,
+        },
+      },
+    },
+    401: { description: "Unauthorized" },
+    404: { description: "Cliente no encontrado" },
+  },
+});
+
+FeedApp.openapi(getPreferencesFeedRoute, async c => {
+  try {
+    const { page, limit, preferences } = c.req.valid("query");
+    logger.info("/GET feed preferences page: %s limit: %s, preferences: %v", page, limit, preferences);
+    const preferencesArray = preferences.split(",").map(p => p.trim()).filter(p => p.length > 0);
+
+    let res: CatalogResponseSchemaType | ErrorSchemaType;
+    const result = await GetPreferencesFeed(preferencesArray, page, limit);
+    if (result.error) {
+      res = {
+        error: true,
+        details: "Error querying Weaviate",
+      };
+      return c.json(res, 500);
+    }
+    res = {
+      error: false,
+      items: result.items,
+    };
+    return c.json(res, 200);
+  }
+  catch (error) {
+    logger.error("Error parsing query parameters: %o", error);
+    return c.json({ error: true, details: "Invalid query parameters" }, 400);
+  }
 });

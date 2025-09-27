@@ -3,9 +3,10 @@ import React, { useEffect, useState } from "react";
 import LoadingPage from "../components/LoadingPage";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
-import { getClothingItemsHome } from "../utils/fetch";
+import { getClothingItemsHome, getPreferencesItemsHome } from "../utils/fetch";
 import List2 from "@/app/components/List2";
 import { useSession } from "@/lib/auth-client";
+import { useFetchClientProfile } from "../utils/use-query";
 
 const Home = () => {
   const queryClient = useQueryClient();
@@ -13,8 +14,10 @@ const Home = () => {
   const { user } = useSession();
   const params = useLocalSearchParams();
 
-  // Puedes acceder al parámetro prefetch así:
   const alreadyPrefetched = params.prefetch === "true" || user?.new;
+
+  const data = useFetchClientProfile({ email: user?.email ?? "", name: user?.name ?? "" });
+  const preferences = data?.user.preferences ?? [];
 
   useEffect(() => {
     // Check immediately first
@@ -44,9 +47,10 @@ const Home = () => {
       <SafeAreaView className="bg-brown-strong w-full flex-1 ">
         <List2
           queryKey={["home-items", user?.email]}
-          getClothingItems={getClothingItemsHome}
+          getClothingItems={getPreferencesItemsHome}
           limit={10}
           columnCount={2}
+          preferences={preferences}
         />
       </SafeAreaView>
     </SafeAreaProvider>

@@ -14,8 +14,9 @@ import {
 } from "../catalog/functions";
 import { EmbbedingResponseSchemaType } from "@/schemas/search/search-schema";
 import { db } from "../db.config";
-import { Filters } from "weaviate-client";
+import { Filters, Metadata } from "weaviate-client";
 import { QueryIdSchemaType } from "@/schemas/standar-query-schema";
+import { keyof } from "zod/v4";
 
 export async function SearchItems(
   page: number,
@@ -122,6 +123,122 @@ export async function SearchItems(
     error: false,
     items: items,
   };
+}
+
+export async function SearchPrefItems(
+  preferences: string[],
+): Promise<CatalogResponseSchemaType | ErrorSchemaType> {
+  const resCollection = await getCollection();
+  if (resCollection.error) {
+    return {
+      error: true,
+      details: resCollection.details || "Error getting collection",
+    };
+  }
+
+  const collection = resCollection.collection;
+  const returnProperties = [
+    "name",
+    "description",
+    "imageUrl",
+    "url",
+    "brandId",
+    "price",
+  ];
+
+  let results = [];
+
+  const queryOptions = {
+    limit: 100, // ToDo
+    returnProperties: returnProperties,
+    targetVector: "image_vector",
+    includeDistance: true,
+    includeMatchDistance: true,
+    returnMetadata: ["distance"] as (keyof Metadata)[]
+  };
+
+  for (const pref of preferences) {
+    const embeddingResponse = await extractTextFeatures(pref);
+    if (
+      embeddingResponse.error ||
+      !Array.isArray(embeddingResponse.features) ||
+      embeddingResponse.features.length !== 768
+    ) {
+      logger.error("Error extracting features for preference: %s", pref);
+      continue;
+    }
+    const embedding = embeddingResponse.features;
+    const result = await collection.query.nearVector(embedding, queryOptions);
+    results.push(...result.objects);
+  }
+
+  const uniqueResults = aggregateResults(results);
+
+  // Map results to ItemSchemaType
+  const items: ItemSchemaType[] = uniqueResults
+    .map(match => {
+      const item = {
+        name: match.name || "",
+        description: match.description || "",
+        imageUrl: match.imageUrl || "",
+        url: match.url || "",
+        brandId: match.brandId || "",
+        price: match.price || 0,
+        uuid: match.uuid || "",
+      };
+
+      const validationResult = ItemSchema.safeParse(item);
+      if (!validationResult.success) {
+        logger.warn("Item validation failed:", validationResult.error);
+        return null;
+      }
+      return validationResult.data;
+    })
+    .filter((item): item is ItemSchemaType => {
+      return item !== null;
+    });
+
+  return {
+    error: false,
+    items: items,
+  };
+}
+
+interface ItemWithDistance extends ItemSchemaType {
+  totalDistance: number;
+}
+
+function aggregateResults(results: any[]) {
+  const itemsMap = new Map<string, ItemWithDistance>();
+
+  for (const match of results) {
+    const uuid = match.uuid;
+    const distance = (match.metadata?.distance ?? 0) as number;
+
+    if (!uuid) continue;
+
+    const existing = itemsMap.get(uuid);
+    if (existing) {
+      existing.totalDistance += distance;
+    } else {
+      const item: ItemWithDistance = {
+        name: match.properties?.name || "",
+        description: match.properties?.description || "",
+        imageUrl: match.properties?.imageUrl || "",
+        url: match.properties?.url || "",
+        brandId: match.properties?.brandId || "",
+        price: match.properties?.price || 0,
+        uuid,
+        totalDistance: distance,
+      };
+      itemsMap.set(uuid, item);
+    }
+  }
+
+  const finalItems = Array.from(itemsMap.values())
+    .sort((a, b) => a.totalDistance - b.totalDistance);
+
+  return finalItems;
 }
 
 export async function GetEmbedding(

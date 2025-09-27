@@ -1,7 +1,7 @@
 import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AppName from "@/app/components/AppName";
 import LogoSquareBeige from "@/app/components/logo/LogoSquareBeige";
 import "../global.css";
@@ -15,18 +15,39 @@ import prefetchHome, {
 } from "@/app/utils/prefetchs";
 import Toast from "react-native-toast-message";
 import LoadingPage from "./components/LoadingPage";
+import { useFetchClientProfile } from "./utils/use-query";
 
 export default function App() {
-  //verificar si hay un usuario autenticado
+  // verificar si hay un usuario autenticado
   const { data, isPending, error } = authClient.useSession();
   const user = data?.user;
+  const [preferences, setPreferences] = useState<string[]>([]);
   const loading = isPending;
   const queryClient = useQueryClient();
   const [timeout, setHasTimedOut] = useState(false);
 
-  if (!timeout) {
-    setTimeout(() => setHasTimedOut(true), 1000);
-  }
+  useEffect(() => {
+    const t = setTimeout(() => setHasTimedOut(true), 1000);
+    return () => clearTimeout(t);
+  }, []);
+
+  const dataUser = useFetchClientProfile(
+    user ? { email: user.email, name: user.name ?? "" } : { email: "", name: "" }
+  );
+
+  useEffect(() => {
+    if (dataUser?.user?.preferences) {
+      setPreferences(dataUser.user.preferences);
+    }
+  }, [dataUser]);
+
+  useEffect(() => {
+    if (user && !user.new && preferences.length) {
+      prefetchHome(queryClient, user.email, preferences);
+      prefetchProfile(user, queryClient);
+      prefetchLikeAndFavoritePage(queryClient, user.email);
+    }
+  }, [user, preferences, queryClient]);
 
   if (error) {
     Toast.show({
@@ -40,15 +61,16 @@ export default function App() {
     if (user && !user.new) {
       // Solo ejecutar prefetch para usuarios existentes
       setTimeout(() => {
-        prefetchHome(queryClient, user.email);
+        prefetchHome(queryClient, user.email, preferences);
         prefetchProfile(user, queryClient);
         prefetchLikeAndFavoritePage(queryClient, user.email);
         prefetchExplorePage(queryClient);
       }, 100);
     }
+
     return (
       <SafeAreaView className="flex-1 h-full bg-brown-strong">
-        <ScrollView className="my-1 ">
+        <ScrollView className="my-1">
           <View className="w-full justify-center items-center min-h-[85vh]">
             <LogoSquareBeige classname="w-[90] h-[90] mb-2" />
             <AppName classname="text-2xl text-[#d6bfa0] tracking-[7] font-giregular " />

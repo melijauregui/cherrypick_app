@@ -33,22 +33,24 @@ const ImageGallery = ({
   contentUp,
   roundRobin,
   canRefresh = true,
+  preferences = []
 }: {
   queryKey: any[];
-  getClothingItems: (page: number, limit: number) => Promise<ItemSchemaType[]>;
+  getClothingItems: (page: number, limit: number, preferences?: string[]) => Promise<ItemSchemaType[]>;
   limit: number;
   columnCount: number;
   itemWhenNothingFound?: () => React.ReactElement;
   contentUp?: React.ReactElement;
   roundRobin?: boolean;
   canRefresh?: boolean;
+  preferences?: string[];
 }) => {
   const { user } = useSession();
   const lastTriggeredHeightRef = useRef(0);
   const queryClient = useQueryClient();
   const { data, fetchNextPage, refetch } = useInfiniteGetItems(
     queryKey,
-    pageParam => getClothingItems(pageParam, limit),
+    pageParam => getClothingItems(pageParam, limit, preferences),
     item =>
       prefetchItemDetail(queryClient, item, user?.email ?? "", item.brandId)
   );
@@ -121,9 +123,8 @@ const ImageGallery = ({
   ) : (
     <>
       <View
-        className={`flex-row ${
-          itemQuantity < columnCount ? `justify-start ` : "justify-between"
-        }`}
+        className={`flex-row ${itemQuantity < columnCount ? `justify-start ` : "justify-between"
+          }`}
         style={{
           gap: itemQuantity < columnCount ? resto : 0,
         }}

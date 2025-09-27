@@ -16,6 +16,7 @@ import {
   getEmbedding,
   getClothingItemsTextSearch,
   getInspirationItems,
+  getPreferencesItemsHome,
 } from "./fetch";
 import { QueryIdSchemaType } from "@/schemas/standar-query-schema";
 
@@ -49,13 +50,14 @@ export function prefetchProfile(
 
 export default function prefetchHome(
   queryClient: QueryClient,
-  userEmail: string
+  userEmail: string,
+  preferences: string[]
 ) {
   // console.log("prefetchHome called for user:", userEmail);
   prefetchInfiniteQueryIfNeeded(
     queryClient,
     ["home-items", userEmail],
-    () => getClothingItemsHome(0, 10),
+    () => getPreferencesItemsHome(0, 10, preferences),
     userEmail
   );
 }

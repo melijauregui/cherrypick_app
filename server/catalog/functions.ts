@@ -11,6 +11,7 @@ import weaviate, { Collection, Filters, ObjectDataType } from "weaviate-client";
 import { ErrorSchemaType } from "@/schemas/standar-response-schema";
 import { config } from "../../config";
 import logger from "../logger";
+import { GetEmbedding, SearchItems, SearchPrefItems } from "../search/functions";
 
 //funcion para hacer query a pinecone
 export async function GetCatalog(
@@ -388,13 +389,13 @@ export async function searchText(
 // Función para verificar si ya existe un elemento con el mismo nombre y brand en Weaviate
 export async function getCollection(): Promise<
   | {
-      error: true;
-      details: string;
-    }
+    error: true;
+    details: string;
+  }
   | {
-      error: false;
-      collection: Collection;
-    }
+    error: false;
+    collection: Collection;
+  }
 > {
   try {
     const client = await weaviate.connectToWeaviateCloud(config.WEAVIATE_URL, {
@@ -550,4 +551,37 @@ export async function GetItemsFromWeaviate(
     error: false,
     items: items,
   };
+}
+
+export async function GetPreferencesFeed(
+  preferences: string[],
+  page: number,
+  limit: number
+): Promise<CatalogResponseSchemaType | ErrorSchemaType> {
+  return await getRandomPreferenceCatalog(preferences, page, limit);
+}
+
+async function getRandomPreferenceCatalog(preferences: string[],
+  page: number,
+  limit: number): Promise<CatalogResponseSchemaType | ErrorSchemaType> {
+
+  const allResults = await SearchPrefItems(preferences);
+  if (allResults.error) {
+    console.error("Error searching preferred items:", allResults.details);
+    return allResults;
+  }
+
+  const pageResults = allResults.items.slice(page * limit, (page + 1) * limit);
+
+  const shuffledResults = shuffleArray(pageResults);
+  return { error: false, items: shuffledResults };
+}
+
+function shuffleArray<T>(array: T[]): T[] {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j] as T, arr[i] as T];
+  }
+  return arr;
 }

@@ -1,7 +1,7 @@
 import safeFetch from "./safe-fetch";
 import { LOCAL_IP } from "@/config/api";
 import * as FileSystem from "expo-file-system";
-import {} from "@/schemas/auth/brand-schema";
+import { } from "@/schemas/auth/brand-schema";
 import {
   CatalogResponseSchema,
   IsMyItemSchema,
@@ -216,6 +216,27 @@ export async function getClothingItemsHome(
       }),
     CatalogResponseSchema,
     "getClothingItemsHome"
+  );
+  return res?.items || [];
+}
+
+export async function getPreferencesItemsHome(
+  page: number,
+  limit: number,
+  preferences: string[] = []
+): Promise<ItemSchemaType[]> {
+  const prefString = preferences.map(p => encodeURIComponent(p)).join(",");
+  console.log("getPreferencesItemsHome", page, limit, prefString);
+  const res = await handleApiResponse<{
+    items: ItemSchemaType[];
+  }>(
+    () =>
+      safeFetch({
+        url: `http://${LOCAL_IP}:3000/feed/preferences?page=${page}&limit=${limit}&preferences=${prefString}`,
+        method: "GET",
+      }),
+    CatalogResponseSchema,
+    "getPreferencesItemsHome"
   );
   return res?.items || [];
 }
