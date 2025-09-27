@@ -17,6 +17,7 @@ import { db } from "../db.config";
 import { Filters, Metadata } from "weaviate-client";
 import { QueryIdSchemaType } from "@/schemas/standar-query-schema";
 import { keyof } from "zod/v4";
+import { countObjects } from "../catalog/insert";
 
 export async function SearchItems(
   page: number,
@@ -146,10 +147,10 @@ export async function SearchPrefItems(
     "price",
   ];
 
-  let results = [];
+  const limit = await countObjects(collection);
 
   const queryOptions = {
-    limit: 100, // ToDo
+    limit: limit,
     returnProperties: returnProperties,
     targetVector: "image_vector",
     includeDistance: true,
@@ -157,22 +158,43 @@ export async function SearchPrefItems(
     returnMetadata: ["distance"] as (keyof Metadata)[]
   };
 
+  const embeddings: number[][] = [];
+
   for (const pref of preferences) {
     const embeddingResponse = await extractTextFeatures(pref);
     if (
       embeddingResponse.error ||
-      !Array.isArray(embeddingResponse.features) ||
-      embeddingResponse.features.length !== 768
+      !Array.isArray(embeddingResponse.features)
     ) {
       logger.error("Error extracting features for preference: %s", pref);
       continue;
     }
-    const embedding = embeddingResponse.features;
-    const result = await collection.query.nearVector(embedding, queryOptions);
-    results.push(...result.objects);
+    embeddings.push(embeddingResponse.features);
   }
 
-  const uniqueResults = aggregateResults(results);
+  if (!embeddings[0]) {
+    return {
+      error: true,
+      details: "No valid embeddings from preferences",
+    };
+  }
+
+  const vectorSize = embeddings[0].length;
+  if (!embeddings.every(e => e.length === vectorSize)) {
+    return {
+      error: true,
+      details: "Embeddings have inconsistent dimensions",
+    };
+  }
+
+  const meanEmbedding = embeddings[0].map((_, i) =>
+    embeddings.reduce((sum, emb) => sum + (emb?.[i] ?? 0), 0) / embeddings.length
+  );
+
+  let results = await collection.query.nearVector(meanEmbedding, queryOptions);
+
+
+  const uniqueResults = aggregateResults(results.objects);
 
   // Map results to ItemSchemaType
   const items: ItemSchemaType[] = uniqueResults
