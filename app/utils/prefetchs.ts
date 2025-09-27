@@ -51,13 +51,12 @@ export function prefetchProfile(
 export default function prefetchHome(
   queryClient: QueryClient,
   userEmail: string,
-  preferences: string[]
 ) {
   // console.log("prefetchHome called for user:", userEmail);
   prefetchInfiniteQueryIfNeeded(
     queryClient,
     ["home-items", userEmail],
-    () => getPreferencesItemsHome(0, 10, preferences),
+    () => getPreferencesItemsHome(0, 10, userEmail),
     userEmail
   );
 }

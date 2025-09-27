@@ -33,24 +33,22 @@ const ImageGallery = ({
   contentUp,
   roundRobin,
   canRefresh = true,
-  preferences = []
 }: {
   queryKey: any[];
-  getClothingItems: (page: number, limit: number, preferences?: string[]) => Promise<ItemSchemaType[]>;
+  getClothingItems: (page: number, limit: number, email: string) => Promise<ItemSchemaType[]>;
   limit: number;
   columnCount: number;
   itemWhenNothingFound?: () => React.ReactElement;
   contentUp?: React.ReactElement;
   roundRobin?: boolean;
   canRefresh?: boolean;
-  preferences?: string[];
 }) => {
   const { user } = useSession();
   const lastTriggeredHeightRef = useRef(0);
   const queryClient = useQueryClient();
   const { data, fetchNextPage, refetch } = useInfiniteGetItems(
     queryKey,
-    pageParam => getClothingItems(pageParam, limit, preferences),
+    pageParam => getClothingItems(pageParam, limit, user?.email ?? ""),
     item =>
       prefetchItemDetail(queryClient, item, user?.email ?? "", item.brandId)
   );

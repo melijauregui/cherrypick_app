@@ -50,7 +50,6 @@ const Home = () => {
           getClothingItems={getPreferencesItemsHome}
           limit={10}
           columnCount={2}
-          preferences={preferences}
         />
       </SafeAreaView>
     </SafeAreaProvider>

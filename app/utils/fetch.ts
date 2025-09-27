@@ -223,16 +223,15 @@ export async function getClothingItemsHome(
 export async function getPreferencesItemsHome(
   page: number,
   limit: number,
-  preferences: string[] = []
+  email: string
 ): Promise<ItemSchemaType[]> {
-  const prefString = preferences.map(p => encodeURIComponent(p)).join(",");
-  console.log("getPreferencesItemsHome", page, limit, prefString);
+  console.log("getPreferencesItemsHome", page, limit, email);
   const res = await handleApiResponse<{
     items: ItemSchemaType[];
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/feed/preferences?page=${page}&limit=${limit}&preferences=${prefString}`,
+        url: `http://${LOCAL_IP}:3000/feed/preferences?page=${page}&limit=${limit}&email=${email}`,
         method: "GET",
       }),
     CatalogResponseSchema,

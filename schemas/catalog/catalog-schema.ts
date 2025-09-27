@@ -64,7 +64,7 @@ export const PaginationSchema = z.object({
 
 export const PaginationPreferencesSchema = z.object({
   ...PaginationSchema.shape,
-  preferences: z.string().min(1, "Las preferencias son requeridas"),
+  email: z.string().email("Email is required"),
 });
 
 export const ImageBase64Schema = z.object({

@@ -14,6 +14,7 @@ import {
 } from "@/schemas/standar-response-schema";
 import { GetCatalog, GetPreferencesFeed } from "../catalog/functions";
 import logger from "../logger";
+import { GetClient } from "../client/functions";
 
 const FeedApp = new OpenAPIHono<AppEnv>({
   defaultHook: (result, c) => {
@@ -102,12 +103,29 @@ const getPreferencesFeedRoute = createRoute({
 
 FeedApp.openapi(getPreferencesFeedRoute, async c => {
   try {
-    const { page, limit, preferences } = c.req.valid("query");
-    logger.info("/GET feed preferences page: %s limit: %s, preferences: %v", page, limit, preferences);
-    const preferencesArray = preferences.split(",").map(p => p.trim()).filter(p => p.length > 0);
+    const { page, limit, email } = c.req.valid("query");
+    logger.info("/GET feed preferences page: %s limit: %s, email: %s", page, limit, email);
 
     let res: CatalogResponseSchemaType | ErrorSchemaType;
+    const resultUser = await GetClient(email);
+    if (resultUser.error) {
+      res = {
+        error: true,
+        details: "Cliente no encontrado",
+      };
+      return c.json(res, 404);
+    }
+    const user = resultUser.user;
+    if (!user || user.preferences.length === 0) {
+      res = {
+        error: true,
+        details: "El cliente no tiene preferencias",
+      };
+      return c.json(res, 404);
+    }
+    const preferencesArray = user.preferences;
     const result = await GetPreferencesFeed(preferencesArray, page, limit);
+
     if (result.error) {
       res = {
         error: true,

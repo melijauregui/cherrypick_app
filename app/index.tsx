@@ -21,7 +21,6 @@ export default function App() {
   // verificar si hay un usuario autenticado
   const { data, isPending, error } = authClient.useSession();
   const user = data?.user;
-  const [preferences, setPreferences] = useState<string[]>([]);
   const loading = isPending;
   const queryClient = useQueryClient();
   const [timeout, setHasTimedOut] = useState(false);
@@ -36,18 +35,12 @@ export default function App() {
   );
 
   useEffect(() => {
-    if (dataUser?.user?.preferences) {
-      setPreferences(dataUser.user.preferences);
-    }
-  }, [dataUser]);
-
-  useEffect(() => {
-    if (user && !user.new && preferences.length) {
-      prefetchHome(queryClient, user.email, preferences);
+    if (user && !user.new) {
+      prefetchHome(queryClient, user.email);
       prefetchProfile(user, queryClient);
       prefetchLikeAndFavoritePage(queryClient, user.email);
     }
-  }, [user, preferences, queryClient]);
+  }, [user, queryClient]);
 
   if (error) {
     Toast.show({
@@ -61,7 +54,7 @@ export default function App() {
     if (user && !user.new) {
       // Solo ejecutar prefetch para usuarios existentes
       setTimeout(() => {
-        prefetchHome(queryClient, user.email, preferences);
+        prefetchHome(queryClient, user.email);
         prefetchProfile(user, queryClient);
         prefetchLikeAndFavoritePage(queryClient, user.email);
         prefetchExplorePage(queryClient);
