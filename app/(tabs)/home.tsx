@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import LoadingPage from "../components/LoadingPage";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
-import { getClothingItemsHome, getPreferencesItemsHome } from "../utils/fetch";
+import { getClothingItemsHome, getPersonalizedItemsHome } from "../utils/fetch";
 import List2 from "@/app/components/List2";
 import { useSession } from "@/lib/auth-client";
 import { useFetchClientProfile } from "../utils/use-query";
@@ -47,7 +47,7 @@ const Home = () => {
       <SafeAreaView className="bg-brown-strong w-full flex-1 ">
         <List2
           queryKey={["home-items", user?.email]}
-          getClothingItems={getPreferencesItemsHome}
+          getClothingItems={getPersonalizedItemsHome}
           limit={10}
           columnCount={2}
         />

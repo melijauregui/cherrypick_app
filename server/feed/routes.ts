@@ -5,16 +5,17 @@ import { AppEnv } from "../app";
 import {
   CatalogResponseSchema,
   CatalogResponseSchemaType,
-  PaginationPreferencesSchema,
+  PaginationPreferencesSchema as PaginationPersonalizedSchema,
   PaginationSchema,
 } from "@/schemas/catalog/catalog-schema";
 import {
   ErrorSchema,
   ErrorSchemaType,
 } from "@/schemas/standar-response-schema";
-import { GetCatalog, GetPreferencesFeed } from "../catalog/functions";
+import { GetCatalog, GetPersonalizedFeed as GetPersonalizedFeed } from "../catalog/functions";
 import logger from "../logger";
 import { GetClient } from "../client/functions";
+import { getAllLikedFavoritedItems } from "../catalog/like-favorite";
 
 const FeedApp = new OpenAPIHono<AppEnv>({
   defaultHook: (result, c) => {
@@ -81,11 +82,11 @@ FeedApp.openapi(paginatedRoute, async c => {
 });
 
 
-const getPreferencesFeedRoute = createRoute({
+const getPersonalizedFeedRoute = createRoute({
   method: "get",
-  path: "/preferences",
+  path: "/personalized",
   request: {
-    query: PaginationPreferencesSchema,
+    query: PaginationPersonalizedSchema,
   },
   responses: {
     200: {
@@ -101,10 +102,10 @@ const getPreferencesFeedRoute = createRoute({
   },
 });
 
-FeedApp.openapi(getPreferencesFeedRoute, async c => {
+FeedApp.openapi(getPersonalizedFeedRoute, async c => {
   try {
     const { page, limit, email } = c.req.valid("query");
-    logger.info("/GET feed preferences page: %s limit: %s, email: %s", page, limit, email);
+    logger.info("/GET feed personalized page: %s limit: %s, email: %s", page, limit, email);
 
     let res: CatalogResponseSchemaType | ErrorSchemaType;
     const resultUser = await GetClient(email);
@@ -124,7 +125,20 @@ FeedApp.openapi(getPreferencesFeedRoute, async c => {
       return c.json(res, 404);
     }
     const preferencesArray = user.preferences;
-    const result = await GetPreferencesFeed(preferencesArray, page, limit);
+    const resultLikes = await getAllLikedFavoritedItems("likes", email, 0, 5);
+    if (resultLikes.error) {
+      res = {
+        error: true,
+        details: "Error obteniendo los likes del cliente",
+      };
+      return c.json(res, 500);
+    }
+
+    const likes = resultLikes.items;
+    const likesDescriptions = likes.map(item => item.description);
+    console.log("Descriptions: ", preferencesArray, likesDescriptions);
+
+    const result = await GetPersonalizedFeed(preferencesArray, likesDescriptions, page, limit);
 
     if (result.error) {
       res = {

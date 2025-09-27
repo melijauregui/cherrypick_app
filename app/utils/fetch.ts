@@ -220,22 +220,22 @@ export async function getClothingItemsHome(
   return res?.items || [];
 }
 
-export async function getPreferencesItemsHome(
+export async function getPersonalizedItemsHome(
   page: number,
   limit: number,
   email: string
 ): Promise<ItemSchemaType[]> {
-  console.log("getPreferencesItemsHome", page, limit, email);
+  console.log("getPersonalizedItemsHome", page, limit, email);
   const res = await handleApiResponse<{
     items: ItemSchemaType[];
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/feed/preferences?page=${page}&limit=${limit}&email=${email}`,
+        url: `http://${LOCAL_IP}:3000/feed/personalized?page=${page}&limit=${limit}&email=${email}`,
         method: "GET",
       }),
     CatalogResponseSchema,
-    "getPreferencesItemsHome"
+    "getPersonalizedItemsHome"
   );
   return res?.items || [];
 }

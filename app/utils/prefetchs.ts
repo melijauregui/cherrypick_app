@@ -16,7 +16,7 @@ import {
   getEmbedding,
   getClothingItemsTextSearch,
   getInspirationItems,
-  getPreferencesItemsHome,
+  getPersonalizedItemsHome,
 } from "./fetch";
 import { QueryIdSchemaType } from "@/schemas/standar-query-schema";
 
@@ -56,7 +56,7 @@ export default function prefetchHome(
   prefetchInfiniteQueryIfNeeded(
     queryClient,
     ["home-items", userEmail],
-    () => getPreferencesItemsHome(0, 10, userEmail),
+    () => getPersonalizedItemsHome(0, 10, userEmail),
     userEmail
   );
 }

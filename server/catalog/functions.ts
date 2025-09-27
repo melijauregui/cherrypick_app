@@ -11,7 +11,7 @@ import weaviate, { Collection, Filters, ObjectDataType } from "weaviate-client";
 import { ErrorSchemaType } from "@/schemas/standar-response-schema";
 import { config } from "../../config";
 import logger from "../logger";
-import { GetEmbedding, SearchItems, SearchPrefItems } from "../search/functions";
+import { GetEmbedding, SearchItems, SearchPersonalizedItems } from "../search/functions";
 
 //funcion para hacer query a pinecone
 export async function GetCatalog(
@@ -553,19 +553,14 @@ export async function GetItemsFromWeaviate(
   };
 }
 
-export async function GetPreferencesFeed(
+export async function GetPersonalizedFeed(
   preferences: string[],
+  likesDescriptions: string[],
   page: number,
   limit: number
 ): Promise<CatalogResponseSchemaType | ErrorSchemaType> {
-  return await getRandomPreferenceCatalog(preferences, page, limit);
-}
 
-async function getRandomPreferenceCatalog(preferences: string[],
-  page: number,
-  limit: number): Promise<CatalogResponseSchemaType | ErrorSchemaType> {
-
-  const allResults = await SearchPrefItems(preferences);
+  const allResults = await SearchPersonalizedItems(preferences, likesDescriptions);
   if (allResults.error) {
     console.error("Error searching preferred items:", allResults.details);
     return allResults;
