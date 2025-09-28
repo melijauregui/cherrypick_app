@@ -1,16 +1,16 @@
 import { createRoute } from "@hono/zod-openapi";
-
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { Context } from "hono";
 import { errorHandler } from "../errorHandler";
-import { BodyCodeVerificationPostSchema } from "@/schemas/auth/sign-up-schema";
 import {
   GenerateVerificationCode,
+  GetExpirationCode,
   SaveVerificationCode,
   SendEmail,
   VerifyVerificationCode,
 } from "./functions";
 import {
+  ExpirationCodeResponseSchema,
   QueryVerifyCodeSchema,
   VerifyCodeResponseSchema,
   VerifyCodeResponseSchemaType,
@@ -22,8 +22,9 @@ import {
   SuccessSchemaType,
 } from "@/schemas/standar-response-schema";
 import { ContentfulStatusCode } from "hono/utils/http-status";
+import { AppEnv } from "../app";
 
-const FormUserApp = new OpenAPIHono({
+const FormUserApp = new OpenAPIHono<AppEnv>({
   defaultHook: (result, c) => {
     //https://github.com/honojs/middleware/tree/main/packages/zod-openapi
     if (!result.success) {
@@ -44,13 +45,6 @@ export default FormUserApp;
 const codeVerificationRoute = createRoute({
   method: "post",
   path: "/",
-  request: {
-    body: {
-      content: {
-        "application/json": { schema: BodyCodeVerificationPostSchema },
-      },
-    },
-  },
   responses: {
     200: {
       content: {
@@ -69,6 +63,14 @@ const codeVerificationRoute = createRoute({
       },
       description: "Error al enviar el código de verificación",
     },
+    401: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Unauthorized",
+    },
     500: {
       content: {
         "application/json": {
@@ -80,7 +82,11 @@ const codeVerificationRoute = createRoute({
   },
 });
 FormUserApp.openapi(codeVerificationRoute, async c => {
-  const { email } = await c.req.valid("json");
+  const user = c.get("user");
+  const email = user?.email;
+  if (!email) {
+    return c.json({ error: true, details: "Unauthorized" }, 401);
+  }
   const code = GenerateVerificationCode();
   const emailSent = await SendEmail(email, code);
   let res: SuccessSchemaType | ErrorSchemaType;
@@ -121,6 +127,14 @@ const verifiedCodeRoute = createRoute({
       description:
         "Devuelve un booleano que indica si el codigo de verificación es correcto",
     },
+    401: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Unauthorized",
+    },
     404: {
       content: {
         "application/json": {
@@ -140,7 +154,12 @@ const verifiedCodeRoute = createRoute({
   },
 });
 FormUserApp.openapi(verifiedCodeRoute, async c => {
-  const { code, email } = await c.req.valid("json");
+  const { code } = await c.req.valid("json");
+  const user = c.get("user");
+  const email = user?.email;
+  if (!email) {
+    return c.json({ error: true, details: "Unauthorized" }, 401);
+  }
   let res:
     | VerifyCodeResponseSchemaType
     | {
@@ -153,6 +172,52 @@ FormUserApp.openapi(verifiedCodeRoute, async c => {
   if (res.error) {
     const errorMsg: ErrorSchemaType = res.errMsg;
     return c.json(errorMsg, res.statusCode as 404 | 410);
+  }
+  return c.json(res, 200);
+});
+
+// endpoint que verifica si el code de verificación es correcto
+const getExpirationCodeRoute = createRoute({
+  method: "post",
+  path: "/expiration",
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: ExpirationCodeResponseSchema,
+        },
+      },
+      description:
+        "Devuelve un booleano que indica si el codigo de verificación es correcto",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Unauthorized",
+    },
+    404: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Email not found",
+    },
+  },
+});
+FormUserApp.openapi(getExpirationCodeRoute, async c => {
+  const user = c.get("user");
+  const email = user?.email;
+  if (!email) {
+    return c.json({ error: true, details: "Unauthorized" }, 401);
+  }
+
+  const res = await GetExpirationCode(email);
+  if (res.error) {
+    return c.json(res, 404);
   }
   return c.json(res, 200);
 });

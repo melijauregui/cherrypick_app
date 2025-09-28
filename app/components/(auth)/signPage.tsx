@@ -8,10 +8,9 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { router } from "expo-router";
 import LogoCircle from "../logo/LogoCircle";
 
-export function SignPage({ children }: { children?: React.ReactNode }) {
+export default function SignPage({ children }: { children?: React.ReactNode }) {
   return (
     <SafeAreaView className="bg-brown-strong flex-1 h-full w-full">
       <ScrollView
@@ -28,17 +27,17 @@ export function SignPage({ children }: { children?: React.ReactNode }) {
 
 export function SignPageHeader({
   children,
-  backButton,
+  onBackButton,
 }: {
   children: React.ReactNode;
-  backButton?: boolean;
+  onBackButton?: () => void;
 }) {
   return (
     <View>
       <View className="flex flex-row items-center">
-        {backButton && (
+        {onBackButton && (
           <TouchableOpacity
-            onPress={() => router.back()}
+            onPress={onBackButton}
             accessibilityLabel="Go back"
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
@@ -83,7 +82,7 @@ export function NextButton({
       onPress={isDisabled ? undefined : onPress}
       className={`
             flex flex-row items-center px-5 py-2 rounded-3xl bg-neutral-500
-            ${isDisabled || isLoading ? " opacity-50" : ""}
+            ${isDisabled || isLoading ? "bg-gray-400 opacity-50" : "bg-white"}
           `}
     >
       <Text

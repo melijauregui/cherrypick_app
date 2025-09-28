@@ -3,7 +3,6 @@ import { SuccessSchema } from "./standar-response-schema";
 
 const QueryVerifyCodeSchema = z.object({
   code: z.string(),
-  email: z.string().email(),
 });
 export { QueryVerifyCodeSchema };
 
@@ -24,3 +23,11 @@ const FormSchemaCodeVerification = z.object({
     .length(6, { message: "Code must have 6 digits" }),
 });
 export { FormSchemaCodeVerification };
+
+export const ExpirationCodeResponseSchema = z.object({
+  ...SuccessSchema.shape,
+  expirationTime: z.date(),
+});
+export type ExpirationCodeResponseSchemaType = z.infer<
+  typeof ExpirationCodeResponseSchema
+>;

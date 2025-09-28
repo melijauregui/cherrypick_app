@@ -2,15 +2,22 @@ import { ScrollView, Text, View, TouchableOpacity, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useEffect, useState } from "react";
 import LogoCircle from "@/app/components/logo/LogoCircle";
-import { router } from "expo-router";
+import { router, usePathname } from "expo-router";
 import { authClient, useSession } from "@/lib/auth-client";
 
 const SignIn = () => {
   const { user, status } = useSession();
+  //veo en que ruta esta
+  const pathname = usePathname();
+  console.log("pathname", pathname);
 
   useEffect(() => {
-    if (user && status === "authenticated") {
-      router.replace("cherrypick:///home");
+    if (user && status === "authenticated" && user.emailVerified) {
+      if (!user.emailVerified && pathname !== "/code-verification") {
+        router.replace("cherrypick:///code-verification");
+      } else {
+        router.replace("cherrypick:///home");
+      }
     }
   }, [status, user]);
 

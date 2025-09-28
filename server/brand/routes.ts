@@ -18,7 +18,6 @@ import {
 import { GetBrandById, GetBrandId, UpdateBrand } from "./functions";
 import { QueryIdSchema } from "@/schemas/standar-query-schema";
 import logger from "../logger";
-import { BodyCodeVerificationPostSchema } from "@/schemas/auth/sign-up-schema";
 import { VerifyUserExists } from "../user/functions";
 import { SendEmailBrand } from "../formUser/functions";
 import {
@@ -37,6 +36,7 @@ import {
 import { GetCatalog, GetItemsUuidNamesFromBrand } from "../catalog/functions";
 import { UpdateCatalog } from "../catalog/insert";
 import { DeleteFromCatalog } from "../catalog/delete";
+import { BodyCodeVerificationPostSchema } from "@/schemas/auth/sign-up-schema";
 
 const BrandApp = new OpenAPIHono<AppEnv>({
   defaultHook: (result, c) => {

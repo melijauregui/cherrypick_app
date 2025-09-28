@@ -5,16 +5,15 @@ import React, { useState } from "react";
 import AppName from "@/app/components/AppName";
 import LogoSquareBeige from "@/app/components/logo/LogoSquareBeige";
 import "../global.css";
-import { Redirect } from "expo-router";
+import { Redirect, usePathname } from "expo-router";
 import { authClient } from "@/lib/auth-client";
-import { QueryClient, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import prefetchHome, {
   prefetchExplorePage,
   prefetchLikeAndFavoritePage,
   prefetchProfile,
 } from "@/app/utils/prefetchs";
 import Toast from "react-native-toast-message";
-import LoadingPage from "./components/LoadingPage";
 
 export default function App() {
   //verificar si hay un usuario autenticado
@@ -23,6 +22,7 @@ export default function App() {
   const loading = isPending;
   const queryClient = useQueryClient();
   const [timeout, setHasTimedOut] = useState(false);
+  const pathname = usePathname();
 
   if (!timeout) {
     setTimeout(() => setHasTimedOut(true), 1000);
@@ -37,7 +37,7 @@ export default function App() {
   }
 
   if (loading || !timeout) {
-    if (user && !user.new) {
+    if (user && user.emailVerified) {
       // Solo ejecutar prefetch para usuarios existentes
       setTimeout(() => {
         prefetchHome(queryClient, user.email);
@@ -61,9 +61,9 @@ export default function App() {
 
   // Redirect based on authentication status
   if (user) {
-    if (user.new) {
+    if (!user.emailVerified && pathname !== "/code-verification") {
       // Usuario nuevo - redirigir a sign-in para que el useEffect maneje el redirect a preferences
-      return <LoadingPage alreadyPrefetched={true} />;
+      return <Redirect href="/code-verification" />;
     } else {
       // Usuario existente - redirigir directamente a home
       return <Redirect href="/home?prefetch=true" />;

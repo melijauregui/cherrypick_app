@@ -538,3 +538,44 @@ export async function getInspirationItems(
   );
   return res?.items || null;
 }
+
+export async function getExpirationCode(): Promise<Date | null> {
+  const res = await handleApiResponse<{
+    expirationTime: string;
+  }>(
+    () =>
+      safeFetch({
+        url: `http://${LOCAL_IP}:3000/code-verification/expiration`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+    SuccessSchema.extend({ expirationTime: z.string() }),
+    "getExpirationCode"
+  );
+  console.log("res", res);
+  return new Date(res?.expirationTime ?? "") || null;
+}
+
+export async function verifyCode(
+  code: string,
+  email: string
+): Promise<{ isCorrect: boolean } | null> {
+  const res = await handleApiResponse<{
+    isCorrect: boolean;
+  }>(
+    () =>
+      safeFetch({
+        url: `http://${LOCAL_IP}:3000/code-verification/verify`,
+        method: "POST",
+        body: JSON.stringify({ code, email }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+    SuccessSchema.extend({ isCorrect: z.boolean() }),
+    "verifyCode"
+  );
+  return res || null;
+}

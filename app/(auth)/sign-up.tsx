@@ -1,15 +1,14 @@
 import { ClientFormSchemaSignUp } from "@/schemas/client/client-schema";
 import { router, useRouter } from "expo-router";
 import { useState } from "react";
-import {
+import SignPage, {
   Input,
   NextButton,
-  SignPage,
   SignPageContent,
   SignPageFooter,
   SignPageHeader,
   SignPageItems,
-} from "../components/(auth)/sign-page";
+} from "../components/(auth)/signPage";
 import {
   ErrorSchemaType,
   SuccessSchema,
@@ -20,6 +19,7 @@ import { VerifyUserExistsResponseSchema } from "@/schemas/user/user-schema";
 import { LOCAL_IP } from "@/config/api";
 import { authClient } from "@/lib/auth-client";
 import Toast from "react-native-toast-message";
+import { useSendCode } from "./code-verification";
 
 const SignIn = () => {
   const [name, setName] = useState<string>("");
@@ -36,6 +36,7 @@ const SignIn = () => {
   const [confirmPasswordError, setConfirmPasswordError] = useState<
     string | undefined
   >(undefined);
+  const sendCode = useSendCode();
 
   async function verifySubmit(): Promise<boolean> {
     const result = ClientFormSchemaSignUp.safeParse({
@@ -72,28 +73,14 @@ const SignIn = () => {
 
   let isDisabled = !email || !password || !name || !confirmPassword;
 
-  // async function handleSubmit() {
-  //   router.push({
-  //     pathname: "/code-verification",
-  //     params: {
-  //       name,
-  //       email,
-  //       dateBirth: date?.toISOString(),
-  //     },
-  //   });
-
-  //   console.log("Sending code verification to email:", emailValue);
-
-  //   const resPost = await postCodeVerification({ email: emailValue });
-  //   if (resPost.error) {
-  //     setEmailError(resPost.details);
-  //   }
-  // }
-
   return (
     <SignPage>
       <SignPageContent>
-        <SignPageHeader backButton>Create account</SignPageHeader>
+        <SignPageHeader
+          onBackButton={() => router.replace("cherrypick:///sign-in")}
+        >
+          Create account
+        </SignPageHeader>
         <SignPageItems>
           <Input
             placeholder="Name"
@@ -150,7 +137,7 @@ const SignIn = () => {
               setIsLoading(false);
               return;
             }
-            await handleSubmitSignUp(name, email, password);
+            await handleSubmitSignUp(name, email, password, sendCode);
             setIsLoading(false);
           }}
           isLoading={isLoading}
@@ -195,39 +182,11 @@ async function verifyMailAvailability(
   }
 }
 
-async function postCodeVerification({
-  email,
-}: {
-  email: string;
-}): Promise<SuccessSchemaType | ErrorSchemaType> {
-  try {
-    const { data } = await safeFetch({
-      url: `http://${LOCAL_IP}:3000/code-verification`,
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email }),
-    });
-    if (data.error) {
-      throw new Error(data.details);
-    }
-    SuccessSchema.parse(data);
-    return {
-      error: false,
-    };
-  } catch (error) {
-    return {
-      error: true,
-      details: error instanceof Error ? error.message : "Unexpected error",
-    };
-  }
-}
-
 export async function handleSubmitSignUp(
   userName: string,
   email: string,
-  password: string
+  password: string,
+  sendCode: ReturnType<typeof useSendCode>
 ) {
   const res = await authClient.signUp.email({
     name: userName,
@@ -245,7 +204,7 @@ export async function handleSubmitSignUp(
     return;
   }
 
-  const resPost = await postCodeVerification({ email: email });
+  const resPost = await sendCode.mutateAsync();
   if (resPost.error) {
     Toast.show({
       type: "error",

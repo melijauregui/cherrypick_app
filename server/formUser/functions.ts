@@ -1,7 +1,10 @@
 import { db } from "../db.config";
 import nodemailer from "nodemailer";
 import { randomInt } from "crypto";
-import { VerifyCodeResponseSchemaType } from "@/schemas/formUser-schema";
+import {
+  ExpirationCodeResponseSchemaType,
+  VerifyCodeResponseSchemaType,
+} from "@/schemas/formUser-schema";
 import { SuccessSchemaType } from "@/schemas/standar-response-schema";
 import { ErrorSchemaType } from "@/schemas/standar-response-schema";
 import { ContentfulStatusCode } from "hono/utils/http-status";
@@ -124,6 +127,13 @@ export async function VerifyVerificationCode(
     await db.registerInProgress.delete({
       where: { email },
     });
+    // Update the user to be verified
+    await db.user.update({
+      where: { email },
+      data: {
+        emailVerified: true,
+      },
+    });
     res = {
       error: false,
       isCorrect: true,
@@ -178,4 +188,22 @@ export async function SendEmailBrand(
       details: "Error al enviar el correo",
     };
   }
+}
+
+export async function GetExpirationCode(
+  email: string
+): Promise<ExpirationCodeResponseSchemaType | ErrorSchemaType> {
+  const registerInProgress = await db.registerInProgress.findUnique({
+    where: { email },
+  });
+  if (!registerInProgress) {
+    return {
+      error: true,
+      details: "Email not found",
+    };
+  }
+  return {
+    error: false,
+    expirationTime: new Date(registerInProgress.verificationCodeExpiration),
+  };
 }
