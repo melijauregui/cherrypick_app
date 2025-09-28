@@ -5,7 +5,6 @@ import {
   checkIfFavorited,
   checkIsMyItem,
   getBrandProfile,
-  getBrandItems,
   getSelfBrandProfile,
   getSelfClientProfile,
   getSelfBrandItems,

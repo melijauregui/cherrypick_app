@@ -4,8 +4,8 @@
 -- Insert users first
 INSERT INTO "user" (id, name, email, "emailVerified", "userType")
 VALUES 
-    ('ca8cce7e-792a-11f0-b577-0242ac120002', 'Tienda Napoli', 'cherrypick.brand.example@gmail.com', false, 'brand'),
-    ('ca8ce0ae-792a-11f0-b577-0242ac120002', 'Charo Store', 'charostoreok@gmail.com', false, 'brand');
+    ('ca8cce7e-792a-11f0-b577-0242ac120002', 'Tienda Napoli', 'cherrypick.brand.example@gmail.com', true, 'brand'),
+    ('ca8ce0ae-792a-11f0-b577-0242ac120002', 'Charo Store', 'charostoreok@gmail.com', true, 'brand');
 
 
 -- Insert brand data

@@ -12,36 +12,18 @@ import {
   Keyboard,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
 import { useEffect, useRef } from "react";
 import React, { useState } from "react";
 import LogoCircle from "@/app/components/logo/LogoCircle";
 import { FormSchemaCodeVerification } from "@/schemas/formUser-schema";
 import { useRouter } from "expo-router";
 import safeFetch from "@/app/utils/safe-fetch";
-import { useLocalSearchParams } from "expo-router";
 import { LOCAL_IP } from "@/config/api";
-import { VerifyCodeResponseSchema } from "@/schemas/formUser-schema";
+import { useSession } from "@/lib/auth-client";
 
 const CodeVerification = () => {
   const router = useRouter();
-  const params = useLocalSearchParams<{
-    name?: string;
-    email?: string;
-    dateBirth?: string;
-  }>();
-
-  const { name, email, dateBirth } = params;
-  if (
-    typeof name !== "string" ||
-    typeof email !== "string" ||
-    typeof dateBirth !== "string"
-  ) {
-    console.error("Missing or invalid parameters in CodeVerification:", params);
-    router.replace("/sign-up");
-    return null;
-  }
-
+  const session = useSession();
   const [code, setCode] = useState("");
   const [codeReady, setCodeReady] = useState(false);
   const [codeError, setCodeError] = useState<string | undefined>(undefined);
@@ -74,6 +56,13 @@ const CodeVerification = () => {
     return () => clearInterval(interval);
   }, [secondsLeft, expirationTime]);
 
+  if (session.status === "unauthenticated" || !session.user) {
+    router.replace("/sign-in");
+    return null;
+  }
+
+  console.log("session in code verification", session);
+
   async function handleResendCode() {
     try {
       setResetCodeInput(true); // trigger reset
@@ -92,7 +81,7 @@ const CodeVerification = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: session.user?.email }),
       });
 
       if (data.error) {
@@ -119,7 +108,7 @@ const CodeVerification = () => {
       return;
     }
     try {
-      const emailStr = email?.toString();
+      const emailStr = session.user?.email?.toString();
       if (!emailStr) {
         console.error("Email is not a string");
         setCodeError("Invalid email");
@@ -129,26 +118,12 @@ const CodeVerification = () => {
       if (isCorrect) {
         console.log("Code is correct");
       } else {
-        console.log("Code is incorrect");
         setCodeError("Code is incorrect");
         return;
       }
-      // Proceed with the next steps, e.g., navigate to the next screen
-      console.log(
-        "Proceeding with name:",
-        name,
-        "and email:",
-        email,
-        "and date:",
-        dateBirth
-      );
+
       router.push({
         pathname: "/preferences",
-        params: {
-          name,
-          email,
-          dateBirth: dateBirth,
-        },
       });
     } catch (error) {
       if (error instanceof Error) {
@@ -177,7 +152,7 @@ const CodeVerification = () => {
                   We sent you a code
                 </Text>
                 <Text className="text-gray-400 text-[15px] font-pregular pt-3">
-                  Enter it below to verify your email: {email}.
+                  Enter it below to verify your email: {session.user?.email}.
                 </Text>
                 <View className="flex flex-col w-full mt-6 gap-3">
                   <CodeInput

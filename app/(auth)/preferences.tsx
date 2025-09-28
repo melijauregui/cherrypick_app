@@ -20,34 +20,17 @@ import { ClientSchema } from "@/schemas/client/client-schema";
 
 const Preferences = () => {
   const router = useRouter();
-  const createAccount = useCreateAccount();
   const [preferences, setPreferences] = useState<string[]>([]);
-  const { name, email, dateBirth } = useLocalSearchParams();
   const [selectedOne, setSelectedOne] = useState<boolean>(false);
 
-  async function handleSubmit() {
-    if (
-      typeof name !== "string" ||
-      typeof email !== "string" ||
-      typeof dateBirth !== "string"
-    ) {
-      console.log("Invalid parameters");
-      //toast
-      Toast.show({
-        type: "error",
-        text1: "Invalid parameters",
-        text2: "Please try again later.",
-        visibilityTime: 4000,
-      });
-      return;
-    }
-    createAccount.mutate({
-      username: name,
-      email,
-      dateOfBirth: dateBirth,
-      preferences,
-    });
-  }
+  // async function handleSubmit() {
+  //   createAccount.mutate({
+  //     username: name,
+  //     email,
+  //     dateOfBirth: dateBirth,
+  //     preferences,
+  //   });
+  // }
 
   return (
     <SafeAreaView className="bg-brown-strong flex-1 h-full w-full">
@@ -67,7 +50,8 @@ const Preferences = () => {
         </View>
         <NextButton
           onPress={() => {
-            handleSubmit();
+            // handleSubmit();
+            console.log("handleSubmit not implemented");
           }}
           codeReady={selectedOne}
         />
@@ -226,74 +210,73 @@ const NextButton = ({
   );
 };
 
-function useCreateAccount() {
-  const router = useRouter();
-  const { status } = useSession();
-  const mutation = useMutation({
-    mutationFn: async (user: {
-      username: string;
-      email: string;
-      dateOfBirth: string;
-      preferences: string[];
-    }) => {
-      const client = ClientSchema.parse({
-        name: user.username,
-        email: user.email,
-        dateOfBirth: user.dateOfBirth,
-        preferences: user.preferences,
-      });
+// function useCreateAccount() {
+//   const router = useRouter();
+//   const mutation = useMutation({
+//     mutationFn: async (user: {
+//       username: string;
+//       email: string;
+//       dateOfBirth: string;
+//       preferences: string[];
+//     }) => {
+//       const client = ClientSchema.parse({
+//         name: user.username,
+//         email: user.email,
+//         dateOfBirth: user.dateOfBirth,
+//         preferences: user.preferences,
+//       });
 
-      console.log(
-        "Creating account with name:",
-        client.name,
-        "email:",
-        client.email,
-        "date:",
-        client.dateOfBirth,
-        "preferences:",
-        client.preferences
-      );
+//       console.log(
+//         "Creating account with name:",
+//         client.name,
+//         "email:",
+//         client.email,
+//         "date:",
+//         client.dateOfBirth,
+//         "preferences:",
+//         client.preferences
+//       );
 
-      const { data } = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/client`,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(client),
-        method: "POST",
-      });
-      if (data.error) {
-        throw new Error(data.details);
-      }
-    },
-    onSuccess: async () => {
-      await authClient.updateUser({
-        new: false,
-      });
-      const session = await authClient.getSession();
-      if (session.data?.user.id) {
-        router.replace("/home");
-      } else {
-        Toast.show({
-          type: "success",
-          text1:
-            "Account created successfully!\nPlease sign in with Google to continue.",
-          visibilityTime: 4000,
-        });
-        router.replace("/sign-in");
-      }
-    },
-    onError: error => {
-      console.error("Error creating account:", error);
-      Toast.show({
-        type: "error",
-        text1: "Error creating account",
-        text2: "Please try again later.",
-        visibilityTime: 4000,
-      });
-      router.replace("/sign-in");
-    },
-  });
+//       const { data } = await safeFetch({
+//         url: `http://${LOCAL_IP}:3000/client`,
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify(client),
+//         method: "POST",
+//       });
+//       if (data.error) {
+//         throw new Error(data.details);
+//       }
+//     },
+//     onSuccess: async () => {
+//       await authClient.updateUser({
+//         new: false,
+//       });
+//       const session = await authClient.getSession();
+//       if (session.data?.user.id) {
+//         router.replace("/home");
+//       } else {
+//         Toast.show({
+//           type: "success",
+//           text1:
+//             "Account created successfully!\nPlease sign in with Google to continue.",
+//           visibilityTime: 4000,
+//         });
+//         router.replace("/sign-in");
+//       }
+//     },
+//     onError: error => {
+//       console.error("Error creating account:", error);
+//       Toast.show({
+//         type: "error",
+//         text1: "Error creating account",
+//         text2: "Please try again later.",
+//         visibilityTime: 4000,
+//       });
+//       router.replace("/sign-in");
+//     },
+//   });
 
-  return mutation;
-}
+//   return mutation;
+// }

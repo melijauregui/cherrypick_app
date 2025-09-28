@@ -55,8 +55,10 @@ const ClientFormSchemaSignUp = z.object({
       required_error: "Email is required",
     })
     .email({ message: "Invalid email address" }),
-  dateOfBirth: z.string().transform(val => {
-    return new Date(val);
-  }),
+  password: z
+    .string({
+      required_error: "Password is required",
+    })
+    .min(8, { message: "Password must be at least 8 characters long" }),
 });
 export { ClientFormSchemaSignUp };

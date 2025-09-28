@@ -77,6 +77,7 @@ UserApp.openapi(verifyUserRoute, async c => {
 
   // Buscar primero en users
   const { exists } = await VerifyUserExists(email);
+  console.log("exists????", exists);
   res = {
     error: false,
     exists: exists,

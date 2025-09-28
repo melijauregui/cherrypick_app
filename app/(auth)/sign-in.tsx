@@ -10,26 +10,7 @@ const SignIn = () => {
 
   useEffect(() => {
     if (user && status === "authenticated") {
-      if (user.new) {
-        const name = user?.name || "";
-        const email = user?.email || "";
-        if (!name || !email) {
-          //TODO PUSH TOAST
-          console.log("Missing user data for creation, redirecting to sign-in");
-          router.replace("/sign-in");
-          return;
-        }
-        router.replace({
-          pathname: "cherrypick:///preferences",
-          params: {
-            name,
-            email,
-            dateBirth: "",
-          },
-        });
-      } else {
-        router.replace("cherrypick:///home");
-      }
+      router.replace("cherrypick:///home");
     }
   }, [status, user]);
 

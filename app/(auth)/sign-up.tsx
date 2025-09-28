@@ -1,235 +1,167 @@
+import { ClientFormSchemaSignUp } from "@/schemas/client/client-schema";
+import { router, useRouter } from "expo-router";
+import { useState } from "react";
 import {
-  ScrollView,
-  Text,
-  View,
-  TouchableOpacity,
-  KeyboardTypeOptions,
-  TextInput,
-  Platform,
-} from "react-native";
-import { format } from "date-fns";
-import { SafeAreaView } from "react-native-safe-area-context";
-import React, { useState } from "react";
-import LogoCircle from "@/app/components/logo/LogoCircle";
-import safeFetch from "@/app/utils/safe-fetch";
-import DatePicker from "react-native-date-picker";
-import { useRouter } from "expo-router";
-import { LOCAL_IP } from "../../config/api";
-import { VerifyUserExistsResponseSchema } from "@/schemas/user/user-schema";
+  Input,
+  NextButton,
+  SignPage,
+  SignPageContent,
+  SignPageFooter,
+  SignPageHeader,
+  SignPageItems,
+} from "../components/(auth)/sign-page";
 import {
   ErrorSchemaType,
   SuccessSchema,
   SuccessSchemaType,
 } from "@/schemas/standar-response-schema";
-import { ClientFormSchemaSignUp } from "@/schemas/client/client-schema";
+import safeFetch from "../utils/safe-fetch";
+import { VerifyUserExistsResponseSchema } from "@/schemas/user/user-schema";
+import { LOCAL_IP } from "@/config/api";
+import { authClient } from "@/lib/auth-client";
+import Toast from "react-native-toast-message";
 
 const SignIn = () => {
-  const router = useRouter();
-  const [name, setName] = useState<string>();
-  const [email, setEmail] = useState<string>();
-  const [date, setDate] = useState<Date | null>(null);
-  const [open, setOpen] = useState(false);
+  const [name, setName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [nameError, setNameError] = useState<string | undefined>(undefined);
   const [emailError, setEmailError] = useState<string | undefined>(undefined);
-  const [dateError, setDateError] = useState<string | undefined>(undefined);
+  const [passwordError, setPasswordError] = useState<string | undefined>(
+    undefined
+  );
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [confirmPasswordError, setConfirmPasswordError] = useState<
+    string | undefined
+  >(undefined);
 
-  async function handleSubmit() {
+  async function verifySubmit(): Promise<boolean> {
     const result = ClientFormSchemaSignUp.safeParse({
       name: name,
       email: email?.toLowerCase(),
-      dateOfBirth: date?.toISOString(),
+      password: password,
     });
     if (!result.success) {
-      //console.log("Validation failed:", result.error);
-      const nameError = result.error.issues.find(
-        issue => issue.path[0] === "name"
-      );
-      const emailError = result.error.issues.find(
-        issue => issue.path[0] === "email"
-      );
-      const dateError = result.error.issues.find(
-        issue => issue.path[0] === "dateOfBirth"
-      );
-      setNameError(nameError?.message);
-      setEmailError(emailError?.message);
-      setDateError(dateError?.message);
-      return;
+      result.error.issues.forEach(issue => {
+        if (issue.path.includes("name")) {
+          setNameError(issue.message);
+        } else if (issue.path.includes("email")) {
+          setEmailError(issue.message);
+        } else if (issue.path.includes("password")) {
+          setPasswordError(issue.message);
+        }
+      });
+      return false;
     }
 
-    const { name: nameValue, email: emailValue } = result.data;
+    if (password !== confirmPassword) {
+      setConfirmPasswordError("Passwords do not match");
+      return false;
+    }
 
-    const resVerify = await verifyMailAvailability(emailValue);
+    const resVerify = await verifyMailAvailability(email);
     if (resVerify.error) {
-      setEmailError(resVerify.details);
-      return;
+      setEmailError("User with this email already exists");
+      return false;
     }
-    // Proceed with the next steps, e.g., navigate to the next screen
-    console.log(
-      "Proceeding with name:",
-      nameValue,
-      "and email:",
-      emailValue,
-      "and date:",
-      date?.toISOString()
-    );
 
-    router.push({
-      pathname: "/code-verification",
-      params: {
-        name,
-        email,
-        dateBirth: date?.toISOString(),
-      },
-    });
-
-    console.log("Sending code verification to email:", emailValue);
-
-    const resPost = await postCodeVerification({ email: emailValue });
-    if (resPost.error) {
-      setEmailError(resPost.details);
-    }
+    return true;
   }
 
-  return (
-    <SafeAreaView className="bg-brown-strong flex-1 h-full w-full">
-      <ScrollView
-        className="flex-1 w-full h-full"
-        contentContainerStyle={{ flexGrow: 1 }}
-      >
-        <View className="flex flex-grow flex-col w-full justify-between px-14 pt-3">
-          <View className="flex flex-col w-full">
-            <LogoCircle classname="w-[60] h-[60] mb-1 self-center" />
-            <Text className="text-white text-[27px] font-pbold pt-6">
-              Create your account
-            </Text>
-            <View className="flex flex-col w-full gap-10 mt-4">
-              <Input
-                placeholder="Name"
-                value={name}
-                onChange={text => {
-                  setNameError(undefined);
-                  setName(text);
-                }}
-                type="default"
-                error={nameError}
-              />
-              <Input
-                type="email-address"
-                placeholder="Email"
-                value={email}
-                onChange={text => {
-                  setEmailError(undefined);
-                  setEmail(text.toLowerCase());
-                }}
-                error={emailError}
-              />
-              <DateOfBirthInput
-                placeholder="Date of birth"
-                value={date ? format(date, "dd/MM/yyyy") : undefined}
-                onPress={() => setOpen(true)}
-                error={dateError}
-              />
+  let isDisabled = !email || !password || !name || !confirmPassword;
 
-              <DatePicker
-                modal
-                open={open}
-                date={date || new Date()}
-                mode="date"
-                // @ts-ignore
-                androidVariant="nativeAndroid"
-                onConfirm={(date: Date) => {
-                  setDateError(undefined);
-                  setOpen(false);
-                  const justDate = new Date(
-                    date.getFullYear(),
-                    date.getMonth(),
-                    date.getDate()
-                  );
-                  setDate(justDate);
-                  console.log("Selected date:", justDate);
-                }}
-                onCancel={() => {
-                  setOpen(false);
-                  setDate(null);
-                }}
-              />
-            </View>
-          </View>
-          <NextButton
-            onPress={handleSubmit}
-            name={name}
-            email={email}
-            date={date?.toISOString()}
+  // async function handleSubmit() {
+  //   router.push({
+  //     pathname: "/code-verification",
+  //     params: {
+  //       name,
+  //       email,
+  //       dateBirth: date?.toISOString(),
+  //     },
+  //   });
+
+  //   console.log("Sending code verification to email:", emailValue);
+
+  //   const resPost = await postCodeVerification({ email: emailValue });
+  //   if (resPost.error) {
+  //     setEmailError(resPost.details);
+  //   }
+  // }
+
+  return (
+    <SignPage>
+      <SignPageContent>
+        <SignPageHeader backButton>Create account</SignPageHeader>
+        <SignPageItems>
+          <Input
+            placeholder="Name"
+            value={name}
+            onChange={text => {
+              setNameError(undefined);
+              setName(text);
+            }}
+            type="default"
+            error={nameError}
           />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+          <Input
+            type="email-address"
+            placeholder="Email"
+            value={email}
+            onChange={text => {
+              setEmailError(undefined);
+              setEmail(text.toLowerCase());
+            }}
+            error={emailError}
+          />
+          <Input
+            placeholder="Password"
+            value={password}
+            onChange={text => {
+              setPasswordError(undefined);
+              setPassword(text);
+            }}
+            error={passwordError}
+            isPassword={true}
+            showPassword={showPassword}
+            onTogglePassword={() => setShowPassword(!showPassword)}
+          />
+          <Input
+            placeholder="Confirm Password"
+            value={confirmPassword}
+            onChange={text => {
+              setConfirmPasswordError(undefined);
+              setConfirmPassword(text);
+            }}
+            error={confirmPasswordError}
+            isPassword={true}
+            showPassword={showPassword}
+            onTogglePassword={() => setShowPassword(!showPassword)}
+          />
+        </SignPageItems>
+      </SignPageContent>
+      <SignPageFooter>
+        <NextButton
+          onPress={async () => {
+            setIsLoading(true);
+            const isValid = await verifySubmit();
+            if (!isValid) {
+              setIsLoading(false);
+              return;
+            }
+            await handleSubmitSignUp(name, email, password);
+            setIsLoading(false);
+          }}
+          isLoading={isLoading}
+          isDisabled={isDisabled}
+        />
+      </SignPageFooter>
+    </SignPage>
   );
 };
 
 export default SignIn;
-
-const NextButton = ({
-  onPress,
-  name,
-  email,
-  date,
-}: {
-  onPress?: () => Promise<void> | undefined;
-  name?: string;
-  email?: string;
-  date?: string;
-}) => {
-  const isDisabled = !name || !email || !date;
-
-  return (
-    <View className="flex flex-row justify-end mb-4">
-      <TouchableOpacity
-        disabled={isDisabled}
-        onPress={isDisabled ? undefined : onPress}
-        className={`
-          flex flex-row items-center px-5 py-2 rounded-3xl
-          ${isDisabled ? "bg-gray-400 opacity-50" : "bg-white"}
-        `}
-      >
-        <Text
-          className={`
-            text-[15px] font-psemibold
-            ${isDisabled ? "text-gray-700" : "text-black"}
-          `}
-        >
-          Next
-        </Text>
-      </TouchableOpacity>
-    </View>
-  );
-};
-
-const Input = ({
-  placeholder,
-  value,
-  onChange,
-  type,
-  error,
-}: {
-  placeholder: string;
-  value?: string;
-  onChange?: (text: string) => void;
-  type?: KeyboardTypeOptions;
-  error?: string;
-}) => (
-  <View className="flex flex-col">
-    <TextInput
-      className="text-[16px] h-[50px] border-b border-gray-500 text-white"
-      placeholder={placeholder}
-      placeholderTextColor="#6b7280"
-      value={value}
-      onChangeText={onChange}
-      keyboardType={type}
-    />
-    {error && <Text className="text-red-500 pt-0.5">{error}</Text>}
-  </View>
-);
 
 async function verifyMailAvailability(
   email: string
@@ -292,27 +224,37 @@ async function postCodeVerification({
   }
 }
 
-const DateOfBirthInput = ({
-  placeholder,
-  onPress,
-  value,
-  error,
-}: {
-  placeholder: string;
-  onPress: () => void;
-  value: string | undefined;
-  error?: string;
-}) => (
-  <View className="flex flex-col">
-    <TouchableOpacity
-      className="h-[50px] border-b border-gray-500 justify-center"
-      onPress={onPress}
-    >
-      {value && <Text className="text-[16px] text-white">{value}</Text>}
-      {!value && (
-        <Text className="text-[16px] text-[#6b7280] ">{placeholder}</Text>
-      )}
-    </TouchableOpacity>
-    {error && <Text className="text-red-500 pt-0.5">{error}</Text>}
-  </View>
-);
+export async function handleSubmitSignUp(
+  userName: string,
+  email: string,
+  password: string
+) {
+  const res = await authClient.signUp.email({
+    name: userName,
+    email: email,
+    password: password,
+    userType: "client",
+  });
+  if (res.error) {
+    console.log("Sign up error", res.error.message);
+    Toast.show({
+      type: "error",
+      text1: res.error.message,
+    });
+    router.replace("/sign-in");
+    return;
+  }
+
+  const resPost = await postCodeVerification({ email: email });
+  if (resPost.error) {
+    Toast.show({
+      type: "error",
+      text1: "Error sending code verification",
+    });
+    router.replace("/sign-in");
+    return;
+  }
+
+  console.log("Sign up successful");
+  router.replace("/code-verification");
+}

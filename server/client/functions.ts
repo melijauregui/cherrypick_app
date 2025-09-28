@@ -6,19 +6,12 @@ import { db } from "../db.config";
 import logger from "../logger";
 import { ClientSchemaResponseType } from "@/schemas/client/client-schema";
 
-export async function CreateClient(
-  email: string,
-  name: string,
-  dateOfBirth: Date | null,
-  preferences: string[],
-  userId: string
-) {
+export async function CreateClient(userId: string, name: string) {
+  logger.info("Creating client!!!!!!!", name, userId);
   await db.client.create({
     data: {
       userId,
       name,
-      dateOfBirth,
-      preferences,
     },
   });
 }

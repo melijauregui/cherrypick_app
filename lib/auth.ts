@@ -1,7 +1,7 @@
 import { betterAuth } from "better-auth";
 import { Pool } from "pg";
 import { expo } from "@better-auth/expo";
-import { VerifyUserExists } from "../server/user/functions";
+import { CreateClient } from "@/server/client/functions";
 
 console.log("BETTER_AUTH_URL", process.env.BETTER_AUTH_URL);
 
@@ -14,6 +14,12 @@ export const auth = betterAuth({
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
   }),
+  emailAndPassword: {
+    enabled: true,
+  },
+  emailVerification: {
+    autoSignInAfterVerification: true,
+  },
   socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID as string,
@@ -39,13 +45,21 @@ export const auth = betterAuth({
   databaseHooks: {
     user: {
       create: {
-        before: async (user: { email: string; userType?: string }) => {
-          const { exists, userType } = await VerifyUserExists(user.email);
-          if (!exists) {
-            console.error("User does not exist");
-            return;
-          }
-          return { data: { ...user, userType: userType } };
+        after: async (user: {
+          userType?: string;
+          id: string;
+          name: string;
+        }) => {
+          setTimeout(async () => {
+            console.log("After user create", user);
+            if (user.userType === "client") {
+              await CreateClient(user.id, user.name);
+            } else if (user.userType === "brand") {
+              console.error("User type is artist");
+            } else {
+              console.error("User type not found");
+            }
+          }, 1000);
         },
       },
     },
