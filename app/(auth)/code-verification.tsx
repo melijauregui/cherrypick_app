@@ -5,7 +5,7 @@ import { FormSchemaCodeVerification } from "@/schemas/formUser-schema";
 import { Redirect, useRouter } from "expo-router";
 import safeFetch from "@/app/utils/safe-fetch";
 import { LOCAL_IP } from "@/config/api";
-import { signOut, useSession } from "@/lib/auth-client";
+import { authClient, signOut, useSession } from "@/lib/auth-client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Toast from "react-native-toast-message";
 import { getExpirationCode } from "../utils/fetch";
@@ -17,16 +17,18 @@ import SignPage, {
   SignPageHeader,
   SignPageItems,
 } from "../components/(auth)/signPage";
-import { SuccessSchema } from "@/schemas/standar-response-schema";
 import CodeInput from "../components/(auth)/inputCode";
+import { useResendCode } from "../utils/update";
 
 const CodeVerification = () => {
   const router = useRouter();
   const session = useSession();
+  // const sessionData = authClient.useSession();
+  // const { data: session } = sessionData;
   const [code, setCode] = useState("");
   const [codeError, setCodeError] = useState<string | undefined>(undefined);
   const verifyCode = useVerifyCode();
-  const resendCode = useSendCode();
+  const resendCode = useResendCode();
   const [resetCodeInput, setResetCodeInput] = useState(false);
   const queryClient = useQueryClient();
   const [isLoadingResendCode, setIsLoadingResendCode] = useState(false);
@@ -41,6 +43,7 @@ const CodeVerification = () => {
     queryFn: () => getExpirationCode(),
     staleTime: Infinity, // Never refetch automatically
     refetchInterval: false, // Disable automatic refetching
+    retry: true,
   });
 
   const [secondsLeft, setSecondsLeft] = useState<number>(
@@ -49,6 +52,20 @@ const CodeVerification = () => {
       Math.floor((expirationTime?.getTime() ?? Infinity) - Date.now()) / 1000
     )
   );
+
+  // Effect to check email verification status
+  useEffect(() => {
+    console.log(
+      "session.user?.emailVerified!!!!!",
+      session.user?.emailVerified
+    );
+    if (session.user?.emailVerified) {
+      console.log("Email verified, navigating to preferences");
+      router.push({
+        pathname: "/preferences",
+      });
+    }
+  }, [session.user?.emailVerified, router]);
 
   useEffect(() => {
     if (expirationTime && expirationTime <= new Date()) {
@@ -74,20 +91,30 @@ const CodeVerification = () => {
   if (isLoadingExpirationTime) {
     return <LoadingPage alreadyPrefetched />;
   }
-  if (error || !expirationTime) {
+  if (error || !expirationTime || !session.user) {
     return <Redirect href="/error" />;
   }
 
   async function handleResendCode() {
+    if (!session.user) {
+      console.error("No user email available for resending code");
+      return;
+    }
+
     setIsLoadingResendCode(true);
     setCodeError(undefined);
     setCode("");
     setResetCodeInput(true);
-    await resendCode.mutateAsync();
+    await resendCode.mutateAsync(session.user.email);
     setIsLoadingResendCode(false);
   }
 
   async function handleSubmit() {
+    if (!session) {
+      console.error("No user email available for submitting code");
+      return;
+    }
+    console.log("code", code);
     const result = FormSchemaCodeVerification.safeParse({
       code,
     });
@@ -105,9 +132,9 @@ const CodeVerification = () => {
       setCodeError("Code is incorrect");
       return;
     }
-    router.push({
-      pathname: "/preferences",
-    });
+
+    // Code verification successful - refetch session to check email verification status
+    await session.refetch();
   }
   return (
     <SignPage>
@@ -196,6 +223,7 @@ export function useVerifyCode() {
           "Content-Type": "application/json",
         },
       });
+      console.log("data VERIFY CODEEE", data);
       if (data.error) {
         throw new Error(data.details);
       }
@@ -207,50 +235,6 @@ export function useVerifyCode() {
         type: "error",
         text1: "Error verifying code",
         visibilityTime: 6000,
-      });
-    },
-  });
-
-  return mutation;
-}
-
-export function useSendCode() {
-  const queryClient = useQueryClient();
-  const mutation = useMutation({
-    mutationFn: async () => {
-      const { data } = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/code-verification`,
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (data.error) {
-        throw new Error(data.details);
-      }
-      console.log("data", data);
-      SuccessSchema.parse(data);
-      return data;
-    },
-    onSuccess: () => {
-      Toast.show({
-        type: "success",
-        text1: "Code sent successfully",
-        visibilityTime: 3000,
-      });
-    },
-    onError: error => {
-      console.error("Error resending code:", error);
-      Toast.show({
-        type: "error",
-        text1: "Failed to resend code",
-        visibilityTime: 3000,
-      });
-    },
-    onSettled: () => {
-      //invalidate query
-      void queryClient.invalidateQueries({
-        queryKey: ["expiration-code"],
       });
     },
   });

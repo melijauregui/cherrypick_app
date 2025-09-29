@@ -7,42 +7,29 @@ import logger from "../logger";
 import { ClientSchemaResponseType } from "@/schemas/client/client-schema";
 
 export async function CreateClient(userId: string, name: string) {
-  logger.info("Creating client!!!!!!!", name, userId);
   await db.client.create({
     data: {
       userId,
       name,
+      preferences: [],
     },
   });
 }
 
 export async function GetClient(
-  email: string
+  userId: string
 ): Promise<ClientSchemaResponseType | ErrorSchemaType> {
   let res: ClientSchemaResponseType | ErrorSchemaType;
 
-  const user = await db.user.findUnique({
-    where: {
-      email,
-    },
-  });
-  if (!user) {
-    res = {
-      error: true,
-      details: "User not found",
-    };
-    return res;
-  }
   const client = await db.client.findUnique({
     where: {
-      userId: user?.id,
+      userId: userId,
     },
   });
   if (client) {
     res = {
       error: false,
       user: {
-        email: user.email,
         ...client,
         preferences: client.preferences as string[],
       },
@@ -86,6 +73,21 @@ export async function UpdateClient(
     },
   });
   logger.info("Client updated", client);
+  res = {
+    error: false,
+  };
+  return res;
+}
+
+export async function UpdatePreferences(
+  idUser: string,
+  preferences: string[]
+): Promise<SuccessSchemaType> {
+  let res: SuccessSchemaType;
+  const client = await db.client.update({
+    where: { userId: idUser },
+    data: { preferences },
+  });
   res = {
     error: false,
   };

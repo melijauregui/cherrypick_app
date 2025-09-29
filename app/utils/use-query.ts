@@ -44,6 +44,8 @@ export function useFetchClientProfile(user: UserInfo): {
     staleTime: 5 * 60 * 1000,
   });
 
+  console.log("useFetchClientProfile data:", data);
+
   if (isLoading) {
     console.log("Loading...");
     return null;

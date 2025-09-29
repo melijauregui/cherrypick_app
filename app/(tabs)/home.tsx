@@ -2,7 +2,7 @@ import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import React, { useEffect, useState } from "react";
 import LoadingPage from "../components/LoadingPage";
 import { useQueryClient } from "@tanstack/react-query";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { getClothingItemsHome } from "../utils/fetch";
 import List2 from "@/app/components/List2";
 import { useSession } from "@/lib/auth-client";
@@ -12,6 +12,8 @@ const Home = () => {
   const [hasData, setHasData] = useState(false);
   const { user } = useSession();
   const params = useLocalSearchParams();
+
+  console.log("user IN HOMEEEEE", user);
 
   // Puedes acceder al parámetro prefetch así:
   const alreadyPrefetched = params.prefetch === "true";

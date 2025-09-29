@@ -9,17 +9,26 @@ const SignIn = () => {
   const { user, status } = useSession();
   //veo en que ruta esta
   const pathname = usePathname();
-  console.log("pathname", pathname);
 
   useEffect(() => {
-    if (user && status === "authenticated" && user.emailVerified) {
-      if (!user.emailVerified && pathname !== "/code-verification") {
+    if (user && status === "authenticated") {
+      // Don't auto-navigate if we're currently on sign-up page (during sign-up process)
+      if (
+        pathname === "/sign-up" ||
+        pathname === "/code-verification" ||
+        pathname === "/preferences"
+      ) {
+        return;
+      }
+
+      if (!user.emailVerified) {
         router.replace("cherrypick:///code-verification");
-      } else {
+      }
+      if (user.emailVerified) {
         router.replace("cherrypick:///home");
       }
     }
-  }, [status, user]);
+  }, [status, user, pathname]);
 
   return (
     <SafeAreaView className="bg-brown-strong flex-1 h-full w-full">

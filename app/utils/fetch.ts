@@ -554,7 +554,6 @@ export async function getExpirationCode(): Promise<Date | null> {
     SuccessSchema.extend({ expirationTime: z.string() }),
     "getExpirationCode"
   );
-  console.log("res", res);
   return new Date(res?.expirationTime ?? "") || null;
 }
 

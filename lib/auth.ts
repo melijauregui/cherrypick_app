@@ -2,6 +2,11 @@ import { betterAuth } from "better-auth";
 import { Pool } from "pg";
 import { expo } from "@better-auth/expo";
 import { CreateClient } from "@/server/client/functions";
+import {
+  GenerateVerificationCode,
+  SaveVerificationCode,
+  SendEmail,
+} from "@/server/formUser/functions";
 
 console.log("BETTER_AUTH_URL", process.env.BETTER_AUTH_URL);
 
@@ -19,6 +24,19 @@ export const auth = betterAuth({
   },
   emailVerification: {
     autoSignInAfterVerification: true,
+    async sendVerificationEmail({ user, url, token }, request) {
+      console.log("YEEES Sending verification email to", user.email);
+      const code = GenerateVerificationCode();
+      const emailSent = await SendEmail(user.email, code);
+      if (!emailSent) {
+        throw new Error("Failed to send verification email");
+      }
+      const res = await SaveVerificationCode(user.id, code, token);
+      if (res.error) {
+        throw new Error("Failed to save verification code");
+      }
+      console.log("Verification email sent successfully!!!");
+    },
   },
   socialProviders: {
     google: {
@@ -50,16 +68,17 @@ export const auth = betterAuth({
           id: string;
           name: string;
         }) => {
-          setTimeout(async () => {
-            console.log("After user create", user);
-            if (user.userType === "client") {
-              await CreateClient(user.id, user.name);
-            } else if (user.userType === "brand") {
-              console.error("User type is artist");
-            } else {
-              console.error("User type not found");
-            }
-          }, 1000);
+          // Wait for the timeout and then execute the logic
+          await new Promise(resolve => setTimeout(resolve, 500));
+
+          console.log("After user create", user);
+          if (user.userType === "client") {
+            await CreateClient(user.id, user.name);
+          } else if (user.userType === "brand") {
+            console.error("User type is artist");
+          } else {
+            console.error("User type not found");
+          }
         },
       },
     },

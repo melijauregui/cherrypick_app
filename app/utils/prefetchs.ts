@@ -26,7 +26,7 @@ export function prefetchProfile(
   queryClient: QueryClient
 ) {
   if (user.userType === "client") {
-    // console.log("prefetching client profile", user.email);
+    console.log("prefetching client profile", user.email);
     queryClient.prefetchQuery({
       queryKey: ["self-client-profile", user.email],
       queryFn: () => getSelfClientProfile(),
@@ -50,7 +50,7 @@ export default function prefetchHome(
   queryClient: QueryClient,
   userEmail: string
 ) {
-  // console.log("prefetchHome called for user:", userEmail);
+  console.log("prefetchHome called for user:", userEmail);
   prefetchInfiniteQueryIfNeeded(
     queryClient,
     ["home-items", userEmail],
@@ -165,6 +165,7 @@ export function prefetchLikeAndFavoritePage(
   queryClient: QueryClient,
   userEmail: string
 ) {
+  console.log("prefetching like and favorite page for user:", userEmail);
   prefetchInfiniteQueryIfNeeded(
     queryClient,
     ["all-liked-items", userEmail],
@@ -179,7 +180,7 @@ export function prefetchLikeAndFavoritePage(
   );
 }
 export async function prefetchExplorePage(queryClient: QueryClient) {
-  // console.log("prefetching explore page");
+  console.log("prefetching explore page");
   prefetchExplorePageQuery(queryClient, "Minimalist");
   prefetchExplorePageQuery(queryClient, "Coquette");
   prefetchExplorePageQuery(queryClient, "Streetwear");

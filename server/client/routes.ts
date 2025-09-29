@@ -9,13 +9,13 @@ import {
   SuccessSchemaType,
 } from "@/schemas/standar-response-schema";
 import {
-  ClientSchema,
   ClientSchemaResponse,
   ClientSchemaResponseType,
   UpdateClientSchema,
+  UpdatePreferencesSchema,
 } from "@/schemas/client/client-schema";
 import { AppEnv } from "../app";
-import { CreateClient, GetClient, UpdateClient } from "./functions";
+import { GetClient, UpdateClient, UpdatePreferences } from "./functions";
 
 const ClientApp = new OpenAPIHono<AppEnv>({
   defaultHook: (result, c) => {
@@ -33,48 +33,6 @@ ClientApp.onError((err: Error, c: Context) => {
 });
 
 export default ClientApp;
-
-// endpoint que crea un nuevo usuario en la base de datos
-const createUserRoute = createRoute({
-  method: "post",
-  path: "/",
-  request: {
-    body: {
-      content: {
-        "application/json": {
-          schema: ClientSchema,
-        },
-      },
-    },
-  },
-  responses: {
-    200: {
-      description: "Crea un nuevo usuario",
-      content: {
-        "application/json": {
-          schema: SuccessSchema,
-        },
-      },
-    },
-  },
-});
-
-// ClientApp.openapi(createUserRoute, async c => {
-//   const { name, email, dateOfBirth, preferences } = await c.req.valid("json");
-//   let res: SuccessSchemaType;
-//   logger.info(
-//     "Creating client: %s %s %s %s",
-//     name,
-//     email,
-//     dateOfBirth,
-//     preferences
-//   );
-//   await CreateClient(email, name, dateOfBirth, preferences);
-//   res = {
-//     error: false,
-//   };
-//   return c.json(res, 200);
-// });
 
 // endpoint que obtiene la información del cliente
 const getClientRoute = createRoute({
@@ -110,8 +68,9 @@ const getClientRoute = createRoute({
 
 ClientApp.openapi(getClientRoute, async c => {
   const user = c.get("user");
-  const email = user?.email;
-  if (!email) {
+  const userId = user?.id;
+  logger.info("/GET CLIENT userId: %s", userId);
+  if (!userId) {
     logger.error("No tienes permisos para obtener el cliente");
     const resError: ErrorSchemaType = {
       error: true,
@@ -119,12 +78,70 @@ ClientApp.openapi(getClientRoute, async c => {
     };
     return c.json(resError, 401);
   }
-  logger.info("Getting client:", email);
   const res: ClientSchemaResponseType | ErrorSchemaType =
-    await GetClient(email);
+    await GetClient(userId);
+  logger.info("/GET CLIENT response: %s", res);
   if (res.error) {
     return c.json(res, 404);
   }
+  return c.json(res, 200);
+});
+
+//endpoint que actualiza preferences
+const updatePreferencesRoute = createRoute({
+  method: "patch",
+  path: "/preferences",
+  request: {
+    body: {
+      content: {
+        "application/json": {
+          schema: UpdatePreferencesSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: "Actualiza las preferences del usuario",
+      content: {
+        "application/json": {
+          schema: SuccessSchema,
+        },
+      },
+    },
+    401: {
+      description: "No tienes permisos para actualizar las preferences",
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+    },
+    404: {
+      description: "Usuario no encontrado",
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+    },
+  },
+});
+
+ClientApp.openapi(updatePreferencesRoute, async c => {
+  const { preferences } = await c.req.valid("json");
+  const user = c.get("user");
+  const idUser = user?.id;
+  if (!idUser) {
+    return c.json(
+      {
+        error: true,
+        details: "No tienes permisos para actualizar las preferences",
+      },
+      401
+    );
+  }
+  const res = await UpdatePreferences(idUser, preferences);
   return c.json(res, 200);
 });
 

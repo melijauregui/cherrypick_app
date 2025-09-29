@@ -41,70 +41,72 @@ FormUserApp.onError((err: Error, c: Context) => {
 
 export default FormUserApp;
 
-// endpoint que publica un nuevo code-verification
-const codeVerificationRoute = createRoute({
-  method: "post",
-  path: "/",
-  responses: {
-    200: {
-      content: {
-        "application/json": {
-          schema: SuccessSchema,
-        },
-      },
-      description:
-        "Devuelve un booleano que indica si se pudo enviar el código de verificación",
-    },
-    400: {
-      content: {
-        "application/json": {
-          schema: ErrorSchema,
-        },
-      },
-      description: "Error al enviar el código de verificación",
-    },
-    401: {
-      content: {
-        "application/json": {
-          schema: ErrorSchema,
-        },
-      },
-      description: "Unauthorized",
-    },
-    500: {
-      content: {
-        "application/json": {
-          schema: ErrorSchema,
-        },
-      },
-      description: "Error al enviar el código de verificación",
-    },
-  },
-});
-FormUserApp.openapi(codeVerificationRoute, async c => {
-  const user = c.get("user");
-  const email = user?.email;
-  if (!email) {
-    return c.json({ error: true, details: "Unauthorized" }, 401);
-  }
-  const code = GenerateVerificationCode();
-  const emailSent = await SendEmail(email, code);
-  let res: SuccessSchemaType | ErrorSchemaType;
+// // endpoint que publica un nuevo code-verification
+// const codeVerificationRoute = createRoute({
+//   method: "post",
+//   path: "/",
+//   responses: {
+//     200: {
+//       content: {
+//         "application/json": {
+//           schema: SuccessSchema,
+//         },
+//       },
+//       description:
+//         "Devuelve un booleano que indica si se pudo enviar el código de verificación",
+//     },
+//     400: {
+//       content: {
+//         "application/json": {
+//           schema: ErrorSchema,
+//         },
+//       },
+//       description: "Error al enviar el código de verificación",
+//     },
+//     401: {
+//       content: {
+//         "application/json": {
+//           schema: ErrorSchema,
+//         },
+//       },
+//       description: "Unauthorized",
+//     },
+//     500: {
+//       content: {
+//         "application/json": {
+//           schema: ErrorSchema,
+//         },
+//       },
+//       description: "Error al enviar el código de verificación",
+//     },
+//   },
+// });
+// FormUserApp.openapi(codeVerificationRoute, async c => {
+//   const user = c.get("user");
+//   const email = user?.email;
+//   const userId = user?.id;
+//   if (!email || !userId) {
+//     return c.json({ error: true, details: "Unauthorized" }, 401);
+//   }
+// const code = GenerateVerificationCode();
+// const emailSent = await SendEmail(email, code);
+// let res: SuccessSchemaType | ErrorSchemaType;
 
-  if (!emailSent) {
-    res = {
-      error: true,
-      details: "Invalid email",
-    };
-    return c.json(res, 400);
-  }
-  // Guardar (o reemplazar) en DB
-  res = await SaveVerificationCode(email, code);
-  if (res.error) {
-    return c.json(res, 500);
-  }
-  return c.json(res, 200);
-});
+// if (!emailSent) {
+//   res = {
+//     error: true,
+//     details: "Invalid email",
+//   };
+//   return c.json(res, 400);
+// }
+// Guardar (o reemplazar) en DB
+// res = await SaveVerificationCode(userId, code);
+// if (res.error) {
+//   console.error("Error saving verification code", res);
+//   return c.json(res, 500);
+// }
+// return c.json(res, 200);
+// });
 
 // endpoint que verifica si el code de verificación es correcto
 const verifiedCodeRoute = createRoute({
@@ -157,7 +159,8 @@ FormUserApp.openapi(verifiedCodeRoute, async c => {
   const { code } = await c.req.valid("json");
   const user = c.get("user");
   const email = user?.email;
-  if (!email) {
+  const userId = user?.id;
+  if (!email || !userId) {
     return c.json({ error: true, details: "Unauthorized" }, 401);
   }
   let res:
@@ -168,7 +171,13 @@ FormUserApp.openapi(verifiedCodeRoute, async c => {
         statusCode: ContentfulStatusCode;
       };
 
-  res = await VerifyVerificationCode(email, code);
+  res = await VerifyVerificationCode(userId, code);
+  // await authClient.getSession({
+  //   query: {
+  //     disableCookieCache: true
+  //   }
+  // })
+  console.log("user NOWWW", user);
   if (res.error) {
     const errorMsg: ErrorSchemaType = res.errMsg;
     return c.json(errorMsg, res.statusCode as 404 | 410);
@@ -210,12 +219,12 @@ const getExpirationCodeRoute = createRoute({
 });
 FormUserApp.openapi(getExpirationCodeRoute, async c => {
   const user = c.get("user");
-  const email = user?.email;
-  if (!email) {
+  const userId = user?.id;
+  if (!userId) {
     return c.json({ error: true, details: "Unauthorized" }, 401);
   }
-
-  const res = await GetExpirationCode(email);
+  console.log("Getting expiration code for email", userId);
+  const res = await GetExpirationCode(userId);
   if (res.error) {
     return c.json(res, 404);
   }

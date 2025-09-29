@@ -1,5 +1,5 @@
 import { ClientFormSchemaSignUp } from "@/schemas/client/client-schema";
-import { router, useRouter } from "expo-router";
+import { router } from "expo-router";
 import { useState } from "react";
 import SignPage, {
   Input,
@@ -11,7 +11,6 @@ import SignPage, {
 } from "../components/(auth)/signPage";
 import {
   ErrorSchemaType,
-  SuccessSchema,
   SuccessSchemaType,
 } from "@/schemas/standar-response-schema";
 import safeFetch from "../utils/safe-fetch";
@@ -19,7 +18,7 @@ import { VerifyUserExistsResponseSchema } from "@/schemas/user/user-schema";
 import { LOCAL_IP } from "@/config/api";
 import { authClient } from "@/lib/auth-client";
 import Toast from "react-native-toast-message";
-import { useSendCode } from "./code-verification";
+import { useResendCode } from "../utils/update";
 
 const SignIn = () => {
   const [name, setName] = useState<string>("");
@@ -36,7 +35,6 @@ const SignIn = () => {
   const [confirmPasswordError, setConfirmPasswordError] = useState<
     string | undefined
   >(undefined);
-  const sendCode = useSendCode();
 
   async function verifySubmit(): Promise<boolean> {
     const result = ClientFormSchemaSignUp.safeParse({
@@ -137,7 +135,12 @@ const SignIn = () => {
               setIsLoading(false);
               return;
             }
-            await handleSubmitSignUp(name, email, password, sendCode);
+            await handleSubmitSignUp(
+              name,
+              email,
+              password
+              // sendCode.mutateAsync
+            );
             setIsLoading(false);
           }}
           isLoading={isLoading}
@@ -185,8 +188,8 @@ async function verifyMailAvailability(
 export async function handleSubmitSignUp(
   userName: string,
   email: string,
-  password: string,
-  sendCode: ReturnType<typeof useSendCode>
+  password: string
+  // sendCode: (email: string) => Promise<void>
 ) {
   const res = await authClient.signUp.email({
     name: userName,
@@ -204,16 +207,33 @@ export async function handleSubmitSignUp(
     return;
   }
 
-  const resPost = await sendCode.mutateAsync();
-  if (resPost.error) {
-    Toast.show({
-      type: "error",
-      text1: "Error sending code verification",
-    });
-    router.replace("/sign-in");
-    return;
-  }
+  console.log("About to call sendCode...");
+  // await sendCode(email);
+  await authClient.sendVerificationEmail({
+    email: email,
+    fetchOptions: {
+      onError: error => {
+        console.error("Error resending code:", error);
+        Toast.show({
+          type: "error",
+          text1: "Failed to resend code",
+          visibilityTime: 3000,
+        });
+        router.replace("/sign-in");
+      },
+      onSuccess: () => {
+        console.log("SendCode onSuccess triggered");
+        Toast.show({
+          type: "success",
+          text1: "Code sent successfully",
+          visibilityTime: 3000,
+        });
+        router.replace("/code-verification");
+      },
+    },
+    callbackURL: "cherrypick:///code-verification",
+  });
 
-  console.log("Sign up successful");
-  router.replace("/code-verification");
+  // console.log("Sign up successful going to code verification");
+  // router.replace("/code-verification");
 }

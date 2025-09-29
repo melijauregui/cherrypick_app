@@ -8,10 +8,12 @@ import {
 import { SuccessSchemaType } from "@/schemas/standar-response-schema";
 import { ErrorSchemaType } from "@/schemas/standar-response-schema";
 import { ContentfulStatusCode } from "hono/utils/http-status";
+import { auth } from "@/lib/auth";
 
 export async function SaveVerificationCode(
-  email: string,
-  code: string
+  userId: string,
+  code: string,
+  token: string
 ): Promise<SuccessSchemaType | ErrorSchemaType> {
   let res: SuccessSchemaType | ErrorSchemaType;
 
@@ -21,17 +23,20 @@ export async function SaveVerificationCode(
     const expirationString = expirationTime.toISOString();
 
     await db.registerInProgress.upsert({
-      where: { email },
+      where: { userId },
       update: {
         verificationCode: code,
         verificationCodeExpiration: expirationString,
+        token,
       },
       create: {
-        email,
+        userId,
         verificationCode: code,
         verificationCodeExpiration: expirationString,
+        token,
       },
     });
+    console.log("Saved verification code for userId", userId, code);
 
     res = {
       error: false,
@@ -84,7 +89,7 @@ function GenerateVerificationCode(): string {
 export { GenerateVerificationCode };
 
 export async function VerifyVerificationCode(
-  email: string,
+  userId: string,
   code: string
 ): Promise<
   | VerifyCodeResponseSchemaType
@@ -94,13 +99,13 @@ export async function VerifyVerificationCode(
 
   try {
     const registerInProgress = await db.registerInProgress.findUnique({
-      where: { email },
+      where: { userId },
     });
 
     if (!registerInProgress) {
       res = {
         error: true,
-        details: "Email not found",
+        details: "User not found",
       };
       return { error: true, errMsg: res, statusCode: 404 };
     }
@@ -124,16 +129,19 @@ export async function VerifyVerificationCode(
     }
 
     // Delete the verification code after successful verification
-    await db.registerInProgress.delete({
-      where: { email },
+    const resDelete = await db.registerInProgress.delete({
+      where: { userId },
     });
-    // Update the user to be verified
-    await db.user.update({
-      where: { email },
-      data: {
-        emailVerified: true,
+    // Update the user to be verified using better-auth
+    console.log("Updating user emailVerified to true for userId:", userId);
+
+    await auth.api.verifyEmail({
+      query: {
+        token: resDelete.token,
       },
     });
+
+    console.log("User updated successfully via better-auth");
     res = {
       error: false,
       isCorrect: true,
@@ -191,15 +199,16 @@ export async function SendEmailBrand(
 }
 
 export async function GetExpirationCode(
-  email: string
+  userId: string
 ): Promise<ExpirationCodeResponseSchemaType | ErrorSchemaType> {
   const registerInProgress = await db.registerInProgress.findUnique({
-    where: { email },
+    where: { userId },
   });
   if (!registerInProgress) {
+    console.log("Email not found", userId);
     return {
       error: true,
-      details: "Email not found",
+      details: "User not found",
     };
   }
   return {

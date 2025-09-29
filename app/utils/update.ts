@@ -343,3 +343,63 @@ export function useUpdateItem(
 
   return mutation;
 }
+
+export function useResendCode() {
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: async (email: string) => {
+      // console.log("Starting sendCode mutation...");
+      // const { data } = await safeFetch({
+      //   url: `http://${LOCAL_IP}:3000/code-verification`,
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      // });
+      // console.log("SendCode response:", data);
+      // if (data.error) {
+      //   console.log("SendCode error:", data.error);
+      //   throw new Error(data.details);
+      // }
+      // SuccessSchema.parse(data);
+      // console.log("SendCode mutation completed successfully");
+      // return data;
+
+      console.log("Sending verification email to", email);
+      await authClient.sendVerificationEmail({
+        email: email,
+        fetchOptions: {
+          onError: error => {
+            throw new Error(error.error.message);
+          },
+        },
+        callbackURL: "cherrypick:///code-verification",
+      });
+    },
+    onSuccess: () => {
+      console.log("SendCode onSuccess triggered");
+      Toast.show({
+        type: "success",
+        text1: "Code sent successfully",
+        visibilityTime: 3000,
+      });
+    },
+    onError: error => {
+      console.error("Error resending code:", error);
+      Toast.show({
+        type: "error",
+        text1: "Failed to resend code",
+        visibilityTime: 3000,
+      });
+    },
+    onSettled: () => {
+      console.log("SendCode onSettled triggered");
+      //invalidate query
+      void queryClient.invalidateQueries({
+        queryKey: ["expiration-code"],
+      });
+    },
+  });
+
+  return mutation;
+}

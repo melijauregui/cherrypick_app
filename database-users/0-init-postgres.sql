@@ -3,9 +3,13 @@
 
 -- Table for register in progress
 CREATE TABLE IF NOT EXISTS "RegisterInProgress" (
-    email VARCHAR(50) PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "userId" TEXT NOT NULL UNIQUE,
     "verificationCode" VARCHAR(6) NOT NULL,
-    "verificationCodeExpiration" VARCHAR(30) NOT NULL
+    "verificationCodeExpiration" VARCHAR(30) NOT NULL,
+    token VARCHAR(255) NOT NULL UNIQUE,
+    FOREIGN KEY ("userId") REFERENCES "user"(id) ON DELETE CASCADE,
+    UNIQUE("userId")
 );
 -- Table for client
 CREATE TABLE IF NOT EXISTS "Client" (

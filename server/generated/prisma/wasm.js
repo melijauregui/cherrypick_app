@@ -150,9 +150,11 @@ exports.Prisma.ItemLikeScalarFieldEnum = {
 };
 
 exports.Prisma.RegisterInProgressScalarFieldEnum = {
-  email: 'email',
+  id: 'id',
+  userId: 'userId',
   verificationCode: 'verificationCode',
-  verificationCodeExpiration: 'verificationCodeExpiration'
+  verificationCodeExpiration: 'verificationCodeExpiration',
+  token: 'token'
 };
 
 exports.Prisma.InspoItemsScalarFieldEnum = {

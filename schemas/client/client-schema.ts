@@ -1,5 +1,16 @@
 import { z } from "zod";
-import { ErrorSchema, SuccessSchema } from "../standar-response-schema";
+import { SuccessSchema } from "../standar-response-schema";
+
+export const UpdatePreferencesSchema = z.object({
+  preferences: z
+    .array(z.string().min(1), {
+      required_error: "Preferences are required",
+      invalid_type_error: "Preferences must be an array of strings",
+    })
+    .min(1, {
+      message: "At least one preference is required",
+    }),
+});
 
 export const UpdateClientSchema = z.object({
   name: z.string({
@@ -15,24 +26,14 @@ export const UpdateClientSchema = z.object({
       return new Date(val);
     })
     .nullable(),
-  preferences: z
-    .array(z.string().min(1), {
-      required_error: "Preferences are required",
-      invalid_type_error: "Preferences must be an array of strings",
-    })
-    .min(1, {
-      message: "At least one preference is required",
-    }),
+  preferences: z.array(z.string().min(1), {
+    required_error: "Preferences are required",
+    invalid_type_error: "Preferences must be an array of strings",
+  }),
 });
 
 export const ClientSchema = z.object({
   ...UpdateClientSchema.shape,
-  email: z
-    .string({
-      required_error: "Email is required",
-      invalid_type_error: "Email must be a string",
-    })
-    .email("Invalid email format"),
 });
 
 export type ClientSchemaType = z.infer<typeof ClientSchema>;

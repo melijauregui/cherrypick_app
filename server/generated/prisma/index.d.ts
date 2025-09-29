@@ -1679,6 +1679,7 @@ export namespace Prisma {
     session: number
     itemFavorites: number
     itemLikes: number
+    RegisterInProgress: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1686,6 +1687,7 @@ export namespace Prisma {
     session?: boolean | UserCountOutputTypeCountSessionArgs
     itemFavorites?: boolean | UserCountOutputTypeCountItemFavoritesArgs
     itemLikes?: boolean | UserCountOutputTypeCountItemLikesArgs
+    RegisterInProgress?: boolean | UserCountOutputTypeCountRegisterInProgressArgs
   }
 
   // Custom InputTypes
@@ -1725,6 +1727,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountItemLikesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ItemLikeWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountRegisterInProgressArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: RegisterInProgressWhereInput
   }
 
 
@@ -5932,41 +5941,53 @@ export namespace Prisma {
   }
 
   export type RegisterInProgressMinAggregateOutputType = {
-    email: string | null
+    id: string | null
+    userId: string | null
     verificationCode: string | null
     verificationCodeExpiration: string | null
+    token: string | null
   }
 
   export type RegisterInProgressMaxAggregateOutputType = {
-    email: string | null
+    id: string | null
+    userId: string | null
     verificationCode: string | null
     verificationCodeExpiration: string | null
+    token: string | null
   }
 
   export type RegisterInProgressCountAggregateOutputType = {
-    email: number
+    id: number
+    userId: number
     verificationCode: number
     verificationCodeExpiration: number
+    token: number
     _all: number
   }
 
 
   export type RegisterInProgressMinAggregateInputType = {
-    email?: true
+    id?: true
+    userId?: true
     verificationCode?: true
     verificationCodeExpiration?: true
+    token?: true
   }
 
   export type RegisterInProgressMaxAggregateInputType = {
-    email?: true
+    id?: true
+    userId?: true
     verificationCode?: true
     verificationCodeExpiration?: true
+    token?: true
   }
 
   export type RegisterInProgressCountAggregateInputType = {
-    email?: true
+    id?: true
+    userId?: true
     verificationCode?: true
     verificationCodeExpiration?: true
+    token?: true
     _all?: true
   }
 
@@ -6043,9 +6064,11 @@ export namespace Prisma {
   }
 
   export type RegisterInProgressGroupByOutputType = {
-    email: string
+    id: string
+    userId: string
     verificationCode: string
     verificationCodeExpiration: string
+    token: string
     _count: RegisterInProgressCountAggregateOutputType | null
     _min: RegisterInProgressMinAggregateOutputType | null
     _max: RegisterInProgressMaxAggregateOutputType | null
@@ -6066,38 +6089,62 @@ export namespace Prisma {
 
 
   export type RegisterInProgressSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    email?: boolean
+    id?: boolean
+    userId?: boolean
     verificationCode?: boolean
     verificationCodeExpiration?: boolean
+    token?: boolean
+    user?: boolean | userDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["registerInProgress"]>
 
   export type RegisterInProgressSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    email?: boolean
+    id?: boolean
+    userId?: boolean
     verificationCode?: boolean
     verificationCodeExpiration?: boolean
+    token?: boolean
+    user?: boolean | userDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["registerInProgress"]>
 
   export type RegisterInProgressSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    email?: boolean
+    id?: boolean
+    userId?: boolean
     verificationCode?: boolean
     verificationCodeExpiration?: boolean
+    token?: boolean
+    user?: boolean | userDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["registerInProgress"]>
 
   export type RegisterInProgressSelectScalar = {
-    email?: boolean
+    id?: boolean
+    userId?: boolean
     verificationCode?: boolean
     verificationCodeExpiration?: boolean
+    token?: boolean
   }
 
-  export type RegisterInProgressOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"email" | "verificationCode" | "verificationCodeExpiration", ExtArgs["result"]["registerInProgress"]>
+  export type RegisterInProgressOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "verificationCode" | "verificationCodeExpiration" | "token", ExtArgs["result"]["registerInProgress"]>
+  export type RegisterInProgressInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | userDefaultArgs<ExtArgs>
+  }
+  export type RegisterInProgressIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | userDefaultArgs<ExtArgs>
+  }
+  export type RegisterInProgressIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | userDefaultArgs<ExtArgs>
+  }
 
   export type $RegisterInProgressPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "RegisterInProgress"
-    objects: {}
+    objects: {
+      user: Prisma.$userPayload<ExtArgs>
+    }
     scalars: $Extensions.GetPayloadResult<{
-      email: string
+      id: string
+      userId: string
       verificationCode: string
       verificationCodeExpiration: string
+      token: string
     }, ExtArgs["result"]["registerInProgress"]>
     composites: {}
   }
@@ -6181,8 +6228,8 @@ export namespace Prisma {
      * // Get first 10 RegisterInProgresses
      * const registerInProgresses = await prisma.registerInProgress.findMany({ take: 10 })
      * 
-     * // Only select the `email`
-     * const registerInProgressWithEmailOnly = await prisma.registerInProgress.findMany({ select: { email: true } })
+     * // Only select the `id`
+     * const registerInProgressWithIdOnly = await prisma.registerInProgress.findMany({ select: { id: true } })
      * 
      */
     findMany<T extends RegisterInProgressFindManyArgs>(args?: SelectSubset<T, RegisterInProgressFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RegisterInProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
@@ -6226,9 +6273,9 @@ export namespace Prisma {
      *   ]
      * })
      * 
-     * // Create many RegisterInProgresses and only return the `email`
-     * const registerInProgressWithEmailOnly = await prisma.registerInProgress.createManyAndReturn({
-     *   select: { email: true },
+     * // Create many RegisterInProgresses and only return the `id`
+     * const registerInProgressWithIdOnly = await prisma.registerInProgress.createManyAndReturn({
+     *   select: { id: true },
      *   data: [
      *     // ... provide data here
      *   ]
@@ -6317,9 +6364,9 @@ export namespace Prisma {
      *   ]
      * })
      * 
-     * // Update zero or more RegisterInProgresses and only return the `email`
-     * const registerInProgressWithEmailOnly = await prisma.registerInProgress.updateManyAndReturn({
-     *   select: { email: true },
+     * // Update zero or more RegisterInProgresses and only return the `id`
+     * const registerInProgressWithIdOnly = await prisma.registerInProgress.updateManyAndReturn({
+     *   select: { id: true },
      *   where: {
      *     // ... provide filter here
      *   },
@@ -6492,6 +6539,7 @@ export namespace Prisma {
    */
   export interface Prisma__RegisterInProgressClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends userDefaultArgs<ExtArgs> = {}>(args?: Subset<T, userDefaultArgs<ExtArgs>>): Prisma__userClient<$Result.GetResult<Prisma.$userPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6521,9 +6569,11 @@ export namespace Prisma {
    * Fields of the RegisterInProgress model
    */
   interface RegisterInProgressFieldRefs {
-    readonly email: FieldRef<"RegisterInProgress", 'String'>
+    readonly id: FieldRef<"RegisterInProgress", 'String'>
+    readonly userId: FieldRef<"RegisterInProgress", 'String'>
     readonly verificationCode: FieldRef<"RegisterInProgress", 'String'>
     readonly verificationCodeExpiration: FieldRef<"RegisterInProgress", 'String'>
+    readonly token: FieldRef<"RegisterInProgress", 'String'>
   }
     
 
@@ -6540,6 +6590,10 @@ export namespace Prisma {
      * Omit specific fields from the RegisterInProgress
      */
     omit?: RegisterInProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RegisterInProgressInclude<ExtArgs> | null
     /**
      * Filter, which RegisterInProgress to fetch.
      */
@@ -6559,6 +6613,10 @@ export namespace Prisma {
      */
     omit?: RegisterInProgressOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RegisterInProgressInclude<ExtArgs> | null
+    /**
      * Filter, which RegisterInProgress to fetch.
      */
     where: RegisterInProgressWhereUniqueInput
@@ -6576,6 +6634,10 @@ export namespace Prisma {
      * Omit specific fields from the RegisterInProgress
      */
     omit?: RegisterInProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RegisterInProgressInclude<ExtArgs> | null
     /**
      * Filter, which RegisterInProgress to fetch.
      */
@@ -6625,6 +6687,10 @@ export namespace Prisma {
      */
     omit?: RegisterInProgressOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RegisterInProgressInclude<ExtArgs> | null
+    /**
      * Filter, which RegisterInProgress to fetch.
      */
     where?: RegisterInProgressWhereInput
@@ -6673,6 +6739,10 @@ export namespace Prisma {
      */
     omit?: RegisterInProgressOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RegisterInProgressInclude<ExtArgs> | null
+    /**
      * Filter, which RegisterInProgresses to fetch.
      */
     where?: RegisterInProgressWhereInput
@@ -6716,6 +6786,10 @@ export namespace Prisma {
      */
     omit?: RegisterInProgressOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RegisterInProgressInclude<ExtArgs> | null
+    /**
      * The data needed to create a RegisterInProgress.
      */
     data: XOR<RegisterInProgressCreateInput, RegisterInProgressUncheckedCreateInput>
@@ -6749,6 +6823,10 @@ export namespace Prisma {
      */
     data: RegisterInProgressCreateManyInput | RegisterInProgressCreateManyInput[]
     skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RegisterInProgressIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -6763,6 +6841,10 @@ export namespace Prisma {
      * Omit specific fields from the RegisterInProgress
      */
     omit?: RegisterInProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RegisterInProgressInclude<ExtArgs> | null
     /**
      * The data needed to update a RegisterInProgress.
      */
@@ -6815,6 +6897,10 @@ export namespace Prisma {
      * Limit how many RegisterInProgresses to update.
      */
     limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RegisterInProgressIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -6829,6 +6915,10 @@ export namespace Prisma {
      * Omit specific fields from the RegisterInProgress
      */
     omit?: RegisterInProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RegisterInProgressInclude<ExtArgs> | null
     /**
      * The filter to search for the RegisterInProgress to update in case it exists.
      */
@@ -6855,6 +6945,10 @@ export namespace Prisma {
      * Omit specific fields from the RegisterInProgress
      */
     omit?: RegisterInProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RegisterInProgressInclude<ExtArgs> | null
     /**
      * Filter which RegisterInProgress to delete.
      */
@@ -6887,6 +6981,10 @@ export namespace Prisma {
      * Omit specific fields from the RegisterInProgress
      */
     omit?: RegisterInProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RegisterInProgressInclude<ExtArgs> | null
   }
 
 
@@ -10359,6 +10457,7 @@ export namespace Prisma {
     client?: boolean | user$clientArgs<ExtArgs>
     itemFavorites?: boolean | user$itemFavoritesArgs<ExtArgs>
     itemLikes?: boolean | user$itemLikesArgs<ExtArgs>
+    RegisterInProgress?: boolean | user$RegisterInProgressArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -10403,6 +10502,7 @@ export namespace Prisma {
     client?: boolean | user$clientArgs<ExtArgs>
     itemFavorites?: boolean | user$itemFavoritesArgs<ExtArgs>
     itemLikes?: boolean | user$itemLikesArgs<ExtArgs>
+    RegisterInProgress?: boolean | user$RegisterInProgressArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type userIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -10417,6 +10517,7 @@ export namespace Prisma {
       client: Prisma.$ClientPayload<ExtArgs> | null
       itemFavorites: Prisma.$ItemFavoritePayload<ExtArgs>[]
       itemLikes: Prisma.$ItemLikePayload<ExtArgs>[]
+      RegisterInProgress: Prisma.$RegisterInProgressPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -10827,6 +10928,7 @@ export namespace Prisma {
     client<T extends user$clientArgs<ExtArgs> = {}>(args?: Subset<T, user$clientArgs<ExtArgs>>): Prisma__ClientClient<$Result.GetResult<Prisma.$ClientPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     itemFavorites<T extends user$itemFavoritesArgs<ExtArgs> = {}>(args?: Subset<T, user$itemFavoritesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ItemFavoritePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     itemLikes<T extends user$itemLikesArgs<ExtArgs> = {}>(args?: Subset<T, user$itemLikesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ItemLikePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    RegisterInProgress<T extends user$RegisterInProgressArgs<ExtArgs> = {}>(args?: Subset<T, user$RegisterInProgressArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RegisterInProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -11383,6 +11485,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ItemLikeScalarFieldEnum | ItemLikeScalarFieldEnum[]
+  }
+
+  /**
+   * user.RegisterInProgress
+   */
+  export type user$RegisterInProgressArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RegisterInProgress
+     */
+    select?: RegisterInProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RegisterInProgress
+     */
+    omit?: RegisterInProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RegisterInProgressInclude<ExtArgs> | null
+    where?: RegisterInProgressWhereInput
+    orderBy?: RegisterInProgressOrderByWithRelationInput | RegisterInProgressOrderByWithRelationInput[]
+    cursor?: RegisterInProgressWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: RegisterInProgressScalarFieldEnum | RegisterInProgressScalarFieldEnum[]
   }
 
   /**
@@ -12468,9 +12594,11 @@ export namespace Prisma {
 
 
   export const RegisterInProgressScalarFieldEnum: {
-    email: 'email',
+    id: 'id',
+    userId: 'userId',
     verificationCode: 'verificationCode',
-    verificationCodeExpiration: 'verificationCodeExpiration'
+    verificationCodeExpiration: 'verificationCodeExpiration',
+    token: 'token'
   };
 
   export type RegisterInProgressScalarFieldEnum = (typeof RegisterInProgressScalarFieldEnum)[keyof typeof RegisterInProgressScalarFieldEnum]
@@ -12882,30 +13010,41 @@ export namespace Prisma {
     AND?: RegisterInProgressWhereInput | RegisterInProgressWhereInput[]
     OR?: RegisterInProgressWhereInput[]
     NOT?: RegisterInProgressWhereInput | RegisterInProgressWhereInput[]
-    email?: StringFilter<"RegisterInProgress"> | string
+    id?: UuidFilter<"RegisterInProgress"> | string
+    userId?: UuidFilter<"RegisterInProgress"> | string
     verificationCode?: StringFilter<"RegisterInProgress"> | string
     verificationCodeExpiration?: StringFilter<"RegisterInProgress"> | string
+    token?: StringFilter<"RegisterInProgress"> | string
+    user?: XOR<UserScalarRelationFilter, userWhereInput>
   }
 
   export type RegisterInProgressOrderByWithRelationInput = {
-    email?: SortOrder
+    id?: SortOrder
+    userId?: SortOrder
     verificationCode?: SortOrder
     verificationCodeExpiration?: SortOrder
+    token?: SortOrder
+    user?: userOrderByWithRelationInput
   }
 
   export type RegisterInProgressWhereUniqueInput = Prisma.AtLeast<{
-    email?: string
+    id?: string
+    userId?: string
+    token?: string
     AND?: RegisterInProgressWhereInput | RegisterInProgressWhereInput[]
     OR?: RegisterInProgressWhereInput[]
     NOT?: RegisterInProgressWhereInput | RegisterInProgressWhereInput[]
     verificationCode?: StringFilter<"RegisterInProgress"> | string
     verificationCodeExpiration?: StringFilter<"RegisterInProgress"> | string
-  }, "email">
+    user?: XOR<UserScalarRelationFilter, userWhereInput>
+  }, "id" | "userId" | "token">
 
   export type RegisterInProgressOrderByWithAggregationInput = {
-    email?: SortOrder
+    id?: SortOrder
+    userId?: SortOrder
     verificationCode?: SortOrder
     verificationCodeExpiration?: SortOrder
+    token?: SortOrder
     _count?: RegisterInProgressCountOrderByAggregateInput
     _max?: RegisterInProgressMaxOrderByAggregateInput
     _min?: RegisterInProgressMinOrderByAggregateInput
@@ -12915,9 +13054,11 @@ export namespace Prisma {
     AND?: RegisterInProgressScalarWhereWithAggregatesInput | RegisterInProgressScalarWhereWithAggregatesInput[]
     OR?: RegisterInProgressScalarWhereWithAggregatesInput[]
     NOT?: RegisterInProgressScalarWhereWithAggregatesInput | RegisterInProgressScalarWhereWithAggregatesInput[]
-    email?: StringWithAggregatesFilter<"RegisterInProgress"> | string
+    id?: UuidWithAggregatesFilter<"RegisterInProgress"> | string
+    userId?: UuidWithAggregatesFilter<"RegisterInProgress"> | string
     verificationCode?: StringWithAggregatesFilter<"RegisterInProgress"> | string
     verificationCodeExpiration?: StringWithAggregatesFilter<"RegisterInProgress"> | string
+    token?: StringWithAggregatesFilter<"RegisterInProgress"> | string
   }
 
   export type InspoItemsWhereInput = {
@@ -13152,6 +13293,7 @@ export namespace Prisma {
     client?: XOR<ClientNullableScalarRelationFilter, ClientWhereInput> | null
     itemFavorites?: ItemFavoriteListRelationFilter
     itemLikes?: ItemLikeListRelationFilter
+    RegisterInProgress?: RegisterInProgressListRelationFilter
   }
 
   export type userOrderByWithRelationInput = {
@@ -13169,6 +13311,7 @@ export namespace Prisma {
     client?: ClientOrderByWithRelationInput
     itemFavorites?: ItemFavoriteOrderByRelationAggregateInput
     itemLikes?: ItemLikeOrderByRelationAggregateInput
+    RegisterInProgress?: RegisterInProgressOrderByRelationAggregateInput
   }
 
   export type userWhereUniqueInput = Prisma.AtLeast<{
@@ -13189,6 +13332,7 @@ export namespace Prisma {
     client?: XOR<ClientNullableScalarRelationFilter, ClientWhereInput> | null
     itemFavorites?: ItemFavoriteListRelationFilter
     itemLikes?: ItemLikeListRelationFilter
+    RegisterInProgress?: RegisterInProgressListRelationFilter
   }, "id" | "email">
 
   export type userOrderByWithAggregationInput = {
@@ -13476,45 +13620,58 @@ export namespace Prisma {
   }
 
   export type RegisterInProgressCreateInput = {
-    email: string
+    id?: string
     verificationCode: string
     verificationCodeExpiration: string
+    token: string
+    user: userCreateNestedOneWithoutRegisterInProgressInput
   }
 
   export type RegisterInProgressUncheckedCreateInput = {
-    email: string
+    id?: string
+    userId: string
     verificationCode: string
     verificationCodeExpiration: string
+    token: string
   }
 
   export type RegisterInProgressUpdateInput = {
-    email?: StringFieldUpdateOperationsInput | string
+    id?: StringFieldUpdateOperationsInput | string
     verificationCode?: StringFieldUpdateOperationsInput | string
     verificationCodeExpiration?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    user?: userUpdateOneRequiredWithoutRegisterInProgressNestedInput
   }
 
   export type RegisterInProgressUncheckedUpdateInput = {
-    email?: StringFieldUpdateOperationsInput | string
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
     verificationCode?: StringFieldUpdateOperationsInput | string
     verificationCodeExpiration?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
   }
 
   export type RegisterInProgressCreateManyInput = {
-    email: string
+    id?: string
+    userId: string
     verificationCode: string
     verificationCodeExpiration: string
+    token: string
   }
 
   export type RegisterInProgressUpdateManyMutationInput = {
-    email?: StringFieldUpdateOperationsInput | string
+    id?: StringFieldUpdateOperationsInput | string
     verificationCode?: StringFieldUpdateOperationsInput | string
     verificationCodeExpiration?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
   }
 
   export type RegisterInProgressUncheckedUpdateManyInput = {
-    email?: StringFieldUpdateOperationsInput | string
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
     verificationCode?: StringFieldUpdateOperationsInput | string
     verificationCodeExpiration?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
   }
 
   export type InspoItemsCreateInput = {
@@ -13768,6 +13925,7 @@ export namespace Prisma {
     client?: ClientCreateNestedOneWithoutUserInput
     itemFavorites?: ItemFavoriteCreateNestedManyWithoutUserInput
     itemLikes?: ItemLikeCreateNestedManyWithoutUserInput
+    RegisterInProgress?: RegisterInProgressCreateNestedManyWithoutUserInput
   }
 
   export type userUncheckedCreateInput = {
@@ -13785,6 +13943,7 @@ export namespace Prisma {
     client?: ClientUncheckedCreateNestedOneWithoutUserInput
     itemFavorites?: ItemFavoriteUncheckedCreateNestedManyWithoutUserInput
     itemLikes?: ItemLikeUncheckedCreateNestedManyWithoutUserInput
+    RegisterInProgress?: RegisterInProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type userUpdateInput = {
@@ -13802,6 +13961,7 @@ export namespace Prisma {
     client?: ClientUpdateOneWithoutUserNestedInput
     itemFavorites?: ItemFavoriteUpdateManyWithoutUserNestedInput
     itemLikes?: ItemLikeUpdateManyWithoutUserNestedInput
+    RegisterInProgress?: RegisterInProgressUpdateManyWithoutUserNestedInput
   }
 
   export type userUncheckedUpdateInput = {
@@ -13819,6 +13979,7 @@ export namespace Prisma {
     client?: ClientUncheckedUpdateOneWithoutUserNestedInput
     itemFavorites?: ItemFavoriteUncheckedUpdateManyWithoutUserNestedInput
     itemLikes?: ItemLikeUncheckedUpdateManyWithoutUserNestedInput
+    RegisterInProgress?: RegisterInProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type userCreateManyInput = {
@@ -14157,21 +14318,27 @@ export namespace Prisma {
   }
 
   export type RegisterInProgressCountOrderByAggregateInput = {
-    email?: SortOrder
+    id?: SortOrder
+    userId?: SortOrder
     verificationCode?: SortOrder
     verificationCodeExpiration?: SortOrder
+    token?: SortOrder
   }
 
   export type RegisterInProgressMaxOrderByAggregateInput = {
-    email?: SortOrder
+    id?: SortOrder
+    userId?: SortOrder
     verificationCode?: SortOrder
     verificationCodeExpiration?: SortOrder
+    token?: SortOrder
   }
 
   export type RegisterInProgressMinOrderByAggregateInput = {
-    email?: SortOrder
+    id?: SortOrder
+    userId?: SortOrder
     verificationCode?: SortOrder
     verificationCodeExpiration?: SortOrder
+    token?: SortOrder
   }
 
   export type IntFilter<$PrismaModel = never> = {
@@ -14408,6 +14575,12 @@ export namespace Prisma {
     none?: ItemLikeWhereInput
   }
 
+  export type RegisterInProgressListRelationFilter = {
+    every?: RegisterInProgressWhereInput
+    some?: RegisterInProgressWhereInput
+    none?: RegisterInProgressWhereInput
+  }
+
   export type accountOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -14421,6 +14594,10 @@ export namespace Prisma {
   }
 
   export type ItemLikeOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type RegisterInProgressOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -14556,6 +14733,20 @@ export namespace Prisma {
     update?: XOR<XOR<userUpdateToOneWithWhereWithoutItemLikesInput, userUpdateWithoutItemLikesInput>, userUncheckedUpdateWithoutItemLikesInput>
   }
 
+  export type userCreateNestedOneWithoutRegisterInProgressInput = {
+    create?: XOR<userCreateWithoutRegisterInProgressInput, userUncheckedCreateWithoutRegisterInProgressInput>
+    connectOrCreate?: userCreateOrConnectWithoutRegisterInProgressInput
+    connect?: userWhereUniqueInput
+  }
+
+  export type userUpdateOneRequiredWithoutRegisterInProgressNestedInput = {
+    create?: XOR<userCreateWithoutRegisterInProgressInput, userUncheckedCreateWithoutRegisterInProgressInput>
+    connectOrCreate?: userCreateOrConnectWithoutRegisterInProgressInput
+    upsert?: userUpsertWithoutRegisterInProgressInput
+    connect?: userWhereUniqueInput
+    update?: XOR<XOR<userUpdateToOneWithWhereWithoutRegisterInProgressInput, userUpdateWithoutRegisterInProgressInput>, userUncheckedUpdateWithoutRegisterInProgressInput>
+  }
+
   export type IntFieldUpdateOperationsInput = {
     set?: number
     increment?: number
@@ -14640,6 +14831,13 @@ export namespace Prisma {
     connect?: ItemLikeWhereUniqueInput | ItemLikeWhereUniqueInput[]
   }
 
+  export type RegisterInProgressCreateNestedManyWithoutUserInput = {
+    create?: XOR<RegisterInProgressCreateWithoutUserInput, RegisterInProgressUncheckedCreateWithoutUserInput> | RegisterInProgressCreateWithoutUserInput[] | RegisterInProgressUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: RegisterInProgressCreateOrConnectWithoutUserInput | RegisterInProgressCreateOrConnectWithoutUserInput[]
+    createMany?: RegisterInProgressCreateManyUserInputEnvelope
+    connect?: RegisterInProgressWhereUniqueInput | RegisterInProgressWhereUniqueInput[]
+  }
+
   export type accountUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<accountCreateWithoutUserInput, accountUncheckedCreateWithoutUserInput> | accountCreateWithoutUserInput[] | accountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: accountCreateOrConnectWithoutUserInput | accountCreateOrConnectWithoutUserInput[]
@@ -14678,6 +14876,13 @@ export namespace Prisma {
     connectOrCreate?: ItemLikeCreateOrConnectWithoutUserInput | ItemLikeCreateOrConnectWithoutUserInput[]
     createMany?: ItemLikeCreateManyUserInputEnvelope
     connect?: ItemLikeWhereUniqueInput | ItemLikeWhereUniqueInput[]
+  }
+
+  export type RegisterInProgressUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<RegisterInProgressCreateWithoutUserInput, RegisterInProgressUncheckedCreateWithoutUserInput> | RegisterInProgressCreateWithoutUserInput[] | RegisterInProgressUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: RegisterInProgressCreateOrConnectWithoutUserInput | RegisterInProgressCreateOrConnectWithoutUserInput[]
+    createMany?: RegisterInProgressCreateManyUserInputEnvelope
+    connect?: RegisterInProgressWhereUniqueInput | RegisterInProgressWhereUniqueInput[]
   }
 
   export type BoolFieldUpdateOperationsInput = {
@@ -14760,6 +14965,20 @@ export namespace Prisma {
     deleteMany?: ItemLikeScalarWhereInput | ItemLikeScalarWhereInput[]
   }
 
+  export type RegisterInProgressUpdateManyWithoutUserNestedInput = {
+    create?: XOR<RegisterInProgressCreateWithoutUserInput, RegisterInProgressUncheckedCreateWithoutUserInput> | RegisterInProgressCreateWithoutUserInput[] | RegisterInProgressUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: RegisterInProgressCreateOrConnectWithoutUserInput | RegisterInProgressCreateOrConnectWithoutUserInput[]
+    upsert?: RegisterInProgressUpsertWithWhereUniqueWithoutUserInput | RegisterInProgressUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: RegisterInProgressCreateManyUserInputEnvelope
+    set?: RegisterInProgressWhereUniqueInput | RegisterInProgressWhereUniqueInput[]
+    disconnect?: RegisterInProgressWhereUniqueInput | RegisterInProgressWhereUniqueInput[]
+    delete?: RegisterInProgressWhereUniqueInput | RegisterInProgressWhereUniqueInput[]
+    connect?: RegisterInProgressWhereUniqueInput | RegisterInProgressWhereUniqueInput[]
+    update?: RegisterInProgressUpdateWithWhereUniqueWithoutUserInput | RegisterInProgressUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: RegisterInProgressUpdateManyWithWhereWithoutUserInput | RegisterInProgressUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: RegisterInProgressScalarWhereInput | RegisterInProgressScalarWhereInput[]
+  }
+
   export type accountUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<accountCreateWithoutUserInput, accountUncheckedCreateWithoutUserInput> | accountCreateWithoutUserInput[] | accountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: accountCreateOrConnectWithoutUserInput | accountCreateOrConnectWithoutUserInput[]
@@ -14834,6 +15053,20 @@ export namespace Prisma {
     update?: ItemLikeUpdateWithWhereUniqueWithoutUserInput | ItemLikeUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: ItemLikeUpdateManyWithWhereWithoutUserInput | ItemLikeUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: ItemLikeScalarWhereInput | ItemLikeScalarWhereInput[]
+  }
+
+  export type RegisterInProgressUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<RegisterInProgressCreateWithoutUserInput, RegisterInProgressUncheckedCreateWithoutUserInput> | RegisterInProgressCreateWithoutUserInput[] | RegisterInProgressUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: RegisterInProgressCreateOrConnectWithoutUserInput | RegisterInProgressCreateOrConnectWithoutUserInput[]
+    upsert?: RegisterInProgressUpsertWithWhereUniqueWithoutUserInput | RegisterInProgressUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: RegisterInProgressCreateManyUserInputEnvelope
+    set?: RegisterInProgressWhereUniqueInput | RegisterInProgressWhereUniqueInput[]
+    disconnect?: RegisterInProgressWhereUniqueInput | RegisterInProgressWhereUniqueInput[]
+    delete?: RegisterInProgressWhereUniqueInput | RegisterInProgressWhereUniqueInput[]
+    connect?: RegisterInProgressWhereUniqueInput | RegisterInProgressWhereUniqueInput[]
+    update?: RegisterInProgressUpdateWithWhereUniqueWithoutUserInput | RegisterInProgressUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: RegisterInProgressUpdateManyWithWhereWithoutUserInput | RegisterInProgressUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: RegisterInProgressScalarWhereInput | RegisterInProgressScalarWhereInput[]
   }
 
   export type NestedUuidFilter<$PrismaModel = never> = {
@@ -15072,6 +15305,7 @@ export namespace Prisma {
     client?: ClientCreateNestedOneWithoutUserInput
     itemFavorites?: ItemFavoriteCreateNestedManyWithoutUserInput
     itemLikes?: ItemLikeCreateNestedManyWithoutUserInput
+    RegisterInProgress?: RegisterInProgressCreateNestedManyWithoutUserInput
   }
 
   export type userUncheckedCreateWithoutBrandInput = {
@@ -15088,6 +15322,7 @@ export namespace Prisma {
     client?: ClientUncheckedCreateNestedOneWithoutUserInput
     itemFavorites?: ItemFavoriteUncheckedCreateNestedManyWithoutUserInput
     itemLikes?: ItemLikeUncheckedCreateNestedManyWithoutUserInput
+    RegisterInProgress?: RegisterInProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type userCreateOrConnectWithoutBrandInput = {
@@ -15120,6 +15355,7 @@ export namespace Prisma {
     client?: ClientUpdateOneWithoutUserNestedInput
     itemFavorites?: ItemFavoriteUpdateManyWithoutUserNestedInput
     itemLikes?: ItemLikeUpdateManyWithoutUserNestedInput
+    RegisterInProgress?: RegisterInProgressUpdateManyWithoutUserNestedInput
   }
 
   export type userUncheckedUpdateWithoutBrandInput = {
@@ -15136,6 +15372,7 @@ export namespace Prisma {
     client?: ClientUncheckedUpdateOneWithoutUserNestedInput
     itemFavorites?: ItemFavoriteUncheckedUpdateManyWithoutUserNestedInput
     itemLikes?: ItemLikeUncheckedUpdateManyWithoutUserNestedInput
+    RegisterInProgress?: RegisterInProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type userCreateWithoutClientInput = {
@@ -15152,6 +15389,7 @@ export namespace Prisma {
     brand?: BrandCreateNestedOneWithoutUserInput
     itemFavorites?: ItemFavoriteCreateNestedManyWithoutUserInput
     itemLikes?: ItemLikeCreateNestedManyWithoutUserInput
+    RegisterInProgress?: RegisterInProgressCreateNestedManyWithoutUserInput
   }
 
   export type userUncheckedCreateWithoutClientInput = {
@@ -15168,6 +15406,7 @@ export namespace Prisma {
     brand?: BrandUncheckedCreateNestedOneWithoutUserInput
     itemFavorites?: ItemFavoriteUncheckedCreateNestedManyWithoutUserInput
     itemLikes?: ItemLikeUncheckedCreateNestedManyWithoutUserInput
+    RegisterInProgress?: RegisterInProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type userCreateOrConnectWithoutClientInput = {
@@ -15200,6 +15439,7 @@ export namespace Prisma {
     brand?: BrandUpdateOneWithoutUserNestedInput
     itemFavorites?: ItemFavoriteUpdateManyWithoutUserNestedInput
     itemLikes?: ItemLikeUpdateManyWithoutUserNestedInput
+    RegisterInProgress?: RegisterInProgressUpdateManyWithoutUserNestedInput
   }
 
   export type userUncheckedUpdateWithoutClientInput = {
@@ -15216,6 +15456,7 @@ export namespace Prisma {
     brand?: BrandUncheckedUpdateOneWithoutUserNestedInput
     itemFavorites?: ItemFavoriteUncheckedUpdateManyWithoutUserNestedInput
     itemLikes?: ItemLikeUncheckedUpdateManyWithoutUserNestedInput
+    RegisterInProgress?: RegisterInProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type userCreateWithoutItemFavoritesInput = {
@@ -15232,6 +15473,7 @@ export namespace Prisma {
     brand?: BrandCreateNestedOneWithoutUserInput
     client?: ClientCreateNestedOneWithoutUserInput
     itemLikes?: ItemLikeCreateNestedManyWithoutUserInput
+    RegisterInProgress?: RegisterInProgressCreateNestedManyWithoutUserInput
   }
 
   export type userUncheckedCreateWithoutItemFavoritesInput = {
@@ -15248,6 +15490,7 @@ export namespace Prisma {
     brand?: BrandUncheckedCreateNestedOneWithoutUserInput
     client?: ClientUncheckedCreateNestedOneWithoutUserInput
     itemLikes?: ItemLikeUncheckedCreateNestedManyWithoutUserInput
+    RegisterInProgress?: RegisterInProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type userCreateOrConnectWithoutItemFavoritesInput = {
@@ -15280,6 +15523,7 @@ export namespace Prisma {
     brand?: BrandUpdateOneWithoutUserNestedInput
     client?: ClientUpdateOneWithoutUserNestedInput
     itemLikes?: ItemLikeUpdateManyWithoutUserNestedInput
+    RegisterInProgress?: RegisterInProgressUpdateManyWithoutUserNestedInput
   }
 
   export type userUncheckedUpdateWithoutItemFavoritesInput = {
@@ -15296,6 +15540,7 @@ export namespace Prisma {
     brand?: BrandUncheckedUpdateOneWithoutUserNestedInput
     client?: ClientUncheckedUpdateOneWithoutUserNestedInput
     itemLikes?: ItemLikeUncheckedUpdateManyWithoutUserNestedInput
+    RegisterInProgress?: RegisterInProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type userCreateWithoutItemLikesInput = {
@@ -15312,6 +15557,7 @@ export namespace Prisma {
     brand?: BrandCreateNestedOneWithoutUserInput
     client?: ClientCreateNestedOneWithoutUserInput
     itemFavorites?: ItemFavoriteCreateNestedManyWithoutUserInput
+    RegisterInProgress?: RegisterInProgressCreateNestedManyWithoutUserInput
   }
 
   export type userUncheckedCreateWithoutItemLikesInput = {
@@ -15328,6 +15574,7 @@ export namespace Prisma {
     brand?: BrandUncheckedCreateNestedOneWithoutUserInput
     client?: ClientUncheckedCreateNestedOneWithoutUserInput
     itemFavorites?: ItemFavoriteUncheckedCreateNestedManyWithoutUserInput
+    RegisterInProgress?: RegisterInProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type userCreateOrConnectWithoutItemLikesInput = {
@@ -15360,6 +15607,7 @@ export namespace Prisma {
     brand?: BrandUpdateOneWithoutUserNestedInput
     client?: ClientUpdateOneWithoutUserNestedInput
     itemFavorites?: ItemFavoriteUpdateManyWithoutUserNestedInput
+    RegisterInProgress?: RegisterInProgressUpdateManyWithoutUserNestedInput
   }
 
   export type userUncheckedUpdateWithoutItemLikesInput = {
@@ -15376,6 +15624,91 @@ export namespace Prisma {
     brand?: BrandUncheckedUpdateOneWithoutUserNestedInput
     client?: ClientUncheckedUpdateOneWithoutUserNestedInput
     itemFavorites?: ItemFavoriteUncheckedUpdateManyWithoutUserNestedInput
+    RegisterInProgress?: RegisterInProgressUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type userCreateWithoutRegisterInProgressInput = {
+    id: string
+    name: string
+    email: string
+    emailVerified: boolean
+    image?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userType?: string
+    account?: accountCreateNestedManyWithoutUserInput
+    session?: sessionCreateNestedManyWithoutUserInput
+    brand?: BrandCreateNestedOneWithoutUserInput
+    client?: ClientCreateNestedOneWithoutUserInput
+    itemFavorites?: ItemFavoriteCreateNestedManyWithoutUserInput
+    itemLikes?: ItemLikeCreateNestedManyWithoutUserInput
+  }
+
+  export type userUncheckedCreateWithoutRegisterInProgressInput = {
+    id: string
+    name: string
+    email: string
+    emailVerified: boolean
+    image?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userType?: string
+    account?: accountUncheckedCreateNestedManyWithoutUserInput
+    session?: sessionUncheckedCreateNestedManyWithoutUserInput
+    brand?: BrandUncheckedCreateNestedOneWithoutUserInput
+    client?: ClientUncheckedCreateNestedOneWithoutUserInput
+    itemFavorites?: ItemFavoriteUncheckedCreateNestedManyWithoutUserInput
+    itemLikes?: ItemLikeUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type userCreateOrConnectWithoutRegisterInProgressInput = {
+    where: userWhereUniqueInput
+    create: XOR<userCreateWithoutRegisterInProgressInput, userUncheckedCreateWithoutRegisterInProgressInput>
+  }
+
+  export type userUpsertWithoutRegisterInProgressInput = {
+    update: XOR<userUpdateWithoutRegisterInProgressInput, userUncheckedUpdateWithoutRegisterInProgressInput>
+    create: XOR<userCreateWithoutRegisterInProgressInput, userUncheckedCreateWithoutRegisterInProgressInput>
+    where?: userWhereInput
+  }
+
+  export type userUpdateToOneWithWhereWithoutRegisterInProgressInput = {
+    where?: userWhereInput
+    data: XOR<userUpdateWithoutRegisterInProgressInput, userUncheckedUpdateWithoutRegisterInProgressInput>
+  }
+
+  export type userUpdateWithoutRegisterInProgressInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userType?: StringFieldUpdateOperationsInput | string
+    account?: accountUpdateManyWithoutUserNestedInput
+    session?: sessionUpdateManyWithoutUserNestedInput
+    brand?: BrandUpdateOneWithoutUserNestedInput
+    client?: ClientUpdateOneWithoutUserNestedInput
+    itemFavorites?: ItemFavoriteUpdateManyWithoutUserNestedInput
+    itemLikes?: ItemLikeUpdateManyWithoutUserNestedInput
+  }
+
+  export type userUncheckedUpdateWithoutRegisterInProgressInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userType?: StringFieldUpdateOperationsInput | string
+    account?: accountUncheckedUpdateManyWithoutUserNestedInput
+    session?: sessionUncheckedUpdateManyWithoutUserNestedInput
+    brand?: BrandUncheckedUpdateOneWithoutUserNestedInput
+    client?: ClientUncheckedUpdateOneWithoutUserNestedInput
+    itemFavorites?: ItemFavoriteUncheckedUpdateManyWithoutUserNestedInput
+    itemLikes?: ItemLikeUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type userCreateWithoutAccountInput = {
@@ -15392,6 +15725,7 @@ export namespace Prisma {
     client?: ClientCreateNestedOneWithoutUserInput
     itemFavorites?: ItemFavoriteCreateNestedManyWithoutUserInput
     itemLikes?: ItemLikeCreateNestedManyWithoutUserInput
+    RegisterInProgress?: RegisterInProgressCreateNestedManyWithoutUserInput
   }
 
   export type userUncheckedCreateWithoutAccountInput = {
@@ -15408,6 +15742,7 @@ export namespace Prisma {
     client?: ClientUncheckedCreateNestedOneWithoutUserInput
     itemFavorites?: ItemFavoriteUncheckedCreateNestedManyWithoutUserInput
     itemLikes?: ItemLikeUncheckedCreateNestedManyWithoutUserInput
+    RegisterInProgress?: RegisterInProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type userCreateOrConnectWithoutAccountInput = {
@@ -15440,6 +15775,7 @@ export namespace Prisma {
     client?: ClientUpdateOneWithoutUserNestedInput
     itemFavorites?: ItemFavoriteUpdateManyWithoutUserNestedInput
     itemLikes?: ItemLikeUpdateManyWithoutUserNestedInput
+    RegisterInProgress?: RegisterInProgressUpdateManyWithoutUserNestedInput
   }
 
   export type userUncheckedUpdateWithoutAccountInput = {
@@ -15456,6 +15792,7 @@ export namespace Prisma {
     client?: ClientUncheckedUpdateOneWithoutUserNestedInput
     itemFavorites?: ItemFavoriteUncheckedUpdateManyWithoutUserNestedInput
     itemLikes?: ItemLikeUncheckedUpdateManyWithoutUserNestedInput
+    RegisterInProgress?: RegisterInProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type userCreateWithoutSessionInput = {
@@ -15472,6 +15809,7 @@ export namespace Prisma {
     client?: ClientCreateNestedOneWithoutUserInput
     itemFavorites?: ItemFavoriteCreateNestedManyWithoutUserInput
     itemLikes?: ItemLikeCreateNestedManyWithoutUserInput
+    RegisterInProgress?: RegisterInProgressCreateNestedManyWithoutUserInput
   }
 
   export type userUncheckedCreateWithoutSessionInput = {
@@ -15488,6 +15826,7 @@ export namespace Prisma {
     client?: ClientUncheckedCreateNestedOneWithoutUserInput
     itemFavorites?: ItemFavoriteUncheckedCreateNestedManyWithoutUserInput
     itemLikes?: ItemLikeUncheckedCreateNestedManyWithoutUserInput
+    RegisterInProgress?: RegisterInProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type userCreateOrConnectWithoutSessionInput = {
@@ -15520,6 +15859,7 @@ export namespace Prisma {
     client?: ClientUpdateOneWithoutUserNestedInput
     itemFavorites?: ItemFavoriteUpdateManyWithoutUserNestedInput
     itemLikes?: ItemLikeUpdateManyWithoutUserNestedInput
+    RegisterInProgress?: RegisterInProgressUpdateManyWithoutUserNestedInput
   }
 
   export type userUncheckedUpdateWithoutSessionInput = {
@@ -15536,6 +15876,7 @@ export namespace Prisma {
     client?: ClientUncheckedUpdateOneWithoutUserNestedInput
     itemFavorites?: ItemFavoriteUncheckedUpdateManyWithoutUserNestedInput
     itemLikes?: ItemLikeUncheckedUpdateManyWithoutUserNestedInput
+    RegisterInProgress?: RegisterInProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type accountCreateWithoutUserInput = {
@@ -15685,6 +16026,30 @@ export namespace Prisma {
 
   export type ItemLikeCreateManyUserInputEnvelope = {
     data: ItemLikeCreateManyUserInput | ItemLikeCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type RegisterInProgressCreateWithoutUserInput = {
+    id?: string
+    verificationCode: string
+    verificationCodeExpiration: string
+    token: string
+  }
+
+  export type RegisterInProgressUncheckedCreateWithoutUserInput = {
+    id?: string
+    verificationCode: string
+    verificationCodeExpiration: string
+    token: string
+  }
+
+  export type RegisterInProgressCreateOrConnectWithoutUserInput = {
+    where: RegisterInProgressWhereUniqueInput
+    create: XOR<RegisterInProgressCreateWithoutUserInput, RegisterInProgressUncheckedCreateWithoutUserInput>
+  }
+
+  export type RegisterInProgressCreateManyUserInputEnvelope = {
+    data: RegisterInProgressCreateManyUserInput | RegisterInProgressCreateManyUserInput[]
     skipDuplicates?: boolean
   }
 
@@ -15853,6 +16218,33 @@ export namespace Prisma {
     createdAt?: DateTimeNullableFilter<"ItemLike"> | Date | string | null
   }
 
+  export type RegisterInProgressUpsertWithWhereUniqueWithoutUserInput = {
+    where: RegisterInProgressWhereUniqueInput
+    update: XOR<RegisterInProgressUpdateWithoutUserInput, RegisterInProgressUncheckedUpdateWithoutUserInput>
+    create: XOR<RegisterInProgressCreateWithoutUserInput, RegisterInProgressUncheckedCreateWithoutUserInput>
+  }
+
+  export type RegisterInProgressUpdateWithWhereUniqueWithoutUserInput = {
+    where: RegisterInProgressWhereUniqueInput
+    data: XOR<RegisterInProgressUpdateWithoutUserInput, RegisterInProgressUncheckedUpdateWithoutUserInput>
+  }
+
+  export type RegisterInProgressUpdateManyWithWhereWithoutUserInput = {
+    where: RegisterInProgressScalarWhereInput
+    data: XOR<RegisterInProgressUpdateManyMutationInput, RegisterInProgressUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type RegisterInProgressScalarWhereInput = {
+    AND?: RegisterInProgressScalarWhereInput | RegisterInProgressScalarWhereInput[]
+    OR?: RegisterInProgressScalarWhereInput[]
+    NOT?: RegisterInProgressScalarWhereInput | RegisterInProgressScalarWhereInput[]
+    id?: UuidFilter<"RegisterInProgress"> | string
+    userId?: UuidFilter<"RegisterInProgress"> | string
+    verificationCode?: StringFilter<"RegisterInProgress"> | string
+    verificationCodeExpiration?: StringFilter<"RegisterInProgress"> | string
+    token?: StringFilter<"RegisterInProgress"> | string
+  }
+
   export type accountCreateManyUserInput = {
     id: string
     accountId: string
@@ -15888,6 +16280,13 @@ export namespace Prisma {
     id?: string
     itemUuid: string
     createdAt?: Date | string | null
+  }
+
+  export type RegisterInProgressCreateManyUserInput = {
+    id?: string
+    verificationCode: string
+    verificationCodeExpiration: string
+    token: string
   }
 
   export type accountUpdateWithoutUserInput = {
@@ -15999,6 +16398,27 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     itemUuid?: StringFieldUpdateOperationsInput | string
     createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type RegisterInProgressUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    verificationCode?: StringFieldUpdateOperationsInput | string
+    verificationCodeExpiration?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type RegisterInProgressUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    verificationCode?: StringFieldUpdateOperationsInput | string
+    verificationCodeExpiration?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type RegisterInProgressUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    verificationCode?: StringFieldUpdateOperationsInput | string
+    verificationCodeExpiration?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
   }
 
 

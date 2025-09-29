@@ -226,7 +226,7 @@ function BottomSheetSame({
   value?: string;
 }) {
   // callbacks
-  const handleSheetChanges = useCallback((index: number) => { }, []);
+  const handleSheetChanges = useCallback((index: number) => {}, []);
   return (
     <BottomSheet
       ref={bottomSheetRef}
@@ -254,8 +254,9 @@ function BottomSheetSame({
           )}
 
           <Text
-            className={`text-black font-pmedium text-xl ${hasDone ? "" : "absolute right-0 left-0 text-center"
-              }`}
+            className={`text-black font-pmedium text-xl ${
+              hasDone ? "" : "absolute right-0 left-0 text-center"
+            }`}
           >
             {value}
           </Text>
@@ -369,6 +370,13 @@ const RenderProfileItemPreferences = ({
           justifyContent: "space-between",
         }}
         showsVerticalScrollIndicator={false}
+        ListEmptyComponent={() => (
+          <View className="flex-1 justify-center items-center py-8">
+            <Text className="text-grey-lighter font-pregular text-center">
+              No hay elementos disponibles
+            </Text>
+          </View>
+        )}
       />
     </View>
   );

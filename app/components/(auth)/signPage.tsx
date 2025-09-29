@@ -13,14 +13,14 @@ import LogoCircle from "../logo/LogoCircle";
 export default function SignPage({ children }: { children?: React.ReactNode }) {
   return (
     <SafeAreaView className="bg-brown-strong flex-1 h-full w-full">
-      <ScrollView
+      {/* <ScrollView
         className="flex-1 w-full h-full"
         contentContainerStyle={{ flexGrow: 1 }}
-      >
-        <View className="flex flex-grow flex-col w-full justify-between px-14 pt-3">
-          {children}
-        </View>
-      </ScrollView>
+      > */}
+      <View className="flex-1 flex-col w-full justify-start px-14 pt-3">
+        {children}
+      </View>
+      {/* </ScrollView> */}
     </SafeAreaView>
   );
 }
@@ -56,7 +56,7 @@ export function SignPageHeader({
 }
 
 export function SignPageContent({ children }: { children: React.ReactNode }) {
-  return <View className="flex flex-col w-full">{children}</View>;
+  return <View className="flex-1 flex flex-col w-full">{children}</View>;
 }
 
 export function SignPageItems({ children }: { children: React.ReactNode }) {
@@ -81,7 +81,7 @@ export function NextButton({
       disabled={isDisabled}
       onPress={isDisabled ? undefined : onPress}
       className={`
-            flex flex-row items-center px-5 py-2 rounded-3xl bg-neutral-500
+            flex flex-row items-center px-5 py-2 mt-2 rounded-3xl bg-neutral-500
             ${isDisabled || isLoading ? "bg-gray-400 opacity-50" : "bg-white"}
           `}
     >

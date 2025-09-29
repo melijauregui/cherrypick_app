@@ -134,7 +134,7 @@ const ClientProfile = ({
             />
             <RenderProfileItem
               label="Email"
-              value={data.user.email}
+              value={user.email}
               canEdit={false}
             />
             <RenderProfileItem
