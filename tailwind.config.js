@@ -26,6 +26,7 @@ module.exports = {
           extraLight: "#bd8e75",
           light: "#af785a",
           strong: "#301c11",
+          extraLightText: "#c6aa9b",
         },
         pink: {
           light: "#F8BFBF",

@@ -29,7 +29,6 @@ function useSession() {
   const isLoading = first || session.isPending;
   const authorized = session.data?.user.id;
   const [forceUpdate, setForceUpdate] = useState(0);
-  const intervalRef = useRef<ReturnType<typeof setInterval>>(undefined);
 
   // Custom refetch that also gets fresh session data when needed
   const customRefetch = async () => {
@@ -100,7 +99,7 @@ export function OnlyAuthenticated({ children }: { children: React.ReactNode }) {
     return null;
   }
 
-  if (status === "unauthenticated" || !user?.emailVerified) {
+  if (status === "unauthenticated") {
     router.replace("cherrypick:///sign-in");
     return null;
   }

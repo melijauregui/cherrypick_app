@@ -61,7 +61,7 @@ const CodeVerification = () => {
     );
     if (session.user?.emailVerified) {
       console.log("Email verified, navigating to preferences");
-      router.push({
+      router.replace({
         pathname: "/preferences",
       });
     }

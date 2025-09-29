@@ -69,6 +69,7 @@ export default function App() {
       return <Redirect href="/home?prefetch=true" />;
     }
   } else {
+    console.log("Index: No user found, redirecting to sign-in");
     return <Redirect href="/sign-in" />;
   }
 }

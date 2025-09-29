@@ -74,9 +74,7 @@ const SignIn = () => {
   return (
     <SignPage>
       <SignPageContent>
-        <SignPageHeader
-          onBackButton={() => router.replace("cherrypick:///sign-in")}
-        >
+        <SignPageHeader onBackButton={() => router.back()}>
           Create account
         </SignPageHeader>
         <SignPageItems>

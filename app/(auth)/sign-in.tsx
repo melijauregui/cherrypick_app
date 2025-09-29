@@ -11,20 +11,13 @@ const SignIn = () => {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (user && status === "authenticated") {
-      // Don't auto-navigate if we're currently on sign-up page (during sign-up process)
-      if (
-        pathname === "/sign-up" ||
-        pathname === "/code-verification" ||
-        pathname === "/preferences"
-      ) {
-        return;
-      }
-
+    // Only run if user is authenticated and we're on the sign-in page
+    if (user && status === "authenticated" && pathname === "/sign-in") {
       if (!user.emailVerified) {
         router.replace("cherrypick:///code-verification");
       }
       if (user.emailVerified) {
+        console.log("user email verified, redirecting to home");
         router.replace("cherrypick:///home");
       }
     }
@@ -44,6 +37,7 @@ const SignIn = () => {
             </Text>
             <View className="w-full mt-40 flex flex-col gap-4">
               <GoogleSignInButton />
+              <LogInButton />
               <OrLine />
               <SignUpButton />
             </View>
@@ -75,9 +69,20 @@ const GoogleSignInButton: React.FC<{}> = () => {
   );
 };
 
-const SignUpButton = () => (
+const LogInButton = () => (
   <TouchableOpacity
     className="flex flex-row bg-white h-[50px] justify-center items-center rounded-full"
+    onPress={() => router.push("/log-in")}
+  >
+    <Text className="text-black font-psemibold text-[15px]">
+      Log in with email
+    </Text>
+  </TouchableOpacity>
+);
+
+const SignUpButton = () => (
+  <TouchableOpacity
+    className="flex flex-row bg-brown-extraLight h-[50px] justify-center items-center rounded-full"
     onPress={() => router.push("/sign-up")}
   >
     <Text className="text-black font-psemibold text-[15px]">
