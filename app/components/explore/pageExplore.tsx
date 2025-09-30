@@ -365,8 +365,8 @@ function SearchInput({
             const filterCount =
               (minPrice ? 1 : 0) + (maxPrice ? 1 : 0) + brandsSelected.size;
             return filterCount > 0 ? (
-              <View className="absolute -bottom-2 -right-1 bg-brown-light rounded-full w-4 h-4 flex items-center justify-center">
-                <Text className="text-white text-[10px] font-bold">
+              <View className="absolute -bottom-2 -right-1 bg-beige rounded-full w-4 h-4 flex items-center justify-center">
+                <Text className="text-black text-[10px] font-bold">
                   {filterCount}
                 </Text>
               </View>

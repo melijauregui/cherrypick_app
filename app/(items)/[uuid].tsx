@@ -318,7 +318,7 @@ const IconComponent = ({
           <Ionicons
             name={isLiked ? "heart" : "heart-outline"}
             size={24}
-            color={isLiked ? "#bd8e75" : "white"}
+            color={isLiked ? "#d8bc9e" : "white"}
           />
         </TouchableOpacity>
         <TouchableOpacity
@@ -329,7 +329,7 @@ const IconComponent = ({
           <FontAwesome
             name={isFavorited ? "bookmark" : "bookmark-o"}
             size={24}
-            color={isFavorited ? "#bd8e75" : "white"}
+            color={isFavorited ? "#d8bc9e" : "white"}
           />
         </TouchableOpacity>
 
