@@ -157,6 +157,14 @@ exports.Prisma.RegisterInProgressScalarFieldEnum = {
   token: 'token'
 };
 
+exports.Prisma.ResetPasswordInProgressScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  verificationCode: 'verificationCode',
+  verificationCodeExpiration: 'verificationCodeExpiration',
+  token: 'token'
+};
+
 exports.Prisma.InspoItemsScalarFieldEnum = {
   id: 'id',
   itemUuid: 'itemUuid',
@@ -244,6 +252,7 @@ exports.Prisma.ModelName = {
   ItemFavorite: 'ItemFavorite',
   ItemLike: 'ItemLike',
   RegisterInProgress: 'RegisterInProgress',
+  ResetPasswordInProgress: 'ResetPasswordInProgress',
   InspoItems: 'InspoItems',
   account: 'account',
   session: 'session',

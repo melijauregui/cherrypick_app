@@ -39,6 +39,11 @@ export type ItemLike = $Result.DefaultSelection<Prisma.$ItemLikePayload>
  */
 export type RegisterInProgress = $Result.DefaultSelection<Prisma.$RegisterInProgressPayload>
 /**
+ * Model ResetPasswordInProgress
+ * 
+ */
+export type ResetPasswordInProgress = $Result.DefaultSelection<Prisma.$ResetPasswordInProgressPayload>
+/**
  * Model InspoItems
  * 
  */
@@ -231,6 +236,16 @@ export class PrismaClient<
     * ```
     */
   get registerInProgress(): Prisma.RegisterInProgressDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.resetPasswordInProgress`: Exposes CRUD operations for the **ResetPasswordInProgress** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ResetPasswordInProgresses
+    * const resetPasswordInProgresses = await prisma.resetPasswordInProgress.findMany()
+    * ```
+    */
+  get resetPasswordInProgress(): Prisma.ResetPasswordInProgressDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.inspoItems`: Exposes CRUD operations for the **InspoItems** model.
@@ -726,6 +741,7 @@ export namespace Prisma {
     ItemFavorite: 'ItemFavorite',
     ItemLike: 'ItemLike',
     RegisterInProgress: 'RegisterInProgress',
+    ResetPasswordInProgress: 'ResetPasswordInProgress',
     InspoItems: 'InspoItems',
     account: 'account',
     session: 'session',
@@ -749,7 +765,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "brand" | "client" | "itemFavorite" | "itemLike" | "registerInProgress" | "inspoItems" | "account" | "session" | "user" | "verification"
+      modelProps: "brand" | "client" | "itemFavorite" | "itemLike" | "registerInProgress" | "resetPasswordInProgress" | "inspoItems" | "account" | "session" | "user" | "verification"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1120,6 +1136,80 @@ export namespace Prisma {
           count: {
             args: Prisma.RegisterInProgressCountArgs<ExtArgs>
             result: $Utils.Optional<RegisterInProgressCountAggregateOutputType> | number
+          }
+        }
+      }
+      ResetPasswordInProgress: {
+        payload: Prisma.$ResetPasswordInProgressPayload<ExtArgs>
+        fields: Prisma.ResetPasswordInProgressFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ResetPasswordInProgressFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ResetPasswordInProgressPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ResetPasswordInProgressFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ResetPasswordInProgressPayload>
+          }
+          findFirst: {
+            args: Prisma.ResetPasswordInProgressFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ResetPasswordInProgressPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ResetPasswordInProgressFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ResetPasswordInProgressPayload>
+          }
+          findMany: {
+            args: Prisma.ResetPasswordInProgressFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ResetPasswordInProgressPayload>[]
+          }
+          create: {
+            args: Prisma.ResetPasswordInProgressCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ResetPasswordInProgressPayload>
+          }
+          createMany: {
+            args: Prisma.ResetPasswordInProgressCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ResetPasswordInProgressCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ResetPasswordInProgressPayload>[]
+          }
+          delete: {
+            args: Prisma.ResetPasswordInProgressDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ResetPasswordInProgressPayload>
+          }
+          update: {
+            args: Prisma.ResetPasswordInProgressUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ResetPasswordInProgressPayload>
+          }
+          deleteMany: {
+            args: Prisma.ResetPasswordInProgressDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ResetPasswordInProgressUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ResetPasswordInProgressUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ResetPasswordInProgressPayload>[]
+          }
+          upsert: {
+            args: Prisma.ResetPasswordInProgressUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ResetPasswordInProgressPayload>
+          }
+          aggregate: {
+            args: Prisma.ResetPasswordInProgressAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateResetPasswordInProgress>
+          }
+          groupBy: {
+            args: Prisma.ResetPasswordInProgressGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ResetPasswordInProgressGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ResetPasswordInProgressCountArgs<ExtArgs>
+            result: $Utils.Optional<ResetPasswordInProgressCountAggregateOutputType> | number
           }
         }
       }
@@ -1590,6 +1680,7 @@ export namespace Prisma {
     itemFavorite?: ItemFavoriteOmit
     itemLike?: ItemLikeOmit
     registerInProgress?: RegisterInProgressOmit
+    resetPasswordInProgress?: ResetPasswordInProgressOmit
     inspoItems?: InspoItemsOmit
     account?: accountOmit
     session?: sessionOmit
@@ -1680,6 +1771,7 @@ export namespace Prisma {
     itemFavorites: number
     itemLikes: number
     RegisterInProgress: number
+    ResetPasswordInProgress: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1688,6 +1780,7 @@ export namespace Prisma {
     itemFavorites?: boolean | UserCountOutputTypeCountItemFavoritesArgs
     itemLikes?: boolean | UserCountOutputTypeCountItemLikesArgs
     RegisterInProgress?: boolean | UserCountOutputTypeCountRegisterInProgressArgs
+    ResetPasswordInProgress?: boolean | UserCountOutputTypeCountResetPasswordInProgressArgs
   }
 
   // Custom InputTypes
@@ -1734,6 +1827,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountRegisterInProgressArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: RegisterInProgressWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountResetPasswordInProgressArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ResetPasswordInProgressWhereInput
   }
 
 
@@ -6989,6 +7089,1064 @@ export namespace Prisma {
 
 
   /**
+   * Model ResetPasswordInProgress
+   */
+
+  export type AggregateResetPasswordInProgress = {
+    _count: ResetPasswordInProgressCountAggregateOutputType | null
+    _min: ResetPasswordInProgressMinAggregateOutputType | null
+    _max: ResetPasswordInProgressMaxAggregateOutputType | null
+  }
+
+  export type ResetPasswordInProgressMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    verificationCode: string | null
+    verificationCodeExpiration: string | null
+    token: string | null
+  }
+
+  export type ResetPasswordInProgressMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    verificationCode: string | null
+    verificationCodeExpiration: string | null
+    token: string | null
+  }
+
+  export type ResetPasswordInProgressCountAggregateOutputType = {
+    id: number
+    userId: number
+    verificationCode: number
+    verificationCodeExpiration: number
+    token: number
+    _all: number
+  }
+
+
+  export type ResetPasswordInProgressMinAggregateInputType = {
+    id?: true
+    userId?: true
+    verificationCode?: true
+    verificationCodeExpiration?: true
+    token?: true
+  }
+
+  export type ResetPasswordInProgressMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    verificationCode?: true
+    verificationCodeExpiration?: true
+    token?: true
+  }
+
+  export type ResetPasswordInProgressCountAggregateInputType = {
+    id?: true
+    userId?: true
+    verificationCode?: true
+    verificationCodeExpiration?: true
+    token?: true
+    _all?: true
+  }
+
+  export type ResetPasswordInProgressAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ResetPasswordInProgress to aggregate.
+     */
+    where?: ResetPasswordInProgressWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ResetPasswordInProgresses to fetch.
+     */
+    orderBy?: ResetPasswordInProgressOrderByWithRelationInput | ResetPasswordInProgressOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ResetPasswordInProgressWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ResetPasswordInProgresses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ResetPasswordInProgresses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ResetPasswordInProgresses
+    **/
+    _count?: true | ResetPasswordInProgressCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ResetPasswordInProgressMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ResetPasswordInProgressMaxAggregateInputType
+  }
+
+  export type GetResetPasswordInProgressAggregateType<T extends ResetPasswordInProgressAggregateArgs> = {
+        [P in keyof T & keyof AggregateResetPasswordInProgress]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateResetPasswordInProgress[P]>
+      : GetScalarType<T[P], AggregateResetPasswordInProgress[P]>
+  }
+
+
+
+
+  export type ResetPasswordInProgressGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ResetPasswordInProgressWhereInput
+    orderBy?: ResetPasswordInProgressOrderByWithAggregationInput | ResetPasswordInProgressOrderByWithAggregationInput[]
+    by: ResetPasswordInProgressScalarFieldEnum[] | ResetPasswordInProgressScalarFieldEnum
+    having?: ResetPasswordInProgressScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ResetPasswordInProgressCountAggregateInputType | true
+    _min?: ResetPasswordInProgressMinAggregateInputType
+    _max?: ResetPasswordInProgressMaxAggregateInputType
+  }
+
+  export type ResetPasswordInProgressGroupByOutputType = {
+    id: string
+    userId: string
+    verificationCode: string
+    verificationCodeExpiration: string
+    token: string
+    _count: ResetPasswordInProgressCountAggregateOutputType | null
+    _min: ResetPasswordInProgressMinAggregateOutputType | null
+    _max: ResetPasswordInProgressMaxAggregateOutputType | null
+  }
+
+  type GetResetPasswordInProgressGroupByPayload<T extends ResetPasswordInProgressGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ResetPasswordInProgressGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ResetPasswordInProgressGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ResetPasswordInProgressGroupByOutputType[P]>
+            : GetScalarType<T[P], ResetPasswordInProgressGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ResetPasswordInProgressSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    verificationCode?: boolean
+    verificationCodeExpiration?: boolean
+    token?: boolean
+    user?: boolean | userDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["resetPasswordInProgress"]>
+
+  export type ResetPasswordInProgressSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    verificationCode?: boolean
+    verificationCodeExpiration?: boolean
+    token?: boolean
+    user?: boolean | userDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["resetPasswordInProgress"]>
+
+  export type ResetPasswordInProgressSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    verificationCode?: boolean
+    verificationCodeExpiration?: boolean
+    token?: boolean
+    user?: boolean | userDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["resetPasswordInProgress"]>
+
+  export type ResetPasswordInProgressSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    verificationCode?: boolean
+    verificationCodeExpiration?: boolean
+    token?: boolean
+  }
+
+  export type ResetPasswordInProgressOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "verificationCode" | "verificationCodeExpiration" | "token", ExtArgs["result"]["resetPasswordInProgress"]>
+  export type ResetPasswordInProgressInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | userDefaultArgs<ExtArgs>
+  }
+  export type ResetPasswordInProgressIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | userDefaultArgs<ExtArgs>
+  }
+  export type ResetPasswordInProgressIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | userDefaultArgs<ExtArgs>
+  }
+
+  export type $ResetPasswordInProgressPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ResetPasswordInProgress"
+    objects: {
+      user: Prisma.$userPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      verificationCode: string
+      verificationCodeExpiration: string
+      token: string
+    }, ExtArgs["result"]["resetPasswordInProgress"]>
+    composites: {}
+  }
+
+  type ResetPasswordInProgressGetPayload<S extends boolean | null | undefined | ResetPasswordInProgressDefaultArgs> = $Result.GetResult<Prisma.$ResetPasswordInProgressPayload, S>
+
+  type ResetPasswordInProgressCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ResetPasswordInProgressFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ResetPasswordInProgressCountAggregateInputType | true
+    }
+
+  export interface ResetPasswordInProgressDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ResetPasswordInProgress'], meta: { name: 'ResetPasswordInProgress' } }
+    /**
+     * Find zero or one ResetPasswordInProgress that matches the filter.
+     * @param {ResetPasswordInProgressFindUniqueArgs} args - Arguments to find a ResetPasswordInProgress
+     * @example
+     * // Get one ResetPasswordInProgress
+     * const resetPasswordInProgress = await prisma.resetPasswordInProgress.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ResetPasswordInProgressFindUniqueArgs>(args: SelectSubset<T, ResetPasswordInProgressFindUniqueArgs<ExtArgs>>): Prisma__ResetPasswordInProgressClient<$Result.GetResult<Prisma.$ResetPasswordInProgressPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ResetPasswordInProgress that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ResetPasswordInProgressFindUniqueOrThrowArgs} args - Arguments to find a ResetPasswordInProgress
+     * @example
+     * // Get one ResetPasswordInProgress
+     * const resetPasswordInProgress = await prisma.resetPasswordInProgress.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ResetPasswordInProgressFindUniqueOrThrowArgs>(args: SelectSubset<T, ResetPasswordInProgressFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ResetPasswordInProgressClient<$Result.GetResult<Prisma.$ResetPasswordInProgressPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ResetPasswordInProgress that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ResetPasswordInProgressFindFirstArgs} args - Arguments to find a ResetPasswordInProgress
+     * @example
+     * // Get one ResetPasswordInProgress
+     * const resetPasswordInProgress = await prisma.resetPasswordInProgress.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ResetPasswordInProgressFindFirstArgs>(args?: SelectSubset<T, ResetPasswordInProgressFindFirstArgs<ExtArgs>>): Prisma__ResetPasswordInProgressClient<$Result.GetResult<Prisma.$ResetPasswordInProgressPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ResetPasswordInProgress that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ResetPasswordInProgressFindFirstOrThrowArgs} args - Arguments to find a ResetPasswordInProgress
+     * @example
+     * // Get one ResetPasswordInProgress
+     * const resetPasswordInProgress = await prisma.resetPasswordInProgress.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ResetPasswordInProgressFindFirstOrThrowArgs>(args?: SelectSubset<T, ResetPasswordInProgressFindFirstOrThrowArgs<ExtArgs>>): Prisma__ResetPasswordInProgressClient<$Result.GetResult<Prisma.$ResetPasswordInProgressPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ResetPasswordInProgresses that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ResetPasswordInProgressFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ResetPasswordInProgresses
+     * const resetPasswordInProgresses = await prisma.resetPasswordInProgress.findMany()
+     * 
+     * // Get first 10 ResetPasswordInProgresses
+     * const resetPasswordInProgresses = await prisma.resetPasswordInProgress.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const resetPasswordInProgressWithIdOnly = await prisma.resetPasswordInProgress.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ResetPasswordInProgressFindManyArgs>(args?: SelectSubset<T, ResetPasswordInProgressFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ResetPasswordInProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ResetPasswordInProgress.
+     * @param {ResetPasswordInProgressCreateArgs} args - Arguments to create a ResetPasswordInProgress.
+     * @example
+     * // Create one ResetPasswordInProgress
+     * const ResetPasswordInProgress = await prisma.resetPasswordInProgress.create({
+     *   data: {
+     *     // ... data to create a ResetPasswordInProgress
+     *   }
+     * })
+     * 
+     */
+    create<T extends ResetPasswordInProgressCreateArgs>(args: SelectSubset<T, ResetPasswordInProgressCreateArgs<ExtArgs>>): Prisma__ResetPasswordInProgressClient<$Result.GetResult<Prisma.$ResetPasswordInProgressPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ResetPasswordInProgresses.
+     * @param {ResetPasswordInProgressCreateManyArgs} args - Arguments to create many ResetPasswordInProgresses.
+     * @example
+     * // Create many ResetPasswordInProgresses
+     * const resetPasswordInProgress = await prisma.resetPasswordInProgress.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ResetPasswordInProgressCreateManyArgs>(args?: SelectSubset<T, ResetPasswordInProgressCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ResetPasswordInProgresses and returns the data saved in the database.
+     * @param {ResetPasswordInProgressCreateManyAndReturnArgs} args - Arguments to create many ResetPasswordInProgresses.
+     * @example
+     * // Create many ResetPasswordInProgresses
+     * const resetPasswordInProgress = await prisma.resetPasswordInProgress.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ResetPasswordInProgresses and only return the `id`
+     * const resetPasswordInProgressWithIdOnly = await prisma.resetPasswordInProgress.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ResetPasswordInProgressCreateManyAndReturnArgs>(args?: SelectSubset<T, ResetPasswordInProgressCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ResetPasswordInProgressPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a ResetPasswordInProgress.
+     * @param {ResetPasswordInProgressDeleteArgs} args - Arguments to delete one ResetPasswordInProgress.
+     * @example
+     * // Delete one ResetPasswordInProgress
+     * const ResetPasswordInProgress = await prisma.resetPasswordInProgress.delete({
+     *   where: {
+     *     // ... filter to delete one ResetPasswordInProgress
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ResetPasswordInProgressDeleteArgs>(args: SelectSubset<T, ResetPasswordInProgressDeleteArgs<ExtArgs>>): Prisma__ResetPasswordInProgressClient<$Result.GetResult<Prisma.$ResetPasswordInProgressPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ResetPasswordInProgress.
+     * @param {ResetPasswordInProgressUpdateArgs} args - Arguments to update one ResetPasswordInProgress.
+     * @example
+     * // Update one ResetPasswordInProgress
+     * const resetPasswordInProgress = await prisma.resetPasswordInProgress.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ResetPasswordInProgressUpdateArgs>(args: SelectSubset<T, ResetPasswordInProgressUpdateArgs<ExtArgs>>): Prisma__ResetPasswordInProgressClient<$Result.GetResult<Prisma.$ResetPasswordInProgressPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ResetPasswordInProgresses.
+     * @param {ResetPasswordInProgressDeleteManyArgs} args - Arguments to filter ResetPasswordInProgresses to delete.
+     * @example
+     * // Delete a few ResetPasswordInProgresses
+     * const { count } = await prisma.resetPasswordInProgress.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ResetPasswordInProgressDeleteManyArgs>(args?: SelectSubset<T, ResetPasswordInProgressDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ResetPasswordInProgresses.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ResetPasswordInProgressUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ResetPasswordInProgresses
+     * const resetPasswordInProgress = await prisma.resetPasswordInProgress.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ResetPasswordInProgressUpdateManyArgs>(args: SelectSubset<T, ResetPasswordInProgressUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ResetPasswordInProgresses and returns the data updated in the database.
+     * @param {ResetPasswordInProgressUpdateManyAndReturnArgs} args - Arguments to update many ResetPasswordInProgresses.
+     * @example
+     * // Update many ResetPasswordInProgresses
+     * const resetPasswordInProgress = await prisma.resetPasswordInProgress.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more ResetPasswordInProgresses and only return the `id`
+     * const resetPasswordInProgressWithIdOnly = await prisma.resetPasswordInProgress.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ResetPasswordInProgressUpdateManyAndReturnArgs>(args: SelectSubset<T, ResetPasswordInProgressUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ResetPasswordInProgressPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one ResetPasswordInProgress.
+     * @param {ResetPasswordInProgressUpsertArgs} args - Arguments to update or create a ResetPasswordInProgress.
+     * @example
+     * // Update or create a ResetPasswordInProgress
+     * const resetPasswordInProgress = await prisma.resetPasswordInProgress.upsert({
+     *   create: {
+     *     // ... data to create a ResetPasswordInProgress
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ResetPasswordInProgress we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ResetPasswordInProgressUpsertArgs>(args: SelectSubset<T, ResetPasswordInProgressUpsertArgs<ExtArgs>>): Prisma__ResetPasswordInProgressClient<$Result.GetResult<Prisma.$ResetPasswordInProgressPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ResetPasswordInProgresses.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ResetPasswordInProgressCountArgs} args - Arguments to filter ResetPasswordInProgresses to count.
+     * @example
+     * // Count the number of ResetPasswordInProgresses
+     * const count = await prisma.resetPasswordInProgress.count({
+     *   where: {
+     *     // ... the filter for the ResetPasswordInProgresses we want to count
+     *   }
+     * })
+    **/
+    count<T extends ResetPasswordInProgressCountArgs>(
+      args?: Subset<T, ResetPasswordInProgressCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ResetPasswordInProgressCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ResetPasswordInProgress.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ResetPasswordInProgressAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ResetPasswordInProgressAggregateArgs>(args: Subset<T, ResetPasswordInProgressAggregateArgs>): Prisma.PrismaPromise<GetResetPasswordInProgressAggregateType<T>>
+
+    /**
+     * Group by ResetPasswordInProgress.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ResetPasswordInProgressGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ResetPasswordInProgressGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ResetPasswordInProgressGroupByArgs['orderBy'] }
+        : { orderBy?: ResetPasswordInProgressGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ResetPasswordInProgressGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetResetPasswordInProgressGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ResetPasswordInProgress model
+   */
+  readonly fields: ResetPasswordInProgressFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ResetPasswordInProgress.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ResetPasswordInProgressClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends userDefaultArgs<ExtArgs> = {}>(args?: Subset<T, userDefaultArgs<ExtArgs>>): Prisma__userClient<$Result.GetResult<Prisma.$userPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ResetPasswordInProgress model
+   */
+  interface ResetPasswordInProgressFieldRefs {
+    readonly id: FieldRef<"ResetPasswordInProgress", 'String'>
+    readonly userId: FieldRef<"ResetPasswordInProgress", 'String'>
+    readonly verificationCode: FieldRef<"ResetPasswordInProgress", 'String'>
+    readonly verificationCodeExpiration: FieldRef<"ResetPasswordInProgress", 'String'>
+    readonly token: FieldRef<"ResetPasswordInProgress", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ResetPasswordInProgress findUnique
+   */
+  export type ResetPasswordInProgressFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ResetPasswordInProgress
+     */
+    select?: ResetPasswordInProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ResetPasswordInProgress
+     */
+    omit?: ResetPasswordInProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ResetPasswordInProgressInclude<ExtArgs> | null
+    /**
+     * Filter, which ResetPasswordInProgress to fetch.
+     */
+    where: ResetPasswordInProgressWhereUniqueInput
+  }
+
+  /**
+   * ResetPasswordInProgress findUniqueOrThrow
+   */
+  export type ResetPasswordInProgressFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ResetPasswordInProgress
+     */
+    select?: ResetPasswordInProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ResetPasswordInProgress
+     */
+    omit?: ResetPasswordInProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ResetPasswordInProgressInclude<ExtArgs> | null
+    /**
+     * Filter, which ResetPasswordInProgress to fetch.
+     */
+    where: ResetPasswordInProgressWhereUniqueInput
+  }
+
+  /**
+   * ResetPasswordInProgress findFirst
+   */
+  export type ResetPasswordInProgressFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ResetPasswordInProgress
+     */
+    select?: ResetPasswordInProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ResetPasswordInProgress
+     */
+    omit?: ResetPasswordInProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ResetPasswordInProgressInclude<ExtArgs> | null
+    /**
+     * Filter, which ResetPasswordInProgress to fetch.
+     */
+    where?: ResetPasswordInProgressWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ResetPasswordInProgresses to fetch.
+     */
+    orderBy?: ResetPasswordInProgressOrderByWithRelationInput | ResetPasswordInProgressOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ResetPasswordInProgresses.
+     */
+    cursor?: ResetPasswordInProgressWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ResetPasswordInProgresses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ResetPasswordInProgresses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ResetPasswordInProgresses.
+     */
+    distinct?: ResetPasswordInProgressScalarFieldEnum | ResetPasswordInProgressScalarFieldEnum[]
+  }
+
+  /**
+   * ResetPasswordInProgress findFirstOrThrow
+   */
+  export type ResetPasswordInProgressFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ResetPasswordInProgress
+     */
+    select?: ResetPasswordInProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ResetPasswordInProgress
+     */
+    omit?: ResetPasswordInProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ResetPasswordInProgressInclude<ExtArgs> | null
+    /**
+     * Filter, which ResetPasswordInProgress to fetch.
+     */
+    where?: ResetPasswordInProgressWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ResetPasswordInProgresses to fetch.
+     */
+    orderBy?: ResetPasswordInProgressOrderByWithRelationInput | ResetPasswordInProgressOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ResetPasswordInProgresses.
+     */
+    cursor?: ResetPasswordInProgressWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ResetPasswordInProgresses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ResetPasswordInProgresses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ResetPasswordInProgresses.
+     */
+    distinct?: ResetPasswordInProgressScalarFieldEnum | ResetPasswordInProgressScalarFieldEnum[]
+  }
+
+  /**
+   * ResetPasswordInProgress findMany
+   */
+  export type ResetPasswordInProgressFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ResetPasswordInProgress
+     */
+    select?: ResetPasswordInProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ResetPasswordInProgress
+     */
+    omit?: ResetPasswordInProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ResetPasswordInProgressInclude<ExtArgs> | null
+    /**
+     * Filter, which ResetPasswordInProgresses to fetch.
+     */
+    where?: ResetPasswordInProgressWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ResetPasswordInProgresses to fetch.
+     */
+    orderBy?: ResetPasswordInProgressOrderByWithRelationInput | ResetPasswordInProgressOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ResetPasswordInProgresses.
+     */
+    cursor?: ResetPasswordInProgressWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ResetPasswordInProgresses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ResetPasswordInProgresses.
+     */
+    skip?: number
+    distinct?: ResetPasswordInProgressScalarFieldEnum | ResetPasswordInProgressScalarFieldEnum[]
+  }
+
+  /**
+   * ResetPasswordInProgress create
+   */
+  export type ResetPasswordInProgressCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ResetPasswordInProgress
+     */
+    select?: ResetPasswordInProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ResetPasswordInProgress
+     */
+    omit?: ResetPasswordInProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ResetPasswordInProgressInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ResetPasswordInProgress.
+     */
+    data: XOR<ResetPasswordInProgressCreateInput, ResetPasswordInProgressUncheckedCreateInput>
+  }
+
+  /**
+   * ResetPasswordInProgress createMany
+   */
+  export type ResetPasswordInProgressCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ResetPasswordInProgresses.
+     */
+    data: ResetPasswordInProgressCreateManyInput | ResetPasswordInProgressCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ResetPasswordInProgress createManyAndReturn
+   */
+  export type ResetPasswordInProgressCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ResetPasswordInProgress
+     */
+    select?: ResetPasswordInProgressSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ResetPasswordInProgress
+     */
+    omit?: ResetPasswordInProgressOmit<ExtArgs> | null
+    /**
+     * The data used to create many ResetPasswordInProgresses.
+     */
+    data: ResetPasswordInProgressCreateManyInput | ResetPasswordInProgressCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ResetPasswordInProgressIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ResetPasswordInProgress update
+   */
+  export type ResetPasswordInProgressUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ResetPasswordInProgress
+     */
+    select?: ResetPasswordInProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ResetPasswordInProgress
+     */
+    omit?: ResetPasswordInProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ResetPasswordInProgressInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ResetPasswordInProgress.
+     */
+    data: XOR<ResetPasswordInProgressUpdateInput, ResetPasswordInProgressUncheckedUpdateInput>
+    /**
+     * Choose, which ResetPasswordInProgress to update.
+     */
+    where: ResetPasswordInProgressWhereUniqueInput
+  }
+
+  /**
+   * ResetPasswordInProgress updateMany
+   */
+  export type ResetPasswordInProgressUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ResetPasswordInProgresses.
+     */
+    data: XOR<ResetPasswordInProgressUpdateManyMutationInput, ResetPasswordInProgressUncheckedUpdateManyInput>
+    /**
+     * Filter which ResetPasswordInProgresses to update
+     */
+    where?: ResetPasswordInProgressWhereInput
+    /**
+     * Limit how many ResetPasswordInProgresses to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ResetPasswordInProgress updateManyAndReturn
+   */
+  export type ResetPasswordInProgressUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ResetPasswordInProgress
+     */
+    select?: ResetPasswordInProgressSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ResetPasswordInProgress
+     */
+    omit?: ResetPasswordInProgressOmit<ExtArgs> | null
+    /**
+     * The data used to update ResetPasswordInProgresses.
+     */
+    data: XOR<ResetPasswordInProgressUpdateManyMutationInput, ResetPasswordInProgressUncheckedUpdateManyInput>
+    /**
+     * Filter which ResetPasswordInProgresses to update
+     */
+    where?: ResetPasswordInProgressWhereInput
+    /**
+     * Limit how many ResetPasswordInProgresses to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ResetPasswordInProgressIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ResetPasswordInProgress upsert
+   */
+  export type ResetPasswordInProgressUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ResetPasswordInProgress
+     */
+    select?: ResetPasswordInProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ResetPasswordInProgress
+     */
+    omit?: ResetPasswordInProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ResetPasswordInProgressInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ResetPasswordInProgress to update in case it exists.
+     */
+    where: ResetPasswordInProgressWhereUniqueInput
+    /**
+     * In case the ResetPasswordInProgress found by the `where` argument doesn't exist, create a new ResetPasswordInProgress with this data.
+     */
+    create: XOR<ResetPasswordInProgressCreateInput, ResetPasswordInProgressUncheckedCreateInput>
+    /**
+     * In case the ResetPasswordInProgress was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ResetPasswordInProgressUpdateInput, ResetPasswordInProgressUncheckedUpdateInput>
+  }
+
+  /**
+   * ResetPasswordInProgress delete
+   */
+  export type ResetPasswordInProgressDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ResetPasswordInProgress
+     */
+    select?: ResetPasswordInProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ResetPasswordInProgress
+     */
+    omit?: ResetPasswordInProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ResetPasswordInProgressInclude<ExtArgs> | null
+    /**
+     * Filter which ResetPasswordInProgress to delete.
+     */
+    where: ResetPasswordInProgressWhereUniqueInput
+  }
+
+  /**
+   * ResetPasswordInProgress deleteMany
+   */
+  export type ResetPasswordInProgressDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ResetPasswordInProgresses to delete
+     */
+    where?: ResetPasswordInProgressWhereInput
+    /**
+     * Limit how many ResetPasswordInProgresses to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ResetPasswordInProgress without action
+   */
+  export type ResetPasswordInProgressDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ResetPasswordInProgress
+     */
+    select?: ResetPasswordInProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ResetPasswordInProgress
+     */
+    omit?: ResetPasswordInProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ResetPasswordInProgressInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Model InspoItems
    */
 
@@ -10458,6 +11616,7 @@ export namespace Prisma {
     itemFavorites?: boolean | user$itemFavoritesArgs<ExtArgs>
     itemLikes?: boolean | user$itemLikesArgs<ExtArgs>
     RegisterInProgress?: boolean | user$RegisterInProgressArgs<ExtArgs>
+    ResetPasswordInProgress?: boolean | user$ResetPasswordInProgressArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -10503,6 +11662,7 @@ export namespace Prisma {
     itemFavorites?: boolean | user$itemFavoritesArgs<ExtArgs>
     itemLikes?: boolean | user$itemLikesArgs<ExtArgs>
     RegisterInProgress?: boolean | user$RegisterInProgressArgs<ExtArgs>
+    ResetPasswordInProgress?: boolean | user$ResetPasswordInProgressArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type userIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -10518,6 +11678,7 @@ export namespace Prisma {
       itemFavorites: Prisma.$ItemFavoritePayload<ExtArgs>[]
       itemLikes: Prisma.$ItemLikePayload<ExtArgs>[]
       RegisterInProgress: Prisma.$RegisterInProgressPayload<ExtArgs>[]
+      ResetPasswordInProgress: Prisma.$ResetPasswordInProgressPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -10929,6 +12090,7 @@ export namespace Prisma {
     itemFavorites<T extends user$itemFavoritesArgs<ExtArgs> = {}>(args?: Subset<T, user$itemFavoritesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ItemFavoritePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     itemLikes<T extends user$itemLikesArgs<ExtArgs> = {}>(args?: Subset<T, user$itemLikesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ItemLikePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     RegisterInProgress<T extends user$RegisterInProgressArgs<ExtArgs> = {}>(args?: Subset<T, user$RegisterInProgressArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RegisterInProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    ResetPasswordInProgress<T extends user$ResetPasswordInProgressArgs<ExtArgs> = {}>(args?: Subset<T, user$ResetPasswordInProgressArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ResetPasswordInProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -11509,6 +12671,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: RegisterInProgressScalarFieldEnum | RegisterInProgressScalarFieldEnum[]
+  }
+
+  /**
+   * user.ResetPasswordInProgress
+   */
+  export type user$ResetPasswordInProgressArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ResetPasswordInProgress
+     */
+    select?: ResetPasswordInProgressSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ResetPasswordInProgress
+     */
+    omit?: ResetPasswordInProgressOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ResetPasswordInProgressInclude<ExtArgs> | null
+    where?: ResetPasswordInProgressWhereInput
+    orderBy?: ResetPasswordInProgressOrderByWithRelationInput | ResetPasswordInProgressOrderByWithRelationInput[]
+    cursor?: ResetPasswordInProgressWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ResetPasswordInProgressScalarFieldEnum | ResetPasswordInProgressScalarFieldEnum[]
   }
 
   /**
@@ -12604,6 +13790,17 @@ export namespace Prisma {
   export type RegisterInProgressScalarFieldEnum = (typeof RegisterInProgressScalarFieldEnum)[keyof typeof RegisterInProgressScalarFieldEnum]
 
 
+  export const ResetPasswordInProgressScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    verificationCode: 'verificationCode',
+    verificationCodeExpiration: 'verificationCodeExpiration',
+    token: 'token'
+  };
+
+  export type ResetPasswordInProgressScalarFieldEnum = (typeof ResetPasswordInProgressScalarFieldEnum)[keyof typeof ResetPasswordInProgressScalarFieldEnum]
+
+
   export const InspoItemsScalarFieldEnum: {
     id: 'id',
     itemUuid: 'itemUuid',
@@ -13061,6 +14258,61 @@ export namespace Prisma {
     token?: StringWithAggregatesFilter<"RegisterInProgress"> | string
   }
 
+  export type ResetPasswordInProgressWhereInput = {
+    AND?: ResetPasswordInProgressWhereInput | ResetPasswordInProgressWhereInput[]
+    OR?: ResetPasswordInProgressWhereInput[]
+    NOT?: ResetPasswordInProgressWhereInput | ResetPasswordInProgressWhereInput[]
+    id?: UuidFilter<"ResetPasswordInProgress"> | string
+    userId?: UuidFilter<"ResetPasswordInProgress"> | string
+    verificationCode?: StringFilter<"ResetPasswordInProgress"> | string
+    verificationCodeExpiration?: StringFilter<"ResetPasswordInProgress"> | string
+    token?: StringFilter<"ResetPasswordInProgress"> | string
+    user?: XOR<UserScalarRelationFilter, userWhereInput>
+  }
+
+  export type ResetPasswordInProgressOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    verificationCode?: SortOrder
+    verificationCodeExpiration?: SortOrder
+    token?: SortOrder
+    user?: userOrderByWithRelationInput
+  }
+
+  export type ResetPasswordInProgressWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    userId?: string
+    token?: string
+    AND?: ResetPasswordInProgressWhereInput | ResetPasswordInProgressWhereInput[]
+    OR?: ResetPasswordInProgressWhereInput[]
+    NOT?: ResetPasswordInProgressWhereInput | ResetPasswordInProgressWhereInput[]
+    verificationCode?: StringFilter<"ResetPasswordInProgress"> | string
+    verificationCodeExpiration?: StringFilter<"ResetPasswordInProgress"> | string
+    user?: XOR<UserScalarRelationFilter, userWhereInput>
+  }, "id" | "userId" | "token">
+
+  export type ResetPasswordInProgressOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    verificationCode?: SortOrder
+    verificationCodeExpiration?: SortOrder
+    token?: SortOrder
+    _count?: ResetPasswordInProgressCountOrderByAggregateInput
+    _max?: ResetPasswordInProgressMaxOrderByAggregateInput
+    _min?: ResetPasswordInProgressMinOrderByAggregateInput
+  }
+
+  export type ResetPasswordInProgressScalarWhereWithAggregatesInput = {
+    AND?: ResetPasswordInProgressScalarWhereWithAggregatesInput | ResetPasswordInProgressScalarWhereWithAggregatesInput[]
+    OR?: ResetPasswordInProgressScalarWhereWithAggregatesInput[]
+    NOT?: ResetPasswordInProgressScalarWhereWithAggregatesInput | ResetPasswordInProgressScalarWhereWithAggregatesInput[]
+    id?: UuidWithAggregatesFilter<"ResetPasswordInProgress"> | string
+    userId?: UuidWithAggregatesFilter<"ResetPasswordInProgress"> | string
+    verificationCode?: StringWithAggregatesFilter<"ResetPasswordInProgress"> | string
+    verificationCodeExpiration?: StringWithAggregatesFilter<"ResetPasswordInProgress"> | string
+    token?: StringWithAggregatesFilter<"ResetPasswordInProgress"> | string
+  }
+
   export type InspoItemsWhereInput = {
     AND?: InspoItemsWhereInput | InspoItemsWhereInput[]
     OR?: InspoItemsWhereInput[]
@@ -13294,6 +14546,7 @@ export namespace Prisma {
     itemFavorites?: ItemFavoriteListRelationFilter
     itemLikes?: ItemLikeListRelationFilter
     RegisterInProgress?: RegisterInProgressListRelationFilter
+    ResetPasswordInProgress?: ResetPasswordInProgressListRelationFilter
   }
 
   export type userOrderByWithRelationInput = {
@@ -13312,6 +14565,7 @@ export namespace Prisma {
     itemFavorites?: ItemFavoriteOrderByRelationAggregateInput
     itemLikes?: ItemLikeOrderByRelationAggregateInput
     RegisterInProgress?: RegisterInProgressOrderByRelationAggregateInput
+    ResetPasswordInProgress?: ResetPasswordInProgressOrderByRelationAggregateInput
   }
 
   export type userWhereUniqueInput = Prisma.AtLeast<{
@@ -13333,6 +14587,7 @@ export namespace Prisma {
     itemFavorites?: ItemFavoriteListRelationFilter
     itemLikes?: ItemLikeListRelationFilter
     RegisterInProgress?: RegisterInProgressListRelationFilter
+    ResetPasswordInProgress?: ResetPasswordInProgressListRelationFilter
   }, "id" | "email">
 
   export type userOrderByWithAggregationInput = {
@@ -13674,6 +14929,61 @@ export namespace Prisma {
     token?: StringFieldUpdateOperationsInput | string
   }
 
+  export type ResetPasswordInProgressCreateInput = {
+    id?: string
+    verificationCode: string
+    verificationCodeExpiration: string
+    token: string
+    user: userCreateNestedOneWithoutResetPasswordInProgressInput
+  }
+
+  export type ResetPasswordInProgressUncheckedCreateInput = {
+    id?: string
+    userId: string
+    verificationCode: string
+    verificationCodeExpiration: string
+    token: string
+  }
+
+  export type ResetPasswordInProgressUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    verificationCode?: StringFieldUpdateOperationsInput | string
+    verificationCodeExpiration?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    user?: userUpdateOneRequiredWithoutResetPasswordInProgressNestedInput
+  }
+
+  export type ResetPasswordInProgressUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    verificationCode?: StringFieldUpdateOperationsInput | string
+    verificationCodeExpiration?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type ResetPasswordInProgressCreateManyInput = {
+    id?: string
+    userId: string
+    verificationCode: string
+    verificationCodeExpiration: string
+    token: string
+  }
+
+  export type ResetPasswordInProgressUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    verificationCode?: StringFieldUpdateOperationsInput | string
+    verificationCodeExpiration?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type ResetPasswordInProgressUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    verificationCode?: StringFieldUpdateOperationsInput | string
+    verificationCodeExpiration?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+  }
+
   export type InspoItemsCreateInput = {
     id?: string
     itemUuid: string
@@ -13926,6 +15236,7 @@ export namespace Prisma {
     itemFavorites?: ItemFavoriteCreateNestedManyWithoutUserInput
     itemLikes?: ItemLikeCreateNestedManyWithoutUserInput
     RegisterInProgress?: RegisterInProgressCreateNestedManyWithoutUserInput
+    ResetPasswordInProgress?: ResetPasswordInProgressCreateNestedManyWithoutUserInput
   }
 
   export type userUncheckedCreateInput = {
@@ -13944,6 +15255,7 @@ export namespace Prisma {
     itemFavorites?: ItemFavoriteUncheckedCreateNestedManyWithoutUserInput
     itemLikes?: ItemLikeUncheckedCreateNestedManyWithoutUserInput
     RegisterInProgress?: RegisterInProgressUncheckedCreateNestedManyWithoutUserInput
+    ResetPasswordInProgress?: ResetPasswordInProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type userUpdateInput = {
@@ -13962,6 +15274,7 @@ export namespace Prisma {
     itemFavorites?: ItemFavoriteUpdateManyWithoutUserNestedInput
     itemLikes?: ItemLikeUpdateManyWithoutUserNestedInput
     RegisterInProgress?: RegisterInProgressUpdateManyWithoutUserNestedInput
+    ResetPasswordInProgress?: ResetPasswordInProgressUpdateManyWithoutUserNestedInput
   }
 
   export type userUncheckedUpdateInput = {
@@ -13980,6 +15293,7 @@ export namespace Prisma {
     itemFavorites?: ItemFavoriteUncheckedUpdateManyWithoutUserNestedInput
     itemLikes?: ItemLikeUncheckedUpdateManyWithoutUserNestedInput
     RegisterInProgress?: RegisterInProgressUncheckedUpdateManyWithoutUserNestedInput
+    ResetPasswordInProgress?: ResetPasswordInProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type userCreateManyInput = {
@@ -14341,6 +15655,30 @@ export namespace Prisma {
     token?: SortOrder
   }
 
+  export type ResetPasswordInProgressCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    verificationCode?: SortOrder
+    verificationCodeExpiration?: SortOrder
+    token?: SortOrder
+  }
+
+  export type ResetPasswordInProgressMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    verificationCode?: SortOrder
+    verificationCodeExpiration?: SortOrder
+    token?: SortOrder
+  }
+
+  export type ResetPasswordInProgressMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    verificationCode?: SortOrder
+    verificationCodeExpiration?: SortOrder
+    token?: SortOrder
+  }
+
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -14581,6 +15919,12 @@ export namespace Prisma {
     none?: RegisterInProgressWhereInput
   }
 
+  export type ResetPasswordInProgressListRelationFilter = {
+    every?: ResetPasswordInProgressWhereInput
+    some?: ResetPasswordInProgressWhereInput
+    none?: ResetPasswordInProgressWhereInput
+  }
+
   export type accountOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -14598,6 +15942,10 @@ export namespace Prisma {
   }
 
   export type RegisterInProgressOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ResetPasswordInProgressOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -14747,6 +16095,20 @@ export namespace Prisma {
     update?: XOR<XOR<userUpdateToOneWithWhereWithoutRegisterInProgressInput, userUpdateWithoutRegisterInProgressInput>, userUncheckedUpdateWithoutRegisterInProgressInput>
   }
 
+  export type userCreateNestedOneWithoutResetPasswordInProgressInput = {
+    create?: XOR<userCreateWithoutResetPasswordInProgressInput, userUncheckedCreateWithoutResetPasswordInProgressInput>
+    connectOrCreate?: userCreateOrConnectWithoutResetPasswordInProgressInput
+    connect?: userWhereUniqueInput
+  }
+
+  export type userUpdateOneRequiredWithoutResetPasswordInProgressNestedInput = {
+    create?: XOR<userCreateWithoutResetPasswordInProgressInput, userUncheckedCreateWithoutResetPasswordInProgressInput>
+    connectOrCreate?: userCreateOrConnectWithoutResetPasswordInProgressInput
+    upsert?: userUpsertWithoutResetPasswordInProgressInput
+    connect?: userWhereUniqueInput
+    update?: XOR<XOR<userUpdateToOneWithWhereWithoutResetPasswordInProgressInput, userUpdateWithoutResetPasswordInProgressInput>, userUncheckedUpdateWithoutResetPasswordInProgressInput>
+  }
+
   export type IntFieldUpdateOperationsInput = {
     set?: number
     increment?: number
@@ -14838,6 +16200,13 @@ export namespace Prisma {
     connect?: RegisterInProgressWhereUniqueInput | RegisterInProgressWhereUniqueInput[]
   }
 
+  export type ResetPasswordInProgressCreateNestedManyWithoutUserInput = {
+    create?: XOR<ResetPasswordInProgressCreateWithoutUserInput, ResetPasswordInProgressUncheckedCreateWithoutUserInput> | ResetPasswordInProgressCreateWithoutUserInput[] | ResetPasswordInProgressUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ResetPasswordInProgressCreateOrConnectWithoutUserInput | ResetPasswordInProgressCreateOrConnectWithoutUserInput[]
+    createMany?: ResetPasswordInProgressCreateManyUserInputEnvelope
+    connect?: ResetPasswordInProgressWhereUniqueInput | ResetPasswordInProgressWhereUniqueInput[]
+  }
+
   export type accountUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<accountCreateWithoutUserInput, accountUncheckedCreateWithoutUserInput> | accountCreateWithoutUserInput[] | accountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: accountCreateOrConnectWithoutUserInput | accountCreateOrConnectWithoutUserInput[]
@@ -14883,6 +16252,13 @@ export namespace Prisma {
     connectOrCreate?: RegisterInProgressCreateOrConnectWithoutUserInput | RegisterInProgressCreateOrConnectWithoutUserInput[]
     createMany?: RegisterInProgressCreateManyUserInputEnvelope
     connect?: RegisterInProgressWhereUniqueInput | RegisterInProgressWhereUniqueInput[]
+  }
+
+  export type ResetPasswordInProgressUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<ResetPasswordInProgressCreateWithoutUserInput, ResetPasswordInProgressUncheckedCreateWithoutUserInput> | ResetPasswordInProgressCreateWithoutUserInput[] | ResetPasswordInProgressUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ResetPasswordInProgressCreateOrConnectWithoutUserInput | ResetPasswordInProgressCreateOrConnectWithoutUserInput[]
+    createMany?: ResetPasswordInProgressCreateManyUserInputEnvelope
+    connect?: ResetPasswordInProgressWhereUniqueInput | ResetPasswordInProgressWhereUniqueInput[]
   }
 
   export type BoolFieldUpdateOperationsInput = {
@@ -14979,6 +16355,20 @@ export namespace Prisma {
     deleteMany?: RegisterInProgressScalarWhereInput | RegisterInProgressScalarWhereInput[]
   }
 
+  export type ResetPasswordInProgressUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ResetPasswordInProgressCreateWithoutUserInput, ResetPasswordInProgressUncheckedCreateWithoutUserInput> | ResetPasswordInProgressCreateWithoutUserInput[] | ResetPasswordInProgressUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ResetPasswordInProgressCreateOrConnectWithoutUserInput | ResetPasswordInProgressCreateOrConnectWithoutUserInput[]
+    upsert?: ResetPasswordInProgressUpsertWithWhereUniqueWithoutUserInput | ResetPasswordInProgressUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ResetPasswordInProgressCreateManyUserInputEnvelope
+    set?: ResetPasswordInProgressWhereUniqueInput | ResetPasswordInProgressWhereUniqueInput[]
+    disconnect?: ResetPasswordInProgressWhereUniqueInput | ResetPasswordInProgressWhereUniqueInput[]
+    delete?: ResetPasswordInProgressWhereUniqueInput | ResetPasswordInProgressWhereUniqueInput[]
+    connect?: ResetPasswordInProgressWhereUniqueInput | ResetPasswordInProgressWhereUniqueInput[]
+    update?: ResetPasswordInProgressUpdateWithWhereUniqueWithoutUserInput | ResetPasswordInProgressUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ResetPasswordInProgressUpdateManyWithWhereWithoutUserInput | ResetPasswordInProgressUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ResetPasswordInProgressScalarWhereInput | ResetPasswordInProgressScalarWhereInput[]
+  }
+
   export type accountUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<accountCreateWithoutUserInput, accountUncheckedCreateWithoutUserInput> | accountCreateWithoutUserInput[] | accountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: accountCreateOrConnectWithoutUserInput | accountCreateOrConnectWithoutUserInput[]
@@ -15067,6 +16457,20 @@ export namespace Prisma {
     update?: RegisterInProgressUpdateWithWhereUniqueWithoutUserInput | RegisterInProgressUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: RegisterInProgressUpdateManyWithWhereWithoutUserInput | RegisterInProgressUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: RegisterInProgressScalarWhereInput | RegisterInProgressScalarWhereInput[]
+  }
+
+  export type ResetPasswordInProgressUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ResetPasswordInProgressCreateWithoutUserInput, ResetPasswordInProgressUncheckedCreateWithoutUserInput> | ResetPasswordInProgressCreateWithoutUserInput[] | ResetPasswordInProgressUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ResetPasswordInProgressCreateOrConnectWithoutUserInput | ResetPasswordInProgressCreateOrConnectWithoutUserInput[]
+    upsert?: ResetPasswordInProgressUpsertWithWhereUniqueWithoutUserInput | ResetPasswordInProgressUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ResetPasswordInProgressCreateManyUserInputEnvelope
+    set?: ResetPasswordInProgressWhereUniqueInput | ResetPasswordInProgressWhereUniqueInput[]
+    disconnect?: ResetPasswordInProgressWhereUniqueInput | ResetPasswordInProgressWhereUniqueInput[]
+    delete?: ResetPasswordInProgressWhereUniqueInput | ResetPasswordInProgressWhereUniqueInput[]
+    connect?: ResetPasswordInProgressWhereUniqueInput | ResetPasswordInProgressWhereUniqueInput[]
+    update?: ResetPasswordInProgressUpdateWithWhereUniqueWithoutUserInput | ResetPasswordInProgressUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ResetPasswordInProgressUpdateManyWithWhereWithoutUserInput | ResetPasswordInProgressUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ResetPasswordInProgressScalarWhereInput | ResetPasswordInProgressScalarWhereInput[]
   }
 
   export type NestedUuidFilter<$PrismaModel = never> = {
@@ -15306,6 +16710,7 @@ export namespace Prisma {
     itemFavorites?: ItemFavoriteCreateNestedManyWithoutUserInput
     itemLikes?: ItemLikeCreateNestedManyWithoutUserInput
     RegisterInProgress?: RegisterInProgressCreateNestedManyWithoutUserInput
+    ResetPasswordInProgress?: ResetPasswordInProgressCreateNestedManyWithoutUserInput
   }
 
   export type userUncheckedCreateWithoutBrandInput = {
@@ -15323,6 +16728,7 @@ export namespace Prisma {
     itemFavorites?: ItemFavoriteUncheckedCreateNestedManyWithoutUserInput
     itemLikes?: ItemLikeUncheckedCreateNestedManyWithoutUserInput
     RegisterInProgress?: RegisterInProgressUncheckedCreateNestedManyWithoutUserInput
+    ResetPasswordInProgress?: ResetPasswordInProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type userCreateOrConnectWithoutBrandInput = {
@@ -15356,6 +16762,7 @@ export namespace Prisma {
     itemFavorites?: ItemFavoriteUpdateManyWithoutUserNestedInput
     itemLikes?: ItemLikeUpdateManyWithoutUserNestedInput
     RegisterInProgress?: RegisterInProgressUpdateManyWithoutUserNestedInput
+    ResetPasswordInProgress?: ResetPasswordInProgressUpdateManyWithoutUserNestedInput
   }
 
   export type userUncheckedUpdateWithoutBrandInput = {
@@ -15373,6 +16780,7 @@ export namespace Prisma {
     itemFavorites?: ItemFavoriteUncheckedUpdateManyWithoutUserNestedInput
     itemLikes?: ItemLikeUncheckedUpdateManyWithoutUserNestedInput
     RegisterInProgress?: RegisterInProgressUncheckedUpdateManyWithoutUserNestedInput
+    ResetPasswordInProgress?: ResetPasswordInProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type userCreateWithoutClientInput = {
@@ -15390,6 +16798,7 @@ export namespace Prisma {
     itemFavorites?: ItemFavoriteCreateNestedManyWithoutUserInput
     itemLikes?: ItemLikeCreateNestedManyWithoutUserInput
     RegisterInProgress?: RegisterInProgressCreateNestedManyWithoutUserInput
+    ResetPasswordInProgress?: ResetPasswordInProgressCreateNestedManyWithoutUserInput
   }
 
   export type userUncheckedCreateWithoutClientInput = {
@@ -15407,6 +16816,7 @@ export namespace Prisma {
     itemFavorites?: ItemFavoriteUncheckedCreateNestedManyWithoutUserInput
     itemLikes?: ItemLikeUncheckedCreateNestedManyWithoutUserInput
     RegisterInProgress?: RegisterInProgressUncheckedCreateNestedManyWithoutUserInput
+    ResetPasswordInProgress?: ResetPasswordInProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type userCreateOrConnectWithoutClientInput = {
@@ -15440,6 +16850,7 @@ export namespace Prisma {
     itemFavorites?: ItemFavoriteUpdateManyWithoutUserNestedInput
     itemLikes?: ItemLikeUpdateManyWithoutUserNestedInput
     RegisterInProgress?: RegisterInProgressUpdateManyWithoutUserNestedInput
+    ResetPasswordInProgress?: ResetPasswordInProgressUpdateManyWithoutUserNestedInput
   }
 
   export type userUncheckedUpdateWithoutClientInput = {
@@ -15457,6 +16868,7 @@ export namespace Prisma {
     itemFavorites?: ItemFavoriteUncheckedUpdateManyWithoutUserNestedInput
     itemLikes?: ItemLikeUncheckedUpdateManyWithoutUserNestedInput
     RegisterInProgress?: RegisterInProgressUncheckedUpdateManyWithoutUserNestedInput
+    ResetPasswordInProgress?: ResetPasswordInProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type userCreateWithoutItemFavoritesInput = {
@@ -15474,6 +16886,7 @@ export namespace Prisma {
     client?: ClientCreateNestedOneWithoutUserInput
     itemLikes?: ItemLikeCreateNestedManyWithoutUserInput
     RegisterInProgress?: RegisterInProgressCreateNestedManyWithoutUserInput
+    ResetPasswordInProgress?: ResetPasswordInProgressCreateNestedManyWithoutUserInput
   }
 
   export type userUncheckedCreateWithoutItemFavoritesInput = {
@@ -15491,6 +16904,7 @@ export namespace Prisma {
     client?: ClientUncheckedCreateNestedOneWithoutUserInput
     itemLikes?: ItemLikeUncheckedCreateNestedManyWithoutUserInput
     RegisterInProgress?: RegisterInProgressUncheckedCreateNestedManyWithoutUserInput
+    ResetPasswordInProgress?: ResetPasswordInProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type userCreateOrConnectWithoutItemFavoritesInput = {
@@ -15524,6 +16938,7 @@ export namespace Prisma {
     client?: ClientUpdateOneWithoutUserNestedInput
     itemLikes?: ItemLikeUpdateManyWithoutUserNestedInput
     RegisterInProgress?: RegisterInProgressUpdateManyWithoutUserNestedInput
+    ResetPasswordInProgress?: ResetPasswordInProgressUpdateManyWithoutUserNestedInput
   }
 
   export type userUncheckedUpdateWithoutItemFavoritesInput = {
@@ -15541,6 +16956,7 @@ export namespace Prisma {
     client?: ClientUncheckedUpdateOneWithoutUserNestedInput
     itemLikes?: ItemLikeUncheckedUpdateManyWithoutUserNestedInput
     RegisterInProgress?: RegisterInProgressUncheckedUpdateManyWithoutUserNestedInput
+    ResetPasswordInProgress?: ResetPasswordInProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type userCreateWithoutItemLikesInput = {
@@ -15558,6 +16974,7 @@ export namespace Prisma {
     client?: ClientCreateNestedOneWithoutUserInput
     itemFavorites?: ItemFavoriteCreateNestedManyWithoutUserInput
     RegisterInProgress?: RegisterInProgressCreateNestedManyWithoutUserInput
+    ResetPasswordInProgress?: ResetPasswordInProgressCreateNestedManyWithoutUserInput
   }
 
   export type userUncheckedCreateWithoutItemLikesInput = {
@@ -15575,6 +16992,7 @@ export namespace Prisma {
     client?: ClientUncheckedCreateNestedOneWithoutUserInput
     itemFavorites?: ItemFavoriteUncheckedCreateNestedManyWithoutUserInput
     RegisterInProgress?: RegisterInProgressUncheckedCreateNestedManyWithoutUserInput
+    ResetPasswordInProgress?: ResetPasswordInProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type userCreateOrConnectWithoutItemLikesInput = {
@@ -15608,6 +17026,7 @@ export namespace Prisma {
     client?: ClientUpdateOneWithoutUserNestedInput
     itemFavorites?: ItemFavoriteUpdateManyWithoutUserNestedInput
     RegisterInProgress?: RegisterInProgressUpdateManyWithoutUserNestedInput
+    ResetPasswordInProgress?: ResetPasswordInProgressUpdateManyWithoutUserNestedInput
   }
 
   export type userUncheckedUpdateWithoutItemLikesInput = {
@@ -15625,6 +17044,7 @@ export namespace Prisma {
     client?: ClientUncheckedUpdateOneWithoutUserNestedInput
     itemFavorites?: ItemFavoriteUncheckedUpdateManyWithoutUserNestedInput
     RegisterInProgress?: RegisterInProgressUncheckedUpdateManyWithoutUserNestedInput
+    ResetPasswordInProgress?: ResetPasswordInProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type userCreateWithoutRegisterInProgressInput = {
@@ -15642,6 +17062,7 @@ export namespace Prisma {
     client?: ClientCreateNestedOneWithoutUserInput
     itemFavorites?: ItemFavoriteCreateNestedManyWithoutUserInput
     itemLikes?: ItemLikeCreateNestedManyWithoutUserInput
+    ResetPasswordInProgress?: ResetPasswordInProgressCreateNestedManyWithoutUserInput
   }
 
   export type userUncheckedCreateWithoutRegisterInProgressInput = {
@@ -15659,6 +17080,7 @@ export namespace Prisma {
     client?: ClientUncheckedCreateNestedOneWithoutUserInput
     itemFavorites?: ItemFavoriteUncheckedCreateNestedManyWithoutUserInput
     itemLikes?: ItemLikeUncheckedCreateNestedManyWithoutUserInput
+    ResetPasswordInProgress?: ResetPasswordInProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type userCreateOrConnectWithoutRegisterInProgressInput = {
@@ -15692,6 +17114,7 @@ export namespace Prisma {
     client?: ClientUpdateOneWithoutUserNestedInput
     itemFavorites?: ItemFavoriteUpdateManyWithoutUserNestedInput
     itemLikes?: ItemLikeUpdateManyWithoutUserNestedInput
+    ResetPasswordInProgress?: ResetPasswordInProgressUpdateManyWithoutUserNestedInput
   }
 
   export type userUncheckedUpdateWithoutRegisterInProgressInput = {
@@ -15709,6 +17132,95 @@ export namespace Prisma {
     client?: ClientUncheckedUpdateOneWithoutUserNestedInput
     itemFavorites?: ItemFavoriteUncheckedUpdateManyWithoutUserNestedInput
     itemLikes?: ItemLikeUncheckedUpdateManyWithoutUserNestedInput
+    ResetPasswordInProgress?: ResetPasswordInProgressUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type userCreateWithoutResetPasswordInProgressInput = {
+    id: string
+    name: string
+    email: string
+    emailVerified: boolean
+    image?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userType?: string
+    account?: accountCreateNestedManyWithoutUserInput
+    session?: sessionCreateNestedManyWithoutUserInput
+    brand?: BrandCreateNestedOneWithoutUserInput
+    client?: ClientCreateNestedOneWithoutUserInput
+    itemFavorites?: ItemFavoriteCreateNestedManyWithoutUserInput
+    itemLikes?: ItemLikeCreateNestedManyWithoutUserInput
+    RegisterInProgress?: RegisterInProgressCreateNestedManyWithoutUserInput
+  }
+
+  export type userUncheckedCreateWithoutResetPasswordInProgressInput = {
+    id: string
+    name: string
+    email: string
+    emailVerified: boolean
+    image?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userType?: string
+    account?: accountUncheckedCreateNestedManyWithoutUserInput
+    session?: sessionUncheckedCreateNestedManyWithoutUserInput
+    brand?: BrandUncheckedCreateNestedOneWithoutUserInput
+    client?: ClientUncheckedCreateNestedOneWithoutUserInput
+    itemFavorites?: ItemFavoriteUncheckedCreateNestedManyWithoutUserInput
+    itemLikes?: ItemLikeUncheckedCreateNestedManyWithoutUserInput
+    RegisterInProgress?: RegisterInProgressUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type userCreateOrConnectWithoutResetPasswordInProgressInput = {
+    where: userWhereUniqueInput
+    create: XOR<userCreateWithoutResetPasswordInProgressInput, userUncheckedCreateWithoutResetPasswordInProgressInput>
+  }
+
+  export type userUpsertWithoutResetPasswordInProgressInput = {
+    update: XOR<userUpdateWithoutResetPasswordInProgressInput, userUncheckedUpdateWithoutResetPasswordInProgressInput>
+    create: XOR<userCreateWithoutResetPasswordInProgressInput, userUncheckedCreateWithoutResetPasswordInProgressInput>
+    where?: userWhereInput
+  }
+
+  export type userUpdateToOneWithWhereWithoutResetPasswordInProgressInput = {
+    where?: userWhereInput
+    data: XOR<userUpdateWithoutResetPasswordInProgressInput, userUncheckedUpdateWithoutResetPasswordInProgressInput>
+  }
+
+  export type userUpdateWithoutResetPasswordInProgressInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userType?: StringFieldUpdateOperationsInput | string
+    account?: accountUpdateManyWithoutUserNestedInput
+    session?: sessionUpdateManyWithoutUserNestedInput
+    brand?: BrandUpdateOneWithoutUserNestedInput
+    client?: ClientUpdateOneWithoutUserNestedInput
+    itemFavorites?: ItemFavoriteUpdateManyWithoutUserNestedInput
+    itemLikes?: ItemLikeUpdateManyWithoutUserNestedInput
+    RegisterInProgress?: RegisterInProgressUpdateManyWithoutUserNestedInput
+  }
+
+  export type userUncheckedUpdateWithoutResetPasswordInProgressInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userType?: StringFieldUpdateOperationsInput | string
+    account?: accountUncheckedUpdateManyWithoutUserNestedInput
+    session?: sessionUncheckedUpdateManyWithoutUserNestedInput
+    brand?: BrandUncheckedUpdateOneWithoutUserNestedInput
+    client?: ClientUncheckedUpdateOneWithoutUserNestedInput
+    itemFavorites?: ItemFavoriteUncheckedUpdateManyWithoutUserNestedInput
+    itemLikes?: ItemLikeUncheckedUpdateManyWithoutUserNestedInput
+    RegisterInProgress?: RegisterInProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type userCreateWithoutAccountInput = {
@@ -15726,6 +17238,7 @@ export namespace Prisma {
     itemFavorites?: ItemFavoriteCreateNestedManyWithoutUserInput
     itemLikes?: ItemLikeCreateNestedManyWithoutUserInput
     RegisterInProgress?: RegisterInProgressCreateNestedManyWithoutUserInput
+    ResetPasswordInProgress?: ResetPasswordInProgressCreateNestedManyWithoutUserInput
   }
 
   export type userUncheckedCreateWithoutAccountInput = {
@@ -15743,6 +17256,7 @@ export namespace Prisma {
     itemFavorites?: ItemFavoriteUncheckedCreateNestedManyWithoutUserInput
     itemLikes?: ItemLikeUncheckedCreateNestedManyWithoutUserInput
     RegisterInProgress?: RegisterInProgressUncheckedCreateNestedManyWithoutUserInput
+    ResetPasswordInProgress?: ResetPasswordInProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type userCreateOrConnectWithoutAccountInput = {
@@ -15776,6 +17290,7 @@ export namespace Prisma {
     itemFavorites?: ItemFavoriteUpdateManyWithoutUserNestedInput
     itemLikes?: ItemLikeUpdateManyWithoutUserNestedInput
     RegisterInProgress?: RegisterInProgressUpdateManyWithoutUserNestedInput
+    ResetPasswordInProgress?: ResetPasswordInProgressUpdateManyWithoutUserNestedInput
   }
 
   export type userUncheckedUpdateWithoutAccountInput = {
@@ -15793,6 +17308,7 @@ export namespace Prisma {
     itemFavorites?: ItemFavoriteUncheckedUpdateManyWithoutUserNestedInput
     itemLikes?: ItemLikeUncheckedUpdateManyWithoutUserNestedInput
     RegisterInProgress?: RegisterInProgressUncheckedUpdateManyWithoutUserNestedInput
+    ResetPasswordInProgress?: ResetPasswordInProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type userCreateWithoutSessionInput = {
@@ -15810,6 +17326,7 @@ export namespace Prisma {
     itemFavorites?: ItemFavoriteCreateNestedManyWithoutUserInput
     itemLikes?: ItemLikeCreateNestedManyWithoutUserInput
     RegisterInProgress?: RegisterInProgressCreateNestedManyWithoutUserInput
+    ResetPasswordInProgress?: ResetPasswordInProgressCreateNestedManyWithoutUserInput
   }
 
   export type userUncheckedCreateWithoutSessionInput = {
@@ -15827,6 +17344,7 @@ export namespace Prisma {
     itemFavorites?: ItemFavoriteUncheckedCreateNestedManyWithoutUserInput
     itemLikes?: ItemLikeUncheckedCreateNestedManyWithoutUserInput
     RegisterInProgress?: RegisterInProgressUncheckedCreateNestedManyWithoutUserInput
+    ResetPasswordInProgress?: ResetPasswordInProgressUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type userCreateOrConnectWithoutSessionInput = {
@@ -15860,6 +17378,7 @@ export namespace Prisma {
     itemFavorites?: ItemFavoriteUpdateManyWithoutUserNestedInput
     itemLikes?: ItemLikeUpdateManyWithoutUserNestedInput
     RegisterInProgress?: RegisterInProgressUpdateManyWithoutUserNestedInput
+    ResetPasswordInProgress?: ResetPasswordInProgressUpdateManyWithoutUserNestedInput
   }
 
   export type userUncheckedUpdateWithoutSessionInput = {
@@ -15877,6 +17396,7 @@ export namespace Prisma {
     itemFavorites?: ItemFavoriteUncheckedUpdateManyWithoutUserNestedInput
     itemLikes?: ItemLikeUncheckedUpdateManyWithoutUserNestedInput
     RegisterInProgress?: RegisterInProgressUncheckedUpdateManyWithoutUserNestedInput
+    ResetPasswordInProgress?: ResetPasswordInProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type accountCreateWithoutUserInput = {
@@ -16050,6 +17570,30 @@ export namespace Prisma {
 
   export type RegisterInProgressCreateManyUserInputEnvelope = {
     data: RegisterInProgressCreateManyUserInput | RegisterInProgressCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ResetPasswordInProgressCreateWithoutUserInput = {
+    id?: string
+    verificationCode: string
+    verificationCodeExpiration: string
+    token: string
+  }
+
+  export type ResetPasswordInProgressUncheckedCreateWithoutUserInput = {
+    id?: string
+    verificationCode: string
+    verificationCodeExpiration: string
+    token: string
+  }
+
+  export type ResetPasswordInProgressCreateOrConnectWithoutUserInput = {
+    where: ResetPasswordInProgressWhereUniqueInput
+    create: XOR<ResetPasswordInProgressCreateWithoutUserInput, ResetPasswordInProgressUncheckedCreateWithoutUserInput>
+  }
+
+  export type ResetPasswordInProgressCreateManyUserInputEnvelope = {
+    data: ResetPasswordInProgressCreateManyUserInput | ResetPasswordInProgressCreateManyUserInput[]
     skipDuplicates?: boolean
   }
 
@@ -16245,6 +17789,33 @@ export namespace Prisma {
     token?: StringFilter<"RegisterInProgress"> | string
   }
 
+  export type ResetPasswordInProgressUpsertWithWhereUniqueWithoutUserInput = {
+    where: ResetPasswordInProgressWhereUniqueInput
+    update: XOR<ResetPasswordInProgressUpdateWithoutUserInput, ResetPasswordInProgressUncheckedUpdateWithoutUserInput>
+    create: XOR<ResetPasswordInProgressCreateWithoutUserInput, ResetPasswordInProgressUncheckedCreateWithoutUserInput>
+  }
+
+  export type ResetPasswordInProgressUpdateWithWhereUniqueWithoutUserInput = {
+    where: ResetPasswordInProgressWhereUniqueInput
+    data: XOR<ResetPasswordInProgressUpdateWithoutUserInput, ResetPasswordInProgressUncheckedUpdateWithoutUserInput>
+  }
+
+  export type ResetPasswordInProgressUpdateManyWithWhereWithoutUserInput = {
+    where: ResetPasswordInProgressScalarWhereInput
+    data: XOR<ResetPasswordInProgressUpdateManyMutationInput, ResetPasswordInProgressUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type ResetPasswordInProgressScalarWhereInput = {
+    AND?: ResetPasswordInProgressScalarWhereInput | ResetPasswordInProgressScalarWhereInput[]
+    OR?: ResetPasswordInProgressScalarWhereInput[]
+    NOT?: ResetPasswordInProgressScalarWhereInput | ResetPasswordInProgressScalarWhereInput[]
+    id?: UuidFilter<"ResetPasswordInProgress"> | string
+    userId?: UuidFilter<"ResetPasswordInProgress"> | string
+    verificationCode?: StringFilter<"ResetPasswordInProgress"> | string
+    verificationCodeExpiration?: StringFilter<"ResetPasswordInProgress"> | string
+    token?: StringFilter<"ResetPasswordInProgress"> | string
+  }
+
   export type accountCreateManyUserInput = {
     id: string
     accountId: string
@@ -16283,6 +17854,13 @@ export namespace Prisma {
   }
 
   export type RegisterInProgressCreateManyUserInput = {
+    id?: string
+    verificationCode: string
+    verificationCodeExpiration: string
+    token: string
+  }
+
+  export type ResetPasswordInProgressCreateManyUserInput = {
     id?: string
     verificationCode: string
     verificationCodeExpiration: string
@@ -16415,6 +17993,27 @@ export namespace Prisma {
   }
 
   export type RegisterInProgressUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    verificationCode?: StringFieldUpdateOperationsInput | string
+    verificationCodeExpiration?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type ResetPasswordInProgressUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    verificationCode?: StringFieldUpdateOperationsInput | string
+    verificationCodeExpiration?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type ResetPasswordInProgressUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    verificationCode?: StringFieldUpdateOperationsInput | string
+    verificationCodeExpiration?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type ResetPasswordInProgressUncheckedUpdateManyWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     verificationCode?: StringFieldUpdateOperationsInput | string
     verificationCodeExpiration?: StringFieldUpdateOperationsInput | string

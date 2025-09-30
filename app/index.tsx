@@ -63,7 +63,7 @@ export default function App() {
   if (user) {
     if (!user.emailVerified && pathname !== "/code-verification") {
       // Usuario nuevo - redirigir a sign-in para que el useEffect maneje el redirect a preferences
-      return <Redirect href="/code-verification" />;
+      return <Redirect href="/code-verification-register" />;
     } else {
       // Usuario existente - redirigir directamente a home
       return <Redirect href="/home?prefetch=true" />;

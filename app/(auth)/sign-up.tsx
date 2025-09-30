@@ -19,6 +19,7 @@ import { LOCAL_IP } from "@/config/api";
 import { authClient } from "@/lib/auth-client";
 import Toast from "react-native-toast-message";
 import { useResendCode } from "../utils/update";
+import { verifyMailAvailability } from "../utils/fetch";
 
 const SignIn = () => {
   const [name, setName] = useState<string>("");
@@ -62,7 +63,18 @@ const SignIn = () => {
 
     const resVerify = await verifyMailAvailability(email);
     if (resVerify.error) {
-      setEmailError("User with this email already exists");
+      console.error("Error verifying email availability", resVerify.details);
+      Toast.show({
+        type: "error",
+        text1: "An error occurred while verifying email availability",
+      });
+      return false;
+    }
+    if (resVerify.exists) {
+      Toast.show({
+        type: "error",
+        text1: "Email already exists",
+      });
       return false;
     }
 
@@ -151,38 +163,6 @@ const SignIn = () => {
 
 export default SignIn;
 
-async function verifyMailAvailability(
-  email: string
-): Promise<SuccessSchemaType | ErrorSchemaType> {
-  try {
-    const { data } = await safeFetch({
-      url: `http://${LOCAL_IP}:3000/user/verify`,
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email }),
-    });
-
-    if (data.error) {
-      throw new Error(data.details || "Unexpected error");
-    }
-    VerifyUserExistsResponseSchema.parse(data);
-    if (data.exists) {
-      throw new Error("Email is already registered");
-    } else {
-      return {
-        error: false,
-      };
-    }
-  } catch (error: unknown) {
-    return {
-      error: true,
-      details: error instanceof Error ? error.message : "Unexpected error",
-    };
-  }
-}
-
 export async function handleSubmitSignUp(
   userName: string,
   email: string,
@@ -226,12 +206,9 @@ export async function handleSubmitSignUp(
           text1: "Code sent successfully",
           visibilityTime: 3000,
         });
-        router.replace("/code-verification");
+        router.replace("/code-verification-register");
       },
     },
-    callbackURL: "cherrypick:///code-verification",
+    callbackURL: "cherrypick:///code-verification-register",
   });
-
-  // console.log("Sign up successful going to code verification");
-  // router.replace("/code-verification");
 }

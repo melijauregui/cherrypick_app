@@ -14,7 +14,7 @@ const SignIn = () => {
     // Only run if user is authenticated and we're on the sign-in page
     if (user && status === "authenticated" && pathname === "/sign-in") {
       if (!user.emailVerified) {
-        router.replace("cherrypick:///code-verification");
+        router.replace("cherrypick:///code-verification-register");
       }
       if (user.emailVerified) {
         console.log("user email verified, redirecting to home");
@@ -82,7 +82,7 @@ const LogInButton = () => (
 
 const SignUpButton = () => (
   <TouchableOpacity
-    className="flex flex-row bg-brown-extraLight h-[50px] justify-center items-center rounded-full"
+    className="flex flex-row bg-beige h-[50px] justify-center items-center rounded-full"
     onPress={() => router.push("/sign-up")}
   >
     <Text className="text-black font-psemibold text-[15px]">

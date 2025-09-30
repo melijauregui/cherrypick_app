@@ -70,6 +70,18 @@ model RegisterInProgress {
   @@map("RegisterInProgress")
 }
 
+model ResetPasswordInProgress {
+  id                         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId                     String @unique @db.Uuid
+  verificationCode           String @db.VarChar(6)
+  verificationCodeExpiration String @db.VarChar(30)
+  token                      String @unique
+  user                       user   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([userId], map: "idx_reset_password_in_progress_user_id")
+  @@map("ResetPasswordInProgress")
+}
+
 model InspoItems {
   id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   itemUuid String @db.VarChar(255)
@@ -121,11 +133,12 @@ model user {
   session       session[]
 
   // Relations
-  brand              Brand?
-  client             Client?
-  itemFavorites      ItemFavorite[]
-  itemLikes          ItemLike[]
-  RegisterInProgress RegisterInProgress[]
+  brand                   Brand?
+  client                  Client?
+  itemFavorites           ItemFavorite[]
+  itemLikes               ItemLike[]
+  RegisterInProgress      RegisterInProgress[]
+  ResetPasswordInProgress ResetPasswordInProgress[]
 }
 
 model verification {

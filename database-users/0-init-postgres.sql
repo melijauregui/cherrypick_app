@@ -11,6 +11,18 @@ CREATE TABLE IF NOT EXISTS "RegisterInProgress" (
     FOREIGN KEY ("userId") REFERENCES "user"(id) ON DELETE CASCADE,
     UNIQUE("userId")
 );
+
+-- Table for reset password in progress
+CREATE TABLE IF NOT EXISTS "ResetPasswordInProgress" (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "userId" TEXT NOT NULL UNIQUE,
+    "verificationCode" VARCHAR(6) NOT NULL,
+    "verificationCodeExpiration" VARCHAR(30) NOT NULL,
+    token VARCHAR(255) NOT NULL UNIQUE,
+    FOREIGN KEY ("userId") REFERENCES "user"(id) ON DELETE CASCADE,
+    UNIQUE("userId")
+);
+
 -- Table for client
 CREATE TABLE IF NOT EXISTS "Client" (
     "userId" TEXT NOT NULL PRIMARY KEY,

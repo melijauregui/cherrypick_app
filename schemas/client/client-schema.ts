@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { SuccessSchema } from "../standar-response-schema";
+import { PasswordSchema } from "../formUser-schema";
 
 export const UpdatePreferencesSchema = z.object({
   preferences: z
@@ -56,10 +57,6 @@ const ClientFormSchemaSignUp = z.object({
       required_error: "Email is required",
     })
     .email({ message: "Invalid email address" }),
-  password: z
-    .string({
-      required_error: "Password is required",
-    })
-    .min(8, { message: "Password must be at least 8 characters long" }),
+  ...PasswordSchema.shape,
 });
 export { ClientFormSchemaSignUp };

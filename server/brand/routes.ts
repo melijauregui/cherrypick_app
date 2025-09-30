@@ -36,7 +36,7 @@ import {
 import { GetCatalog, GetItemsUuidNamesFromBrand } from "../catalog/functions";
 import { UpdateCatalog } from "../catalog/insert";
 import { DeleteFromCatalog } from "../catalog/delete";
-import { BodyCodeVerificationPostSchema } from "@/schemas/auth/sign-up-schema";
+import { QueryEmailSchema } from "@/schemas/standar-query-schema";
 
 const BrandApp = new OpenAPIHono<AppEnv>({
   defaultHook: (result, c) => {
@@ -182,7 +182,7 @@ const sendFormBrandRoute = createRoute({
   request: {
     body: {
       content: {
-        "application/json": { schema: BodyCodeVerificationPostSchema },
+        "application/json": { schema: QueryEmailSchema },
       },
     },
   },

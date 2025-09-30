@@ -2,7 +2,7 @@ import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import { Context } from "hono";
 import { errorHandler } from "../errorHandler";
 import { VerifyUserExists } from "./functions";
-import { BodyUserVerificationPostSchema } from "@/schemas/auth/sign-up-schema";
+import { QueryEmailSchema } from "@/schemas/standar-query-schema";
 import {
   VerifyUserExistsResponseSchema,
   VerifyUserExistsResponseSchemaType,
@@ -47,7 +47,7 @@ const verifyUserRoute = createRoute({
   request: {
     body: {
       content: {
-        "application/json": { schema: BodyUserVerificationPostSchema },
+        "application/json": { schema: QueryEmailSchema },
       },
     },
   },

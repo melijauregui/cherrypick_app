@@ -64,9 +64,9 @@ const ForgotPasswordButton = () => (
   <TouchableOpacity
     className="flex flex-row justify-center items-center bottom-6"
     // onPress={() => router.push("/forgot-password")}
-    onPress={() => router.back()}
+    onPress={() => router.push("/forgot-password")}
   >
-    <Text className="text-brown-extraLightText font-pmedium text-[15px]">
+    <Text className="text-beige font-pmedium text-[15px]">
       Forgot your password?
     </Text>
   </TouchableOpacity>

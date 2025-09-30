@@ -3,32 +3,35 @@ import { useEffect } from "react";
 import React, { useState } from "react";
 import { FormSchemaCodeVerification } from "@/schemas/formUser-schema";
 import { Redirect, useRouter } from "expo-router";
-import safeFetch from "@/app/utils/safe-fetch";
-import { LOCAL_IP } from "@/config/api";
-import { authClient, signOut, useSession } from "@/lib/auth-client";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import Toast from "react-native-toast-message";
-import { getExpirationCode } from "../utils/fetch";
-import LoadingPage from "../components/LoadingPage";
+import { signOut, useSession } from "@/lib/auth-client";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import LoadingPage from "@/app/components/LoadingPage";
 import SignPage, {
   NextButton,
   SignPageContent,
   SignPageFooter,
   SignPageHeader,
   SignPageItems,
-} from "../components/(auth)/signPage";
-import CodeInput from "../components/(auth)/inputCode";
-import { useResendCode } from "../utils/update";
+} from "@/app/components/(auth)/signPage";
+import CodeInput from "@/app/components/(auth)/inputCode";
 
-const CodeVerification = () => {
+const CodeVerification = ({
+  queryKey,
+  queryFn,
+  onResendCode,
+  onSubmit,
+  email,
+}: {
+  email: string;
+  queryKey: string[];
+  queryFn: () => Promise<any>;
+  onResendCode: () => Promise<void>;
+  onSubmit: (code: string) => Promise<boolean>;
+}) => {
   const router = useRouter();
-  const session = useSession();
-  // const sessionData = authClient.useSession();
-  // const { data: session } = sessionData;
+  // const session = useSession();
   const [code, setCode] = useState("");
   const [codeError, setCodeError] = useState<string | undefined>(undefined);
-  const verifyCode = useVerifyCode();
-  const resendCode = useResendCode();
   const [resetCodeInput, setResetCodeInput] = useState(false);
   const queryClient = useQueryClient();
   const [isLoadingResendCode, setIsLoadingResendCode] = useState(false);
@@ -39,8 +42,8 @@ const CodeVerification = () => {
     isLoading: isLoadingExpirationTime,
     error,
   } = useQuery({
-    queryKey: ["expiration-code"],
-    queryFn: () => getExpirationCode(),
+    queryKey: queryKey,
+    queryFn: queryFn,
     staleTime: Infinity, // Never refetch automatically
     refetchInterval: false, // Disable automatic refetching
     retry: true,
@@ -53,19 +56,13 @@ const CodeVerification = () => {
     )
   );
 
-  // Effect to check email verification status
-  useEffect(() => {
-    console.log(
-      "session.user?.emailVerified!!!!!",
-      session.user?.emailVerified
-    );
-    if (session.user?.emailVerified) {
-      console.log("Email verified, navigating to preferences");
-      router.replace({
-        pathname: "/preferences",
-      });
-    }
-  }, [session.user?.emailVerified, router]);
+  // console.log(
+  //   "expirationTime",
+  //   expirationTime.toString(),
+  //   "date now",
+  //   new Date().toString()
+  // );
+  // console.log("secondsLeft", secondsLeft);
 
   useEffect(() => {
     if (expirationTime && expirationTime <= new Date()) {
@@ -91,29 +88,20 @@ const CodeVerification = () => {
   if (isLoadingExpirationTime) {
     return <LoadingPage alreadyPrefetched />;
   }
-  if (error || !expirationTime || !session.user) {
+  if (error || !expirationTime) {
     return <Redirect href="/error" />;
   }
 
   async function handleResendCode() {
-    if (!session.user) {
-      console.error("No user email available for resending code");
-      return;
-    }
-
     setIsLoadingResendCode(true);
     setCodeError(undefined);
     setCode("");
     setResetCodeInput(true);
-    await resendCode.mutateAsync(session.user.email);
+    await onResendCode();
     setIsLoadingResendCode(false);
   }
 
   async function handleSubmit() {
-    if (!session) {
-      console.error("No user email available for submitting code");
-      return;
-    }
     console.log("code", code);
     const result = FormSchemaCodeVerification.safeParse({
       code,
@@ -125,16 +113,11 @@ const CodeVerification = () => {
       setCodeError(codeError?.message);
       return;
     }
-    const { isCorrect } = await verifyCode.mutateAsync({
-      code,
-    });
+    const isCorrect = await onSubmit(code);
     if (!isCorrect) {
       setCodeError("Code is incorrect");
       return;
     }
-
-    // Code verification successful - refetch session to check email verification status
-    await session.refetch();
   }
   return (
     <SignPage>
@@ -154,7 +137,7 @@ const CodeVerification = () => {
         </SignPageHeader>
         <SignPageItems>
           <Text className="text-gray-400 text-[15px] font-pregular pt-3">
-            Enter it below to verify your email: {session.user?.email}.
+            Enter it below to verify your email: {email}.
           </Text>
           <View className="flex flex-col w-full gap-3">
             <View className="flex flex-col w-full gap-3">
@@ -211,33 +194,3 @@ const CodeVerification = () => {
 };
 
 export default CodeVerification;
-
-export function useVerifyCode() {
-  const mutation = useMutation({
-    mutationFn: async ({ code }: { code: string }) => {
-      const { data } = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/code-verification/verify`,
-        method: "POST",
-        body: JSON.stringify({ code }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      console.log("data VERIFY CODEEE", data);
-      if (data.error) {
-        throw new Error(data.details);
-      }
-      return data;
-    },
-    onError: error => {
-      console.error("Error verifying code:", error);
-      Toast.show({
-        type: "error",
-        text1: "Error verifying code",
-        visibilityTime: 6000,
-      });
-    },
-  });
-
-  return mutation;
-}

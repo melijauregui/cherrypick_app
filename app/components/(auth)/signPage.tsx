@@ -105,6 +105,7 @@ export function Input({
   isPassword,
   showPassword,
   onTogglePassword,
+  autoCapitalize,
 }: {
   placeholder: string;
   value?: string;
@@ -114,6 +115,7 @@ export function Input({
   isPassword?: boolean;
   showPassword?: boolean;
   onTogglePassword?: () => void;
+  autoCapitalize?: "none" | "sentences" | "words" | "characters";
 }) {
   return (
     <View className="flex flex-col">
@@ -126,6 +128,7 @@ export function Input({
           onChangeText={onChange}
           keyboardType={type}
           secureTextEntry={isPassword && !showPassword}
+          autoCapitalize={autoCapitalize ?? "none"}
         />
         {isPassword && (
           <TouchableOpacity

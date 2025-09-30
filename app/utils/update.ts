@@ -348,23 +348,6 @@ export function useResendCode() {
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: async (email: string) => {
-      // console.log("Starting sendCode mutation...");
-      // const { data } = await safeFetch({
-      //   url: `http://${LOCAL_IP}:3000/code-verification`,
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      // });
-      // console.log("SendCode response:", data);
-      // if (data.error) {
-      //   console.log("SendCode error:", data.error);
-      //   throw new Error(data.details);
-      // }
-      // SuccessSchema.parse(data);
-      // console.log("SendCode mutation completed successfully");
-      // return data;
-
       console.log("Sending verification email to", email);
       await authClient.sendVerificationEmail({
         email: email,
@@ -373,7 +356,7 @@ export function useResendCode() {
             throw new Error(error.error.message);
           },
         },
-        callbackURL: "cherrypick:///code-verification",
+        callbackURL: "cherrypick:///code-verification-register",
       });
     },
     onSuccess: () => {
@@ -397,6 +380,45 @@ export function useResendCode() {
       //invalidate query
       void queryClient.invalidateQueries({
         queryKey: ["expiration-code"],
+      });
+    },
+  });
+
+  return mutation;
+}
+
+export function useResendCodeResetPassword() {
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: async (email: string) => {
+      console.log("Sending verification email to", email);
+      await authClient.requestPasswordReset({
+        email: email,
+        redirectTo: "cherrypick:///reset-password",
+        fetchOptions: {
+          onError: error => {
+            console.error(error);
+            Toast.show({
+              type: "error",
+              text1: "Failed to send reset password email",
+            });
+          },
+          onSuccess: () => {
+            console.log("Reset password email sent");
+            Toast.show({
+              type: "success",
+              text1: "Reset password email sent!",
+            });
+          },
+        },
+      });
+    },
+
+    onSettled: () => {
+      console.log("SendCode onSettled triggered");
+      //invalidate query
+      void queryClient.invalidateQueries({
+        queryKey: ["reset-password-code"],
       });
     },
   });

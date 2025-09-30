@@ -5,7 +5,9 @@ import { CreateClient } from "@/server/client/functions";
 import {
   GenerateVerificationCode,
   SaveVerificationCode,
+  SaveVerificationCodeResetPassword,
   SendEmail,
+  SendEmailResetPassword,
 } from "@/server/formUser/functions";
 
 console.log("BETTER_AUTH_URL", process.env.BETTER_AUTH_URL);
@@ -21,11 +23,23 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
+    sendResetPassword: async ({ user, url, token }, request) => {
+      console.log("YEEES Sending reset password email to", user.email);
+      const code = GenerateVerificationCode();
+      const emailSent = await SendEmailResetPassword(user.email, code);
+      if (!emailSent) {
+        throw new Error("Failed to send verification email");
+      }
+      const res = await SaveVerificationCodeResetPassword(user.id, code, token);
+      if (res.error) {
+        throw new Error("Failed to save verification code reset password");
+      }
+      console.log("Reset password email sent successfully!!!");
+    },
   },
   emailVerification: {
     autoSignInAfterVerification: true,
     async sendVerificationEmail({ user, url, token }, request) {
-      console.log("YEEES Sending verification email to", user.email);
       const code = GenerateVerificationCode();
       const emailSent = await SendEmail(user.email, code);
       if (!emailSent) {
@@ -35,7 +49,6 @@ export const auth = betterAuth({
       if (res.error) {
         throw new Error("Failed to save verification code");
       }
-      console.log("Verification email sent successfully!!!");
     },
   },
   socialProviders: {
