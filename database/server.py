@@ -165,7 +165,13 @@ async def extract_features(request: dict):
         }
 
     except Exception as e:
-        return {"error": str(e)}
+        print("Error processing:", e)
+        return {
+            "error": True,
+            "image_features": [],
+            "text_features": [],
+            "details": str(e),
+        }
 
 
 @app.post("/search-text/")

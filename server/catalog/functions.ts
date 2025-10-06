@@ -279,6 +279,14 @@ export async function extractFeatures(
     }
 
     const result = await response.json();
+    if (result.error || !result.image_features || !result.text_features) {
+      return {
+        error: true,
+        details: result.details || "Error extracting features",
+        features: { image_features: [], text_features: [] },
+      };
+    }
+
     return {
       error: false,
       details: "Features extracted successfully",
@@ -386,13 +394,13 @@ export async function searchText(
 // Función para verificar si ya existe un elemento con el mismo nombre y brand en Weaviate
 export async function getCollection(): Promise<
   | {
-      error: true;
-      details: string;
-    }
+    error: true;
+    details: string;
+  }
   | {
-      error: false;
-      collection: Collection;
-    }
+    error: false;
+    collection: Collection;
+  }
 > {
   try {
     const client = await weaviate.connectToWeaviateCloud(config.WEAVIATE_URL, {
