@@ -1,5 +1,4 @@
 import {
-  CatalogResponseSchema,
   CatalogResponseSchemaType,
   ItemSchema,
   ItemSchemaType,
@@ -7,11 +6,11 @@ import {
   UuidNameSchema,
   UuidNameSchemaType,
 } from "@/schemas/catalog/catalog-schema";
-import weaviate, { Collection, Filters, ObjectDataType } from "weaviate-client";
+import weaviate, { Collection, Filters } from "weaviate-client";
 import { ErrorSchemaType } from "@/schemas/standar-response-schema";
 import { config } from "../../config";
 import logger from "../logger";
-import { GetEmbedding, SearchItems, SearchPersonalizedItems } from "../search/functions";
+import { GetEmbedding, SearchItems, SearchPersonalizedItems, SearchPersonalizedItems2 } from "../search/functions";
 
 //funcion para hacer query a pinecone
 export async function GetCatalog(
@@ -112,7 +111,6 @@ export async function GetItemsUuidNamesFromBrand(
     // ],
   };
   const result = await collection.query.fetchObjects(queryOptions);
-  console.log("result!!!!!", result);
 
   const topResults: UuidNameSchemaType[] = result.objects
     .map(match => {
@@ -282,6 +280,14 @@ export async function extractFeatures(
     }
 
     const result = await response.json();
+    if (result.error || !result.image_features || !result.text_features) {
+      return {
+        error: true,
+        details: result.details || "Error extracting features",
+        features: { image_features: [], text_features: [] },
+      };
+    }
+
     return {
       error: false,
       details: "Features extracted successfully",
@@ -560,13 +566,27 @@ export async function GetPersonalizedFeed(
   limit: number
 ): Promise<CatalogResponseSchemaType | ErrorSchemaType> {
 
-  const allResults = await SearchPersonalizedItems(preferences, likesDescriptions);
-  if (allResults.error) {
-    console.error("Error searching preferred items:", allResults.details);
-    return allResults;
+  let pageResults: ItemSchemaType[] = [];
+
+  if (preferences.length === 0 && likesDescriptions.length === 0) {
+    const embedding = Array(768).fill(0.5);
+    const result = await GetCatalog(embedding, page, limit, undefined);
+    if (result.error) {
+      return {
+        error: true,
+        details: "Error querying Weaviate",
+      };
+    }
+    pageResults = result.items;
+  } else {
+    const allResults = await SearchPersonalizedItems(preferences, likesDescriptions);
+    if (allResults.error) {
+      console.error("Error searching preferred items:", allResults.details);
+      return allResults;
+    }
+    pageResults = allResults.items.slice(page * limit, (page + 1) * limit);
   }
 
-  const pageResults = allResults.items.slice(page * limit, (page + 1) * limit);
 
   const shuffledResults = shuffleArray(pageResults);
   return { error: false, items: shuffledResults };

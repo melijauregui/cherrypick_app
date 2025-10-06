@@ -41,3 +41,13 @@ export async function DeleteUser(email: string) {
     where: { email },
   });
 }
+
+export async function GetUserIdByEmail(email: string): Promise<string | null> {
+  const user = await db.user.findUnique({
+    where: { email },
+  });
+  if (!user) {
+    return null;
+  }
+  return user.id;
+}

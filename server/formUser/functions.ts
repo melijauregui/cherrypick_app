@@ -1,14 +1,21 @@
 import { db } from "../db.config";
 import nodemailer from "nodemailer";
 import { randomInt } from "crypto";
-import { VerifyCodeResponseSchemaType } from "@/schemas/formUser-schema";
+import {
+  ExpirationCodeResponseSchemaType,
+  VerifyCodeResponseSchemaType,
+  VerifyCodeResponseSchemaTypeResetPassword,
+  VerifyCodeSchemaType,
+} from "@/schemas/formUser-schema";
 import { SuccessSchemaType } from "@/schemas/standar-response-schema";
 import { ErrorSchemaType } from "@/schemas/standar-response-schema";
 import { ContentfulStatusCode } from "hono/utils/http-status";
+import { auth } from "@/lib/auth";
 
 export async function SaveVerificationCode(
-  email: string,
-  code: string
+  userId: string,
+  code: string,
+  token: string
 ): Promise<SuccessSchemaType | ErrorSchemaType> {
   let res: SuccessSchemaType | ErrorSchemaType;
 
@@ -18,17 +25,20 @@ export async function SaveVerificationCode(
     const expirationString = expirationTime.toISOString();
 
     await db.registerInProgress.upsert({
-      where: { email },
+      where: { userId },
       update: {
         verificationCode: code,
         verificationCodeExpiration: expirationString,
+        token,
       },
       create: {
-        email,
+        userId,
         verificationCode: code,
         verificationCodeExpiration: expirationString,
+        token,
       },
     });
+    console.log("Saved verification code for userId", userId, code);
 
     res = {
       error: false,
@@ -38,6 +48,52 @@ export async function SaveVerificationCode(
     res = {
       error: true,
       details: "Error saving verification code",
+    };
+  }
+
+  return res;
+}
+
+export async function SaveVerificationCodeResetPassword(
+  userId: string,
+  code: string,
+  token: string
+): Promise<SuccessSchemaType | ErrorSchemaType> {
+  let res: SuccessSchemaType | ErrorSchemaType;
+
+  try {
+    const expirationTime = new Date();
+    expirationTime.setMinutes(expirationTime.getMinutes() + 3); // Expira en 3 minutos
+    const expirationString = expirationTime.toISOString();
+
+    await db.resetPasswordInProgress.upsert({
+      where: { userId },
+      update: {
+        verificationCode: code,
+        verificationCodeExpiration: expirationString,
+        token,
+      },
+      create: {
+        userId,
+        verificationCode: code,
+        verificationCodeExpiration: expirationString,
+        token,
+      },
+    });
+    console.log(
+      "Saved verification code reset password for userId",
+      userId,
+      code
+    );
+
+    res = {
+      error: false,
+    };
+  } catch (error) {
+    console.error("Error saving verification code reset password:", error);
+    res = {
+      error: true,
+      details: "Error saving verification code reset password",
     };
   }
 
@@ -74,40 +130,124 @@ export async function SendEmail(email: string, code: string): Promise<boolean> {
   }
 }
 
+export async function SendEmailResetPassword(
+  email: string,
+  code: string
+): Promise<boolean> {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+
+    console.log("Enviando correo a:", email);
+    const info = await transporter.sendMail({
+      from: `"Cherrypick" <${process.env.SMTP_USER}>`,
+      to: email,
+      subject: "Resetear contraseña",
+      text: `¡Gracias por registrarte en CherryPick!\n\nPara resetear tu contraseña, por favor ingresá el siguiente código de verificación en nuestra app:\n\n${code}\n\n¡Gracias!\nEl equipo de CherryPick.`,
+      html: `
+            <p>¡Gracias por registrarte en <strong>CherryPick</strong>!</p>
+            <p>Para resetear tu contraseña, por favor ingresá el siguiente código de verificación en nuestra app:</p>
+            <p><strong>${code}</strong></p>
+            <p>¡Gracias!<br/>Equipo <strong>CherryPick</strong></p>
+          `,
+    });
+    return true;
+  } catch (error) {
+    console.error("Error enviando correo:", error);
+    return false;
+  }
+}
+
 function GenerateVerificationCode(): string {
   return String(randomInt(100000, 999999));
 }
 
 export { GenerateVerificationCode };
 
-export async function VerifyVerificationCode(
-  email: string,
+export async function VerifyVerificationCodeRegister(
+  userId: string,
   code: string
 ): Promise<
   | VerifyCodeResponseSchemaType
   | { error: true; errMsg: ErrorSchemaType; statusCode: ContentfulStatusCode }
 > {
-  let res: VerifyCodeResponseSchemaType | ErrorSchemaType;
+  const res = await VerifyVerificationCode(
+    userId,
+    code,
+    async () => await db.registerInProgress.findUnique({ where: { userId } }),
+    async () => {
+      const resDelete = await db.registerInProgress.delete({
+        where: { userId },
+      });
+      await auth.api.verifyEmail({
+        query: {
+          token: resDelete.token,
+        },
+      });
+      return resDelete.token;
+    }
+  );
+  if (res.error) {
+    return res;
+  }
+  return { error: res.error, isCorrect: res.isCorrect };
+}
+
+export async function VerifyVerificationCodeResetPassword(
+  userId: string,
+  code: string
+): Promise<
+  | VerifyCodeResponseSchemaTypeResetPassword
+  | { error: true; errMsg: ErrorSchemaType; statusCode: ContentfulStatusCode }
+> {
+  return await VerifyVerificationCode(
+    userId,
+    code,
+    async () =>
+      await db.resetPasswordInProgress.findUnique({ where: { userId } }),
+    async () => {
+      const resDelete = await db.resetPasswordInProgress.delete({
+        where: { userId },
+      });
+      return resDelete.token;
+    }
+  );
+}
+
+async function VerifyVerificationCode(
+  userId: string,
+  code: string,
+  searchInProgress: () => Promise<VerifyCodeSchemaType | null>,
+  onVerificationSuccess: () => Promise<string>
+): Promise<
+  | VerifyCodeResponseSchemaTypeResetPassword
+  | { error: true; errMsg: ErrorSchemaType; statusCode: ContentfulStatusCode }
+> {
+  let res: VerifyCodeResponseSchemaTypeResetPassword | ErrorSchemaType;
 
   try {
-    const registerInProgress = await db.registerInProgress.findUnique({
-      where: { email },
-    });
+    const inProgress = await searchInProgress();
 
-    if (!registerInProgress) {
+    if (!inProgress) {
       res = {
         error: true,
-        details: "Email not found",
+        details: "User not found",
       };
       return { error: true, errMsg: res, statusCode: 404 };
     }
 
-    const { verificationCode, verificationCodeExpiration } = registerInProgress;
+    const { verificationCode, verificationCodeExpiration } = inProgress;
 
     if (!verificationCode || verificationCode !== code) {
       res = {
         error: false,
         isCorrect: false,
+        token: "",
       };
       return res;
     }
@@ -121,12 +261,11 @@ export async function VerifyVerificationCode(
     }
 
     // Delete the verification code after successful verification
-    await db.registerInProgress.delete({
-      where: { email },
-    });
+    const token = await onVerificationSuccess();
     res = {
       error: false,
       isCorrect: true,
+      token,
     };
   } catch (error) {
     console.error("Error verifying code:", error);
@@ -178,4 +317,38 @@ export async function SendEmailBrand(
       details: "Error al enviar el correo",
     };
   }
+}
+
+export async function GetExpirationCodeRegister(
+  userId: string
+): Promise<ExpirationCodeResponseSchemaType | ErrorSchemaType> {
+  return await GetExpirationCode(userId, () =>
+    db.registerInProgress.findUnique({ where: { userId } })
+  );
+}
+
+export async function GetExpirationCodeResetPassword(
+  userId: string
+): Promise<ExpirationCodeResponseSchemaType | ErrorSchemaType> {
+  return await GetExpirationCode(userId, () =>
+    db.resetPasswordInProgress.findUnique({ where: { userId } })
+  );
+}
+
+async function GetExpirationCode(
+  userId: string,
+  searchInProgress: () => Promise<VerifyCodeSchemaType | null>
+): Promise<ExpirationCodeResponseSchemaType | ErrorSchemaType> {
+  const registerInProgress = await searchInProgress();
+  if (!registerInProgress) {
+    console.log("Email not found", userId);
+    return {
+      error: true,
+      details: "User not found",
+    };
+  }
+  return {
+    error: false,
+    expirationTime: new Date(registerInProgress.verificationCodeExpiration),
+  };
 }

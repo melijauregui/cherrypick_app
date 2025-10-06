@@ -35,7 +35,7 @@ const ImageGallery = ({
   canRefresh = true,
 }: {
   queryKey: any[];
-  getClothingItems: (page: number, limit: number, email: string) => Promise<ItemSchemaType[]>;
+  getClothingItems: (page: number, limit: number) => Promise<ItemSchemaType[]>;
   limit: number;
   columnCount: number;
   itemWhenNothingFound?: () => React.ReactElement;
@@ -48,7 +48,7 @@ const ImageGallery = ({
   const queryClient = useQueryClient();
   const { data, fetchNextPage, refetch } = useInfiniteGetItems(
     queryKey,
-    pageParam => getClothingItems(pageParam, limit, user?.email ?? ""),
+    pageParam => getClothingItems(pageParam, limit),
     item =>
       prefetchItemDetail(queryClient, item, user?.email ?? "", item.brandId)
   );

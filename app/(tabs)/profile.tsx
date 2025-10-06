@@ -33,7 +33,9 @@ const Profile = () => {
     // Cancelar todas las peticiones activas y limpiar la caché de React Query antes de hacer logout
     await queryClient.cancelQueries();
     await queryClient.clear();
-    signOut();
+    await signOut();
+    // Navegar directamente a sign-in para evitar problemas de cache
+    // router.replace("/sign-in");
   };
 
   if (!user) {
@@ -134,7 +136,7 @@ const ClientProfile = ({
             />
             <RenderProfileItem
               label="Email"
-              value={data.user.email}
+              value={user.email}
               canEdit={false}
             />
             <RenderProfileItem

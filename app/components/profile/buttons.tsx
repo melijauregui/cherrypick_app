@@ -38,10 +38,10 @@ const DeleteAccountButton: React.FC<{
   return (
     <>
       <TouchableOpacity
-        className="flex flex-row bg-brown-light h-[50px] justify-center items-center rounded-full"
+        className="flex flex-row bg-beige h-[50px] justify-center items-center rounded-full"
         onPress={() => setVisibleModal(true)}
       >
-        <Text className="text-white font-psemibold text-[15px]">
+        <Text className="text-black font-psemibold text-[15px]">
           Delete Account
         </Text>
       </TouchableOpacity>

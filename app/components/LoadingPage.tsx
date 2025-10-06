@@ -36,7 +36,8 @@ function LoadingPage({
   }, []);
 
   // Do prefetch if user is available
-  if (user && !alreadyPrefetched) {
+  if (user && user.emailVerified && !alreadyPrefetched) {
+    console.log("Prefetching user", user.email);
     prefetchHome(queryClient, user.email);
     prefetchProfile(user, queryClient);
     prefetchLikeAndFavoritePage(queryClient, user.email);

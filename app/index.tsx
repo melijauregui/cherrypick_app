@@ -5,17 +5,15 @@ import React, { useState, useEffect } from "react";
 import AppName from "@/app/components/AppName";
 import LogoSquareBeige from "@/app/components/logo/LogoSquareBeige";
 import "../global.css";
-import { Redirect } from "expo-router";
+import { Redirect, usePathname } from "expo-router";
 import { authClient } from "@/lib/auth-client";
-import { QueryClient, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import prefetchHome, {
   prefetchExplorePage,
   prefetchLikeAndFavoritePage,
   prefetchProfile,
 } from "@/app/utils/prefetchs";
 import Toast from "react-native-toast-message";
-import LoadingPage from "./components/LoadingPage";
-import { useFetchClientProfile } from "./utils/use-query";
 
 export default function App() {
   // verificar si hay un usuario autenticado
@@ -24,23 +22,20 @@ export default function App() {
   const loading = isPending;
   const queryClient = useQueryClient();
   const [timeout, setHasTimedOut] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const t = setTimeout(() => setHasTimedOut(true), 1000);
     return () => clearTimeout(t);
   }, []);
 
-  const dataUser = useFetchClientProfile(
-    user ? { email: user.email, name: user.name ?? "" } : { email: "", name: "" }
-  );
-
-  useEffect(() => {
-    if (user && !user.new) {
+  /* useEffect(() => {
+    if (user) {
       prefetchHome(queryClient, user.email);
       prefetchProfile(user, queryClient);
       prefetchLikeAndFavoritePage(queryClient, user.email);
     }
-  }, [user, queryClient]);
+  }, [user, queryClient]); */
 
   if (error) {
     Toast.show({
@@ -51,7 +46,7 @@ export default function App() {
   }
 
   if (loading || !timeout) {
-    if (user && !user.new) {
+    if (user && user.emailVerified) {
       // Solo ejecutar prefetch para usuarios existentes
       setTimeout(() => {
         prefetchHome(queryClient, user.email);
@@ -76,14 +71,15 @@ export default function App() {
 
   // Redirect based on authentication status
   if (user) {
-    if (user.new) {
+    if (!user.emailVerified && pathname !== "/code-verification") {
       // Usuario nuevo - redirigir a sign-in para que el useEffect maneje el redirect a preferences
-      return <LoadingPage alreadyPrefetched={true} />;
+      return <Redirect href="/code-verification-register" />;
     } else {
       // Usuario existente - redirigir directamente a home
       return <Redirect href="/home?prefetch=true" />;
     }
   } else {
+    console.log("Index: No user found, redirecting to sign-in");
     return <Redirect href="/sign-in" />;
   }
 }

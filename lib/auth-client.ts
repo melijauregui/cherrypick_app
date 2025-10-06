@@ -1,8 +1,8 @@
 import { createAuthClient } from "better-auth/react";
 import { expoClient } from "@better-auth/expo/client";
 import * as SecureStore from "expo-secure-store";
-import { useEffect, useState } from "react";
-import { adminClient, inferAdditionalFields } from "better-auth/client/plugins";
+import { useEffect, useRef, useState } from "react";
+import { inferAdditionalFields } from "better-auth/client/plugins";
 import { auth } from "@/lib/auth";
 import { router } from "expo-router";
 import { BETTER_AUTH_URL } from "@/config/api";
@@ -28,17 +28,57 @@ function useSession() {
   const session = _useSession();
   const isLoading = first || session.isPending;
   const authorized = session.data?.user.id;
+  const [forceUpdate, setForceUpdate] = useState(0);
+
+  // Custom refetch that also gets fresh session data when needed
+  const customRefetch = async () => {
+    // First do the normal refetch
+    const refetchResult = await session.refetch?.();
+
+    // If user is authenticated but not email verified, get fresh session data
+    if (session.data?.user && !session.data.user.emailVerified) {
+      console.log(
+        "User authenticated but not verified, getting fresh session data..."
+      );
+      try {
+        const freshSession = await authClient.getSession({
+          query: {
+            disableCookieCache: true,
+          },
+        });
+
+        // If we got fresh data and email is now verified, force a re-render
+        if (freshSession.data?.user?.emailVerified) {
+          console.log("Email is now verified, forcing re-render");
+          setForceUpdate(prev => prev + 1);
+        }
+      } catch (error) {
+        console.error("Error getting fresh session:", error);
+      }
+    }
+
+    return refetchResult;
+  };
+
+  // Effect to handle force updates
+  useEffect(() => {
+    if (forceUpdate > 0) {
+      console.log("Force update triggered, refetching session...");
+      session.refetch?.();
+    }
+  }, [forceUpdate, session.refetch]);
 
   useEffect(() => {
     setFirst(false);
   }, [session.isPending]);
 
   if (session.error) {
-    return { ...session.data, status: "error" };
+    return { ...session.data, refetch: customRefetch, status: "error" };
   }
 
   return {
     ...session.data,
+    refetch: customRefetch,
     status: authorized
       ? "authenticated"
       : isLoading
@@ -50,7 +90,7 @@ function useSession() {
 export { useSession, signIn, signUp, signOut };
 
 export function OnlyAuthenticated({ children }: { children: React.ReactNode }) {
-  const { status } = useSession();
+  const { status, user } = useSession();
 
   if (status === "loading") return null;
 

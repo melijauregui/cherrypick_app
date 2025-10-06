@@ -5,7 +5,6 @@ import { AppEnv } from "../app";
 import {
   CatalogResponseSchema,
   CatalogResponseSchemaType,
-  PaginationPreferencesSchema as PaginationPersonalizedSchema,
   PaginationSchema,
 } from "@/schemas/catalog/catalog-schema";
 import {
@@ -86,7 +85,7 @@ const getPersonalizedFeedRoute = createRoute({
   method: "get",
   path: "/personalized",
   request: {
-    query: PaginationPersonalizedSchema,
+    query: PaginationSchema,
   },
   responses: {
     200: {
@@ -104,28 +103,26 @@ const getPersonalizedFeedRoute = createRoute({
 
 FeedApp.openapi(getPersonalizedFeedRoute, async c => {
   try {
-    const { page, limit, email } = c.req.valid("query");
-    logger.info("/GET feed personalized page: %s limit: %s, email: %s", page, limit, email);
+    const { page, limit } = c.req.valid("query");
+    const user = c.get("user");
+    if (!user) {
+      return c.json({ error: true, details: "Unauthorized" }, 401);
+    }
+    logger.info("/GET feed personalized page: %s limit: %s, email: %s", page, limit, user?.email);
 
     let res: CatalogResponseSchemaType | ErrorSchemaType;
-    const resultUser = await GetClient(email);
-    if (resultUser.error) {
+    const resultClient = await GetClient(user.id);
+    if (resultClient.error) {
       res = {
         error: true,
         details: "Cliente no encontrado",
       };
       return c.json(res, 404);
     }
-    const user = resultUser.user;
-    if (!user || user.preferences.length === 0) {
-      res = {
-        error: true,
-        details: "El cliente no tiene preferencias",
-      };
-      return c.json(res, 404);
-    }
-    const preferencesArray = user.preferences;
-    const resultLikes = await getAllLikedFavoritedItems("likes", email, 0, 5);
+    const client = resultClient.user;
+
+    const preferencesArray = client.preferences;
+    const resultLikes = await getAllLikedFavoritedItems("likes", user.email, 0, 5);
     if (resultLikes.error) {
       res = {
         error: true,

@@ -159,30 +159,43 @@ export async function SearchPersonalizedItems(
     returnMetadata: ["distance"] as (keyof Metadata)[]
   };
 
-  const meanEmbeddingPreferences = await getEmbeddingsForTexts(preferences);
-  if (meanEmbeddingPreferences.length === 0) {
+  const meanEmbeddingPreferences =
+    preferences.length > 0 ? await getEmbeddingsForTexts(preferences) : [];
+
+  const meanEmbeddingLikes =
+    likesDescriptions.length > 0 ? await getEmbeddingsForTexts(likesDescriptions) : [];
+
+  if (preferences.length > 0 && meanEmbeddingPreferences.length === 0) {
     return {
       error: true,
       details: "No valid embeddings for preferences",
     };
   }
 
-  let meanEmbedding = meanEmbeddingPreferences;
-
-  const meanEmbeddingLikes = await getEmbeddingsForTexts(likesDescriptions);
   if (likesDescriptions.length > 0 && meanEmbeddingLikes.length === 0) {
     return {
       error: true,
       details: "No valid embeddings for likes descriptions",
     };
   }
-  if (meanEmbeddingLikes.length > 0) {
+
+  let meanEmbedding: number[] = [];
+
+  if (meanEmbeddingPreferences.length > 0 && meanEmbeddingLikes.length > 0) {
     const weightPref = 0.7;
     const weightLikes = 0.3;
-    meanEmbedding = meanEmbeddingPreferences.map((v, i) =>
-      v * weightPref + (meanEmbeddingLikes[i] ?? 0) * weightLikes
+    meanEmbedding = meanEmbeddingPreferences.map(
+      (v, i) => v * weightPref + (meanEmbeddingLikes[i] ?? 0) * weightLikes
     );
-
+  } else if (meanEmbeddingPreferences.length > 0) {
+    meanEmbedding = meanEmbeddingPreferences;
+  } else if (meanEmbeddingLikes.length > 0) {
+    meanEmbedding = meanEmbeddingLikes;
+  } else {
+    return {
+      error: true,
+      details: "No valid embeddings for preferences or likes descriptions",
+    };
   }
 
   let results = await collection.query.nearVector(meanEmbedding, queryOptions);
@@ -252,48 +265,61 @@ export async function SearchPersonalizedItems2(
     returnMetadata: ["distance"] as (keyof Metadata)[]
   };
 
-  const meanEmbeddingPreferences = await getEmbeddingsForTexts(preferences);
-  if (meanEmbeddingPreferences.length === 0) {
+  const meanEmbeddingPreferences =
+    preferences.length > 0 ? await getEmbeddingsForTexts(preferences) : [];
+
+  const meanEmbeddingLikes =
+    likesDescriptions.length > 0 ? await getEmbeddingsForTexts(likesDescriptions) : [];
+
+  if (preferences.length > 0 && meanEmbeddingPreferences.length === 0) {
     return {
       error: true,
       details: "No valid embeddings for preferences",
     };
   }
 
-  const resultsPref = await collection.query.nearVector(meanEmbeddingPreferences, queryOptions);
-  const weightPref = 0.7;
-  const weightLikes = 0.3;
-
-  const meanEmbeddingLikes = await getEmbeddingsForTexts(likesDescriptions);
   if (likesDescriptions.length > 0 && meanEmbeddingLikes.length === 0) {
     return {
       error: true,
       details: "No valid embeddings for likes descriptions",
     };
   }
+
+  const resultsPref = meanEmbeddingPreferences.length > 0 ? await collection.query.nearVector(meanEmbeddingPreferences, queryOptions) : { objects: [] };
   const likesResults = meanEmbeddingLikes.length > 0
     ? await collection.query.nearVector(meanEmbeddingLikes, queryOptions)
     : { objects: [] };
 
-  const combinedMap = new Map<string, { item: any; score: number }>();
-  addResults(resultsPref, weightPref, combinedMap);
-  addResults(likesResults, weightLikes, combinedMap);
+  let sortedItems: any[] = [];
 
-  const sortedItems = Array.from(combinedMap.values())
-    .sort((a, b) => b.score - a.score)
-    .map(entry => entry.item);
+  if (meanEmbeddingPreferences.length > 0 && meanEmbeddingLikes.length > 0) {
+    const weightPref = 0.7;
+    const weightLikes = 0.3;
 
+    const combinedMap = new Map<string, { item: any; score: number }>();
+    addResults(resultsPref, weightPref, combinedMap);
+    addResults(likesResults, weightLikes, combinedMap);
+
+    sortedItems = Array.from(combinedMap.values())
+      .sort((a, b) => b.score - a.score)
+      .map(entry => entry.item);
+
+  } else if (meanEmbeddingPreferences.length > 0) {
+    sortedItems = resultsPref.objects;
+  } else if (meanEmbeddingLikes.length > 0) {
+    sortedItems = likesResults.objects;
+  }
 
   // Map results to ItemSchemaType
   const items: ItemSchemaType[] = sortedItems
     .map(match => {
       const item = {
-        name: match.name || "",
-        description: match.description || "",
-        imageUrl: match.imageUrl || "",
-        url: match.url || "",
-        brandId: match.brandId || "",
-        price: match.price || 0,
+        name: match.name || match.properties?.name || "",
+        description: match.description || match.properties?.description || "",
+        imageUrl: match.imageUrl || match.properties?.imageUrl || "",
+        url: match.url || match.properties?.url || "",
+        brandId: match.brandId || match.properties?.brandId || "",
+        price: match.price || match.properties?.price || 0,
         uuid: match.uuid || "",
       };
 

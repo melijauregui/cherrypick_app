@@ -150,9 +150,19 @@ exports.Prisma.ItemLikeScalarFieldEnum = {
 };
 
 exports.Prisma.RegisterInProgressScalarFieldEnum = {
-  email: 'email',
+  id: 'id',
+  userId: 'userId',
   verificationCode: 'verificationCode',
-  verificationCodeExpiration: 'verificationCodeExpiration'
+  verificationCodeExpiration: 'verificationCodeExpiration',
+  token: 'token'
+};
+
+exports.Prisma.ResetPasswordInProgressScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  verificationCode: 'verificationCode',
+  verificationCodeExpiration: 'verificationCodeExpiration',
+  token: 'token'
 };
 
 exports.Prisma.InspoItemsScalarFieldEnum = {
@@ -160,12 +170,6 @@ exports.Prisma.InspoItemsScalarFieldEnum = {
   itemUuid: 'itemUuid',
   category: 'category',
   index: 'index'
-};
-
-exports.Prisma.UserScalarFieldEnum = {
-  id: 'id',
-  email: 'email',
-  userType: 'userType'
 };
 
 exports.Prisma.AccountScalarFieldEnum = {
@@ -203,7 +207,6 @@ exports.Prisma.UserScalarFieldEnum = {
   image: 'image',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  new: 'new',
   userType: 'userType'
 };
 
@@ -249,8 +252,8 @@ exports.Prisma.ModelName = {
   ItemFavorite: 'ItemFavorite',
   ItemLike: 'ItemLike',
   RegisterInProgress: 'RegisterInProgress',
+  ResetPasswordInProgress: 'ResetPasswordInProgress',
   InspoItems: 'InspoItems',
-  User: 'User',
   account: 'account',
   session: 'session',
   user: 'user',

@@ -34,7 +34,7 @@ import { useDeleteItem } from "@/app/utils/update";
 import { prefetchBrandPageItem } from "@/app/utils/prefetchs";
 import List2 from "@/app/components/List2";
 import { ItemSchemaType } from "@/schemas/catalog/catalog-schema";
-import { BrandSchemaPropertiesType } from "@/schemas/brand/brand-schema";
+import { BrandSchemaType } from "@/schemas/brand/brand-schema";
 import ImageComplete from "../components/ImageComplete";
 
 const ItemDetail = () => {
@@ -180,7 +180,7 @@ const ItemDetailComponent = ({
   brand,
 }: {
   item: ItemSchemaType;
-  brand: BrandSchemaPropertiesType | undefined;
+  brand: BrandSchemaType | undefined;
 }) => {
   const [measured, setMeasured] = React.useState(false); // ya medí?
   const [overflows, setOverflows] = React.useState(false); // tiene >1 línea?
@@ -292,7 +292,7 @@ const IconComponent = ({
 
       // Mostrar toast de confirmación
       Toast.show({
-        type: "normal",
+        type: "success",
         text1: "Link copiado!",
         visibilityTime: 3000,
       });
@@ -318,7 +318,7 @@ const IconComponent = ({
           <Ionicons
             name={isLiked ? "heart" : "heart-outline"}
             size={24}
-            color={isLiked ? "#bd8e75" : "white"}
+            color={isLiked ? "#d8bc9e" : "white"}
           />
         </TouchableOpacity>
         <TouchableOpacity
@@ -329,7 +329,7 @@ const IconComponent = ({
           <FontAwesome
             name={isFavorited ? "bookmark" : "bookmark-o"}
             size={24}
-            color={isFavorited ? "#bd8e75" : "white"}
+            color={isFavorited ? "#d8bc9e" : "white"}
           />
         </TouchableOpacity>
 

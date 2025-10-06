@@ -29,7 +29,7 @@ const ErrorPage = () => {
               <View className="w-full flex flex-col gap-4">
                 <TouchableOpacity
                   className="flex flex-row bg-white h-[50px] justify-center items-center rounded-full"
-                  onPress={() => router.push("/sign-in")}
+                  onPress={() => router.replace("/sign-in")}
                 >
                   <Text className="text-black font-psemibold text-[15px]">
                     Go back to Sign In

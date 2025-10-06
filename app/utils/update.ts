@@ -28,9 +28,19 @@ export default function useUpdateBrand(brandEmail: string) {
       }
       SuccessSchema.parse(data);
     },
-    onSuccess: () => {},
+    onSuccess: () => {
+      Toast.show({
+        type: "success",
+        text1: `Brand updated successfully`,
+        visibilityTime: 4000,
+      });
+    },
     onError: error => {
-      // TODO PUSH TOAST
+      Toast.show({
+        type: "error",
+        text1: `could not update user:`,
+        visibilityTime: 4000,
+      });
       console.log(`could not update user:`, error);
     },
     onSettled: () => {
@@ -159,7 +169,7 @@ export function useDeleteItem(itemUuid: string) {
       });
 
       Toast.show({
-        type: "normal",
+        type: "success",
         text1: `Producto eliminado correctamente`,
       });
       router.back();
@@ -253,8 +263,8 @@ export function useUpdateItem(
       if (result.data.description !== formDataLastValue.description) {
         itemUpdated.description = result.data.description;
       }
-      if (result.data.price !== formDataLastValue.price) {
-        itemUpdated.price = result.data.price;
+      if (result.data.price.toString() !== formDataLastValue.price) {
+        itemUpdated.price = result.data.price.toString();
       }
       if (result.data.imageUrl !== formDataLastValue.imageUrl) {
         itemUpdated.imageUrl = result.data.imageUrl;
@@ -285,7 +295,7 @@ export function useUpdateItem(
       });
       onSubmit(variables.formData);
       Toast.show({
-        type: "normal",
+        type: "success",
         text1: `The item ${variables.formData.name} has been successfully updated in the catalog!`,
         visibilityTime: 2000,
       });
@@ -328,6 +338,88 @@ export function useUpdateItem(
     onSettled: () => {
       setIsSubmitting(false);
       Keyboard.dismiss();
+    },
+  });
+
+  return mutation;
+}
+
+export function useResendCode() {
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: async (email: string) => {
+      console.log("Sending verification email to", email);
+      await authClient.sendVerificationEmail({
+        email: email,
+        fetchOptions: {
+          onError: error => {
+            throw new Error(error.error.message);
+          },
+        },
+        callbackURL: "cherrypick:///code-verification-register",
+      });
+    },
+    onSuccess: () => {
+      console.log("SendCode onSuccess triggered");
+      Toast.show({
+        type: "success",
+        text1: "Code sent successfully",
+        visibilityTime: 3000,
+      });
+    },
+    onError: error => {
+      console.error("Error resending code:", error);
+      Toast.show({
+        type: "error",
+        text1: "Failed to resend code",
+        visibilityTime: 3000,
+      });
+    },
+    onSettled: () => {
+      console.log("SendCode onSettled triggered");
+      //invalidate query
+      void queryClient.invalidateQueries({
+        queryKey: ["expiration-code"],
+      });
+    },
+  });
+
+  return mutation;
+}
+
+export function useResendCodeResetPassword() {
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: async (email: string) => {
+      console.log("Sending verification email to", email);
+      await authClient.requestPasswordReset({
+        email: email,
+        redirectTo: "cherrypick:///reset-password",
+        fetchOptions: {
+          onError: error => {
+            console.error(error);
+            Toast.show({
+              type: "error",
+              text1: "Failed to send reset password email",
+            });
+          },
+          onSuccess: () => {
+            console.log("Reset password email sent");
+            Toast.show({
+              type: "success",
+              text1: "Reset password email sent!",
+            });
+          },
+        },
+      });
+    },
+
+    onSettled: () => {
+      console.log("SendCode onSettled triggered");
+      //invalidate query
+      void queryClient.invalidateQueries({
+        queryKey: ["reset-password-code"],
+      });
     },
   });
 

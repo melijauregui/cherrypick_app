@@ -1,7 +1,6 @@
 import safeFetch from "./safe-fetch";
 import { LOCAL_IP } from "@/config/api";
 import * as FileSystem from "expo-file-system";
-import { } from "@/schemas/auth/brand-schema";
 import {
   CatalogResponseSchema,
   IsMyItemSchema,
@@ -18,11 +17,11 @@ import {
 } from "@/schemas/client/client-schema";
 import {
   BrandSchemaPropertiesResponse,
-  BrandSchemaPropertiesType,
-  BrandSchemaResponse,
   BrandSchemaType,
+  BrandSchemaResponse,
 } from "@/schemas/brand/brand-schema";
 import {
+  ErrorSchemaType,
   SuccessSchema,
   SuccessSchemaType,
 } from "@/schemas/standar-response-schema";
@@ -34,6 +33,10 @@ import {
   QueryIdSchema,
   QueryIdSchemaType,
 } from "@/schemas/standar-query-schema";
+import {
+  VerifyUserExistsResponseSchema,
+  VerifyUserExistsResponseSchemaType,
+} from "@/schemas/user/user-schema";
 
 // Helper function to handle API responses consistently
 const handleApiResponse = async <T>(
@@ -107,13 +110,13 @@ export async function checkIsMyItem(
 
 export async function getBrandProfile(
   brandId: string
-): Promise<BrandSchemaPropertiesType | null> {
+): Promise<BrandSchemaType | null> {
   if (!brandId) {
     return null;
   }
 
   const res = await handleApiResponse<{
-    brand: BrandSchemaPropertiesType;
+    brand: BrandSchemaType;
   }>(
     () =>
       safeFetch({
@@ -223,15 +226,14 @@ export async function getClothingItemsHome(
 export async function getPersonalizedItemsHome(
   page: number,
   limit: number,
-  email: string
 ): Promise<ItemSchemaType[]> {
-  console.log("getPersonalizedItemsHome", page, limit, email);
+  console.log("getPersonalizedItemsHome", page, limit);
   const res = await handleApiResponse<{
     items: ItemSchemaType[];
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/feed/personalized?page=${page}&limit=${limit}&email=${email}`,
+        url: `http://${LOCAL_IP}:3000/feed/personalized?page=${page}&limit=${limit}`,
         method: "GET",
       }),
     CatalogResponseSchema,
@@ -558,4 +560,92 @@ export async function getInspirationItems(
     "getInspirationItems"
   );
   return res?.items || null;
+}
+
+export async function getExpirationCode(): Promise<Date | null> {
+  const res = await handleApiResponse<{
+    expirationTime: string;
+  }>(
+    () =>
+      safeFetch({
+        url: `http://${LOCAL_IP}:3000/code-verification/expiration`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+    SuccessSchema.extend({ expirationTime: z.string() }),
+    "getExpirationCode"
+  );
+  return new Date(res?.expirationTime ?? "") || null;
+}
+
+export async function verifyCode(
+  code: string,
+  email: string
+): Promise<{ isCorrect: boolean } | null> {
+  const res = await handleApiResponse<{
+    isCorrect: boolean;
+  }>(
+    () =>
+      safeFetch({
+        url: `http://${LOCAL_IP}:3000/code-verification/verify`,
+        method: "POST",
+        body: JSON.stringify({ code, email }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+    SuccessSchema.extend({ isCorrect: z.boolean() }),
+    "verifyCode"
+  );
+  return res || null;
+}
+
+export async function getExpirationCodeResetPassword(
+  email: string
+): Promise<Date | null> {
+  const res = await handleApiResponse<{
+    expirationTime: string;
+  }>(
+    () =>
+      safeFetch({
+        url: `http://${LOCAL_IP}:3000/code-verification/expiration-reset-password`,
+        method: "POST",
+        body: JSON.stringify({ email: email }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+    SuccessSchema.extend({ expirationTime: z.string() }),
+    "getExpirationCodeResetPassword"
+  );
+  console.log("getExpirationCodeResetPassword", res);
+  return new Date(res?.expirationTime ?? "") || null;
+}
+
+export async function verifyMailAvailability(
+  email: string
+): Promise<VerifyUserExistsResponseSchemaType | ErrorSchemaType> {
+  try {
+    const { data } = await safeFetch({
+      url: `http://${LOCAL_IP}:3000/user/verify`,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email: email }),
+    });
+
+    if (data.error) {
+      throw new Error(data.details || "Unexpected error");
+    }
+    VerifyUserExistsResponseSchema.parse(data);
+    return data;
+  } catch (error: unknown) {
+    return {
+      error: true,
+      details: error instanceof Error ? error.message : "Unexpected error",
+    };
+  }
 }

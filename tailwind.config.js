@@ -23,18 +23,9 @@ module.exports = {
           strong: "#242424",
         },
         brown: {
-          extraLight: "#bd8e75",
-          light: "#af785a",
           strong: "#301c11",
         },
-        pink: {
-          light: "#F8BFBF",
-          strong: "#DE7070",
-        },
-        beige: {
-          light: "#E6D4C1",
-          strong: "#C2B09A",
-        },
+        beige: "#d8bc9e",
       },
       fontFamily: {
         pthin: ["Poppins-Thin", "sans-serif"],

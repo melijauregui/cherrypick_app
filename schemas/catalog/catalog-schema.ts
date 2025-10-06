@@ -62,10 +62,6 @@ export const PaginationSchema = z.object({
   limit: z.preprocess(val => parseInt(val as string) || 10, z.number().min(1)),
 });
 
-export const PaginationPreferencesSchema = z.object({
-  ...PaginationSchema.shape,
-  email: z.string().email("Email is required"),
-});
 
 export const ImageBase64Schema = z.object({
   ...PaginationSchema.shape,

@@ -2,36 +2,26 @@ import { ScrollView, Text, View, TouchableOpacity, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useEffect, useState } from "react";
 import LogoCircle from "@/app/components/logo/LogoCircle";
-import { router } from "expo-router";
+import { router, usePathname } from "expo-router";
 import { authClient, useSession } from "@/lib/auth-client";
 
 const SignIn = () => {
   const { user, status } = useSession();
+  //veo en que ruta esta
+  const pathname = usePathname();
 
   useEffect(() => {
-    if (user && status === "authenticated") {
-      if (user.new) {
-        const name = user?.name || "";
-        const email = user?.email || "";
-        if (!name || !email) {
-          //TODO PUSH TOAST
-          console.log("Missing user data for creation, redirecting to sign-in");
-          router.replace("/sign-in");
-          return;
-        }
-        router.replace({
-          pathname: "cherrypick:///preferences",
-          params: {
-            name,
-            email,
-            dateBirth: "",
-          },
-        });
-      } else {
+    // Only run if user is authenticated and we're on the sign-in page
+    if (user && status === "authenticated" && pathname === "/sign-in") {
+      if (!user.emailVerified) {
+        router.replace("cherrypick:///code-verification-register");
+      }
+      if (user.emailVerified) {
+        console.log("user email verified, redirecting to home");
         router.replace("cherrypick:///home");
       }
     }
-  }, [status, user]);
+  }, [status, user, pathname]);
 
   return (
     <SafeAreaView className="bg-brown-strong flex-1 h-full w-full">
@@ -47,6 +37,7 @@ const SignIn = () => {
             </Text>
             <View className="w-full mt-40 flex flex-col gap-4">
               <GoogleSignInButton />
+              <LogInButton />
               <OrLine />
               <SignUpButton />
             </View>
@@ -78,9 +69,20 @@ const GoogleSignInButton: React.FC<{}> = () => {
   );
 };
 
-const SignUpButton = () => (
+const LogInButton = () => (
   <TouchableOpacity
     className="flex flex-row bg-white h-[50px] justify-center items-center rounded-full"
+    onPress={() => router.push("/log-in")}
+  >
+    <Text className="text-black font-psemibold text-[15px]">
+      Log in with email
+    </Text>
+  </TouchableOpacity>
+);
+
+const SignUpButton = () => (
+  <TouchableOpacity
+    className="flex flex-row bg-beige h-[50px] justify-center items-center rounded-full"
     onPress={() => router.push("/sign-up")}
   >
     <Text className="text-black font-psemibold text-[15px]">

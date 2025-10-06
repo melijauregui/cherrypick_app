@@ -1,7 +1,6 @@
 import { Stack } from "expo-router";
-import React, { useEffect } from "react";
+import React from "react";
 import { StatusBar } from "expo-status-bar";
-import { Linking } from "react-native";
 
 const AuthLayout = () => {
   return (
@@ -26,7 +25,7 @@ const AuthLayout = () => {
           }}
         />
         <Stack.Screen
-          name="code-verification"
+          name="code-verification-register"
           options={{
             headerShown: false,
           }}
@@ -39,6 +38,30 @@ const AuthLayout = () => {
         />
         <Stack.Screen
           name="error"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="log-in"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="forgot-password"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="reset-password"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="code-verification-password"
           options={{
             headerShown: false,
           }}

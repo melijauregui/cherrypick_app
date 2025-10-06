@@ -1,7 +1,14 @@
 import { betterAuth } from "better-auth";
 import { Pool } from "pg";
 import { expo } from "@better-auth/expo";
-import { VerifyUserExists } from "../server/user/functions";
+import { CreateClient } from "@/server/client/functions";
+import {
+  GenerateVerificationCode,
+  SaveVerificationCode,
+  SaveVerificationCodeResetPassword,
+  SendEmail,
+  SendEmailResetPassword,
+} from "@/server/formUser/functions";
 
 console.log("BETTER_AUTH_URL", process.env.BETTER_AUTH_URL);
 
@@ -14,6 +21,36 @@ export const auth = betterAuth({
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
   }),
+  emailAndPassword: {
+    enabled: true,
+    sendResetPassword: async ({ user, url, token }, request) => {
+      console.log("YEEES Sending reset password email to", user.email);
+      const code = GenerateVerificationCode();
+      const emailSent = await SendEmailResetPassword(user.email, code);
+      if (!emailSent) {
+        throw new Error("Failed to send verification email");
+      }
+      const res = await SaveVerificationCodeResetPassword(user.id, code, token);
+      if (res.error) {
+        throw new Error("Failed to save verification code reset password");
+      }
+      console.log("Reset password email sent successfully!!!");
+    },
+  },
+  emailVerification: {
+    autoSignInAfterVerification: true,
+    async sendVerificationEmail({ user, url, token }, request) {
+      const code = GenerateVerificationCode();
+      const emailSent = await SendEmail(user.email, code);
+      if (!emailSent) {
+        throw new Error("Failed to send verification email");
+      }
+      const res = await SaveVerificationCode(user.id, code, token);
+      if (res.error) {
+        throw new Error("Failed to save verification code");
+      }
+    },
+  },
   socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID as string,
@@ -28,9 +65,6 @@ export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL,
   user: {
     additionalFields: {
-      new: {
-        type: "boolean",
-      },
       userType: {
         type: "string",
       },
@@ -42,17 +76,22 @@ export const auth = betterAuth({
   databaseHooks: {
     user: {
       create: {
-        before: async (user: {
-          email: string;
-          new?: boolean;
+        after: async (user: {
           userType?: string;
+          id: string;
+          name: string;
         }) => {
-          const { exists, userType } = await VerifyUserExists(user.email);
-          if (!exists) {
-            console.error("User does not exist");
-            return;
+          // Wait for the timeout and then execute the logic
+          await new Promise(resolve => setTimeout(resolve, 500));
+
+          console.log("After user create", user);
+          if (user.userType === "client") {
+            await CreateClient(user.id, user.name);
+          } else if (user.userType === "brand") {
+            console.error("User type is artist");
+          } else {
+            console.error("User type not found");
           }
-          return { data: { ...user, new: false, userType: userType } };
         },
       },
     },

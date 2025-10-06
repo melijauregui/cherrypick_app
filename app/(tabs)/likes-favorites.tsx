@@ -1,10 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Dimensions,
-} from "react-native";
+import { View, Text, TouchableOpacity, Dimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getAllLikedItems, getAllFavoritedItems } from "../utils/fetch";
 import { useSession } from "@/lib/auth-client";
@@ -47,7 +42,7 @@ const LikesFavoritesPage = () => {
             <Ionicons
               name={activeTab === "likes" ? "heart" : "heart-outline"}
               size={24}
-              color={activeTab === "likes" ? "#bd8e75" : "white"}
+              color={activeTab === "likes" ? "#d8bc9e" : "white"}
             />
           }
         />
@@ -59,7 +54,7 @@ const LikesFavoritesPage = () => {
             <FontAwesome
               name={activeTab === "favorites" ? "bookmark" : "bookmark-o"}
               size={24}
-              color={activeTab === "favorites" ? "#bd8e75" : "white"}
+              color={activeTab === "favorites" ? "#d8bc9e" : "white"}
             />
           }
         />
@@ -106,8 +101,9 @@ const TabNavigation = ({
 }) => {
   return (
     <TouchableOpacity
-      className={`flex-1 py-4 px-6 ${activeTab === tab ? "border-b-2 border-brown-extraLight" : ""
-        }`}
+      className={`flex-1 py-4 px-6 ${
+        activeTab === tab ? "border-b-2 border-beige" : ""
+      }`}
       onPress={() => setActiveTab()}
     >
       <View className="flex-row items-center justify-center gap-1">{icon}</View>
