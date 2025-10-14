@@ -125,7 +125,7 @@ exports.Prisma.BrandScalarFieldEnum = {
   name: 'name',
   description: 'description',
   url: 'url',
-  logoUrl: 'logoUrl'
+  logoId: 'logoId'
 };
 
 exports.Prisma.ClientScalarFieldEnum = {
@@ -170,6 +170,28 @@ exports.Prisma.InspoItemsScalarFieldEnum = {
   itemUuid: 'itemUuid',
   category: 'category',
   index: 'index'
+};
+
+exports.Prisma.ItemScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  price: 'price',
+  url: 'url',
+  brandId: 'brandId',
+  imageId: 'imageId'
+};
+
+exports.Prisma.FilesScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  contentType: 'contentType',
+  bucket: 'bucket',
+  url: 'url',
+  uploadUrl: 'uploadUrl',
+  metadata: 'metadata',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.AccountScalarFieldEnum = {
@@ -229,6 +251,10 @@ exports.Prisma.NullableJsonNullValueInput = {
   JsonNull: Prisma.JsonNull
 };
 
+exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
+};
+
 exports.Prisma.QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
@@ -254,6 +280,8 @@ exports.Prisma.ModelName = {
   RegisterInProgress: 'RegisterInProgress',
   ResetPasswordInProgress: 'ResetPasswordInProgress',
   InspoItems: 'InspoItems',
+  Item: 'Item',
+  Files: 'Files',
   account: 'account',
   session: 'session',
   user: 'user',

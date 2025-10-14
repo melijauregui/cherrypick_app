@@ -9,17 +9,14 @@ import {
   SendEmail,
   SendEmailResetPassword,
 } from "@/server/formUser/functions";
+import { config } from "@/config";
 
-console.log("BETTER_AUTH_URL", process.env.BETTER_AUTH_URL);
+console.log("BETTER_AUTH_URL", config.BETTER_AUTH_URL);
 
 export const auth = betterAuth({
   plugins: [expo()],
   database: new Pool({
-    host: process.env.DB_HOST || "localhost",
-    port: Number(process.env.DATABASE_PORT) || 5432,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
+    connectionString: config.DATABASE_URL,
   }),
   emailAndPassword: {
     enabled: true,
@@ -53,16 +50,16 @@ export const auth = betterAuth({
   },
   socialProviders: {
     google: {
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      clientId: config.GOOGLE_CLIENT_ID,
+      clientSecret: config.GOOGLE_CLIENT_SECRET,
     },
   },
   trustedOrigins: [
     "cherrypick://",
     "https://gibbon-amazing-neatly.ngrok-free.app",
-    process.env.BETTER_AUTH_URL || "http://localhost:3000",
+    config.BETTER_AUTH_URL,
   ],
-  baseURL: process.env.BETTER_AUTH_URL,
+  baseURL: config.BETTER_AUTH_URL,
   user: {
     additionalFields: {
       userType: {

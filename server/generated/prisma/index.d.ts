@@ -49,6 +49,16 @@ export type ResetPasswordInProgress = $Result.DefaultSelection<Prisma.$ResetPass
  */
 export type InspoItems = $Result.DefaultSelection<Prisma.$InspoItemsPayload>
 /**
+ * Model Item
+ * 
+ */
+export type Item = $Result.DefaultSelection<Prisma.$ItemPayload>
+/**
+ * Model Files
+ * 
+ */
+export type Files = $Result.DefaultSelection<Prisma.$FilesPayload>
+/**
  * Model account
  * 
  */
@@ -256,6 +266,26 @@ export class PrismaClient<
     * ```
     */
   get inspoItems(): Prisma.InspoItemsDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.item`: Exposes CRUD operations for the **Item** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Items
+    * const items = await prisma.item.findMany()
+    * ```
+    */
+  get item(): Prisma.ItemDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.files`: Exposes CRUD operations for the **Files** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Files
+    * const files = await prisma.files.findMany()
+    * ```
+    */
+  get files(): Prisma.FilesDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.account`: Exposes CRUD operations for the **account** model.
@@ -743,6 +773,8 @@ export namespace Prisma {
     RegisterInProgress: 'RegisterInProgress',
     ResetPasswordInProgress: 'ResetPasswordInProgress',
     InspoItems: 'InspoItems',
+    Item: 'Item',
+    Files: 'Files',
     account: 'account',
     session: 'session',
     user: 'user',
@@ -765,7 +797,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "brand" | "client" | "itemFavorite" | "itemLike" | "registerInProgress" | "resetPasswordInProgress" | "inspoItems" | "account" | "session" | "user" | "verification"
+      modelProps: "brand" | "client" | "itemFavorite" | "itemLike" | "registerInProgress" | "resetPasswordInProgress" | "inspoItems" | "item" | "files" | "account" | "session" | "user" | "verification"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1287,6 +1319,154 @@ export namespace Prisma {
           }
         }
       }
+      Item: {
+        payload: Prisma.$ItemPayload<ExtArgs>
+        fields: Prisma.ItemFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ItemFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ItemPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ItemFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ItemPayload>
+          }
+          findFirst: {
+            args: Prisma.ItemFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ItemPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ItemFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ItemPayload>
+          }
+          findMany: {
+            args: Prisma.ItemFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ItemPayload>[]
+          }
+          create: {
+            args: Prisma.ItemCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ItemPayload>
+          }
+          createMany: {
+            args: Prisma.ItemCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ItemCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ItemPayload>[]
+          }
+          delete: {
+            args: Prisma.ItemDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ItemPayload>
+          }
+          update: {
+            args: Prisma.ItemUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ItemPayload>
+          }
+          deleteMany: {
+            args: Prisma.ItemDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ItemUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ItemUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ItemPayload>[]
+          }
+          upsert: {
+            args: Prisma.ItemUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ItemPayload>
+          }
+          aggregate: {
+            args: Prisma.ItemAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateItem>
+          }
+          groupBy: {
+            args: Prisma.ItemGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ItemGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ItemCountArgs<ExtArgs>
+            result: $Utils.Optional<ItemCountAggregateOutputType> | number
+          }
+        }
+      }
+      Files: {
+        payload: Prisma.$FilesPayload<ExtArgs>
+        fields: Prisma.FilesFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.FilesFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FilesPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.FilesFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FilesPayload>
+          }
+          findFirst: {
+            args: Prisma.FilesFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FilesPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.FilesFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FilesPayload>
+          }
+          findMany: {
+            args: Prisma.FilesFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FilesPayload>[]
+          }
+          create: {
+            args: Prisma.FilesCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FilesPayload>
+          }
+          createMany: {
+            args: Prisma.FilesCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.FilesCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FilesPayload>[]
+          }
+          delete: {
+            args: Prisma.FilesDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FilesPayload>
+          }
+          update: {
+            args: Prisma.FilesUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FilesPayload>
+          }
+          deleteMany: {
+            args: Prisma.FilesDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.FilesUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.FilesUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FilesPayload>[]
+          }
+          upsert: {
+            args: Prisma.FilesUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FilesPayload>
+          }
+          aggregate: {
+            args: Prisma.FilesAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateFiles>
+          }
+          groupBy: {
+            args: Prisma.FilesGroupByArgs<ExtArgs>
+            result: $Utils.Optional<FilesGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.FilesCountArgs<ExtArgs>
+            result: $Utils.Optional<FilesCountAggregateOutputType> | number
+          }
+        }
+      }
       account: {
         payload: Prisma.$accountPayload<ExtArgs>
         fields: Prisma.accountFieldRefs
@@ -1682,6 +1862,8 @@ export namespace Prisma {
     registerInProgress?: RegisterInProgressOmit
     resetPasswordInProgress?: ResetPasswordInProgressOmit
     inspoItems?: InspoItemsOmit
+    item?: ItemOmit
+    files?: FilesOmit
     account?: accountOmit
     session?: sessionOmit
     user?: userOmit
@@ -1759,6 +1941,77 @@ export namespace Prisma {
   /**
    * Count Types
    */
+
+
+  /**
+   * Count Type BrandCountOutputType
+   */
+
+  export type BrandCountOutputType = {
+    item: number
+  }
+
+  export type BrandCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    item?: boolean | BrandCountOutputTypeCountItemArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * BrandCountOutputType without action
+   */
+  export type BrandCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BrandCountOutputType
+     */
+    select?: BrandCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * BrandCountOutputType without action
+   */
+  export type BrandCountOutputTypeCountItemArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ItemWhereInput
+  }
+
+
+  /**
+   * Count Type FilesCountOutputType
+   */
+
+  export type FilesCountOutputType = {
+    brand: number
+    item: number
+  }
+
+  export type FilesCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    brand?: boolean | FilesCountOutputTypeCountBrandArgs
+    item?: boolean | FilesCountOutputTypeCountItemArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * FilesCountOutputType without action
+   */
+  export type FilesCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FilesCountOutputType
+     */
+    select?: FilesCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * FilesCountOutputType without action
+   */
+  export type FilesCountOutputTypeCountBrandArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BrandWhereInput
+  }
+
+  /**
+   * FilesCountOutputType without action
+   */
+  export type FilesCountOutputTypeCountItemArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ItemWhereInput
+  }
 
 
   /**
@@ -1856,7 +2109,7 @@ export namespace Prisma {
     name: string | null
     description: string | null
     url: string | null
-    logoUrl: string | null
+    logoId: string | null
   }
 
   export type BrandMaxAggregateOutputType = {
@@ -1864,7 +2117,7 @@ export namespace Prisma {
     name: string | null
     description: string | null
     url: string | null
-    logoUrl: string | null
+    logoId: string | null
   }
 
   export type BrandCountAggregateOutputType = {
@@ -1872,7 +2125,7 @@ export namespace Prisma {
     name: number
     description: number
     url: number
-    logoUrl: number
+    logoId: number
     _all: number
   }
 
@@ -1882,7 +2135,7 @@ export namespace Prisma {
     name?: true
     description?: true
     url?: true
-    logoUrl?: true
+    logoId?: true
   }
 
   export type BrandMaxAggregateInputType = {
@@ -1890,7 +2143,7 @@ export namespace Prisma {
     name?: true
     description?: true
     url?: true
-    logoUrl?: true
+    logoId?: true
   }
 
   export type BrandCountAggregateInputType = {
@@ -1898,7 +2151,7 @@ export namespace Prisma {
     name?: true
     description?: true
     url?: true
-    logoUrl?: true
+    logoId?: true
     _all?: true
   }
 
@@ -1979,7 +2232,7 @@ export namespace Prisma {
     name: string
     description: string
     url: string
-    logoUrl: string
+    logoId: string
     _count: BrandCountAggregateOutputType | null
     _min: BrandMinAggregateOutputType | null
     _max: BrandMaxAggregateOutputType | null
@@ -2004,8 +2257,11 @@ export namespace Prisma {
     name?: boolean
     description?: boolean
     url?: boolean
-    logoUrl?: boolean
+    logoId?: boolean
     user?: boolean | userDefaultArgs<ExtArgs>
+    item?: boolean | Brand$itemArgs<ExtArgs>
+    files?: boolean | FilesDefaultArgs<ExtArgs>
+    _count?: boolean | BrandCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["brand"]>
 
   export type BrandSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -2013,8 +2269,9 @@ export namespace Prisma {
     name?: boolean
     description?: boolean
     url?: boolean
-    logoUrl?: boolean
+    logoId?: boolean
     user?: boolean | userDefaultArgs<ExtArgs>
+    files?: boolean | FilesDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["brand"]>
 
   export type BrandSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -2022,8 +2279,9 @@ export namespace Prisma {
     name?: boolean
     description?: boolean
     url?: boolean
-    logoUrl?: boolean
+    logoId?: boolean
     user?: boolean | userDefaultArgs<ExtArgs>
+    files?: boolean | FilesDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["brand"]>
 
   export type BrandSelectScalar = {
@@ -2031,31 +2289,38 @@ export namespace Prisma {
     name?: boolean
     description?: boolean
     url?: boolean
-    logoUrl?: boolean
+    logoId?: boolean
   }
 
-  export type BrandOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"userId" | "name" | "description" | "url" | "logoUrl", ExtArgs["result"]["brand"]>
+  export type BrandOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"userId" | "name" | "description" | "url" | "logoId", ExtArgs["result"]["brand"]>
   export type BrandInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | userDefaultArgs<ExtArgs>
+    item?: boolean | Brand$itemArgs<ExtArgs>
+    files?: boolean | FilesDefaultArgs<ExtArgs>
+    _count?: boolean | BrandCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type BrandIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | userDefaultArgs<ExtArgs>
+    files?: boolean | FilesDefaultArgs<ExtArgs>
   }
   export type BrandIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | userDefaultArgs<ExtArgs>
+    files?: boolean | FilesDefaultArgs<ExtArgs>
   }
 
   export type $BrandPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Brand"
     objects: {
       user: Prisma.$userPayload<ExtArgs>
+      item: Prisma.$ItemPayload<ExtArgs>[]
+      files: Prisma.$FilesPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       userId: string
       name: string
       description: string
       url: string
-      logoUrl: string
+      logoId: string
     }, ExtArgs["result"]["brand"]>
     composites: {}
   }
@@ -2451,6 +2716,8 @@ export namespace Prisma {
   export interface Prisma__BrandClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends userDefaultArgs<ExtArgs> = {}>(args?: Subset<T, userDefaultArgs<ExtArgs>>): Prisma__userClient<$Result.GetResult<Prisma.$userPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    item<T extends Brand$itemArgs<ExtArgs> = {}>(args?: Subset<T, Brand$itemArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    files<T extends FilesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, FilesDefaultArgs<ExtArgs>>): Prisma__FilesClient<$Result.GetResult<Prisma.$FilesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2484,7 +2751,7 @@ export namespace Prisma {
     readonly name: FieldRef<"Brand", 'String'>
     readonly description: FieldRef<"Brand", 'String'>
     readonly url: FieldRef<"Brand", 'String'>
-    readonly logoUrl: FieldRef<"Brand", 'String'>
+    readonly logoId: FieldRef<"Brand", 'String'>
   }
     
 
@@ -2878,6 +3145,30 @@ export namespace Prisma {
      * Limit how many Brands to delete.
      */
     limit?: number
+  }
+
+  /**
+   * Brand.item
+   */
+  export type Brand$itemArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Item
+     */
+    select?: ItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Item
+     */
+    omit?: ItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ItemInclude<ExtArgs> | null
+    where?: ItemWhereInput
+    orderBy?: ItemOrderByWithRelationInput | ItemOrderByWithRelationInput[]
+    cursor?: ItemWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ItemScalarFieldEnum | ItemScalarFieldEnum[]
   }
 
   /**
@@ -9163,6 +9454,2278 @@ export namespace Prisma {
 
 
   /**
+   * Model Item
+   */
+
+  export type AggregateItem = {
+    _count: ItemCountAggregateOutputType | null
+    _avg: ItemAvgAggregateOutputType | null
+    _sum: ItemSumAggregateOutputType | null
+    _min: ItemMinAggregateOutputType | null
+    _max: ItemMaxAggregateOutputType | null
+  }
+
+  export type ItemAvgAggregateOutputType = {
+    price: number | null
+  }
+
+  export type ItemSumAggregateOutputType = {
+    price: number | null
+  }
+
+  export type ItemMinAggregateOutputType = {
+    id: string | null
+    name: string | null
+    description: string | null
+    price: number | null
+    url: string | null
+    brandId: string | null
+    imageId: string | null
+  }
+
+  export type ItemMaxAggregateOutputType = {
+    id: string | null
+    name: string | null
+    description: string | null
+    price: number | null
+    url: string | null
+    brandId: string | null
+    imageId: string | null
+  }
+
+  export type ItemCountAggregateOutputType = {
+    id: number
+    name: number
+    description: number
+    price: number
+    url: number
+    brandId: number
+    imageId: number
+    _all: number
+  }
+
+
+  export type ItemAvgAggregateInputType = {
+    price?: true
+  }
+
+  export type ItemSumAggregateInputType = {
+    price?: true
+  }
+
+  export type ItemMinAggregateInputType = {
+    id?: true
+    name?: true
+    description?: true
+    price?: true
+    url?: true
+    brandId?: true
+    imageId?: true
+  }
+
+  export type ItemMaxAggregateInputType = {
+    id?: true
+    name?: true
+    description?: true
+    price?: true
+    url?: true
+    brandId?: true
+    imageId?: true
+  }
+
+  export type ItemCountAggregateInputType = {
+    id?: true
+    name?: true
+    description?: true
+    price?: true
+    url?: true
+    brandId?: true
+    imageId?: true
+    _all?: true
+  }
+
+  export type ItemAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Item to aggregate.
+     */
+    where?: ItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Items to fetch.
+     */
+    orderBy?: ItemOrderByWithRelationInput | ItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Items from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Items.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Items
+    **/
+    _count?: true | ItemCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ItemAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ItemSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ItemMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ItemMaxAggregateInputType
+  }
+
+  export type GetItemAggregateType<T extends ItemAggregateArgs> = {
+        [P in keyof T & keyof AggregateItem]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateItem[P]>
+      : GetScalarType<T[P], AggregateItem[P]>
+  }
+
+
+
+
+  export type ItemGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ItemWhereInput
+    orderBy?: ItemOrderByWithAggregationInput | ItemOrderByWithAggregationInput[]
+    by: ItemScalarFieldEnum[] | ItemScalarFieldEnum
+    having?: ItemScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ItemCountAggregateInputType | true
+    _avg?: ItemAvgAggregateInputType
+    _sum?: ItemSumAggregateInputType
+    _min?: ItemMinAggregateInputType
+    _max?: ItemMaxAggregateInputType
+  }
+
+  export type ItemGroupByOutputType = {
+    id: string
+    name: string
+    description: string
+    price: number
+    url: string
+    brandId: string
+    imageId: string
+    _count: ItemCountAggregateOutputType | null
+    _avg: ItemAvgAggregateOutputType | null
+    _sum: ItemSumAggregateOutputType | null
+    _min: ItemMinAggregateOutputType | null
+    _max: ItemMaxAggregateOutputType | null
+  }
+
+  type GetItemGroupByPayload<T extends ItemGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ItemGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ItemGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ItemGroupByOutputType[P]>
+            : GetScalarType<T[P], ItemGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ItemSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    description?: boolean
+    price?: boolean
+    url?: boolean
+    brandId?: boolean
+    imageId?: boolean
+    brand?: boolean | BrandDefaultArgs<ExtArgs>
+    files?: boolean | FilesDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["item"]>
+
+  export type ItemSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    description?: boolean
+    price?: boolean
+    url?: boolean
+    brandId?: boolean
+    imageId?: boolean
+    brand?: boolean | BrandDefaultArgs<ExtArgs>
+    files?: boolean | FilesDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["item"]>
+
+  export type ItemSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    description?: boolean
+    price?: boolean
+    url?: boolean
+    brandId?: boolean
+    imageId?: boolean
+    brand?: boolean | BrandDefaultArgs<ExtArgs>
+    files?: boolean | FilesDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["item"]>
+
+  export type ItemSelectScalar = {
+    id?: boolean
+    name?: boolean
+    description?: boolean
+    price?: boolean
+    url?: boolean
+    brandId?: boolean
+    imageId?: boolean
+  }
+
+  export type ItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "price" | "url" | "brandId" | "imageId", ExtArgs["result"]["item"]>
+  export type ItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    brand?: boolean | BrandDefaultArgs<ExtArgs>
+    files?: boolean | FilesDefaultArgs<ExtArgs>
+  }
+  export type ItemIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    brand?: boolean | BrandDefaultArgs<ExtArgs>
+    files?: boolean | FilesDefaultArgs<ExtArgs>
+  }
+  export type ItemIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    brand?: boolean | BrandDefaultArgs<ExtArgs>
+    files?: boolean | FilesDefaultArgs<ExtArgs>
+  }
+
+  export type $ItemPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Item"
+    objects: {
+      brand: Prisma.$BrandPayload<ExtArgs>
+      files: Prisma.$FilesPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      name: string
+      description: string
+      price: number
+      url: string
+      brandId: string
+      imageId: string
+    }, ExtArgs["result"]["item"]>
+    composites: {}
+  }
+
+  type ItemGetPayload<S extends boolean | null | undefined | ItemDefaultArgs> = $Result.GetResult<Prisma.$ItemPayload, S>
+
+  type ItemCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ItemFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ItemCountAggregateInputType | true
+    }
+
+  export interface ItemDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Item'], meta: { name: 'Item' } }
+    /**
+     * Find zero or one Item that matches the filter.
+     * @param {ItemFindUniqueArgs} args - Arguments to find a Item
+     * @example
+     * // Get one Item
+     * const item = await prisma.item.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ItemFindUniqueArgs>(args: SelectSubset<T, ItemFindUniqueArgs<ExtArgs>>): Prisma__ItemClient<$Result.GetResult<Prisma.$ItemPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Item that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ItemFindUniqueOrThrowArgs} args - Arguments to find a Item
+     * @example
+     * // Get one Item
+     * const item = await prisma.item.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ItemFindUniqueOrThrowArgs>(args: SelectSubset<T, ItemFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ItemClient<$Result.GetResult<Prisma.$ItemPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Item that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ItemFindFirstArgs} args - Arguments to find a Item
+     * @example
+     * // Get one Item
+     * const item = await prisma.item.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ItemFindFirstArgs>(args?: SelectSubset<T, ItemFindFirstArgs<ExtArgs>>): Prisma__ItemClient<$Result.GetResult<Prisma.$ItemPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Item that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ItemFindFirstOrThrowArgs} args - Arguments to find a Item
+     * @example
+     * // Get one Item
+     * const item = await prisma.item.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ItemFindFirstOrThrowArgs>(args?: SelectSubset<T, ItemFindFirstOrThrowArgs<ExtArgs>>): Prisma__ItemClient<$Result.GetResult<Prisma.$ItemPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Items that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ItemFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Items
+     * const items = await prisma.item.findMany()
+     * 
+     * // Get first 10 Items
+     * const items = await prisma.item.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const itemWithIdOnly = await prisma.item.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ItemFindManyArgs>(args?: SelectSubset<T, ItemFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Item.
+     * @param {ItemCreateArgs} args - Arguments to create a Item.
+     * @example
+     * // Create one Item
+     * const Item = await prisma.item.create({
+     *   data: {
+     *     // ... data to create a Item
+     *   }
+     * })
+     * 
+     */
+    create<T extends ItemCreateArgs>(args: SelectSubset<T, ItemCreateArgs<ExtArgs>>): Prisma__ItemClient<$Result.GetResult<Prisma.$ItemPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Items.
+     * @param {ItemCreateManyArgs} args - Arguments to create many Items.
+     * @example
+     * // Create many Items
+     * const item = await prisma.item.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ItemCreateManyArgs>(args?: SelectSubset<T, ItemCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Items and returns the data saved in the database.
+     * @param {ItemCreateManyAndReturnArgs} args - Arguments to create many Items.
+     * @example
+     * // Create many Items
+     * const item = await prisma.item.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Items and only return the `id`
+     * const itemWithIdOnly = await prisma.item.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ItemCreateManyAndReturnArgs>(args?: SelectSubset<T, ItemCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ItemPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Item.
+     * @param {ItemDeleteArgs} args - Arguments to delete one Item.
+     * @example
+     * // Delete one Item
+     * const Item = await prisma.item.delete({
+     *   where: {
+     *     // ... filter to delete one Item
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ItemDeleteArgs>(args: SelectSubset<T, ItemDeleteArgs<ExtArgs>>): Prisma__ItemClient<$Result.GetResult<Prisma.$ItemPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Item.
+     * @param {ItemUpdateArgs} args - Arguments to update one Item.
+     * @example
+     * // Update one Item
+     * const item = await prisma.item.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ItemUpdateArgs>(args: SelectSubset<T, ItemUpdateArgs<ExtArgs>>): Prisma__ItemClient<$Result.GetResult<Prisma.$ItemPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Items.
+     * @param {ItemDeleteManyArgs} args - Arguments to filter Items to delete.
+     * @example
+     * // Delete a few Items
+     * const { count } = await prisma.item.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ItemDeleteManyArgs>(args?: SelectSubset<T, ItemDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Items.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ItemUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Items
+     * const item = await prisma.item.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ItemUpdateManyArgs>(args: SelectSubset<T, ItemUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Items and returns the data updated in the database.
+     * @param {ItemUpdateManyAndReturnArgs} args - Arguments to update many Items.
+     * @example
+     * // Update many Items
+     * const item = await prisma.item.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Items and only return the `id`
+     * const itemWithIdOnly = await prisma.item.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ItemUpdateManyAndReturnArgs>(args: SelectSubset<T, ItemUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ItemPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Item.
+     * @param {ItemUpsertArgs} args - Arguments to update or create a Item.
+     * @example
+     * // Update or create a Item
+     * const item = await prisma.item.upsert({
+     *   create: {
+     *     // ... data to create a Item
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Item we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ItemUpsertArgs>(args: SelectSubset<T, ItemUpsertArgs<ExtArgs>>): Prisma__ItemClient<$Result.GetResult<Prisma.$ItemPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Items.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ItemCountArgs} args - Arguments to filter Items to count.
+     * @example
+     * // Count the number of Items
+     * const count = await prisma.item.count({
+     *   where: {
+     *     // ... the filter for the Items we want to count
+     *   }
+     * })
+    **/
+    count<T extends ItemCountArgs>(
+      args?: Subset<T, ItemCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ItemCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Item.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ItemAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ItemAggregateArgs>(args: Subset<T, ItemAggregateArgs>): Prisma.PrismaPromise<GetItemAggregateType<T>>
+
+    /**
+     * Group by Item.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ItemGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ItemGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ItemGroupByArgs['orderBy'] }
+        : { orderBy?: ItemGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ItemGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetItemGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Item model
+   */
+  readonly fields: ItemFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Item.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ItemClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    brand<T extends BrandDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BrandDefaultArgs<ExtArgs>>): Prisma__BrandClient<$Result.GetResult<Prisma.$BrandPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    files<T extends FilesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, FilesDefaultArgs<ExtArgs>>): Prisma__FilesClient<$Result.GetResult<Prisma.$FilesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Item model
+   */
+  interface ItemFieldRefs {
+    readonly id: FieldRef<"Item", 'String'>
+    readonly name: FieldRef<"Item", 'String'>
+    readonly description: FieldRef<"Item", 'String'>
+    readonly price: FieldRef<"Item", 'Int'>
+    readonly url: FieldRef<"Item", 'String'>
+    readonly brandId: FieldRef<"Item", 'String'>
+    readonly imageId: FieldRef<"Item", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Item findUnique
+   */
+  export type ItemFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Item
+     */
+    select?: ItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Item
+     */
+    omit?: ItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ItemInclude<ExtArgs> | null
+    /**
+     * Filter, which Item to fetch.
+     */
+    where: ItemWhereUniqueInput
+  }
+
+  /**
+   * Item findUniqueOrThrow
+   */
+  export type ItemFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Item
+     */
+    select?: ItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Item
+     */
+    omit?: ItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ItemInclude<ExtArgs> | null
+    /**
+     * Filter, which Item to fetch.
+     */
+    where: ItemWhereUniqueInput
+  }
+
+  /**
+   * Item findFirst
+   */
+  export type ItemFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Item
+     */
+    select?: ItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Item
+     */
+    omit?: ItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ItemInclude<ExtArgs> | null
+    /**
+     * Filter, which Item to fetch.
+     */
+    where?: ItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Items to fetch.
+     */
+    orderBy?: ItemOrderByWithRelationInput | ItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Items.
+     */
+    cursor?: ItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Items from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Items.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Items.
+     */
+    distinct?: ItemScalarFieldEnum | ItemScalarFieldEnum[]
+  }
+
+  /**
+   * Item findFirstOrThrow
+   */
+  export type ItemFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Item
+     */
+    select?: ItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Item
+     */
+    omit?: ItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ItemInclude<ExtArgs> | null
+    /**
+     * Filter, which Item to fetch.
+     */
+    where?: ItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Items to fetch.
+     */
+    orderBy?: ItemOrderByWithRelationInput | ItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Items.
+     */
+    cursor?: ItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Items from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Items.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Items.
+     */
+    distinct?: ItemScalarFieldEnum | ItemScalarFieldEnum[]
+  }
+
+  /**
+   * Item findMany
+   */
+  export type ItemFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Item
+     */
+    select?: ItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Item
+     */
+    omit?: ItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ItemInclude<ExtArgs> | null
+    /**
+     * Filter, which Items to fetch.
+     */
+    where?: ItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Items to fetch.
+     */
+    orderBy?: ItemOrderByWithRelationInput | ItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Items.
+     */
+    cursor?: ItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Items from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Items.
+     */
+    skip?: number
+    distinct?: ItemScalarFieldEnum | ItemScalarFieldEnum[]
+  }
+
+  /**
+   * Item create
+   */
+  export type ItemCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Item
+     */
+    select?: ItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Item
+     */
+    omit?: ItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ItemInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Item.
+     */
+    data: XOR<ItemCreateInput, ItemUncheckedCreateInput>
+  }
+
+  /**
+   * Item createMany
+   */
+  export type ItemCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Items.
+     */
+    data: ItemCreateManyInput | ItemCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Item createManyAndReturn
+   */
+  export type ItemCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Item
+     */
+    select?: ItemSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Item
+     */
+    omit?: ItemOmit<ExtArgs> | null
+    /**
+     * The data used to create many Items.
+     */
+    data: ItemCreateManyInput | ItemCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ItemIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Item update
+   */
+  export type ItemUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Item
+     */
+    select?: ItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Item
+     */
+    omit?: ItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ItemInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Item.
+     */
+    data: XOR<ItemUpdateInput, ItemUncheckedUpdateInput>
+    /**
+     * Choose, which Item to update.
+     */
+    where: ItemWhereUniqueInput
+  }
+
+  /**
+   * Item updateMany
+   */
+  export type ItemUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Items.
+     */
+    data: XOR<ItemUpdateManyMutationInput, ItemUncheckedUpdateManyInput>
+    /**
+     * Filter which Items to update
+     */
+    where?: ItemWhereInput
+    /**
+     * Limit how many Items to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Item updateManyAndReturn
+   */
+  export type ItemUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Item
+     */
+    select?: ItemSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Item
+     */
+    omit?: ItemOmit<ExtArgs> | null
+    /**
+     * The data used to update Items.
+     */
+    data: XOR<ItemUpdateManyMutationInput, ItemUncheckedUpdateManyInput>
+    /**
+     * Filter which Items to update
+     */
+    where?: ItemWhereInput
+    /**
+     * Limit how many Items to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ItemIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Item upsert
+   */
+  export type ItemUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Item
+     */
+    select?: ItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Item
+     */
+    omit?: ItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ItemInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Item to update in case it exists.
+     */
+    where: ItemWhereUniqueInput
+    /**
+     * In case the Item found by the `where` argument doesn't exist, create a new Item with this data.
+     */
+    create: XOR<ItemCreateInput, ItemUncheckedCreateInput>
+    /**
+     * In case the Item was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ItemUpdateInput, ItemUncheckedUpdateInput>
+  }
+
+  /**
+   * Item delete
+   */
+  export type ItemDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Item
+     */
+    select?: ItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Item
+     */
+    omit?: ItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ItemInclude<ExtArgs> | null
+    /**
+     * Filter which Item to delete.
+     */
+    where: ItemWhereUniqueInput
+  }
+
+  /**
+   * Item deleteMany
+   */
+  export type ItemDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Items to delete
+     */
+    where?: ItemWhereInput
+    /**
+     * Limit how many Items to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Item without action
+   */
+  export type ItemDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Item
+     */
+    select?: ItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Item
+     */
+    omit?: ItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ItemInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model Files
+   */
+
+  export type AggregateFiles = {
+    _count: FilesCountAggregateOutputType | null
+    _min: FilesMinAggregateOutputType | null
+    _max: FilesMaxAggregateOutputType | null
+  }
+
+  export type FilesMinAggregateOutputType = {
+    id: string | null
+    name: string | null
+    contentType: string | null
+    bucket: string | null
+    url: string | null
+    uploadUrl: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type FilesMaxAggregateOutputType = {
+    id: string | null
+    name: string | null
+    contentType: string | null
+    bucket: string | null
+    url: string | null
+    uploadUrl: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type FilesCountAggregateOutputType = {
+    id: number
+    name: number
+    contentType: number
+    bucket: number
+    url: number
+    uploadUrl: number
+    metadata: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type FilesMinAggregateInputType = {
+    id?: true
+    name?: true
+    contentType?: true
+    bucket?: true
+    url?: true
+    uploadUrl?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type FilesMaxAggregateInputType = {
+    id?: true
+    name?: true
+    contentType?: true
+    bucket?: true
+    url?: true
+    uploadUrl?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type FilesCountAggregateInputType = {
+    id?: true
+    name?: true
+    contentType?: true
+    bucket?: true
+    url?: true
+    uploadUrl?: true
+    metadata?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type FilesAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Files to aggregate.
+     */
+    where?: FilesWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Files to fetch.
+     */
+    orderBy?: FilesOrderByWithRelationInput | FilesOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: FilesWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Files from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Files.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Files
+    **/
+    _count?: true | FilesCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: FilesMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: FilesMaxAggregateInputType
+  }
+
+  export type GetFilesAggregateType<T extends FilesAggregateArgs> = {
+        [P in keyof T & keyof AggregateFiles]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateFiles[P]>
+      : GetScalarType<T[P], AggregateFiles[P]>
+  }
+
+
+
+
+  export type FilesGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FilesWhereInput
+    orderBy?: FilesOrderByWithAggregationInput | FilesOrderByWithAggregationInput[]
+    by: FilesScalarFieldEnum[] | FilesScalarFieldEnum
+    having?: FilesScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: FilesCountAggregateInputType | true
+    _min?: FilesMinAggregateInputType
+    _max?: FilesMaxAggregateInputType
+  }
+
+  export type FilesGroupByOutputType = {
+    id: string
+    name: string
+    contentType: string
+    bucket: string
+    url: string
+    uploadUrl: string
+    metadata: JsonValue
+    createdAt: Date
+    updatedAt: Date
+    _count: FilesCountAggregateOutputType | null
+    _min: FilesMinAggregateOutputType | null
+    _max: FilesMaxAggregateOutputType | null
+  }
+
+  type GetFilesGroupByPayload<T extends FilesGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<FilesGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof FilesGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], FilesGroupByOutputType[P]>
+            : GetScalarType<T[P], FilesGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type FilesSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    contentType?: boolean
+    bucket?: boolean
+    url?: boolean
+    uploadUrl?: boolean
+    metadata?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    brand?: boolean | Files$brandArgs<ExtArgs>
+    item?: boolean | Files$itemArgs<ExtArgs>
+    _count?: boolean | FilesCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["files"]>
+
+  export type FilesSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    contentType?: boolean
+    bucket?: boolean
+    url?: boolean
+    uploadUrl?: boolean
+    metadata?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["files"]>
+
+  export type FilesSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    contentType?: boolean
+    bucket?: boolean
+    url?: boolean
+    uploadUrl?: boolean
+    metadata?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["files"]>
+
+  export type FilesSelectScalar = {
+    id?: boolean
+    name?: boolean
+    contentType?: boolean
+    bucket?: boolean
+    url?: boolean
+    uploadUrl?: boolean
+    metadata?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type FilesOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "contentType" | "bucket" | "url" | "uploadUrl" | "metadata" | "createdAt" | "updatedAt", ExtArgs["result"]["files"]>
+  export type FilesInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    brand?: boolean | Files$brandArgs<ExtArgs>
+    item?: boolean | Files$itemArgs<ExtArgs>
+    _count?: boolean | FilesCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type FilesIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type FilesIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+
+  export type $FilesPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Files"
+    objects: {
+      brand: Prisma.$BrandPayload<ExtArgs>[]
+      item: Prisma.$ItemPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      name: string
+      contentType: string
+      bucket: string
+      url: string
+      uploadUrl: string
+      metadata: Prisma.JsonValue
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["files"]>
+    composites: {}
+  }
+
+  type FilesGetPayload<S extends boolean | null | undefined | FilesDefaultArgs> = $Result.GetResult<Prisma.$FilesPayload, S>
+
+  type FilesCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<FilesFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: FilesCountAggregateInputType | true
+    }
+
+  export interface FilesDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Files'], meta: { name: 'Files' } }
+    /**
+     * Find zero or one Files that matches the filter.
+     * @param {FilesFindUniqueArgs} args - Arguments to find a Files
+     * @example
+     * // Get one Files
+     * const files = await prisma.files.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends FilesFindUniqueArgs>(args: SelectSubset<T, FilesFindUniqueArgs<ExtArgs>>): Prisma__FilesClient<$Result.GetResult<Prisma.$FilesPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Files that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {FilesFindUniqueOrThrowArgs} args - Arguments to find a Files
+     * @example
+     * // Get one Files
+     * const files = await prisma.files.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends FilesFindUniqueOrThrowArgs>(args: SelectSubset<T, FilesFindUniqueOrThrowArgs<ExtArgs>>): Prisma__FilesClient<$Result.GetResult<Prisma.$FilesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Files that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FilesFindFirstArgs} args - Arguments to find a Files
+     * @example
+     * // Get one Files
+     * const files = await prisma.files.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends FilesFindFirstArgs>(args?: SelectSubset<T, FilesFindFirstArgs<ExtArgs>>): Prisma__FilesClient<$Result.GetResult<Prisma.$FilesPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Files that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FilesFindFirstOrThrowArgs} args - Arguments to find a Files
+     * @example
+     * // Get one Files
+     * const files = await prisma.files.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends FilesFindFirstOrThrowArgs>(args?: SelectSubset<T, FilesFindFirstOrThrowArgs<ExtArgs>>): Prisma__FilesClient<$Result.GetResult<Prisma.$FilesPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Files that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FilesFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Files
+     * const files = await prisma.files.findMany()
+     * 
+     * // Get first 10 Files
+     * const files = await prisma.files.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const filesWithIdOnly = await prisma.files.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends FilesFindManyArgs>(args?: SelectSubset<T, FilesFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FilesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Files.
+     * @param {FilesCreateArgs} args - Arguments to create a Files.
+     * @example
+     * // Create one Files
+     * const Files = await prisma.files.create({
+     *   data: {
+     *     // ... data to create a Files
+     *   }
+     * })
+     * 
+     */
+    create<T extends FilesCreateArgs>(args: SelectSubset<T, FilesCreateArgs<ExtArgs>>): Prisma__FilesClient<$Result.GetResult<Prisma.$FilesPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Files.
+     * @param {FilesCreateManyArgs} args - Arguments to create many Files.
+     * @example
+     * // Create many Files
+     * const files = await prisma.files.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends FilesCreateManyArgs>(args?: SelectSubset<T, FilesCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Files and returns the data saved in the database.
+     * @param {FilesCreateManyAndReturnArgs} args - Arguments to create many Files.
+     * @example
+     * // Create many Files
+     * const files = await prisma.files.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Files and only return the `id`
+     * const filesWithIdOnly = await prisma.files.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends FilesCreateManyAndReturnArgs>(args?: SelectSubset<T, FilesCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FilesPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Files.
+     * @param {FilesDeleteArgs} args - Arguments to delete one Files.
+     * @example
+     * // Delete one Files
+     * const Files = await prisma.files.delete({
+     *   where: {
+     *     // ... filter to delete one Files
+     *   }
+     * })
+     * 
+     */
+    delete<T extends FilesDeleteArgs>(args: SelectSubset<T, FilesDeleteArgs<ExtArgs>>): Prisma__FilesClient<$Result.GetResult<Prisma.$FilesPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Files.
+     * @param {FilesUpdateArgs} args - Arguments to update one Files.
+     * @example
+     * // Update one Files
+     * const files = await prisma.files.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends FilesUpdateArgs>(args: SelectSubset<T, FilesUpdateArgs<ExtArgs>>): Prisma__FilesClient<$Result.GetResult<Prisma.$FilesPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Files.
+     * @param {FilesDeleteManyArgs} args - Arguments to filter Files to delete.
+     * @example
+     * // Delete a few Files
+     * const { count } = await prisma.files.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends FilesDeleteManyArgs>(args?: SelectSubset<T, FilesDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Files.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FilesUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Files
+     * const files = await prisma.files.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends FilesUpdateManyArgs>(args: SelectSubset<T, FilesUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Files and returns the data updated in the database.
+     * @param {FilesUpdateManyAndReturnArgs} args - Arguments to update many Files.
+     * @example
+     * // Update many Files
+     * const files = await prisma.files.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Files and only return the `id`
+     * const filesWithIdOnly = await prisma.files.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends FilesUpdateManyAndReturnArgs>(args: SelectSubset<T, FilesUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FilesPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Files.
+     * @param {FilesUpsertArgs} args - Arguments to update or create a Files.
+     * @example
+     * // Update or create a Files
+     * const files = await prisma.files.upsert({
+     *   create: {
+     *     // ... data to create a Files
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Files we want to update
+     *   }
+     * })
+     */
+    upsert<T extends FilesUpsertArgs>(args: SelectSubset<T, FilesUpsertArgs<ExtArgs>>): Prisma__FilesClient<$Result.GetResult<Prisma.$FilesPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Files.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FilesCountArgs} args - Arguments to filter Files to count.
+     * @example
+     * // Count the number of Files
+     * const count = await prisma.files.count({
+     *   where: {
+     *     // ... the filter for the Files we want to count
+     *   }
+     * })
+    **/
+    count<T extends FilesCountArgs>(
+      args?: Subset<T, FilesCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], FilesCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Files.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FilesAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends FilesAggregateArgs>(args: Subset<T, FilesAggregateArgs>): Prisma.PrismaPromise<GetFilesAggregateType<T>>
+
+    /**
+     * Group by Files.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FilesGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends FilesGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: FilesGroupByArgs['orderBy'] }
+        : { orderBy?: FilesGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, FilesGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetFilesGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Files model
+   */
+  readonly fields: FilesFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Files.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__FilesClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    brand<T extends Files$brandArgs<ExtArgs> = {}>(args?: Subset<T, Files$brandArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BrandPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    item<T extends Files$itemArgs<ExtArgs> = {}>(args?: Subset<T, Files$itemArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Files model
+   */
+  interface FilesFieldRefs {
+    readonly id: FieldRef<"Files", 'String'>
+    readonly name: FieldRef<"Files", 'String'>
+    readonly contentType: FieldRef<"Files", 'String'>
+    readonly bucket: FieldRef<"Files", 'String'>
+    readonly url: FieldRef<"Files", 'String'>
+    readonly uploadUrl: FieldRef<"Files", 'String'>
+    readonly metadata: FieldRef<"Files", 'Json'>
+    readonly createdAt: FieldRef<"Files", 'DateTime'>
+    readonly updatedAt: FieldRef<"Files", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Files findUnique
+   */
+  export type FilesFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Files
+     */
+    select?: FilesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Files
+     */
+    omit?: FilesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FilesInclude<ExtArgs> | null
+    /**
+     * Filter, which Files to fetch.
+     */
+    where: FilesWhereUniqueInput
+  }
+
+  /**
+   * Files findUniqueOrThrow
+   */
+  export type FilesFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Files
+     */
+    select?: FilesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Files
+     */
+    omit?: FilesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FilesInclude<ExtArgs> | null
+    /**
+     * Filter, which Files to fetch.
+     */
+    where: FilesWhereUniqueInput
+  }
+
+  /**
+   * Files findFirst
+   */
+  export type FilesFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Files
+     */
+    select?: FilesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Files
+     */
+    omit?: FilesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FilesInclude<ExtArgs> | null
+    /**
+     * Filter, which Files to fetch.
+     */
+    where?: FilesWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Files to fetch.
+     */
+    orderBy?: FilesOrderByWithRelationInput | FilesOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Files.
+     */
+    cursor?: FilesWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Files from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Files.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Files.
+     */
+    distinct?: FilesScalarFieldEnum | FilesScalarFieldEnum[]
+  }
+
+  /**
+   * Files findFirstOrThrow
+   */
+  export type FilesFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Files
+     */
+    select?: FilesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Files
+     */
+    omit?: FilesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FilesInclude<ExtArgs> | null
+    /**
+     * Filter, which Files to fetch.
+     */
+    where?: FilesWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Files to fetch.
+     */
+    orderBy?: FilesOrderByWithRelationInput | FilesOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Files.
+     */
+    cursor?: FilesWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Files from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Files.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Files.
+     */
+    distinct?: FilesScalarFieldEnum | FilesScalarFieldEnum[]
+  }
+
+  /**
+   * Files findMany
+   */
+  export type FilesFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Files
+     */
+    select?: FilesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Files
+     */
+    omit?: FilesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FilesInclude<ExtArgs> | null
+    /**
+     * Filter, which Files to fetch.
+     */
+    where?: FilesWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Files to fetch.
+     */
+    orderBy?: FilesOrderByWithRelationInput | FilesOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Files.
+     */
+    cursor?: FilesWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Files from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Files.
+     */
+    skip?: number
+    distinct?: FilesScalarFieldEnum | FilesScalarFieldEnum[]
+  }
+
+  /**
+   * Files create
+   */
+  export type FilesCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Files
+     */
+    select?: FilesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Files
+     */
+    omit?: FilesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FilesInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Files.
+     */
+    data: XOR<FilesCreateInput, FilesUncheckedCreateInput>
+  }
+
+  /**
+   * Files createMany
+   */
+  export type FilesCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Files.
+     */
+    data: FilesCreateManyInput | FilesCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Files createManyAndReturn
+   */
+  export type FilesCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Files
+     */
+    select?: FilesSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Files
+     */
+    omit?: FilesOmit<ExtArgs> | null
+    /**
+     * The data used to create many Files.
+     */
+    data: FilesCreateManyInput | FilesCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Files update
+   */
+  export type FilesUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Files
+     */
+    select?: FilesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Files
+     */
+    omit?: FilesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FilesInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Files.
+     */
+    data: XOR<FilesUpdateInput, FilesUncheckedUpdateInput>
+    /**
+     * Choose, which Files to update.
+     */
+    where: FilesWhereUniqueInput
+  }
+
+  /**
+   * Files updateMany
+   */
+  export type FilesUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Files.
+     */
+    data: XOR<FilesUpdateManyMutationInput, FilesUncheckedUpdateManyInput>
+    /**
+     * Filter which Files to update
+     */
+    where?: FilesWhereInput
+    /**
+     * Limit how many Files to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Files updateManyAndReturn
+   */
+  export type FilesUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Files
+     */
+    select?: FilesSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Files
+     */
+    omit?: FilesOmit<ExtArgs> | null
+    /**
+     * The data used to update Files.
+     */
+    data: XOR<FilesUpdateManyMutationInput, FilesUncheckedUpdateManyInput>
+    /**
+     * Filter which Files to update
+     */
+    where?: FilesWhereInput
+    /**
+     * Limit how many Files to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Files upsert
+   */
+  export type FilesUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Files
+     */
+    select?: FilesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Files
+     */
+    omit?: FilesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FilesInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Files to update in case it exists.
+     */
+    where: FilesWhereUniqueInput
+    /**
+     * In case the Files found by the `where` argument doesn't exist, create a new Files with this data.
+     */
+    create: XOR<FilesCreateInput, FilesUncheckedCreateInput>
+    /**
+     * In case the Files was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<FilesUpdateInput, FilesUncheckedUpdateInput>
+  }
+
+  /**
+   * Files delete
+   */
+  export type FilesDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Files
+     */
+    select?: FilesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Files
+     */
+    omit?: FilesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FilesInclude<ExtArgs> | null
+    /**
+     * Filter which Files to delete.
+     */
+    where: FilesWhereUniqueInput
+  }
+
+  /**
+   * Files deleteMany
+   */
+  export type FilesDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Files to delete
+     */
+    where?: FilesWhereInput
+    /**
+     * Limit how many Files to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Files.brand
+   */
+  export type Files$brandArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Brand
+     */
+    select?: BrandSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Brand
+     */
+    omit?: BrandOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BrandInclude<ExtArgs> | null
+    where?: BrandWhereInput
+    orderBy?: BrandOrderByWithRelationInput | BrandOrderByWithRelationInput[]
+    cursor?: BrandWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: BrandScalarFieldEnum | BrandScalarFieldEnum[]
+  }
+
+  /**
+   * Files.item
+   */
+  export type Files$itemArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Item
+     */
+    select?: ItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Item
+     */
+    omit?: ItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ItemInclude<ExtArgs> | null
+    where?: ItemWhereInput
+    orderBy?: ItemOrderByWithRelationInput | ItemOrderByWithRelationInput[]
+    cursor?: ItemWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ItemScalarFieldEnum | ItemScalarFieldEnum[]
+  }
+
+  /**
+   * Files without action
+   */
+  export type FilesDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Files
+     */
+    select?: FilesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Files
+     */
+    omit?: FilesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FilesInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Model account
    */
 
@@ -13743,7 +16306,7 @@ export namespace Prisma {
     name: 'name',
     description: 'description',
     url: 'url',
-    logoUrl: 'logoUrl'
+    logoId: 'logoId'
   };
 
   export type BrandScalarFieldEnum = (typeof BrandScalarFieldEnum)[keyof typeof BrandScalarFieldEnum]
@@ -13809,6 +16372,34 @@ export namespace Prisma {
   };
 
   export type InspoItemsScalarFieldEnum = (typeof InspoItemsScalarFieldEnum)[keyof typeof InspoItemsScalarFieldEnum]
+
+
+  export const ItemScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    description: 'description',
+    price: 'price',
+    url: 'url',
+    brandId: 'brandId',
+    imageId: 'imageId'
+  };
+
+  export type ItemScalarFieldEnum = (typeof ItemScalarFieldEnum)[keyof typeof ItemScalarFieldEnum]
+
+
+  export const FilesScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    contentType: 'contentType',
+    bucket: 'bucket',
+    url: 'url',
+    uploadUrl: 'uploadUrl',
+    metadata: 'metadata',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type FilesScalarFieldEnum = (typeof FilesScalarFieldEnum)[keyof typeof FilesScalarFieldEnum]
 
 
   export const AccountScalarFieldEnum: {
@@ -13884,6 +16475,13 @@ export namespace Prisma {
   };
 
   export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+  export const JsonNullValueInput: {
+    JsonNull: typeof JsonNull
+  };
+
+  export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
   export const QueryMode: {
@@ -14004,8 +16602,10 @@ export namespace Prisma {
     name?: StringFilter<"Brand"> | string
     description?: StringFilter<"Brand"> | string
     url?: StringFilter<"Brand"> | string
-    logoUrl?: StringFilter<"Brand"> | string
+    logoId?: UuidFilter<"Brand"> | string
     user?: XOR<UserScalarRelationFilter, userWhereInput>
+    item?: ItemListRelationFilter
+    files?: XOR<FilesScalarRelationFilter, FilesWhereInput>
   }
 
   export type BrandOrderByWithRelationInput = {
@@ -14013,8 +16613,10 @@ export namespace Prisma {
     name?: SortOrder
     description?: SortOrder
     url?: SortOrder
-    logoUrl?: SortOrder
+    logoId?: SortOrder
     user?: userOrderByWithRelationInput
+    item?: ItemOrderByRelationAggregateInput
+    files?: FilesOrderByWithRelationInput
   }
 
   export type BrandWhereUniqueInput = Prisma.AtLeast<{
@@ -14025,8 +16627,10 @@ export namespace Prisma {
     name?: StringFilter<"Brand"> | string
     description?: StringFilter<"Brand"> | string
     url?: StringFilter<"Brand"> | string
-    logoUrl?: StringFilter<"Brand"> | string
+    logoId?: UuidFilter<"Brand"> | string
     user?: XOR<UserScalarRelationFilter, userWhereInput>
+    item?: ItemListRelationFilter
+    files?: XOR<FilesScalarRelationFilter, FilesWhereInput>
   }, "userId">
 
   export type BrandOrderByWithAggregationInput = {
@@ -14034,7 +16638,7 @@ export namespace Prisma {
     name?: SortOrder
     description?: SortOrder
     url?: SortOrder
-    logoUrl?: SortOrder
+    logoId?: SortOrder
     _count?: BrandCountOrderByAggregateInput
     _max?: BrandMaxOrderByAggregateInput
     _min?: BrandMinOrderByAggregateInput
@@ -14048,7 +16652,7 @@ export namespace Prisma {
     name?: StringWithAggregatesFilter<"Brand"> | string
     description?: StringWithAggregatesFilter<"Brand"> | string
     url?: StringWithAggregatesFilter<"Brand"> | string
-    logoUrl?: StringWithAggregatesFilter<"Brand"> | string
+    logoId?: UuidWithAggregatesFilter<"Brand"> | string
   }
 
   export type ClientWhereInput = {
@@ -14362,6 +16966,154 @@ export namespace Prisma {
     index?: IntWithAggregatesFilter<"InspoItems"> | number
   }
 
+  export type ItemWhereInput = {
+    AND?: ItemWhereInput | ItemWhereInput[]
+    OR?: ItemWhereInput[]
+    NOT?: ItemWhereInput | ItemWhereInput[]
+    id?: StringFilter<"Item"> | string
+    name?: StringFilter<"Item"> | string
+    description?: StringFilter<"Item"> | string
+    price?: IntFilter<"Item"> | number
+    url?: StringFilter<"Item"> | string
+    brandId?: UuidFilter<"Item"> | string
+    imageId?: UuidFilter<"Item"> | string
+    brand?: XOR<BrandScalarRelationFilter, BrandWhereInput>
+    files?: XOR<FilesScalarRelationFilter, FilesWhereInput>
+  }
+
+  export type ItemOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    price?: SortOrder
+    url?: SortOrder
+    brandId?: SortOrder
+    imageId?: SortOrder
+    brand?: BrandOrderByWithRelationInput
+    files?: FilesOrderByWithRelationInput
+  }
+
+  export type ItemWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: ItemWhereInput | ItemWhereInput[]
+    OR?: ItemWhereInput[]
+    NOT?: ItemWhereInput | ItemWhereInput[]
+    name?: StringFilter<"Item"> | string
+    description?: StringFilter<"Item"> | string
+    price?: IntFilter<"Item"> | number
+    url?: StringFilter<"Item"> | string
+    brandId?: UuidFilter<"Item"> | string
+    imageId?: UuidFilter<"Item"> | string
+    brand?: XOR<BrandScalarRelationFilter, BrandWhereInput>
+    files?: XOR<FilesScalarRelationFilter, FilesWhereInput>
+  }, "id">
+
+  export type ItemOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    price?: SortOrder
+    url?: SortOrder
+    brandId?: SortOrder
+    imageId?: SortOrder
+    _count?: ItemCountOrderByAggregateInput
+    _avg?: ItemAvgOrderByAggregateInput
+    _max?: ItemMaxOrderByAggregateInput
+    _min?: ItemMinOrderByAggregateInput
+    _sum?: ItemSumOrderByAggregateInput
+  }
+
+  export type ItemScalarWhereWithAggregatesInput = {
+    AND?: ItemScalarWhereWithAggregatesInput | ItemScalarWhereWithAggregatesInput[]
+    OR?: ItemScalarWhereWithAggregatesInput[]
+    NOT?: ItemScalarWhereWithAggregatesInput | ItemScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Item"> | string
+    name?: StringWithAggregatesFilter<"Item"> | string
+    description?: StringWithAggregatesFilter<"Item"> | string
+    price?: IntWithAggregatesFilter<"Item"> | number
+    url?: StringWithAggregatesFilter<"Item"> | string
+    brandId?: UuidWithAggregatesFilter<"Item"> | string
+    imageId?: UuidWithAggregatesFilter<"Item"> | string
+  }
+
+  export type FilesWhereInput = {
+    AND?: FilesWhereInput | FilesWhereInput[]
+    OR?: FilesWhereInput[]
+    NOT?: FilesWhereInput | FilesWhereInput[]
+    id?: UuidFilter<"Files"> | string
+    name?: StringFilter<"Files"> | string
+    contentType?: StringFilter<"Files"> | string
+    bucket?: StringFilter<"Files"> | string
+    url?: StringFilter<"Files"> | string
+    uploadUrl?: StringFilter<"Files"> | string
+    metadata?: JsonFilter<"Files">
+    createdAt?: DateTimeFilter<"Files"> | Date | string
+    updatedAt?: DateTimeFilter<"Files"> | Date | string
+    brand?: BrandListRelationFilter
+    item?: ItemListRelationFilter
+  }
+
+  export type FilesOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    contentType?: SortOrder
+    bucket?: SortOrder
+    url?: SortOrder
+    uploadUrl?: SortOrder
+    metadata?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    brand?: BrandOrderByRelationAggregateInput
+    item?: ItemOrderByRelationAggregateInput
+  }
+
+  export type FilesWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: FilesWhereInput | FilesWhereInput[]
+    OR?: FilesWhereInput[]
+    NOT?: FilesWhereInput | FilesWhereInput[]
+    name?: StringFilter<"Files"> | string
+    contentType?: StringFilter<"Files"> | string
+    bucket?: StringFilter<"Files"> | string
+    url?: StringFilter<"Files"> | string
+    uploadUrl?: StringFilter<"Files"> | string
+    metadata?: JsonFilter<"Files">
+    createdAt?: DateTimeFilter<"Files"> | Date | string
+    updatedAt?: DateTimeFilter<"Files"> | Date | string
+    brand?: BrandListRelationFilter
+    item?: ItemListRelationFilter
+  }, "id">
+
+  export type FilesOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    contentType?: SortOrder
+    bucket?: SortOrder
+    url?: SortOrder
+    uploadUrl?: SortOrder
+    metadata?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: FilesCountOrderByAggregateInput
+    _max?: FilesMaxOrderByAggregateInput
+    _min?: FilesMinOrderByAggregateInput
+  }
+
+  export type FilesScalarWhereWithAggregatesInput = {
+    AND?: FilesScalarWhereWithAggregatesInput | FilesScalarWhereWithAggregatesInput[]
+    OR?: FilesScalarWhereWithAggregatesInput[]
+    NOT?: FilesScalarWhereWithAggregatesInput | FilesScalarWhereWithAggregatesInput[]
+    id?: UuidWithAggregatesFilter<"Files"> | string
+    name?: StringWithAggregatesFilter<"Files"> | string
+    contentType?: StringWithAggregatesFilter<"Files"> | string
+    bucket?: StringWithAggregatesFilter<"Files"> | string
+    url?: StringWithAggregatesFilter<"Files"> | string
+    uploadUrl?: StringWithAggregatesFilter<"Files"> | string
+    metadata?: JsonWithAggregatesFilter<"Files">
+    createdAt?: DateTimeWithAggregatesFilter<"Files"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Files"> | Date | string
+  }
+
   export type accountWhereInput = {
     AND?: accountWhereInput | accountWhereInput[]
     OR?: accountWhereInput[]
@@ -14369,7 +17121,7 @@ export namespace Prisma {
     id?: StringFilter<"account"> | string
     accountId?: StringFilter<"account"> | string
     providerId?: StringFilter<"account"> | string
-    userId?: StringFilter<"account"> | string
+    userId?: UuidFilter<"account"> | string
     accessToken?: StringNullableFilter<"account"> | string | null
     refreshToken?: StringNullableFilter<"account"> | string | null
     idToken?: StringNullableFilter<"account"> | string | null
@@ -14406,7 +17158,7 @@ export namespace Prisma {
     NOT?: accountWhereInput | accountWhereInput[]
     accountId?: StringFilter<"account"> | string
     providerId?: StringFilter<"account"> | string
-    userId?: StringFilter<"account"> | string
+    userId?: UuidFilter<"account"> | string
     accessToken?: StringNullableFilter<"account"> | string | null
     refreshToken?: StringNullableFilter<"account"> | string | null
     idToken?: StringNullableFilter<"account"> | string | null
@@ -14445,7 +17197,7 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"account"> | string
     accountId?: StringWithAggregatesFilter<"account"> | string
     providerId?: StringWithAggregatesFilter<"account"> | string
-    userId?: StringWithAggregatesFilter<"account"> | string
+    userId?: UuidWithAggregatesFilter<"account"> | string
     accessToken?: StringNullableWithAggregatesFilter<"account"> | string | null
     refreshToken?: StringNullableWithAggregatesFilter<"account"> | string | null
     idToken?: StringNullableWithAggregatesFilter<"account"> | string | null
@@ -14468,7 +17220,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"session"> | Date | string
     ipAddress?: StringNullableFilter<"session"> | string | null
     userAgent?: StringNullableFilter<"session"> | string | null
-    userId?: StringFilter<"session"> | string
+    userId?: UuidFilter<"session"> | string
     user?: XOR<UserScalarRelationFilter, userWhereInput>
   }
 
@@ -14495,7 +17247,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"session"> | Date | string
     ipAddress?: StringNullableFilter<"session"> | string | null
     userAgent?: StringNullableFilter<"session"> | string | null
-    userId?: StringFilter<"session"> | string
+    userId?: UuidFilter<"session"> | string
     user?: XOR<UserScalarRelationFilter, userWhereInput>
   }, "id" | "token">
 
@@ -14524,14 +17276,14 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"session"> | Date | string
     ipAddress?: StringNullableWithAggregatesFilter<"session"> | string | null
     userAgent?: StringNullableWithAggregatesFilter<"session"> | string | null
-    userId?: StringWithAggregatesFilter<"session"> | string
+    userId?: UuidWithAggregatesFilter<"session"> | string
   }
 
   export type userWhereInput = {
     AND?: userWhereInput | userWhereInput[]
     OR?: userWhereInput[]
     NOT?: userWhereInput | userWhereInput[]
-    id?: StringFilter<"user"> | string
+    id?: UuidFilter<"user"> | string
     name?: StringFilter<"user"> | string
     email?: StringFilter<"user"> | string
     emailVerified?: BoolFilter<"user"> | boolean
@@ -14608,7 +17360,7 @@ export namespace Prisma {
     AND?: userScalarWhereWithAggregatesInput | userScalarWhereWithAggregatesInput[]
     OR?: userScalarWhereWithAggregatesInput[]
     NOT?: userScalarWhereWithAggregatesInput | userScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"user"> | string
+    id?: UuidWithAggregatesFilter<"user"> | string
     name?: StringWithAggregatesFilter<"user"> | string
     email?: StringWithAggregatesFilter<"user"> | string
     emailVerified?: BoolWithAggregatesFilter<"user"> | boolean
@@ -14679,8 +17431,9 @@ export namespace Prisma {
     name: string
     description: string
     url: string
-    logoUrl: string
     user: userCreateNestedOneWithoutBrandInput
+    item?: ItemCreateNestedManyWithoutBrandInput
+    files: FilesCreateNestedOneWithoutBrandInput
   }
 
   export type BrandUncheckedCreateInput = {
@@ -14688,15 +17441,17 @@ export namespace Prisma {
     name: string
     description: string
     url: string
-    logoUrl: string
+    logoId: string
+    item?: ItemUncheckedCreateNestedManyWithoutBrandInput
   }
 
   export type BrandUpdateInput = {
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
-    logoUrl?: StringFieldUpdateOperationsInput | string
     user?: userUpdateOneRequiredWithoutBrandNestedInput
+    item?: ItemUpdateManyWithoutBrandNestedInput
+    files?: FilesUpdateOneRequiredWithoutBrandNestedInput
   }
 
   export type BrandUncheckedUpdateInput = {
@@ -14704,7 +17459,8 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
-    logoUrl?: StringFieldUpdateOperationsInput | string
+    logoId?: StringFieldUpdateOperationsInput | string
+    item?: ItemUncheckedUpdateManyWithoutBrandNestedInput
   }
 
   export type BrandCreateManyInput = {
@@ -14712,14 +17468,13 @@ export namespace Prisma {
     name: string
     description: string
     url: string
-    logoUrl: string
+    logoId: string
   }
 
   export type BrandUpdateManyMutationInput = {
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
-    logoUrl?: StringFieldUpdateOperationsInput | string
   }
 
   export type BrandUncheckedUpdateManyInput = {
@@ -14727,7 +17482,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
-    logoUrl?: StringFieldUpdateOperationsInput | string
+    logoId?: StringFieldUpdateOperationsInput | string
   }
 
   export type ClientCreateInput = {
@@ -15031,6 +17786,166 @@ export namespace Prisma {
     itemUuid?: StringFieldUpdateOperationsInput | string
     category?: StringFieldUpdateOperationsInput | string
     index?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type ItemCreateInput = {
+    id?: string
+    name: string
+    description: string
+    price: number
+    url: string
+    brand: BrandCreateNestedOneWithoutItemInput
+    files: FilesCreateNestedOneWithoutItemInput
+  }
+
+  export type ItemUncheckedCreateInput = {
+    id?: string
+    name: string
+    description: string
+    price: number
+    url: string
+    brandId: string
+    imageId: string
+  }
+
+  export type ItemUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: IntFieldUpdateOperationsInput | number
+    url?: StringFieldUpdateOperationsInput | string
+    brand?: BrandUpdateOneRequiredWithoutItemNestedInput
+    files?: FilesUpdateOneRequiredWithoutItemNestedInput
+  }
+
+  export type ItemUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: IntFieldUpdateOperationsInput | number
+    url?: StringFieldUpdateOperationsInput | string
+    brandId?: StringFieldUpdateOperationsInput | string
+    imageId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type ItemCreateManyInput = {
+    id?: string
+    name: string
+    description: string
+    price: number
+    url: string
+    brandId: string
+    imageId: string
+  }
+
+  export type ItemUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: IntFieldUpdateOperationsInput | number
+    url?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type ItemUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: IntFieldUpdateOperationsInput | number
+    url?: StringFieldUpdateOperationsInput | string
+    brandId?: StringFieldUpdateOperationsInput | string
+    imageId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type FilesCreateInput = {
+    id?: string
+    name: string
+    contentType: string
+    bucket: string
+    url: string
+    uploadUrl: string
+    metadata: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    brand?: BrandCreateNestedManyWithoutFilesInput
+    item?: ItemCreateNestedManyWithoutFilesInput
+  }
+
+  export type FilesUncheckedCreateInput = {
+    id?: string
+    name: string
+    contentType: string
+    bucket: string
+    url: string
+    uploadUrl: string
+    metadata: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    brand?: BrandUncheckedCreateNestedManyWithoutFilesInput
+    item?: ItemUncheckedCreateNestedManyWithoutFilesInput
+  }
+
+  export type FilesUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    contentType?: StringFieldUpdateOperationsInput | string
+    bucket?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    uploadUrl?: StringFieldUpdateOperationsInput | string
+    metadata?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    brand?: BrandUpdateManyWithoutFilesNestedInput
+    item?: ItemUpdateManyWithoutFilesNestedInput
+  }
+
+  export type FilesUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    contentType?: StringFieldUpdateOperationsInput | string
+    bucket?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    uploadUrl?: StringFieldUpdateOperationsInput | string
+    metadata?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    brand?: BrandUncheckedUpdateManyWithoutFilesNestedInput
+    item?: ItemUncheckedUpdateManyWithoutFilesNestedInput
+  }
+
+  export type FilesCreateManyInput = {
+    id?: string
+    name: string
+    contentType: string
+    bucket: string
+    url: string
+    uploadUrl: string
+    metadata: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FilesUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    contentType?: StringFieldUpdateOperationsInput | string
+    bucket?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    uploadUrl?: StringFieldUpdateOperationsInput | string
+    metadata?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FilesUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    contentType?: StringFieldUpdateOperationsInput | string
+    bucket?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    uploadUrl?: StringFieldUpdateOperationsInput | string
+    metadata?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type accountCreateInput = {
@@ -15424,12 +18339,27 @@ export namespace Prisma {
     isNot?: userWhereInput
   }
 
+  export type ItemListRelationFilter = {
+    every?: ItemWhereInput
+    some?: ItemWhereInput
+    none?: ItemWhereInput
+  }
+
+  export type FilesScalarRelationFilter = {
+    is?: FilesWhereInput
+    isNot?: FilesWhereInput
+  }
+
+  export type ItemOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type BrandCountOrderByAggregateInput = {
     userId?: SortOrder
     name?: SortOrder
     description?: SortOrder
     url?: SortOrder
-    logoUrl?: SortOrder
+    logoId?: SortOrder
   }
 
   export type BrandMaxOrderByAggregateInput = {
@@ -15437,7 +18367,7 @@ export namespace Prisma {
     name?: SortOrder
     description?: SortOrder
     url?: SortOrder
-    logoUrl?: SortOrder
+    logoId?: SortOrder
   }
 
   export type BrandMinOrderByAggregateInput = {
@@ -15445,7 +18375,7 @@ export namespace Prisma {
     name?: SortOrder
     description?: SortOrder
     url?: SortOrder
-    logoUrl?: SortOrder
+    logoId?: SortOrder
   }
 
   export type UuidWithAggregatesFilter<$PrismaModel = never> = {
@@ -15735,6 +18665,167 @@ export namespace Prisma {
     _max?: NestedIntFilter<$PrismaModel>
   }
 
+  export type BrandScalarRelationFilter = {
+    is?: BrandWhereInput
+    isNot?: BrandWhereInput
+  }
+
+  export type ItemCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    price?: SortOrder
+    url?: SortOrder
+    brandId?: SortOrder
+    imageId?: SortOrder
+  }
+
+  export type ItemAvgOrderByAggregateInput = {
+    price?: SortOrder
+  }
+
+  export type ItemMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    price?: SortOrder
+    url?: SortOrder
+    brandId?: SortOrder
+    imageId?: SortOrder
+  }
+
+  export type ItemMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    price?: SortOrder
+    url?: SortOrder
+    brandId?: SortOrder
+    imageId?: SortOrder
+  }
+
+  export type ItemSumOrderByAggregateInput = {
+    price?: SortOrder
+  }
+  export type JsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type DateTimeFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  }
+
+  export type BrandListRelationFilter = {
+    every?: BrandWhereInput
+    some?: BrandWhereInput
+    none?: BrandWhereInput
+  }
+
+  export type BrandOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type FilesCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    contentType?: SortOrder
+    bucket?: SortOrder
+    url?: SortOrder
+    uploadUrl?: SortOrder
+    metadata?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FilesMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    contentType?: SortOrder
+    bucket?: SortOrder
+    url?: SortOrder
+    uploadUrl?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FilesMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    contentType?: SortOrder
+    bucket?: SortOrder
+    url?: SortOrder
+    uploadUrl?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+  export type JsonWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedJsonFilter<$PrismaModel>
+    _max?: NestedJsonFilter<$PrismaModel>
+  }
+
+  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
   export type StringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -15748,17 +18839,6 @@ export namespace Prisma {
     endsWith?: string | StringFieldRefInput<$PrismaModel>
     mode?: QueryMode
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
-  }
-
-  export type DateTimeFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
   export type accountCountOrderByAggregateInput = {
@@ -15825,20 +18905,6 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
     _max?: NestedStringNullableFilter<$PrismaModel>
-  }
-
-  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
   export type sessionCountOrderByAggregateInput = {
@@ -16023,6 +19089,26 @@ export namespace Prisma {
     connect?: userWhereUniqueInput
   }
 
+  export type ItemCreateNestedManyWithoutBrandInput = {
+    create?: XOR<ItemCreateWithoutBrandInput, ItemUncheckedCreateWithoutBrandInput> | ItemCreateWithoutBrandInput[] | ItemUncheckedCreateWithoutBrandInput[]
+    connectOrCreate?: ItemCreateOrConnectWithoutBrandInput | ItemCreateOrConnectWithoutBrandInput[]
+    createMany?: ItemCreateManyBrandInputEnvelope
+    connect?: ItemWhereUniqueInput | ItemWhereUniqueInput[]
+  }
+
+  export type FilesCreateNestedOneWithoutBrandInput = {
+    create?: XOR<FilesCreateWithoutBrandInput, FilesUncheckedCreateWithoutBrandInput>
+    connectOrCreate?: FilesCreateOrConnectWithoutBrandInput
+    connect?: FilesWhereUniqueInput
+  }
+
+  export type ItemUncheckedCreateNestedManyWithoutBrandInput = {
+    create?: XOR<ItemCreateWithoutBrandInput, ItemUncheckedCreateWithoutBrandInput> | ItemCreateWithoutBrandInput[] | ItemUncheckedCreateWithoutBrandInput[]
+    connectOrCreate?: ItemCreateOrConnectWithoutBrandInput | ItemCreateOrConnectWithoutBrandInput[]
+    createMany?: ItemCreateManyBrandInputEnvelope
+    connect?: ItemWhereUniqueInput | ItemWhereUniqueInput[]
+  }
+
   export type StringFieldUpdateOperationsInput = {
     set?: string
   }
@@ -16033,6 +19119,42 @@ export namespace Prisma {
     upsert?: userUpsertWithoutBrandInput
     connect?: userWhereUniqueInput
     update?: XOR<XOR<userUpdateToOneWithWhereWithoutBrandInput, userUpdateWithoutBrandInput>, userUncheckedUpdateWithoutBrandInput>
+  }
+
+  export type ItemUpdateManyWithoutBrandNestedInput = {
+    create?: XOR<ItemCreateWithoutBrandInput, ItemUncheckedCreateWithoutBrandInput> | ItemCreateWithoutBrandInput[] | ItemUncheckedCreateWithoutBrandInput[]
+    connectOrCreate?: ItemCreateOrConnectWithoutBrandInput | ItemCreateOrConnectWithoutBrandInput[]
+    upsert?: ItemUpsertWithWhereUniqueWithoutBrandInput | ItemUpsertWithWhereUniqueWithoutBrandInput[]
+    createMany?: ItemCreateManyBrandInputEnvelope
+    set?: ItemWhereUniqueInput | ItemWhereUniqueInput[]
+    disconnect?: ItemWhereUniqueInput | ItemWhereUniqueInput[]
+    delete?: ItemWhereUniqueInput | ItemWhereUniqueInput[]
+    connect?: ItemWhereUniqueInput | ItemWhereUniqueInput[]
+    update?: ItemUpdateWithWhereUniqueWithoutBrandInput | ItemUpdateWithWhereUniqueWithoutBrandInput[]
+    updateMany?: ItemUpdateManyWithWhereWithoutBrandInput | ItemUpdateManyWithWhereWithoutBrandInput[]
+    deleteMany?: ItemScalarWhereInput | ItemScalarWhereInput[]
+  }
+
+  export type FilesUpdateOneRequiredWithoutBrandNestedInput = {
+    create?: XOR<FilesCreateWithoutBrandInput, FilesUncheckedCreateWithoutBrandInput>
+    connectOrCreate?: FilesCreateOrConnectWithoutBrandInput
+    upsert?: FilesUpsertWithoutBrandInput
+    connect?: FilesWhereUniqueInput
+    update?: XOR<XOR<FilesUpdateToOneWithWhereWithoutBrandInput, FilesUpdateWithoutBrandInput>, FilesUncheckedUpdateWithoutBrandInput>
+  }
+
+  export type ItemUncheckedUpdateManyWithoutBrandNestedInput = {
+    create?: XOR<ItemCreateWithoutBrandInput, ItemUncheckedCreateWithoutBrandInput> | ItemCreateWithoutBrandInput[] | ItemUncheckedCreateWithoutBrandInput[]
+    connectOrCreate?: ItemCreateOrConnectWithoutBrandInput | ItemCreateOrConnectWithoutBrandInput[]
+    upsert?: ItemUpsertWithWhereUniqueWithoutBrandInput | ItemUpsertWithWhereUniqueWithoutBrandInput[]
+    createMany?: ItemCreateManyBrandInputEnvelope
+    set?: ItemWhereUniqueInput | ItemWhereUniqueInput[]
+    disconnect?: ItemWhereUniqueInput | ItemWhereUniqueInput[]
+    delete?: ItemWhereUniqueInput | ItemWhereUniqueInput[]
+    connect?: ItemWhereUniqueInput | ItemWhereUniqueInput[]
+    update?: ItemUpdateWithWhereUniqueWithoutBrandInput | ItemUpdateWithWhereUniqueWithoutBrandInput[]
+    updateMany?: ItemUpdateManyWithWhereWithoutBrandInput | ItemUpdateManyWithWhereWithoutBrandInput[]
+    deleteMany?: ItemScalarWhereInput | ItemScalarWhereInput[]
   }
 
   export type userCreateNestedOneWithoutClientInput = {
@@ -16117,6 +19239,122 @@ export namespace Prisma {
     divide?: number
   }
 
+  export type BrandCreateNestedOneWithoutItemInput = {
+    create?: XOR<BrandCreateWithoutItemInput, BrandUncheckedCreateWithoutItemInput>
+    connectOrCreate?: BrandCreateOrConnectWithoutItemInput
+    connect?: BrandWhereUniqueInput
+  }
+
+  export type FilesCreateNestedOneWithoutItemInput = {
+    create?: XOR<FilesCreateWithoutItemInput, FilesUncheckedCreateWithoutItemInput>
+    connectOrCreate?: FilesCreateOrConnectWithoutItemInput
+    connect?: FilesWhereUniqueInput
+  }
+
+  export type BrandUpdateOneRequiredWithoutItemNestedInput = {
+    create?: XOR<BrandCreateWithoutItemInput, BrandUncheckedCreateWithoutItemInput>
+    connectOrCreate?: BrandCreateOrConnectWithoutItemInput
+    upsert?: BrandUpsertWithoutItemInput
+    connect?: BrandWhereUniqueInput
+    update?: XOR<XOR<BrandUpdateToOneWithWhereWithoutItemInput, BrandUpdateWithoutItemInput>, BrandUncheckedUpdateWithoutItemInput>
+  }
+
+  export type FilesUpdateOneRequiredWithoutItemNestedInput = {
+    create?: XOR<FilesCreateWithoutItemInput, FilesUncheckedCreateWithoutItemInput>
+    connectOrCreate?: FilesCreateOrConnectWithoutItemInput
+    upsert?: FilesUpsertWithoutItemInput
+    connect?: FilesWhereUniqueInput
+    update?: XOR<XOR<FilesUpdateToOneWithWhereWithoutItemInput, FilesUpdateWithoutItemInput>, FilesUncheckedUpdateWithoutItemInput>
+  }
+
+  export type BrandCreateNestedManyWithoutFilesInput = {
+    create?: XOR<BrandCreateWithoutFilesInput, BrandUncheckedCreateWithoutFilesInput> | BrandCreateWithoutFilesInput[] | BrandUncheckedCreateWithoutFilesInput[]
+    connectOrCreate?: BrandCreateOrConnectWithoutFilesInput | BrandCreateOrConnectWithoutFilesInput[]
+    createMany?: BrandCreateManyFilesInputEnvelope
+    connect?: BrandWhereUniqueInput | BrandWhereUniqueInput[]
+  }
+
+  export type ItemCreateNestedManyWithoutFilesInput = {
+    create?: XOR<ItemCreateWithoutFilesInput, ItemUncheckedCreateWithoutFilesInput> | ItemCreateWithoutFilesInput[] | ItemUncheckedCreateWithoutFilesInput[]
+    connectOrCreate?: ItemCreateOrConnectWithoutFilesInput | ItemCreateOrConnectWithoutFilesInput[]
+    createMany?: ItemCreateManyFilesInputEnvelope
+    connect?: ItemWhereUniqueInput | ItemWhereUniqueInput[]
+  }
+
+  export type BrandUncheckedCreateNestedManyWithoutFilesInput = {
+    create?: XOR<BrandCreateWithoutFilesInput, BrandUncheckedCreateWithoutFilesInput> | BrandCreateWithoutFilesInput[] | BrandUncheckedCreateWithoutFilesInput[]
+    connectOrCreate?: BrandCreateOrConnectWithoutFilesInput | BrandCreateOrConnectWithoutFilesInput[]
+    createMany?: BrandCreateManyFilesInputEnvelope
+    connect?: BrandWhereUniqueInput | BrandWhereUniqueInput[]
+  }
+
+  export type ItemUncheckedCreateNestedManyWithoutFilesInput = {
+    create?: XOR<ItemCreateWithoutFilesInput, ItemUncheckedCreateWithoutFilesInput> | ItemCreateWithoutFilesInput[] | ItemUncheckedCreateWithoutFilesInput[]
+    connectOrCreate?: ItemCreateOrConnectWithoutFilesInput | ItemCreateOrConnectWithoutFilesInput[]
+    createMany?: ItemCreateManyFilesInputEnvelope
+    connect?: ItemWhereUniqueInput | ItemWhereUniqueInput[]
+  }
+
+  export type DateTimeFieldUpdateOperationsInput = {
+    set?: Date | string
+  }
+
+  export type BrandUpdateManyWithoutFilesNestedInput = {
+    create?: XOR<BrandCreateWithoutFilesInput, BrandUncheckedCreateWithoutFilesInput> | BrandCreateWithoutFilesInput[] | BrandUncheckedCreateWithoutFilesInput[]
+    connectOrCreate?: BrandCreateOrConnectWithoutFilesInput | BrandCreateOrConnectWithoutFilesInput[]
+    upsert?: BrandUpsertWithWhereUniqueWithoutFilesInput | BrandUpsertWithWhereUniqueWithoutFilesInput[]
+    createMany?: BrandCreateManyFilesInputEnvelope
+    set?: BrandWhereUniqueInput | BrandWhereUniqueInput[]
+    disconnect?: BrandWhereUniqueInput | BrandWhereUniqueInput[]
+    delete?: BrandWhereUniqueInput | BrandWhereUniqueInput[]
+    connect?: BrandWhereUniqueInput | BrandWhereUniqueInput[]
+    update?: BrandUpdateWithWhereUniqueWithoutFilesInput | BrandUpdateWithWhereUniqueWithoutFilesInput[]
+    updateMany?: BrandUpdateManyWithWhereWithoutFilesInput | BrandUpdateManyWithWhereWithoutFilesInput[]
+    deleteMany?: BrandScalarWhereInput | BrandScalarWhereInput[]
+  }
+
+  export type ItemUpdateManyWithoutFilesNestedInput = {
+    create?: XOR<ItemCreateWithoutFilesInput, ItemUncheckedCreateWithoutFilesInput> | ItemCreateWithoutFilesInput[] | ItemUncheckedCreateWithoutFilesInput[]
+    connectOrCreate?: ItemCreateOrConnectWithoutFilesInput | ItemCreateOrConnectWithoutFilesInput[]
+    upsert?: ItemUpsertWithWhereUniqueWithoutFilesInput | ItemUpsertWithWhereUniqueWithoutFilesInput[]
+    createMany?: ItemCreateManyFilesInputEnvelope
+    set?: ItemWhereUniqueInput | ItemWhereUniqueInput[]
+    disconnect?: ItemWhereUniqueInput | ItemWhereUniqueInput[]
+    delete?: ItemWhereUniqueInput | ItemWhereUniqueInput[]
+    connect?: ItemWhereUniqueInput | ItemWhereUniqueInput[]
+    update?: ItemUpdateWithWhereUniqueWithoutFilesInput | ItemUpdateWithWhereUniqueWithoutFilesInput[]
+    updateMany?: ItemUpdateManyWithWhereWithoutFilesInput | ItemUpdateManyWithWhereWithoutFilesInput[]
+    deleteMany?: ItemScalarWhereInput | ItemScalarWhereInput[]
+  }
+
+  export type BrandUncheckedUpdateManyWithoutFilesNestedInput = {
+    create?: XOR<BrandCreateWithoutFilesInput, BrandUncheckedCreateWithoutFilesInput> | BrandCreateWithoutFilesInput[] | BrandUncheckedCreateWithoutFilesInput[]
+    connectOrCreate?: BrandCreateOrConnectWithoutFilesInput | BrandCreateOrConnectWithoutFilesInput[]
+    upsert?: BrandUpsertWithWhereUniqueWithoutFilesInput | BrandUpsertWithWhereUniqueWithoutFilesInput[]
+    createMany?: BrandCreateManyFilesInputEnvelope
+    set?: BrandWhereUniqueInput | BrandWhereUniqueInput[]
+    disconnect?: BrandWhereUniqueInput | BrandWhereUniqueInput[]
+    delete?: BrandWhereUniqueInput | BrandWhereUniqueInput[]
+    connect?: BrandWhereUniqueInput | BrandWhereUniqueInput[]
+    update?: BrandUpdateWithWhereUniqueWithoutFilesInput | BrandUpdateWithWhereUniqueWithoutFilesInput[]
+    updateMany?: BrandUpdateManyWithWhereWithoutFilesInput | BrandUpdateManyWithWhereWithoutFilesInput[]
+    deleteMany?: BrandScalarWhereInput | BrandScalarWhereInput[]
+  }
+
+  export type ItemUncheckedUpdateManyWithoutFilesNestedInput = {
+    create?: XOR<ItemCreateWithoutFilesInput, ItemUncheckedCreateWithoutFilesInput> | ItemCreateWithoutFilesInput[] | ItemUncheckedCreateWithoutFilesInput[]
+    connectOrCreate?: ItemCreateOrConnectWithoutFilesInput | ItemCreateOrConnectWithoutFilesInput[]
+    upsert?: ItemUpsertWithWhereUniqueWithoutFilesInput | ItemUpsertWithWhereUniqueWithoutFilesInput[]
+    createMany?: ItemCreateManyFilesInputEnvelope
+    set?: ItemWhereUniqueInput | ItemWhereUniqueInput[]
+    disconnect?: ItemWhereUniqueInput | ItemWhereUniqueInput[]
+    delete?: ItemWhereUniqueInput | ItemWhereUniqueInput[]
+    connect?: ItemWhereUniqueInput | ItemWhereUniqueInput[]
+    update?: ItemUpdateWithWhereUniqueWithoutFilesInput | ItemUpdateWithWhereUniqueWithoutFilesInput[]
+    updateMany?: ItemUpdateManyWithWhereWithoutFilesInput | ItemUpdateManyWithWhereWithoutFilesInput[]
+    deleteMany?: ItemScalarWhereInput | ItemScalarWhereInput[]
+  }
+
   export type userCreateNestedOneWithoutAccountInput = {
     create?: XOR<userCreateWithoutAccountInput, userUncheckedCreateWithoutAccountInput>
     connectOrCreate?: userCreateOrConnectWithoutAccountInput
@@ -16125,10 +19363,6 @@ export namespace Prisma {
 
   export type NullableStringFieldUpdateOperationsInput = {
     set?: string | null
-  }
-
-  export type DateTimeFieldUpdateOperationsInput = {
-    set?: Date | string
   }
 
   export type userUpdateOneRequiredWithoutAccountNestedInput = {
@@ -16626,6 +19860,54 @@ export namespace Prisma {
     not?: NestedFloatFilter<$PrismaModel> | number
   }
 
+  export type NestedDateTimeFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  }
+  export type NestedJsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
   export type NestedStringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -16638,17 +19920,6 @@ export namespace Prisma {
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
-  }
-
-  export type NestedDateTimeFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
   export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -16666,20 +19937,6 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
     _max?: NestedStringNullableFilter<$PrismaModel>
-  }
-
-  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
   export type NestedBoolFilter<$PrismaModel = never> = {
@@ -16736,6 +19993,65 @@ export namespace Prisma {
     create: XOR<userCreateWithoutBrandInput, userUncheckedCreateWithoutBrandInput>
   }
 
+  export type ItemCreateWithoutBrandInput = {
+    id?: string
+    name: string
+    description: string
+    price: number
+    url: string
+    files: FilesCreateNestedOneWithoutItemInput
+  }
+
+  export type ItemUncheckedCreateWithoutBrandInput = {
+    id?: string
+    name: string
+    description: string
+    price: number
+    url: string
+    imageId: string
+  }
+
+  export type ItemCreateOrConnectWithoutBrandInput = {
+    where: ItemWhereUniqueInput
+    create: XOR<ItemCreateWithoutBrandInput, ItemUncheckedCreateWithoutBrandInput>
+  }
+
+  export type ItemCreateManyBrandInputEnvelope = {
+    data: ItemCreateManyBrandInput | ItemCreateManyBrandInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type FilesCreateWithoutBrandInput = {
+    id?: string
+    name: string
+    contentType: string
+    bucket: string
+    url: string
+    uploadUrl: string
+    metadata: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    item?: ItemCreateNestedManyWithoutFilesInput
+  }
+
+  export type FilesUncheckedCreateWithoutBrandInput = {
+    id?: string
+    name: string
+    contentType: string
+    bucket: string
+    url: string
+    uploadUrl: string
+    metadata: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    item?: ItemUncheckedCreateNestedManyWithoutFilesInput
+  }
+
+  export type FilesCreateOrConnectWithoutBrandInput = {
+    where: FilesWhereUniqueInput
+    create: XOR<FilesCreateWithoutBrandInput, FilesUncheckedCreateWithoutBrandInput>
+  }
+
   export type userUpsertWithoutBrandInput = {
     update: XOR<userUpdateWithoutBrandInput, userUncheckedUpdateWithoutBrandInput>
     create: XOR<userCreateWithoutBrandInput, userUncheckedCreateWithoutBrandInput>
@@ -16781,6 +20097,72 @@ export namespace Prisma {
     itemLikes?: ItemLikeUncheckedUpdateManyWithoutUserNestedInput
     RegisterInProgress?: RegisterInProgressUncheckedUpdateManyWithoutUserNestedInput
     ResetPasswordInProgress?: ResetPasswordInProgressUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type ItemUpsertWithWhereUniqueWithoutBrandInput = {
+    where: ItemWhereUniqueInput
+    update: XOR<ItemUpdateWithoutBrandInput, ItemUncheckedUpdateWithoutBrandInput>
+    create: XOR<ItemCreateWithoutBrandInput, ItemUncheckedCreateWithoutBrandInput>
+  }
+
+  export type ItemUpdateWithWhereUniqueWithoutBrandInput = {
+    where: ItemWhereUniqueInput
+    data: XOR<ItemUpdateWithoutBrandInput, ItemUncheckedUpdateWithoutBrandInput>
+  }
+
+  export type ItemUpdateManyWithWhereWithoutBrandInput = {
+    where: ItemScalarWhereInput
+    data: XOR<ItemUpdateManyMutationInput, ItemUncheckedUpdateManyWithoutBrandInput>
+  }
+
+  export type ItemScalarWhereInput = {
+    AND?: ItemScalarWhereInput | ItemScalarWhereInput[]
+    OR?: ItemScalarWhereInput[]
+    NOT?: ItemScalarWhereInput | ItemScalarWhereInput[]
+    id?: StringFilter<"Item"> | string
+    name?: StringFilter<"Item"> | string
+    description?: StringFilter<"Item"> | string
+    price?: IntFilter<"Item"> | number
+    url?: StringFilter<"Item"> | string
+    brandId?: UuidFilter<"Item"> | string
+    imageId?: UuidFilter<"Item"> | string
+  }
+
+  export type FilesUpsertWithoutBrandInput = {
+    update: XOR<FilesUpdateWithoutBrandInput, FilesUncheckedUpdateWithoutBrandInput>
+    create: XOR<FilesCreateWithoutBrandInput, FilesUncheckedCreateWithoutBrandInput>
+    where?: FilesWhereInput
+  }
+
+  export type FilesUpdateToOneWithWhereWithoutBrandInput = {
+    where?: FilesWhereInput
+    data: XOR<FilesUpdateWithoutBrandInput, FilesUncheckedUpdateWithoutBrandInput>
+  }
+
+  export type FilesUpdateWithoutBrandInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    contentType?: StringFieldUpdateOperationsInput | string
+    bucket?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    uploadUrl?: StringFieldUpdateOperationsInput | string
+    metadata?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    item?: ItemUpdateManyWithoutFilesNestedInput
+  }
+
+  export type FilesUncheckedUpdateWithoutBrandInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    contentType?: StringFieldUpdateOperationsInput | string
+    bucket?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    uploadUrl?: StringFieldUpdateOperationsInput | string
+    metadata?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    item?: ItemUncheckedUpdateManyWithoutFilesNestedInput
   }
 
   export type userCreateWithoutClientInput = {
@@ -17223,6 +20605,219 @@ export namespace Prisma {
     RegisterInProgress?: RegisterInProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
+  export type BrandCreateWithoutItemInput = {
+    name: string
+    description: string
+    url: string
+    user: userCreateNestedOneWithoutBrandInput
+    files: FilesCreateNestedOneWithoutBrandInput
+  }
+
+  export type BrandUncheckedCreateWithoutItemInput = {
+    userId: string
+    name: string
+    description: string
+    url: string
+    logoId: string
+  }
+
+  export type BrandCreateOrConnectWithoutItemInput = {
+    where: BrandWhereUniqueInput
+    create: XOR<BrandCreateWithoutItemInput, BrandUncheckedCreateWithoutItemInput>
+  }
+
+  export type FilesCreateWithoutItemInput = {
+    id?: string
+    name: string
+    contentType: string
+    bucket: string
+    url: string
+    uploadUrl: string
+    metadata: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    brand?: BrandCreateNestedManyWithoutFilesInput
+  }
+
+  export type FilesUncheckedCreateWithoutItemInput = {
+    id?: string
+    name: string
+    contentType: string
+    bucket: string
+    url: string
+    uploadUrl: string
+    metadata: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    brand?: BrandUncheckedCreateNestedManyWithoutFilesInput
+  }
+
+  export type FilesCreateOrConnectWithoutItemInput = {
+    where: FilesWhereUniqueInput
+    create: XOR<FilesCreateWithoutItemInput, FilesUncheckedCreateWithoutItemInput>
+  }
+
+  export type BrandUpsertWithoutItemInput = {
+    update: XOR<BrandUpdateWithoutItemInput, BrandUncheckedUpdateWithoutItemInput>
+    create: XOR<BrandCreateWithoutItemInput, BrandUncheckedCreateWithoutItemInput>
+    where?: BrandWhereInput
+  }
+
+  export type BrandUpdateToOneWithWhereWithoutItemInput = {
+    where?: BrandWhereInput
+    data: XOR<BrandUpdateWithoutItemInput, BrandUncheckedUpdateWithoutItemInput>
+  }
+
+  export type BrandUpdateWithoutItemInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    user?: userUpdateOneRequiredWithoutBrandNestedInput
+    files?: FilesUpdateOneRequiredWithoutBrandNestedInput
+  }
+
+  export type BrandUncheckedUpdateWithoutItemInput = {
+    userId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    logoId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type FilesUpsertWithoutItemInput = {
+    update: XOR<FilesUpdateWithoutItemInput, FilesUncheckedUpdateWithoutItemInput>
+    create: XOR<FilesCreateWithoutItemInput, FilesUncheckedCreateWithoutItemInput>
+    where?: FilesWhereInput
+  }
+
+  export type FilesUpdateToOneWithWhereWithoutItemInput = {
+    where?: FilesWhereInput
+    data: XOR<FilesUpdateWithoutItemInput, FilesUncheckedUpdateWithoutItemInput>
+  }
+
+  export type FilesUpdateWithoutItemInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    contentType?: StringFieldUpdateOperationsInput | string
+    bucket?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    uploadUrl?: StringFieldUpdateOperationsInput | string
+    metadata?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    brand?: BrandUpdateManyWithoutFilesNestedInput
+  }
+
+  export type FilesUncheckedUpdateWithoutItemInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    contentType?: StringFieldUpdateOperationsInput | string
+    bucket?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    uploadUrl?: StringFieldUpdateOperationsInput | string
+    metadata?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    brand?: BrandUncheckedUpdateManyWithoutFilesNestedInput
+  }
+
+  export type BrandCreateWithoutFilesInput = {
+    name: string
+    description: string
+    url: string
+    user: userCreateNestedOneWithoutBrandInput
+    item?: ItemCreateNestedManyWithoutBrandInput
+  }
+
+  export type BrandUncheckedCreateWithoutFilesInput = {
+    userId: string
+    name: string
+    description: string
+    url: string
+    item?: ItemUncheckedCreateNestedManyWithoutBrandInput
+  }
+
+  export type BrandCreateOrConnectWithoutFilesInput = {
+    where: BrandWhereUniqueInput
+    create: XOR<BrandCreateWithoutFilesInput, BrandUncheckedCreateWithoutFilesInput>
+  }
+
+  export type BrandCreateManyFilesInputEnvelope = {
+    data: BrandCreateManyFilesInput | BrandCreateManyFilesInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ItemCreateWithoutFilesInput = {
+    id?: string
+    name: string
+    description: string
+    price: number
+    url: string
+    brand: BrandCreateNestedOneWithoutItemInput
+  }
+
+  export type ItemUncheckedCreateWithoutFilesInput = {
+    id?: string
+    name: string
+    description: string
+    price: number
+    url: string
+    brandId: string
+  }
+
+  export type ItemCreateOrConnectWithoutFilesInput = {
+    where: ItemWhereUniqueInput
+    create: XOR<ItemCreateWithoutFilesInput, ItemUncheckedCreateWithoutFilesInput>
+  }
+
+  export type ItemCreateManyFilesInputEnvelope = {
+    data: ItemCreateManyFilesInput | ItemCreateManyFilesInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type BrandUpsertWithWhereUniqueWithoutFilesInput = {
+    where: BrandWhereUniqueInput
+    update: XOR<BrandUpdateWithoutFilesInput, BrandUncheckedUpdateWithoutFilesInput>
+    create: XOR<BrandCreateWithoutFilesInput, BrandUncheckedCreateWithoutFilesInput>
+  }
+
+  export type BrandUpdateWithWhereUniqueWithoutFilesInput = {
+    where: BrandWhereUniqueInput
+    data: XOR<BrandUpdateWithoutFilesInput, BrandUncheckedUpdateWithoutFilesInput>
+  }
+
+  export type BrandUpdateManyWithWhereWithoutFilesInput = {
+    where: BrandScalarWhereInput
+    data: XOR<BrandUpdateManyMutationInput, BrandUncheckedUpdateManyWithoutFilesInput>
+  }
+
+  export type BrandScalarWhereInput = {
+    AND?: BrandScalarWhereInput | BrandScalarWhereInput[]
+    OR?: BrandScalarWhereInput[]
+    NOT?: BrandScalarWhereInput | BrandScalarWhereInput[]
+    userId?: UuidFilter<"Brand"> | string
+    name?: StringFilter<"Brand"> | string
+    description?: StringFilter<"Brand"> | string
+    url?: StringFilter<"Brand"> | string
+    logoId?: UuidFilter<"Brand"> | string
+  }
+
+  export type ItemUpsertWithWhereUniqueWithoutFilesInput = {
+    where: ItemWhereUniqueInput
+    update: XOR<ItemUpdateWithoutFilesInput, ItemUncheckedUpdateWithoutFilesInput>
+    create: XOR<ItemCreateWithoutFilesInput, ItemUncheckedCreateWithoutFilesInput>
+  }
+
+  export type ItemUpdateWithWhereUniqueWithoutFilesInput = {
+    where: ItemWhereUniqueInput
+    data: XOR<ItemUpdateWithoutFilesInput, ItemUncheckedUpdateWithoutFilesInput>
+  }
+
+  export type ItemUpdateManyWithWhereWithoutFilesInput = {
+    where: ItemScalarWhereInput
+    data: XOR<ItemUpdateManyMutationInput, ItemUncheckedUpdateManyWithoutFilesInput>
+  }
+
   export type userCreateWithoutAccountInput = {
     id: string
     name: string
@@ -17473,14 +21068,16 @@ export namespace Prisma {
     name: string
     description: string
     url: string
-    logoUrl: string
+    item?: ItemCreateNestedManyWithoutBrandInput
+    files: FilesCreateNestedOneWithoutBrandInput
   }
 
   export type BrandUncheckedCreateWithoutUserInput = {
     name: string
     description: string
     url: string
-    logoUrl: string
+    logoId: string
+    item?: ItemUncheckedCreateNestedManyWithoutBrandInput
   }
 
   export type BrandCreateOrConnectWithoutUserInput = {
@@ -17620,7 +21217,7 @@ export namespace Prisma {
     id?: StringFilter<"account"> | string
     accountId?: StringFilter<"account"> | string
     providerId?: StringFilter<"account"> | string
-    userId?: StringFilter<"account"> | string
+    userId?: UuidFilter<"account"> | string
     accessToken?: StringNullableFilter<"account"> | string | null
     refreshToken?: StringNullableFilter<"account"> | string | null
     idToken?: StringNullableFilter<"account"> | string | null
@@ -17659,7 +21256,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"session"> | Date | string
     ipAddress?: StringNullableFilter<"session"> | string | null
     userAgent?: StringNullableFilter<"session"> | string | null
-    userId?: StringFilter<"session"> | string
+    userId?: UuidFilter<"session"> | string
   }
 
   export type BrandUpsertWithoutUserInput = {
@@ -17677,14 +21274,16 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
-    logoUrl?: StringFieldUpdateOperationsInput | string
+    item?: ItemUpdateManyWithoutBrandNestedInput
+    files?: FilesUpdateOneRequiredWithoutBrandNestedInput
   }
 
   export type BrandUncheckedUpdateWithoutUserInput = {
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
-    logoUrl?: StringFieldUpdateOperationsInput | string
+    logoId?: StringFieldUpdateOperationsInput | string
+    item?: ItemUncheckedUpdateManyWithoutBrandNestedInput
   }
 
   export type ClientUpsertWithoutUserInput = {
@@ -17814,6 +21413,108 @@ export namespace Prisma {
     verificationCode?: StringFilter<"ResetPasswordInProgress"> | string
     verificationCodeExpiration?: StringFilter<"ResetPasswordInProgress"> | string
     token?: StringFilter<"ResetPasswordInProgress"> | string
+  }
+
+  export type ItemCreateManyBrandInput = {
+    id?: string
+    name: string
+    description: string
+    price: number
+    url: string
+    imageId: string
+  }
+
+  export type ItemUpdateWithoutBrandInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: IntFieldUpdateOperationsInput | number
+    url?: StringFieldUpdateOperationsInput | string
+    files?: FilesUpdateOneRequiredWithoutItemNestedInput
+  }
+
+  export type ItemUncheckedUpdateWithoutBrandInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: IntFieldUpdateOperationsInput | number
+    url?: StringFieldUpdateOperationsInput | string
+    imageId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type ItemUncheckedUpdateManyWithoutBrandInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: IntFieldUpdateOperationsInput | number
+    url?: StringFieldUpdateOperationsInput | string
+    imageId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type BrandCreateManyFilesInput = {
+    userId: string
+    name: string
+    description: string
+    url: string
+  }
+
+  export type ItemCreateManyFilesInput = {
+    id?: string
+    name: string
+    description: string
+    price: number
+    url: string
+    brandId: string
+  }
+
+  export type BrandUpdateWithoutFilesInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    user?: userUpdateOneRequiredWithoutBrandNestedInput
+    item?: ItemUpdateManyWithoutBrandNestedInput
+  }
+
+  export type BrandUncheckedUpdateWithoutFilesInput = {
+    userId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    item?: ItemUncheckedUpdateManyWithoutBrandNestedInput
+  }
+
+  export type BrandUncheckedUpdateManyWithoutFilesInput = {
+    userId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type ItemUpdateWithoutFilesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: IntFieldUpdateOperationsInput | number
+    url?: StringFieldUpdateOperationsInput | string
+    brand?: BrandUpdateOneRequiredWithoutItemNestedInput
+  }
+
+  export type ItemUncheckedUpdateWithoutFilesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: IntFieldUpdateOperationsInput | number
+    url?: StringFieldUpdateOperationsInput | string
+    brandId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type ItemUncheckedUpdateManyWithoutFilesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: IntFieldUpdateOperationsInput | number
+    url?: StringFieldUpdateOperationsInput | string
+    brandId?: StringFieldUpdateOperationsInput | string
   }
 
   export type accountCreateManyUserInput = {

@@ -1,7 +1,6 @@
 # Run 
 - front:  npx expo run:ios   
 - server: npx ts-node -r tsconfig-paths/register server/index.ts
-- database-users: npm run db:up (o npm run db:rm para eliminarla completo)
 - database: (cd database && source .venv/bin/activate) uvicorn server:app --reload 
 - ejecutar script: node test-endpoints/test-catalog-upload.js
 

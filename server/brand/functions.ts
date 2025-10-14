@@ -11,11 +11,14 @@ export async function GetBrandById(
 ): Promise<BrandSchemaType | null> {
   const brand = await db.brand.findUnique({
     where: { userId: id },
+    include: {
+      files: true,
+    },
   });
   if (!brand) {
     return null;
   }
-  return { ...brand, id: id };
+  return { ...brand, id: id, logoUrl: brand.files?.url };
 }
 
 export async function GetBrandId(brandEmail: string): Promise<string | null> {

@@ -22,10 +22,11 @@ export default function App() {
   const loading = isPending;
   const queryClient = useQueryClient();
   const [timeout, setHasTimedOut] = useState(false);
+  const [hasPrefetched, setHasPrefetched] = useState(false);
   const pathname = usePathname();
 
   if (!timeout) {
-    setTimeout(() => setHasTimedOut(true), 1000);
+    setTimeout(() => setHasTimedOut(true), 2000);
   }
 
   if (error) {
@@ -37,13 +38,17 @@ export default function App() {
   }
 
   if (loading || !timeout) {
-    if (user && user.emailVerified) {
+    console.log("Index: Loading or timeout");
+    console.log("Index: User", user);
+    if (user && user.emailVerified && !hasPrefetched) {
       // Solo ejecutar prefetch para usuarios existentes
+      console.log("Index: Prefetching user", user.email);
       setTimeout(() => {
         prefetchHome(queryClient, user.email);
         prefetchProfile(user, queryClient);
         prefetchLikeAndFavoritePage(queryClient, user.email);
         prefetchExplorePage(queryClient);
+        setHasPrefetched(true);
       }, 100);
     }
     return (
@@ -66,7 +71,7 @@ export default function App() {
       return <Redirect href="/code-verification-register" />;
     } else {
       // Usuario existente - redirigir directamente a home
-      return <Redirect href="/home?prefetch=true" />;
+      return <Redirect href={`/home?prefetch=${hasPrefetched}`} />;
     }
   } else {
     console.log("Index: No user found, redirecting to sign-in");

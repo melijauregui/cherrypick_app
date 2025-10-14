@@ -227,6 +227,7 @@ export const getItemsUuidNames = async (
   search: string,
   page: number
 ): Promise<UuidNameSchemaType[]> => {
+  console.log("getItemsUuidNames", search, page);
   const limit = 10;
   const res = await handleApiResponse<{
     data: UuidNameSchemaType[];
