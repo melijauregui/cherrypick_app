@@ -71,10 +71,10 @@ async function main() {
       userId: "ca8cce7e-792a-11f0-b577-0242ac120002",
       name: "tienda napoli",
       description: `10% off abonando con transferencia
-3 cuotas sin interés con tarj bancarias
-Envíos a todo el país
-Malabia 1574 , Palermo Soho
-Lun a sab: 11 a 19 hs`,
+  3 cuotas sin interés con tarj bancarias
+  Envíos a todo el país
+  Malabia 1574 , Palermo Soho
+  Lun a sab: 11 a 19 hs`,
       url: "https://www.tiendanapoli.com/",
       logoId: "ca8cce7e-792a-11f0-b577-0242ac120002",
     },
@@ -87,11 +87,11 @@ Lun a sab: 11 a 19 hs`,
       userId: "ca8ce0ae-792a-11f0-b577-0242ac120002",
       name: "charo",
       description: `Info vía WhatsApp 📲 1161428031
-Stores:
-España 3012 Florencio varela
-Calle 13 4777 Berazategui
-Brown 509 Quilmes
-Av 844 2509 Solano`,
+  Stores:
+  España 3012 Florencio varela
+  Calle 13 4777 Berazategui
+  Brown 509 Quilmes
+  Av 844 2509 Solano`,
       url: "https://www.charostoreok.com/",
       logoId: "ca8ce0ae-792a-11f0-b577-0242ac120002",
     },
@@ -105,22 +105,22 @@ Av 844 2509 Solano`,
   // Create inspiration items
   const inspoItems = [
     {
-      itemUuid: "46d53a96-e697-4ac9-92f9-f90313cd8931",
+      itemUuid: "7ba7b827-9dad-11d1-80b4-00c04fd430c8",
       category: "spring",
       index: 0,
     },
     {
-      itemUuid: "958a6478-f6a7-4da9-a255-97d852a3e6de",
+      itemUuid: "6ba7b833-9dad-11d1-80b4-00c04fd430c8",
       category: "spring",
       index: 1,
     },
     {
-      itemUuid: "b4166c0e-21ea-4864-bc2b-55faf6bae889",
+      itemUuid: "6ba7b834-9dad-11d1-80b4-00c04fd430c8",
       category: "spring",
       index: 2,
     },
     {
-      itemUuid: "15580818-3f2f-46ec-b910-8e8a7735874a",
+      itemUuid: "7ba7b828-9dad-11d1-80b4-00c04fd430c8",
       category: "spring",
       index: 3,
     },

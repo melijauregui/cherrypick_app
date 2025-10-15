@@ -21,7 +21,10 @@ import {
   CatalogResponseSchemaType,
   PaginationSchema,
 } from "@/schemas/catalog/catalog-schema";
-import { getAllLikedFavoritedItems } from "../catalog/like-favorite";
+import {
+  getAllFavoritedItems,
+  getAllLikedItems,
+} from "../catalog/like-favorite";
 
 const UserApp = new OpenAPIHono<AppEnv>({
   defaultHook: (result, c) => {
@@ -170,7 +173,7 @@ UserApp.openapi(getAllLikedItemsRoute, async c => {
   logger.info("GET /user/all-liked page: %s limit: %s", page, limit);
   let res: CatalogResponseSchemaType | ErrorSchemaType;
 
-  if (!user?.email) {
+  if (!user?.id) {
     res = {
       error: true,
       details: "Usuario no autenticado",
@@ -178,7 +181,7 @@ UserApp.openapi(getAllLikedItemsRoute, async c => {
     return c.json(res, 401);
   }
 
-  res = await getAllLikedFavoritedItems("likes", user.email, page, limit);
+  res = await getAllLikedItems(user.id, page, limit);
   if (res.error) {
     return c.json(res, 404);
   }
@@ -227,7 +230,7 @@ UserApp.openapi(getAllFavoritedItemsRoute, async c => {
   logger.info("GET /user/all-favorited page: %s limit: %s", page, limit);
   let res: CatalogResponseSchemaType | ErrorSchemaType;
 
-  if (!user?.email) {
+  if (!user?.id) {
     res = {
       error: true,
       details: "Usuario no autenticado",
@@ -235,7 +238,7 @@ UserApp.openapi(getAllFavoritedItemsRoute, async c => {
     return c.json(res, 401);
   }
 
-  res = await getAllLikedFavoritedItems("favorites", user.email, page, limit);
+  res = await getAllFavoritedItems(user.id, page, limit);
   if (res.error) {
     return c.json(res, 404);
   }

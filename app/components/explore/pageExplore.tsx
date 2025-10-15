@@ -435,7 +435,7 @@ const GridImages = ({ query }: { query: string }) => {
       {data.map((item: ItemSchemaType, index: number) => (
         <View key={item.uuid || index} className="flex-1">
           <Image
-            source={{ uri: item.imageUrl }}
+            source={{ uri: item.image.url }}
             className={`w-full h-60 ${index === 0 ? "rounded-l-xl" : index === data.length - 1 ? "rounded-r-xl" : ""}`}
             resizeMode="cover"
           />

@@ -37,7 +37,7 @@ const ClothingItemComponent = ({
   renderedHeight: number;
   renderedWidth: number;
 }) => {
-  const { imageUrl } = item;
+  const { image } = item;
   // const [imageDimensions, setImageDimensions] = useState({
   //   width: 0,
   //   height: 0,
@@ -99,9 +99,9 @@ const ClothingItemComponent = ({
       }}
     >
       <TouchableOpacity onPress={handlePress} activeOpacity={0.9}>
-        {imageUrl ? (
+        {image.url ? (
           <Image
-            source={{ uri: imageUrl }}
+            source={{ uri: image.url }}
             style={{ width: renderedWidth, height: renderedHeight }}
             resizeMode="cover"
           />

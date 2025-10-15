@@ -3,7 +3,7 @@ import { SuccessSchema } from "../standar-response-schema";
 import { QueryIdSchema } from "../standar-query-schema";
 import { EmbbedingSchema } from "../search/search-schema";
 
-export const PropertiesItemSchema = z.object({
+export const MinimumPropertiesItemSchema = z.object({
   name: z
     .string()
     .min(1, { message: "Product name is required" })
@@ -26,22 +26,24 @@ export const PropertiesItemSchema = z.object({
     .string()
     .min(1, { message: "URL is required" })
     .url({ message: "Please enter a valid URL" }),
-  imageUrl: z
-    .string()
-    .min(1, { message: "Image URL is required" })
-    .url({ message: "Please enter a valid image URL" }),
 });
-export type PropertiesItemSchemaType = z.infer<typeof PropertiesItemSchema>;
+export type MinimumPropertiesItemSchemaType = z.infer<
+  typeof MinimumPropertiesItemSchema
+>;
 
-export const ItemSchemaId = z.object({
-  ...PropertiesItemSchema.shape,
-  uuid: z.string().uuid({ message: "UUID is required" }),
+export const CreateItemSchema = MinimumPropertiesItemSchema.extend({
+  imageId: z.string().uuid({ message: "UUID is required" }),
+  uuid: z.string().uuid({ message: "UUID is required" }).optional(),
 });
-export type ItemSchemaIdType = z.infer<typeof ItemSchemaId>;
+export type CreateItemSchemaType = z.infer<typeof CreateItemSchema>;
 
-export const ItemSchema = z.object({
-  ...ItemSchemaId.shape,
+export const ItemSchema = MinimumPropertiesItemSchema.extend({
+  image: z.object({
+    url: z.string().url({ message: "Please enter a valid URL" }),
+    updatedAt: z.string(),
+  }),
   brandId: z.string().uuid({ message: "El id de la marca es requerido" }),
+  uuid: z.string().uuid({ message: "UUID is required" }),
 });
 export type ItemSchemaType = z.infer<typeof ItemSchema>;
 
@@ -112,15 +114,21 @@ export const IsMyItemSchema = z.object({
 
 export type IsMyItemSchemaType = z.infer<typeof IsMyItemSchema>;
 
-export const UpdateItemBodySchema = PropertiesItemSchema.partial();
+export const UpdateItemBodySchema = CreateItemSchema.partial();
 export type UpdateItemBodySchemaType = z.infer<typeof UpdateItemBodySchema>;
 
 // Schema for JSON catalog upload
 export const jsonCatalogUploadSchema = z.object({
-  items: z.array(PropertiesItemSchema).min(1, "Debe tener al menos un item"),
+  items: z.array(CreateItemSchema).min(1, "Debe tener al menos un item"),
 });
 
 export const jsonCatalogUploadSchema2 = z.object({
-  items: z.array(PropertiesItemSchema).min(1, "Debe tener al menos un item"),
+  items: z
+    .array(
+      CreateItemSchema.extend({
+        uuid: z.string().uuid({ message: "UUID is required" }),
+      })
+    )
+    .min(1, "Debe tener al menos un item"),
   brandEmail: z.string().min(1, "La marca es requerida"),
 });

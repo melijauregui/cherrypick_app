@@ -1,6 +1,5 @@
 import {
   ItemResponseSchemaType,
-  ItemSchema,
   UpdateItemBodySchemaType,
 } from "@/schemas/catalog/catalog-schema";
 import {
@@ -13,69 +12,47 @@ import {
   getCollection,
 } from "../catalog/functions";
 import { EmbbedingResponseSchemaType } from "@/schemas/search/search-schema";
+import logger from "../logger";
+import { prisma } from "../db";
+import { getFileUrl } from "../file-uploader";
 
-// Function to query specific item by name and brand in Weaviate
+// Function to query specific item from PostgreSQL
 export async function GetItem(
   uuid: string
 ): Promise<ItemResponseSchemaType | ErrorSchemaType> {
-  const resCollection = await getCollection();
-  if (resCollection.error) {
-    return {
-      error: true,
-      details: resCollection.details || "Error getting collection",
-    };
-  }
-  const collection = resCollection.collection;
+  const item = await prisma.item.findUnique({
+    where: {
+      id: uuid,
+    },
+    include: {
+      files: true, // Incluir la imagen del item
+    },
+  });
 
-  const filters = collection.filter.byId().equal(uuid);
-
-  const queryOptions: any = {
-    filters: filters,
-    limit: 1,
-    returnProperties: [
-      "name",
-      "description",
-      "imageUrl",
-      "url",
-      "brandId",
-      "price",
-    ],
-  };
-
-  const result = await collection.query.fetchObjects(queryOptions);
-
-  if (result.objects.length === 0 || !result.objects[0]) {
+  if (!item) {
+    logger.error("Item not found with uuid: %s", uuid);
     return {
       error: true,
       details: "Item not found",
     };
   }
 
-  const match = result.objects[0];
-
-  const item = {
-    name: match.properties?.name || "",
-    description: match.properties?.description || "",
-    imageUrl: match.properties?.imageUrl || "",
-    url: match.properties?.url || "",
-    brandId: match.properties?.brandId || "",
-    price: match.properties?.price || 0,
-    uuid: match.uuid || "",
+  const itemData = {
+    name: item.name,
+    description: item.description,
+    image: {
+      url: item.files.url,
+      updatedAt: item.files.updatedAt.toISOString(),
+    },
+    url: item.url,
+    brandId: item.brandId,
+    price: item.price,
+    uuid: item.id,
   };
-
-  // Validate the item using Zod schema
-  const validationResult = ItemSchema.safeParse(item);
-  if (!validationResult.success) {
-    console.log("Item validation failed:", validationResult.error);
-    return {
-      error: true,
-      details: "Invalid item data",
-    };
-  }
 
   return {
     error: false,
-    item: validationResult.data,
+    item: itemData,
   };
 }
 
@@ -101,14 +78,21 @@ export async function UpdateItem(
     propertiesToUpdate.description = updatedItem.description;
   if (updatedItem.price !== undefined)
     propertiesToUpdate.price = updatedItem.price;
-  if (updatedItem.imageUrl !== undefined)
-    propertiesToUpdate.imageUrl = updatedItem.imageUrl;
+  if (updatedItem.imageId !== undefined)
+    propertiesToUpdate.imageId = updatedItem.imageId;
   if (updatedItem.url !== undefined) propertiesToUpdate.url = updatedItem.url;
 
+  // Update PostgreSQL table
+  await prisma.item.update({
+    where: { id: uuid },
+    data: propertiesToUpdate,
+  });
+
   const vectorsToUpdate: any = {};
-  if (updatedItem.imageUrl) {
+  if (updatedItem.imageId) {
+    const image = await getFileUrl(updatedItem.imageId);
     console.log("extracting image features");
-    const imageFeatures = await extractImageFeatures(updatedItem.imageUrl);
+    const imageFeatures = await extractImageFeatures(image.url);
     if (imageFeatures.error) {
       return {
         error: true,
@@ -131,7 +115,6 @@ export async function UpdateItem(
 
   const updateData: any = {
     id: uuid,
-    properties: propertiesToUpdate,
     vectors: vectorsToUpdate,
   };
   await collection.data.update(updateData);
@@ -159,13 +142,13 @@ export async function GetEmbeddingItem(
     includeVector: true,
   });
   if (result.objects.length === 0 || !result.objects[0]) {
+    logger.error("Item not found with uuid: %s", itemUuid);
     return {
       error: true,
       details: "Item not found",
     };
   }
   const embedding = result.objects[0].vectors?.image_vector as number[];
-  console.log("embedding", embedding);
   return {
     error: false,
     embedding: embedding,

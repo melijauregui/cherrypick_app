@@ -12,9 +12,9 @@ import Toast from "react-native-toast-message";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { ButtonSubmit } from "./insertNewItems";
 import { useDelete } from "@/app/utils/update";
-import { getItemsUuidNames } from "@/app/utils/fetch";
 import { UuidNameSchemaType } from "@/schemas/catalog/catalog-schema";
 import ListSearch from "../explore/listSearch";
+import { getSelfBrandItems } from "@/app/utils/fetch";
 
 const DeleteCatalogItemsModal = ({
   bottomSheetRef,
@@ -40,7 +40,7 @@ const DeleteCatalogItemsModal = ({
     useInfiniteQuery({
       queryKey: ["delete-catalog-items", brandId, search],
       queryFn: async ({ pageParam }) => {
-        const res = await getItemsUuidNames(search, pageParam);
+        const res = await getSelfBrandItems(pageParam, 20, search);
         return res;
       },
       initialPageParam: 0,

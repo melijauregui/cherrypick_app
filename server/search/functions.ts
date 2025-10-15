@@ -1,12 +1,11 @@
 import {
   CatalogResponseSchemaType,
-  ItemSchema,
   ItemSchemaType,
-  UuidNameResponseSchemaType,
   UuidNameSchemaType,
 } from "@/schemas/catalog/catalog-schema";
 import { ErrorSchemaType } from "@/schemas/standar-response-schema";
 import logger from "../logger";
+import { prisma } from "../db";
 import {
   extractImageFeaturesFromBase64,
   extractTextFeatures,
@@ -38,14 +37,6 @@ export async function SearchItems(
 
   const collection = resCollection.collection;
   const offset = page * limit;
-  const returnProperties = [
-    "name",
-    "description",
-    "imageUrl",
-    "url",
-    "brandId",
-    "price",
-  ];
 
   let result;
 
@@ -84,7 +75,6 @@ export async function SearchItems(
   const queryOptions = {
     limit: limit,
     offset: offset,
-    returnProperties: returnProperties,
     targetVector: type === "text" ? "image_vector" : "text_vector", // ToDo: ver si con image_vector funciona mejor en ambos casos
     includeDistance: true,
     includeMatchDistance: true,
@@ -92,35 +82,59 @@ export async function SearchItems(
   };
 
   result = await collection.query.nearVector(embedding, queryOptions);
-  //}
 
-  // Map results to ItemSchemaType
-  const items: ItemSchemaType[] = result.objects
-    .map(match => {
-      const item = {
-        name: match.properties?.name || "",
-        description: match.properties?.description || "",
-        imageUrl: match.properties?.imageUrl || "",
-        url: match.properties?.url || "",
-        brandId: match.properties?.brandId || "",
-        price: match.properties?.price || 0,
-        uuid: match.uuid || "",
-      };
+  // Obtener UUIDs de Weaviate manteniendo el orden
+  const uuids = result.objects.map(match => match.uuid);
 
-      const validationResult = ItemSchema.safeParse(item);
-      if (!validationResult.success) {
-        logger.warn("Item validation failed:", validationResult.error);
-        return null;
-      }
-      return validationResult.data;
-    })
-    .filter((item): item is ItemSchemaType => {
-      return item !== null && item.imageUrl !== imageUrl;
+  if (uuids.length === 0) {
+    return {
+      error: false,
+      items: [],
+    };
+  }
+
+  // Obtener items de PostgreSQL manteniendo el orden
+  const items = await prisma.item.findMany({
+    where: {
+      id: {
+        in: uuids,
+      },
+    },
+    include: {
+      files: true, // Incluir la imagen del item
+    },
+  });
+
+  // Crear un mapa para mantener el orden de Weaviate
+  const uuidOrderMap = new Map();
+  uuids.forEach((uuid, index) => {
+    uuidOrderMap.set(uuid, index);
+  });
+
+  // Mapear y ordenar los items según el orden de Weaviate
+  const orderedItems: ItemSchemaType[] = items
+    .map(item => ({
+      name: item.name,
+      description: item.description,
+      image: {
+        url: item.files.url,
+        updatedAt: item.files.updatedAt.toISOString(),
+      },
+      url: item.url,
+      brandId: item.brandId,
+      price: item.price,
+      uuid: item.id,
+    }))
+    .filter(item => item.image.url !== imageUrl)
+    .sort((a, b) => {
+      const orderA = uuidOrderMap.get(a.uuid) ?? Number.MAX_SAFE_INTEGER;
+      const orderB = uuidOrderMap.get(b.uuid) ?? Number.MAX_SAFE_INTEGER;
+      return orderA - orderB;
     });
 
   return {
     error: false,
-    items: items,
+    items: orderedItems,
   };
 }
 

@@ -18,7 +18,14 @@ export async function GetBrandById(
   if (!brand) {
     return null;
   }
-  return { ...brand, id: id, logoUrl: brand.files?.url };
+  return {
+    ...brand,
+    id: id,
+    logo: {
+      url: brand.files?.url,
+      updatedAt: brand.files?.updatedAt.toISOString(),
+    },
+  };
 }
 
 export async function GetBrandId(brandEmail: string): Promise<string | null> {

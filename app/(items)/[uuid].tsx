@@ -81,7 +81,7 @@ const ItemDetail = () => {
   const content = (
     <>
       <View className="relative">
-        <ImageComplete imageUrl={item.imageUrl} url={item.url} />
+        <ImageComplete imageUrl={item.image.url} url={item.url} />
       </View>
 
       <View className="px-5 flex flex-col gap-6">
@@ -138,7 +138,7 @@ const ItemDetail = () => {
               page,
               limit,
               itemEmbeddingData?.embedding || [],
-              item.imageUrl
+              item.image.url
             )
           }
           limit={6}
@@ -153,7 +153,7 @@ const ItemDetail = () => {
             name: item.name,
             price: item.price.toString(),
             url: item.url,
-            imageUrl: item.imageUrl,
+            imageUrl: item.image.url,
             description: item.description,
           }}
           itemUuid={decodedUuid}
@@ -217,7 +217,7 @@ const ItemDetailComponent = ({
         activeOpacity={0.7}
       >
         <Image
-          source={{ uri: brand?.logoUrl }}
+          source={{ uri: brand?.logo.url }}
           className="w-6 h-6 rounded-full"
         />
         <Text className="text-white text-xl font-plight">{brand?.name}</Text>

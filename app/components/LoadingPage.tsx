@@ -39,9 +39,9 @@ function LoadingPage({
   if (user && user.emailVerified && !alreadyPrefetched) {
     console.log("Prefetching user", user.email);
     prefetchHome(queryClient, user.email);
-    prefetchProfile(user, queryClient);
-    prefetchLikeAndFavoritePage(queryClient, user.email);
-    prefetchExplorePage(queryClient);
+    // prefetchProfile(user, queryClient);
+    // prefetchLikeAndFavoritePage(queryClient, user.email);
+    // prefetchExplorePage(queryClient);
   }
 
   const spin = spinValue.interpolate({

@@ -38,16 +38,13 @@ export default function App() {
   }
 
   if (loading || !timeout) {
-    console.log("Index: Loading or timeout");
-    console.log("Index: User", user);
     if (user && user.emailVerified && !hasPrefetched) {
       // Solo ejecutar prefetch para usuarios existentes
-      console.log("Index: Prefetching user", user.email);
       setTimeout(() => {
         prefetchHome(queryClient, user.email);
-        prefetchProfile(user, queryClient);
-        prefetchLikeAndFavoritePage(queryClient, user.email);
-        prefetchExplorePage(queryClient);
+        // prefetchProfile(user, queryClient);
+        // prefetchLikeAndFavoritePage(queryClient, user.email);
+        // prefetchExplorePage(queryClient);
         setHasPrefetched(true);
       }, 100);
     }

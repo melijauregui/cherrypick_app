@@ -262,7 +262,7 @@ const prepareColumns = async (
     const itemsWithSizes = await Promise.all(
       items.map(async item => {
         try {
-          const size = await getImageSize(item.imageUrl);
+          const size = await getImageSize(item.image.url);
           const width = size?.width || 1;
           const height = size?.height || 1;
           const scale = widthDetermined / width;

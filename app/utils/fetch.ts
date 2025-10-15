@@ -187,15 +187,16 @@ export async function getSelfClientProfile(): Promise<ClientSchemaType | null> {
 
 export async function getSelfBrandItems(
   page: number,
-  limit: number
+  limit: number,
+  search?: string
 ): Promise<ItemSchemaType[]> {
-  // console.log("getSelfBrandItems", page, limit);
+  console.log("getSelfBrandItems", page, limit, search);
   const res = await handleApiResponse<{
     items: ItemSchemaType[];
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/brand/all-items?page=${page}&limit=${limit}`,
+        url: `http://${LOCAL_IP}:3000/brand/all-items?page=${page}&limit=${limit}${search ? `&filter=${search}` : ""}`,
         method: "GET",
       }),
     CatalogResponseSchema,
@@ -222,26 +223,6 @@ export async function getClothingItemsHome(
   );
   return res?.items || [];
 }
-
-export const getItemsUuidNames = async (
-  search: string,
-  page: number
-): Promise<UuidNameSchemaType[]> => {
-  console.log("getItemsUuidNames", search, page);
-  const limit = 10;
-  const res = await handleApiResponse<{
-    data: UuidNameSchemaType[];
-  }>(
-    () =>
-      safeFetch({
-        url: `http://${LOCAL_IP}:3000/brand/all-names-items?filter=${search}&page=${page}&limit=${limit}`,
-        method: "GET",
-      }),
-    UuidNameResponseSchema,
-    "getItemsUuidNames"
-  );
-  return res?.data || [];
-};
 
 export const getAllBrands = async (
   search: string,

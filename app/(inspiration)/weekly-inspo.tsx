@@ -64,7 +64,8 @@ export default function WeeklyInspo() {
     <SafeAreaView className="flex-1 bg-brown-strong">
       <View className="absolute top-0 left-0 right-0 bottom-0">
         <ImageBackgroundComponent>
-          <View className="absolute top-0 left-0 right-0 z-10 bg-black/40 px-6 pt-20 pb-4"
+          <View
+            className="absolute top-0 left-0 right-0 z-10 bg-black/40 px-6 pt-20 pb-4"
             onLayout={e => setHeaderHeight(e.nativeEvent.layout.height)}
           >
             <View className="flex-row items-center justify-between mb-2">
@@ -164,7 +165,7 @@ const ProductCard = ({ itemId }: { itemId: string }) => {
       <View className="flex-col items-center gap-2">
         <View className="relative">
           <Image
-            source={{ uri: item.imageUrl }}
+            source={{ uri: item.image.url }}
             className="w-24 h-36 rounded-lg"
             resizeMode="cover"
           />

@@ -59,10 +59,9 @@ const paginatedRoute = createRoute({
 FeedApp.openapi(paginatedRoute, async c => {
   const { page, limit } = c.req.valid("query");
   logger.info("/GET feed page: %s limit: %s", page, limit);
-  const embedding = Array(768).fill(0.5);
   let res: CatalogResponseSchemaType | ErrorSchemaType;
 
-  const result = await GetCatalog(embedding, page, limit, undefined);
+  const result = await GetCatalog(page, limit, undefined, undefined);
 
   if (result.error) {
     res = {

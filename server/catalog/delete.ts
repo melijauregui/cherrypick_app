@@ -11,6 +11,28 @@ export async function DeleteFromWeaviate(
   brandId: string
 ): Promise<SuccessSchemaType | ErrorSchemaType> {
   try {
+    // 1. Primero obtener los UUIDs de los items a eliminar desde PostgreSQL
+    const items = await db.item.findMany({
+      where: {
+        brandId: brandId,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    const itemsUuids = items.map(item => item.id);
+
+    if (itemsUuids.length === 0) {
+      return {
+        error: false,
+      };
+    }
+
+    // 2. Eliminar de PostgreSQL (cascade eliminará likes y favorites)
+    await deleteFromDatabase(itemsUuids);
+
+    // 3. Eliminar de Weaviate usando los UUIDs obtenidos
     const collectionRes = await getCollection();
     if (collectionRes.error) {
       return {
@@ -19,41 +41,34 @@ export async function DeleteFromWeaviate(
       };
     }
     const collection = collectionRes.collection;
-    console.log("brandId", brandId);
-    const res = await collection.data.deleteMany(
-      collection.filter.byProperty("brandId").equal(brandId),
-      { verbose: true }
-    );
 
-    const itemsUuids = res.objects.map(obj => obj.id);
-
-    await deleteFromDatabase(itemsUuids);
+    // Eliminar de Weaviate usando los UUIDs
+    for (const uuid of itemsUuids) {
+      try {
+        await collection.data.deleteById(uuid);
+      } catch (error) {
+        console.warn(`Failed to delete ${uuid} from Weaviate:`, error);
+        // Continuar con los demás aunque falle uno
+      }
+    }
 
     return {
       error: false,
     };
   } catch (error) {
-    console.error("Error deleting from Weaviate:", error);
+    console.error("Error deleting items:", error);
     return {
       error: true,
-      details: `Error deleting from Weaviate: ${error}`,
+      details: `Error deleting items: ${error}`,
     };
   }
 }
 
 async function deleteFromDatabase(itemsUuids: string[]) {
-  // Delete from likes and favorites tables for both clients and brands using Prisma
-  await db.itemLike.deleteMany({
+  // Delete from items table - cascade will handle likes and favorites
+  await db.item.deleteMany({
     where: {
-      itemUuid: {
-        in: itemsUuids,
-      },
-    },
-  });
-
-  await db.itemFavorite.deleteMany({
-    where: {
-      itemUuid: {
+      id: {
         in: itemsUuids,
       },
     },
@@ -139,13 +154,9 @@ export async function DeleteFromCatalog(
   for (const itemUuid of itemsUuids) {
     if (!itemUuid) continue; // Skip empty lines
   }
+  await deleteFromDatabase(itemsUuids);
 
   res = await deleteCatalogItemsFromWeaviate(itemsUuids, collection, brandId);
 
-  if (res.error) {
-    return res;
-  }
-
-  await deleteFromDatabase(itemsUuids);
   return res;
 }

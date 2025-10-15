@@ -15,7 +15,7 @@ import { LOCAL_IP } from "@/config/api";
 import Toast from "react-native-toast-message";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import safeFetch from "@/app/utils/safe-fetch";
-import { PropertiesItemSchema } from "@/schemas/catalog/catalog-schema";
+import { MinimumPropertiesItemSchema } from "@/schemas/catalog/catalog-schema";
 import InputBoxWithName from "./inputBox";
 import { FormDataItem, FormErrors, useUpdateItem } from "@/app/utils/update";
 
@@ -303,7 +303,7 @@ function useInsertItem(
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: async (data: { formData: FormDataItem }) => {
-      const result = PropertiesItemSchema.safeParse({
+      const result = MinimumPropertiesItemSchema.safeParse({
         ...data.formData,
       });
       if (!result.success) {

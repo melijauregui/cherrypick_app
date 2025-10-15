@@ -10,125 +10,60 @@ import weaviate, { Collection, Filters } from "weaviate-client";
 import { ErrorSchemaType } from "@/schemas/standar-response-schema";
 import { config } from "../../config";
 import logger from "../logger";
+import { prisma } from "../db";
 
-//funcion para hacer query a pinecone
+//funcion para obtener items de PostgreSQL
 export async function GetCatalog(
-  queryVector: number[],
   page: number,
   limit: number,
-  brandId: string | undefined
+  brandId: string | undefined,
+  filter?: string
 ): Promise<{ items: ItemSchemaType[]; error: boolean }> {
   try {
-    const resCollection = await getCollection();
-    if (resCollection.error) {
-      throw new Error(resCollection.details);
+    const offset = page * limit;
+
+    // Construir filtros para PostgreSQL
+    let whereClause: any = {};
+
+    if (brandId) {
+      whereClause.brandId = brandId;
     }
-    const collection = resCollection.collection;
 
-    const filters = collection.filter.byProperty("brandId").equal(brandId);
+    // Agregar filtro por nombre si se proporciona
+    if (filter && filter.trim() !== "") {
+      whereClause.name = {
+        contains: filter,
+        mode: "insensitive", // Búsqueda case-insensitive
+      };
+    }
 
-    let offset = page * limit;
-    const queryOptions: any = {
-      filters: brandId ? filters : undefined,
-      limit: limit,
-      offset: offset,
-      returnProperties: [
-        "name",
-        "description",
-        "imageUrl",
-        "url",
-        "brandId",
-        "price",
-      ],
-    };
-    const result = await collection.query.fetchObjects(queryOptions);
-    const topResults: ItemSchemaType[] = result.objects
-      .map(match => {
-        const item = {
-          name: match.properties?.name || "",
-          description: match.properties?.description || "",
-          imageUrl: match.properties?.imageUrl || "",
-          url: match.properties?.url || "",
-          brandId: match.properties?.brandId || "",
-          price: match.properties?.price || 0,
-          uuid: match.uuid || "",
-        };
+    const items = await prisma.item.findMany({
+      where: whereClause,
+      skip: offset,
+      take: limit,
+      include: {
+        files: true, // Incluir información del archivo de imagen
+      },
+    });
 
-        // Validar el item usando Zod schema
-        const validationResult = ItemSchema.safeParse(item);
-        if (!validationResult.success) {
-          logger.warn("Item validation failed:", validationResult.error);
-          return null;
-        }
-        return validationResult.data;
-      })
-      .filter((item): item is ItemSchemaType => item !== null);
+    const topResults: ItemSchemaType[] = items.map(item => ({
+      name: item.name,
+      description: item.description,
+      image: {
+        url: item.files.url,
+        updatedAt: item.files.updatedAt.toISOString(),
+      },
+      url: item.url,
+      brandId: item.brandId,
+      price: item.price,
+      uuid: item.id,
+    }));
 
     return { items: topResults, error: false };
   } catch (error) {
-    console.error("Error querying Weaviate:", error);
+    console.error("Error querying PostgreSQL:", error);
     return { items: [], error: true };
   }
-}
-
-export async function GetItemsUuidNamesFromBrand(
-  brandId: string,
-  filter?: string,
-  page: number = 0,
-  limit: number = 10
-): Promise<UuidNameResponseSchemaType | ErrorSchemaType> {
-  const resCollection = await getCollection();
-  if (resCollection.error) {
-    return {
-      error: true,
-      details: "Error getting collection: " + resCollection.details,
-    };
-  }
-  const collection = resCollection.collection;
-
-  let filters = collection.filter.byProperty("brandId").equal(brandId);
-
-  // Add filter for name search if provided
-  if (filter && filter.trim() !== "") {
-    filters = Filters.and(
-      filters,
-      collection.filter.byProperty("name").like(`*${filter}*`)
-    );
-  }
-
-  const offset = page * limit;
-  const queryOptions: any = {
-    filters: filters,
-    limit: limit,
-    offset: offset,
-    returnProperties: ["name"],
-    // sort: [
-    //   {
-    //     path: ["name"],
-    //     order: "asc",
-    //   },
-    // ],
-  };
-  const result = await collection.query.fetchObjects(queryOptions);
-
-  const topResults: UuidNameSchemaType[] = result.objects
-    .map(match => {
-      const validationResult = UuidNameSchema.safeParse({
-        name: match.properties?.name || "",
-        uuid: match.uuid || "",
-      });
-      if (!validationResult.success) {
-        console.log("Item validation failed:", validationResult.error);
-        return null;
-      }
-      return validationResult.data;
-    })
-    .filter((item): item is UuidNameSchemaType => item !== null);
-
-  return {
-    error: false,
-    data: topResults,
-  };
 }
 
 // Función para extraer características de imagen desde URL
@@ -342,12 +277,6 @@ export async function getPreferencesSimilarities(image_url: string): Promise<{
   }
 }
 
-type TextImageMatchResult = {
-  image_url: string;
-  similarity: number;
-  [key: string]: any;
-};
-
 export async function searchText(
   text: string,
   image_urls: string[]
@@ -410,14 +339,6 @@ export async function getCollection(): Promise<
     if (!exists) {
       collection = (await client.collections.create({
         name: "FashionItem",
-        properties: [
-          { name: "name", dataType: "text" },
-          { name: "brandId", dataType: "text" },
-          { name: "description", dataType: "text" },
-          { name: "price", dataType: "number" },
-          { name: "imageUrl", dataType: "text" },
-          { name: "url", dataType: "text" },
-        ],
         vectorizers: [
           weaviate.configure.vectors.selfProvided({ name: "image_vector" }),
           weaviate.configure.vectors.selfProvided({ name: "text_vector" }),
@@ -476,76 +397,3 @@ export const Preferences = {
 export const preferencesRepr: string[] = Object.values(Preferences).map(
   pref => pref.searchName
 ); // ["minimalista", "boho chic", ...]
-
-export async function GetItemsFromWeaviate(
-  uuids: string[],
-  limit: number
-): Promise<CatalogResponseSchemaType | ErrorSchemaType> {
-  const resCollection = await getCollection();
-  if (resCollection.error) {
-    return {
-      error: true,
-      details: resCollection.details || "Error getting collection",
-    };
-  }
-  const collection = resCollection.collection;
-
-  const filters = collection.filter.byId().containsAny(uuids);
-
-  const queryOptions: any = {
-    filters: filters,
-    limit: limit,
-    returnProperties: [
-      "name",
-      "description",
-      "imageUrl",
-      "url",
-      "brandId",
-      "price",
-    ],
-  };
-
-  const result = await collection.query.fetchObjects(queryOptions);
-
-  if (result.objects.length === 0) {
-    return {
-      error: true,
-      details: "Items not found",
-    };
-  }
-
-  // Crear un mapa para mantener el orden original de los UUIDs
-  const uuidOrderMap = new Map();
-  uuids.forEach((uuid, index) => {
-    uuidOrderMap.set(uuid, index);
-  });
-
-  const items = result.objects
-    .map(obj => {
-      const item = {
-        name: obj.properties?.name || "",
-        description: obj.properties?.description || "",
-        imageUrl: obj.properties?.imageUrl || "",
-        url: obj.properties?.url || "",
-        brandId: obj.properties?.brandId || "",
-        price: obj.properties?.price || 0,
-        uuid: obj.uuid || "",
-      };
-      const validationResult = ItemSchema.safeParse(item);
-      if (!validationResult.success) {
-        console.log("Item validation failed:", validationResult.error);
-        return null;
-      }
-      return validationResult.data;
-    })
-    .filter((item): item is ItemSchemaType => item !== null)
-    .sort((a, b) => {
-      const orderA = uuidOrderMap.get(a.uuid) ?? Number.MAX_SAFE_INTEGER;
-      const orderB = uuidOrderMap.get(b.uuid) ?? Number.MAX_SAFE_INTEGER;
-      return orderA - orderB;
-    });
-  return {
-    error: false,
-    items: items,
-  };
-}

@@ -10,21 +10,19 @@ export const UpdateBrandSchema = z.object({
 });
 export type UpdateBrandSchemaType = z.infer<typeof UpdateBrandSchema>;
 
-export const BrandSchema = z.object({
-  ...UpdateBrandSchema.shape,
+export const BrandSchema = UpdateBrandSchema.extend({
   id: z.string().describe("ID de la marca"),
   name: z.string().describe("Nombre de la marca"),
-  logoUrl: z
-    .string({ required_error: "URL del logo de la marca es requerida" })
-    .url({ message: "URL del logo de la marca debe ser una URL válida" })
-    .describe("URL del logo de la marca"),
+  logo: z
+    .object({
+      url: z
+        .string({ required_error: "URL del logo de la marca es requerida" })
+        .url({ message: "URL del logo de la marca debe ser una URL válida" }),
+      updatedAt: z.string(),
+    })
+    .describe("Logo de la marca"),
 });
 export type BrandSchemaType = z.infer<typeof BrandSchema>;
-
-// export const BrandSchema = z.object({
-//   ...BrandSchemaProperties.shape,
-// });
-// export type BrandSchemaType = z.infer<typeof BrandSchema>;
 
 export const BrandSchemaResponse = z.object({
   ...SuccessSchema.shape,

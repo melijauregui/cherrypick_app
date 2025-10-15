@@ -97,7 +97,7 @@ const BrandProfile = ({
           <InsertNewItemsModal
             bottomSheetRef={bottomSheetRefAddItem}
             onSubmit={handleSubmitAddItem}
-            brandEmail={data.brand.email}
+            brandEmail={user.email}
             formDataLastValue={{
               name: "",
               price: "",
@@ -238,10 +238,10 @@ const BrandDetails = ({
   return (
     <View className="flex flex-col w-full">
       <View className="flex flex-row  w-full py-4 gap-5">
-        {brand.logoUrl ? (
+        {brand.logo.url ? (
           <Image
             source={{
-              uri: brand.logoUrl,
+              uri: brand.logo.url,
             }}
             className="w-32 h-32 rounded-full"
             resizeMode="contain"

@@ -33,7 +33,7 @@ import {
   UuidNameResponseSchema,
   UuidNameResponseSchemaType,
 } from "@/schemas/catalog/catalog-schema";
-import { GetCatalog, GetItemsUuidNamesFromBrand } from "../catalog/functions";
+import { GetCatalog } from "../catalog/functions";
 import { UpdateCatalog } from "../catalog/insert";
 import { DeleteFromCatalog } from "../catalog/delete";
 import { QueryEmailSchema } from "@/schemas/standar-query-schema";
@@ -233,7 +233,7 @@ const paginatedRouteBrand = createRoute({
   method: "get",
   path: "/all-items",
   request: {
-    query: PaginationSchema,
+    query: PaginationFilterSchema,
     required: true,
   },
   responses: {
@@ -273,10 +273,13 @@ const paginatedRouteBrand = createRoute({
   },
 });
 BrandApp.openapi(paginatedRouteBrand, async c => {
-  const { page, limit } = c.req.valid("query");
-  console.log("page", page);
-  console.log("limit", limit);
-  logger.info("/GET brand/all-items page: %s limit: %s", page, limit);
+  const { page, limit, filter } = c.req.valid("query");
+  logger.info(
+    "/GET brand/all-items page: %s limit: %s filter: %s",
+    page,
+    limit,
+    filter
+  );
   let res: CatalogResponseSchemaType | ErrorSchemaType;
   const user = c.get("user");
   const brandId = user?.id;
@@ -288,9 +291,7 @@ BrandApp.openapi(paginatedRouteBrand, async c => {
     return c.json(res, 401);
   }
 
-  const embedding = Array(768).fill(0.5);
-
-  const result = await GetCatalog(embedding, page, limit, brandId);
+  const result = await GetCatalog(page, limit, brandId, filter);
 
   if (result.error) {
     res = {
@@ -304,77 +305,6 @@ BrandApp.openapi(paginatedRouteBrand, async c => {
     error: false,
     items: result.items,
   };
-  return c.json(res, 200);
-});
-
-// endpoint que devuelve todos los nombres de los items de una marca
-const allBrandItemsRoute = createRoute({
-  method: "get",
-  path: "/all-names-items",
-  request: {
-    query: PaginationFilterSchema,
-  },
-  responses: {
-    200: {
-      content: {
-        "application/json": {
-          schema: UuidNameResponseSchema,
-        },
-      },
-      description: "Devuelve los nombres de los items de una marca",
-    },
-    401: {
-      content: {
-        "application/json": {
-          schema: ErrorSchema,
-        },
-      },
-      description:
-        "No tienes permisos para obtener los nombres de los items de una marca",
-    },
-    404: {
-      content: {
-        "application/json": {
-          schema: ErrorSchema,
-        },
-      },
-      description: "Marca no encontrada",
-    },
-    500: {
-      content: {
-        "application/json": {
-          schema: ErrorSchema,
-        },
-      },
-      description: "Error interno del servidor",
-    },
-  },
-});
-BrandApp.openapi(allBrandItemsRoute, async c => {
-  const { filter, page = 0, limit = 10 } = c.req.valid("query");
-  logger.info(
-    "/GET brand/all-names-items filter: %s page: %s limit: %s",
-    filter,
-    page,
-    limit
-  );
-  let res: UuidNameResponseSchemaType | ErrorSchemaType;
-  const user = c.get("user");
-  const brandId = user?.id;
-
-  if (!brandId) {
-    res = {
-      error: true,
-      details:
-        "No tienes permisos para obtener los nombres de los items de una marca",
-    };
-    return c.json(res, 401);
-  }
-
-  res = await GetItemsUuidNamesFromBrand(brandId, filter, page, limit);
-  if (res.error) {
-    return c.json(res, 500);
-  }
   return c.json(res, 200);
 });
 
@@ -470,9 +400,7 @@ BrandApp.openapi(paginatedRouteBrandWithId, async c => {
     return c.json(res, 404);
   }
 
-  const embedding = Array(768).fill(0.5);
-
-  const items = await GetCatalog(embedding, page, limit, id);
+  const items = await GetCatalog(page, limit, id);
 
   res = {
     error: false,
@@ -664,9 +592,9 @@ BrandApp.openapi(deleteCatalogRoute, async c => {
   const { items } = c.req.valid("json");
   logger.info("/POST brand/delete-items items: %s", items);
   const user = c.get("user");
-  const brandEmail = user?.email;
+  const brandId = user?.id;
   let res: DeleteItemsResponseSchemaType | ErrorSchemaType;
-  if (!brandEmail) {
+  if (!brandId) {
     res = {
       error: true,
       details: "No tienes permisos para actualizar este item",
@@ -677,15 +605,6 @@ BrandApp.openapi(deleteCatalogRoute, async c => {
   // Extraer los ids de los items del array de objetos
   const itemsUuids = items.map(item => item.id);
 
-  //verifico que la marca exista en la base de datos
-  const brandId = await GetBrandId(brandEmail);
-  if (!brandId) {
-    res = {
-      error: true,
-      details: "Marca no encontrada",
-    };
-    return c.json(res, 404);
-  }
   res = await DeleteFromCatalog(itemsUuids, brandId);
   if (res.error) {
     return c.json(res, 500);

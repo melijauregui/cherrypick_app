@@ -1,32 +1,25 @@
 import {
-  PropertiesItemSchema,
-  PropertiesItemSchemaType,
+  CreateItemSchema,
+  CreateItemSchemaType,
 } from "@/schemas/catalog/catalog-schema";
 import { Collection, Filters } from "weaviate-client";
-import {
-  getCollection,
-  PreferencesSimilaritiesResult,
-  extractFeatures,
-} from "./functions";
+import { getCollection, extractFeatures } from "./functions";
 import {
   ErrorSchemaType,
   SuccessSchemaType,
 } from "@/schemas/standar-response-schema";
+import { prisma } from "../db";
+import { getFileUrl } from "../file-uploader";
 
 // Función para validar items JSON
-async function validateJsonItems(
-  items: PropertiesItemSchemaType[],
-  collection: Collection,
-  brandId: string,
-  includeDuplicates = false
-): Promise<
+async function validateJsonItems(items: CreateItemSchemaType[]): Promise<
   | {
       error: true;
       details: string;
     }
   | {
       error: false;
-      catalogItems: PropertiesItemSchemaType[];
+      catalogItems: CreateItemSchemaType[];
     }
 > {
   if (!Array.isArray(items) || items.length === 0) {
@@ -36,41 +29,22 @@ async function validateJsonItems(
     };
   }
   const invalidRows: number[] = [];
-  const duplicateRows: number[] = [];
-  const validItems: PropertiesItemSchemaType[] = [];
+  const validItems: CreateItemSchemaType[] = [];
   for (let i = 0; i < items.length; i++) {
     const item = { ...items[i] };
     try {
-      const validatedItem = PropertiesItemSchema.parse(item);
-      // Check if item already exists in Weaviate with same name and brand
-      if (includeDuplicates) {
-        await deleteIfDuplicateInWeaviate(
-          collection,
-          validatedItem.name,
-          brandId
-        );
-      } else {
-        const isDuplicate = await checkDuplicateInWeaviate(
-          collection,
-          validatedItem.name,
-          brandId
-        );
-        if (isDuplicate) {
-          duplicateRows.push(i + 1);
-          continue;
-        }
-      }
+      const validatedItem = CreateItemSchema.parse(item);
       validItems.push(validatedItem);
     } catch (error) {
-      console.log("error", error);
+      console.error("error", error);
       invalidRows.push(i + 1);
     }
   }
-  if (invalidRows.length > 0 || duplicateRows.length > 0) {
+  if (invalidRows.length > 0) {
     const rowNumbers = invalidRows.join(",");
     return {
       error: true,
-      details: `ítem(s) [${rowNumbers}] mal formados y ítem(s) [${duplicateRows}] duplicados`,
+      details: `ítem(s) [${rowNumbers}] mal formados`,
     };
   }
   return {
@@ -79,9 +53,9 @@ async function validateJsonItems(
   };
 }
 
-// Función para insertar items del catálogo en Pinecone
-export async function insertCatalogItemsToWeaviate(
-  catalogItems: PropertiesItemSchemaType[],
+// Función para insertar items del catálogo en PostgreSQL y Weaviate
+export async function insertCatalogItems(
+  catalogItems: CreateItemSchemaType[],
   brandId: string,
   collection: Collection
 ): Promise<{
@@ -92,124 +66,67 @@ export async function insertCatalogItemsToWeaviate(
   const errors: string[] = [];
   let insertedCount = 0;
 
-  try {
-    for (const item of catalogItems) {
-      try {
-        const featuresResult = await extractFeatures(
-          item.description,
-          item.imageUrl
+  for (const item of catalogItems) {
+    try {
+      //obtengo el url del imageId
+      const image = await getFileUrl(item.imageId);
+      // 1. Primero extraer características para validar que la imagen es válida
+      const featuresResult = await extractFeatures(item.description, image.url);
+
+      if (
+        featuresResult.error ||
+        featuresResult.features.image_features.length === 0 ||
+        featuresResult.features.text_features.length === 0
+      ) {
+        throw new Error(
+          "No se pudieron extraer características de la imagen o el texto"
         );
-
-        if (
-          featuresResult.error ||
-          featuresResult.features.image_features.length === 0 ||
-          featuresResult.features.text_features.length === 0
-        ) {
-          throw new Error(
-            "No se pudieron extraer características de la imagen o el texto"
-          );
-        }
-
-        const itemData = {
-          ...item,
-          brandId,
-        };
-
-        const result = await collection.data.insert({
-          properties: {
-            ...itemData,
-          },
-          vectors: {
-            image_vector: featuresResult.features.image_features,
-            text_vector: featuresResult.features.text_features,
-          },
-        });
-        insertedCount++;
-      } catch (error) {
-        const errorMsg = `Error processing item ${item.name}: ${error}`;
-        console.error(errorMsg);
-        errors.push(errorMsg);
       }
+
+      // 3. Insertar el item en PostgreSQL
+      const dbItem = await prisma.item.create({
+        data: {
+          ...(item.uuid && { id: item.uuid }), // Solo incluir id si item.uuid está definido
+          name: item.name,
+          description: item.description,
+          price: Math.round(item.price * 100), // Convertir a centavos
+          url: item.url,
+          brandId: brandId,
+          imageId: item.imageId,
+        },
+      });
+
+      await collection.data.insert({
+        id: dbItem.id, // Usar el UUID de PostgreSQL
+        vectors: {
+          image_vector: featuresResult.features.image_features,
+          text_vector: featuresResult.features.text_features,
+        },
+      });
+
+      console.log(`Item inserted with UUID: ${dbItem.id}`);
+      insertedCount++;
+    } catch (error) {
+      const errorMsg = `Error processing item ${item.name}: ${error}`;
+      console.error(errorMsg);
+      errors.push(errorMsg);
     }
-
-    console.log(
-      `Insertion completed. ${insertedCount} vectors inserted, ${errors.length} errors.`
-    );
-
-    return {
-      success: errors.length === 0,
-      insertedCount,
-      errors,
-    };
-  } catch (error) {
-    console.error("Error in insertCatalogItemsToWeaviate:", error);
-    return {
-      success: false,
-      insertedCount: 0,
-      errors: [`General error: ${error}`],
-    };
   }
-}
 
-function getPreferenceScore(
-  similarities: PreferencesSimilaritiesResult[],
-  pref: string
-): number {
-  return similarities.find(s => s.preference === pref)?.similarity ?? 0;
-}
+  console.log(
+    `Insertion completed. ${insertedCount} items inserted in PostgreSQL and Weaviate, ${errors.length} errors.`
+  );
 
-export async function deleteIfDuplicateInWeaviate(
-  collection: Collection,
-  name: string,
-  brandId: string
-) {
-  const result = await collection.query.fetchObjects({
-    filters: Filters.and(
-      collection.filter.byProperty("name").equal(name),
-      collection.filter.byProperty("brandId").equal(brandId)
-    ),
-    limit: 1,
-  });
-
-  let exists = result.objects.length > 0;
-
-  if (exists && result.objects[0]) {
-    const id = result.objects[0].uuid;
-    console.log(
-      "check duplicate in weaviate for",
-      name,
-      brandId,
-      id,
-      "is",
-      exists
-    );
-    await collection.data.deleteById(id);
-    console.log("deleted duplicate with id", id);
-  }
-}
-
-export async function checkDuplicateInWeaviate(
-  collection: Collection,
-  name: string,
-  brandId: string
-): Promise<boolean> {
-  const result = await collection.query.fetchObjects({
-    filters: Filters.and(
-      collection.filter.byProperty("name").equal(name),
-      collection.filter.byProperty("brandId").equal(brandId)
-    ),
-    limit: 1,
-  });
-
-  const exists = result.objects.length > 0;
-  console.log("check duplicate in weaviate for", name, brandId, "is", exists);
-
-  return exists;
+  return {
+    success: errors.length === 0,
+    insertedCount,
+    errors,
+  };
 }
 
 // Cambiado para aceptar items JSON
 export async function UpdateCatalog(
-  items: PropertiesItemSchemaType[],
+  items: CreateItemSchemaType[],
   brandId: string
 ): Promise<SuccessSchemaType | ErrorSchemaType> {
   let res: SuccessSchemaType | ErrorSchemaType;
@@ -227,18 +144,13 @@ export async function UpdateCatalog(
   );
   //await clearCollection(collection, brandId); //solo para testing
 
-  const validationResult = await validateJsonItems(
-    items,
-    collection,
-    brandId,
-    true
-  );
+  const validationResult = await validateJsonItems(items);
   if (validationResult.error) {
     res = validationResult;
     return res;
   }
 
-  const weaviateResult = await insertCatalogItemsToWeaviate(
+  const weaviateResult = await insertCatalogItems(
     validationResult.catalogItems,
     brandId,
     collection

@@ -1975,6 +1975,55 @@ export namespace Prisma {
 
 
   /**
+   * Count Type ItemCountOutputType
+   */
+
+  export type ItemCountOutputType = {
+    favorites: number
+    likes: number
+    inspoItems: number
+  }
+
+  export type ItemCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    favorites?: boolean | ItemCountOutputTypeCountFavoritesArgs
+    likes?: boolean | ItemCountOutputTypeCountLikesArgs
+    inspoItems?: boolean | ItemCountOutputTypeCountInspoItemsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * ItemCountOutputType without action
+   */
+  export type ItemCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ItemCountOutputType
+     */
+    select?: ItemCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * ItemCountOutputType without action
+   */
+  export type ItemCountOutputTypeCountFavoritesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ItemFavoriteWhereInput
+  }
+
+  /**
+   * ItemCountOutputType without action
+   */
+  export type ItemCountOutputTypeCountLikesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ItemLikeWhereInput
+  }
+
+  /**
+   * ItemCountOutputType without action
+   */
+  export type ItemCountOutputTypeCountInspoItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: InspoItemsWhereInput
+  }
+
+
+  /**
    * Count Type FilesCountOutputType
    */
 
@@ -4388,6 +4437,7 @@ export namespace Prisma {
     itemUuid?: boolean
     createdAt?: boolean
     user?: boolean | userDefaultArgs<ExtArgs>
+    item?: boolean | ItemDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["itemFavorite"]>
 
   export type ItemFavoriteSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -4396,6 +4446,7 @@ export namespace Prisma {
     itemUuid?: boolean
     createdAt?: boolean
     user?: boolean | userDefaultArgs<ExtArgs>
+    item?: boolean | ItemDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["itemFavorite"]>
 
   export type ItemFavoriteSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -4404,6 +4455,7 @@ export namespace Prisma {
     itemUuid?: boolean
     createdAt?: boolean
     user?: boolean | userDefaultArgs<ExtArgs>
+    item?: boolean | ItemDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["itemFavorite"]>
 
   export type ItemFavoriteSelectScalar = {
@@ -4416,18 +4468,22 @@ export namespace Prisma {
   export type ItemFavoriteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "itemUuid" | "createdAt", ExtArgs["result"]["itemFavorite"]>
   export type ItemFavoriteInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | userDefaultArgs<ExtArgs>
+    item?: boolean | ItemDefaultArgs<ExtArgs>
   }
   export type ItemFavoriteIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | userDefaultArgs<ExtArgs>
+    item?: boolean | ItemDefaultArgs<ExtArgs>
   }
   export type ItemFavoriteIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | userDefaultArgs<ExtArgs>
+    item?: boolean | ItemDefaultArgs<ExtArgs>
   }
 
   export type $ItemFavoritePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "ItemFavorite"
     objects: {
       user: Prisma.$userPayload<ExtArgs>
+      item: Prisma.$ItemPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -4829,6 +4885,7 @@ export namespace Prisma {
   export interface Prisma__ItemFavoriteClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends userDefaultArgs<ExtArgs> = {}>(args?: Subset<T, userDefaultArgs<ExtArgs>>): Prisma__userClient<$Result.GetResult<Prisma.$userPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    item<T extends ItemDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ItemDefaultArgs<ExtArgs>>): Prisma__ItemClient<$Result.GetResult<Prisma.$ItemPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5433,6 +5490,7 @@ export namespace Prisma {
     itemUuid?: boolean
     createdAt?: boolean
     user?: boolean | userDefaultArgs<ExtArgs>
+    item?: boolean | ItemDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["itemLike"]>
 
   export type ItemLikeSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -5441,6 +5499,7 @@ export namespace Prisma {
     itemUuid?: boolean
     createdAt?: boolean
     user?: boolean | userDefaultArgs<ExtArgs>
+    item?: boolean | ItemDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["itemLike"]>
 
   export type ItemLikeSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -5449,6 +5508,7 @@ export namespace Prisma {
     itemUuid?: boolean
     createdAt?: boolean
     user?: boolean | userDefaultArgs<ExtArgs>
+    item?: boolean | ItemDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["itemLike"]>
 
   export type ItemLikeSelectScalar = {
@@ -5461,18 +5521,22 @@ export namespace Prisma {
   export type ItemLikeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "itemUuid" | "createdAt", ExtArgs["result"]["itemLike"]>
   export type ItemLikeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | userDefaultArgs<ExtArgs>
+    item?: boolean | ItemDefaultArgs<ExtArgs>
   }
   export type ItemLikeIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | userDefaultArgs<ExtArgs>
+    item?: boolean | ItemDefaultArgs<ExtArgs>
   }
   export type ItemLikeIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | userDefaultArgs<ExtArgs>
+    item?: boolean | ItemDefaultArgs<ExtArgs>
   }
 
   export type $ItemLikePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "ItemLike"
     objects: {
       user: Prisma.$userPayload<ExtArgs>
+      item: Prisma.$ItemPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -5874,6 +5938,7 @@ export namespace Prisma {
   export interface Prisma__ItemLikeClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends userDefaultArgs<ExtArgs> = {}>(args?: Subset<T, userDefaultArgs<ExtArgs>>): Prisma__userClient<$Result.GetResult<Prisma.$userPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    item<T extends ItemDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ItemDefaultArgs<ExtArgs>>): Prisma__ItemClient<$Result.GetResult<Prisma.$ItemPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -8627,6 +8692,7 @@ export namespace Prisma {
     itemUuid?: boolean
     category?: boolean
     index?: boolean
+    item?: boolean | ItemDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["inspoItems"]>
 
   export type InspoItemsSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -8634,6 +8700,7 @@ export namespace Prisma {
     itemUuid?: boolean
     category?: boolean
     index?: boolean
+    item?: boolean | ItemDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["inspoItems"]>
 
   export type InspoItemsSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -8641,6 +8708,7 @@ export namespace Prisma {
     itemUuid?: boolean
     category?: boolean
     index?: boolean
+    item?: boolean | ItemDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["inspoItems"]>
 
   export type InspoItemsSelectScalar = {
@@ -8651,10 +8719,21 @@ export namespace Prisma {
   }
 
   export type InspoItemsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "itemUuid" | "category" | "index", ExtArgs["result"]["inspoItems"]>
+  export type InspoItemsInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    item?: boolean | ItemDefaultArgs<ExtArgs>
+  }
+  export type InspoItemsIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    item?: boolean | ItemDefaultArgs<ExtArgs>
+  }
+  export type InspoItemsIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    item?: boolean | ItemDefaultArgs<ExtArgs>
+  }
 
   export type $InspoItemsPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "InspoItems"
-    objects: {}
+    objects: {
+      item: Prisma.$ItemPayload<ExtArgs>
+    }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       itemUuid: string
@@ -9054,6 +9133,7 @@ export namespace Prisma {
    */
   export interface Prisma__InspoItemsClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    item<T extends ItemDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ItemDefaultArgs<ExtArgs>>): Prisma__ItemClient<$Result.GetResult<Prisma.$ItemPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -9104,6 +9184,10 @@ export namespace Prisma {
      */
     omit?: InspoItemsOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InspoItemsInclude<ExtArgs> | null
+    /**
      * Filter, which InspoItems to fetch.
      */
     where: InspoItemsWhereUniqueInput
@@ -9122,6 +9206,10 @@ export namespace Prisma {
      */
     omit?: InspoItemsOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InspoItemsInclude<ExtArgs> | null
+    /**
      * Filter, which InspoItems to fetch.
      */
     where: InspoItemsWhereUniqueInput
@@ -9139,6 +9227,10 @@ export namespace Prisma {
      * Omit specific fields from the InspoItems
      */
     omit?: InspoItemsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InspoItemsInclude<ExtArgs> | null
     /**
      * Filter, which InspoItems to fetch.
      */
@@ -9188,6 +9280,10 @@ export namespace Prisma {
      */
     omit?: InspoItemsOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InspoItemsInclude<ExtArgs> | null
+    /**
      * Filter, which InspoItems to fetch.
      */
     where?: InspoItemsWhereInput
@@ -9236,6 +9332,10 @@ export namespace Prisma {
      */
     omit?: InspoItemsOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InspoItemsInclude<ExtArgs> | null
+    /**
      * Filter, which InspoItems to fetch.
      */
     where?: InspoItemsWhereInput
@@ -9279,6 +9379,10 @@ export namespace Prisma {
      */
     omit?: InspoItemsOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InspoItemsInclude<ExtArgs> | null
+    /**
      * The data needed to create a InspoItems.
      */
     data: XOR<InspoItemsCreateInput, InspoItemsUncheckedCreateInput>
@@ -9312,6 +9416,10 @@ export namespace Prisma {
      */
     data: InspoItemsCreateManyInput | InspoItemsCreateManyInput[]
     skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InspoItemsIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -9326,6 +9434,10 @@ export namespace Prisma {
      * Omit specific fields from the InspoItems
      */
     omit?: InspoItemsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InspoItemsInclude<ExtArgs> | null
     /**
      * The data needed to update a InspoItems.
      */
@@ -9378,6 +9490,10 @@ export namespace Prisma {
      * Limit how many InspoItems to update.
      */
     limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InspoItemsIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -9392,6 +9508,10 @@ export namespace Prisma {
      * Omit specific fields from the InspoItems
      */
     omit?: InspoItemsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InspoItemsInclude<ExtArgs> | null
     /**
      * The filter to search for the InspoItems to update in case it exists.
      */
@@ -9418,6 +9538,10 @@ export namespace Prisma {
      * Omit specific fields from the InspoItems
      */
     omit?: InspoItemsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InspoItemsInclude<ExtArgs> | null
     /**
      * Filter which InspoItems to delete.
      */
@@ -9450,6 +9574,10 @@ export namespace Prisma {
      * Omit specific fields from the InspoItems
      */
     omit?: InspoItemsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InspoItemsInclude<ExtArgs> | null
   }
 
 
@@ -9669,6 +9797,10 @@ export namespace Prisma {
     imageId?: boolean
     brand?: boolean | BrandDefaultArgs<ExtArgs>
     files?: boolean | FilesDefaultArgs<ExtArgs>
+    favorites?: boolean | Item$favoritesArgs<ExtArgs>
+    likes?: boolean | Item$likesArgs<ExtArgs>
+    inspoItems?: boolean | Item$inspoItemsArgs<ExtArgs>
+    _count?: boolean | ItemCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["item"]>
 
   export type ItemSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -9709,6 +9841,10 @@ export namespace Prisma {
   export type ItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     brand?: boolean | BrandDefaultArgs<ExtArgs>
     files?: boolean | FilesDefaultArgs<ExtArgs>
+    favorites?: boolean | Item$favoritesArgs<ExtArgs>
+    likes?: boolean | Item$likesArgs<ExtArgs>
+    inspoItems?: boolean | Item$inspoItemsArgs<ExtArgs>
+    _count?: boolean | ItemCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ItemIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     brand?: boolean | BrandDefaultArgs<ExtArgs>
@@ -9724,6 +9860,9 @@ export namespace Prisma {
     objects: {
       brand: Prisma.$BrandPayload<ExtArgs>
       files: Prisma.$FilesPayload<ExtArgs>
+      favorites: Prisma.$ItemFavoritePayload<ExtArgs>[]
+      likes: Prisma.$ItemLikePayload<ExtArgs>[]
+      inspoItems: Prisma.$InspoItemsPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -10129,6 +10268,9 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     brand<T extends BrandDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BrandDefaultArgs<ExtArgs>>): Prisma__BrandClient<$Result.GetResult<Prisma.$BrandPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     files<T extends FilesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, FilesDefaultArgs<ExtArgs>>): Prisma__FilesClient<$Result.GetResult<Prisma.$FilesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    favorites<T extends Item$favoritesArgs<ExtArgs> = {}>(args?: Subset<T, Item$favoritesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ItemFavoritePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    likes<T extends Item$likesArgs<ExtArgs> = {}>(args?: Subset<T, Item$likesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ItemLikePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    inspoItems<T extends Item$inspoItemsArgs<ExtArgs> = {}>(args?: Subset<T, Item$inspoItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InspoItemsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -10558,6 +10700,78 @@ export namespace Prisma {
      * Limit how many Items to delete.
      */
     limit?: number
+  }
+
+  /**
+   * Item.favorites
+   */
+  export type Item$favoritesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ItemFavorite
+     */
+    select?: ItemFavoriteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ItemFavorite
+     */
+    omit?: ItemFavoriteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ItemFavoriteInclude<ExtArgs> | null
+    where?: ItemFavoriteWhereInput
+    orderBy?: ItemFavoriteOrderByWithRelationInput | ItemFavoriteOrderByWithRelationInput[]
+    cursor?: ItemFavoriteWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ItemFavoriteScalarFieldEnum | ItemFavoriteScalarFieldEnum[]
+  }
+
+  /**
+   * Item.likes
+   */
+  export type Item$likesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ItemLike
+     */
+    select?: ItemLikeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ItemLike
+     */
+    omit?: ItemLikeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ItemLikeInclude<ExtArgs> | null
+    where?: ItemLikeWhereInput
+    orderBy?: ItemLikeOrderByWithRelationInput | ItemLikeOrderByWithRelationInput[]
+    cursor?: ItemLikeWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ItemLikeScalarFieldEnum | ItemLikeScalarFieldEnum[]
+  }
+
+  /**
+   * Item.inspoItems
+   */
+  export type Item$inspoItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InspoItems
+     */
+    select?: InspoItemsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InspoItems
+     */
+    omit?: InspoItemsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InspoItemsInclude<ExtArgs> | null
+    where?: InspoItemsWhereInput
+    orderBy?: InspoItemsOrderByWithRelationInput | InspoItemsOrderByWithRelationInput[]
+    cursor?: InspoItemsWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: InspoItemsScalarFieldEnum | InspoItemsScalarFieldEnum[]
   }
 
   /**
@@ -16711,9 +16925,10 @@ export namespace Prisma {
     NOT?: ItemFavoriteWhereInput | ItemFavoriteWhereInput[]
     id?: UuidFilter<"ItemFavorite"> | string
     userId?: UuidFilter<"ItemFavorite"> | string
-    itemUuid?: StringFilter<"ItemFavorite"> | string
+    itemUuid?: UuidFilter<"ItemFavorite"> | string
     createdAt?: DateTimeNullableFilter<"ItemFavorite"> | Date | string | null
     user?: XOR<UserScalarRelationFilter, userWhereInput>
+    item?: XOR<ItemScalarRelationFilter, ItemWhereInput>
   }
 
   export type ItemFavoriteOrderByWithRelationInput = {
@@ -16722,6 +16937,7 @@ export namespace Prisma {
     itemUuid?: SortOrder
     createdAt?: SortOrderInput | SortOrder
     user?: userOrderByWithRelationInput
+    item?: ItemOrderByWithRelationInput
   }
 
   export type ItemFavoriteWhereUniqueInput = Prisma.AtLeast<{
@@ -16731,9 +16947,10 @@ export namespace Prisma {
     OR?: ItemFavoriteWhereInput[]
     NOT?: ItemFavoriteWhereInput | ItemFavoriteWhereInput[]
     userId?: UuidFilter<"ItemFavorite"> | string
-    itemUuid?: StringFilter<"ItemFavorite"> | string
+    itemUuid?: UuidFilter<"ItemFavorite"> | string
     createdAt?: DateTimeNullableFilter<"ItemFavorite"> | Date | string | null
     user?: XOR<UserScalarRelationFilter, userWhereInput>
+    item?: XOR<ItemScalarRelationFilter, ItemWhereInput>
   }, "id" | "userId_itemUuid">
 
   export type ItemFavoriteOrderByWithAggregationInput = {
@@ -16752,7 +16969,7 @@ export namespace Prisma {
     NOT?: ItemFavoriteScalarWhereWithAggregatesInput | ItemFavoriteScalarWhereWithAggregatesInput[]
     id?: UuidWithAggregatesFilter<"ItemFavorite"> | string
     userId?: UuidWithAggregatesFilter<"ItemFavorite"> | string
-    itemUuid?: StringWithAggregatesFilter<"ItemFavorite"> | string
+    itemUuid?: UuidWithAggregatesFilter<"ItemFavorite"> | string
     createdAt?: DateTimeNullableWithAggregatesFilter<"ItemFavorite"> | Date | string | null
   }
 
@@ -16762,9 +16979,10 @@ export namespace Prisma {
     NOT?: ItemLikeWhereInput | ItemLikeWhereInput[]
     id?: UuidFilter<"ItemLike"> | string
     userId?: UuidFilter<"ItemLike"> | string
-    itemUuid?: StringFilter<"ItemLike"> | string
+    itemUuid?: UuidFilter<"ItemLike"> | string
     createdAt?: DateTimeNullableFilter<"ItemLike"> | Date | string | null
     user?: XOR<UserScalarRelationFilter, userWhereInput>
+    item?: XOR<ItemScalarRelationFilter, ItemWhereInput>
   }
 
   export type ItemLikeOrderByWithRelationInput = {
@@ -16773,6 +16991,7 @@ export namespace Prisma {
     itemUuid?: SortOrder
     createdAt?: SortOrderInput | SortOrder
     user?: userOrderByWithRelationInput
+    item?: ItemOrderByWithRelationInput
   }
 
   export type ItemLikeWhereUniqueInput = Prisma.AtLeast<{
@@ -16782,9 +17001,10 @@ export namespace Prisma {
     OR?: ItemLikeWhereInput[]
     NOT?: ItemLikeWhereInput | ItemLikeWhereInput[]
     userId?: UuidFilter<"ItemLike"> | string
-    itemUuid?: StringFilter<"ItemLike"> | string
+    itemUuid?: UuidFilter<"ItemLike"> | string
     createdAt?: DateTimeNullableFilter<"ItemLike"> | Date | string | null
     user?: XOR<UserScalarRelationFilter, userWhereInput>
+    item?: XOR<ItemScalarRelationFilter, ItemWhereInput>
   }, "id" | "userId_itemUuid">
 
   export type ItemLikeOrderByWithAggregationInput = {
@@ -16803,7 +17023,7 @@ export namespace Prisma {
     NOT?: ItemLikeScalarWhereWithAggregatesInput | ItemLikeScalarWhereWithAggregatesInput[]
     id?: UuidWithAggregatesFilter<"ItemLike"> | string
     userId?: UuidWithAggregatesFilter<"ItemLike"> | string
-    itemUuid?: StringWithAggregatesFilter<"ItemLike"> | string
+    itemUuid?: UuidWithAggregatesFilter<"ItemLike"> | string
     createdAt?: DateTimeNullableWithAggregatesFilter<"ItemLike"> | Date | string | null
   }
 
@@ -16922,9 +17142,10 @@ export namespace Prisma {
     OR?: InspoItemsWhereInput[]
     NOT?: InspoItemsWhereInput | InspoItemsWhereInput[]
     id?: UuidFilter<"InspoItems"> | string
-    itemUuid?: StringFilter<"InspoItems"> | string
+    itemUuid?: UuidFilter<"InspoItems"> | string
     category?: StringFilter<"InspoItems"> | string
     index?: IntFilter<"InspoItems"> | number
+    item?: XOR<ItemScalarRelationFilter, ItemWhereInput>
   }
 
   export type InspoItemsOrderByWithRelationInput = {
@@ -16932,6 +17153,7 @@ export namespace Prisma {
     itemUuid?: SortOrder
     category?: SortOrder
     index?: SortOrder
+    item?: ItemOrderByWithRelationInput
   }
 
   export type InspoItemsWhereUniqueInput = Prisma.AtLeast<{
@@ -16939,9 +17161,10 @@ export namespace Prisma {
     AND?: InspoItemsWhereInput | InspoItemsWhereInput[]
     OR?: InspoItemsWhereInput[]
     NOT?: InspoItemsWhereInput | InspoItemsWhereInput[]
-    itemUuid?: StringFilter<"InspoItems"> | string
+    itemUuid?: UuidFilter<"InspoItems"> | string
     category?: StringFilter<"InspoItems"> | string
     index?: IntFilter<"InspoItems"> | number
+    item?: XOR<ItemScalarRelationFilter, ItemWhereInput>
   }, "id">
 
   export type InspoItemsOrderByWithAggregationInput = {
@@ -16961,7 +17184,7 @@ export namespace Prisma {
     OR?: InspoItemsScalarWhereWithAggregatesInput[]
     NOT?: InspoItemsScalarWhereWithAggregatesInput | InspoItemsScalarWhereWithAggregatesInput[]
     id?: UuidWithAggregatesFilter<"InspoItems"> | string
-    itemUuid?: StringWithAggregatesFilter<"InspoItems"> | string
+    itemUuid?: UuidWithAggregatesFilter<"InspoItems"> | string
     category?: StringWithAggregatesFilter<"InspoItems"> | string
     index?: IntWithAggregatesFilter<"InspoItems"> | number
   }
@@ -16979,6 +17202,9 @@ export namespace Prisma {
     imageId?: UuidFilter<"Item"> | string
     brand?: XOR<BrandScalarRelationFilter, BrandWhereInput>
     files?: XOR<FilesScalarRelationFilter, FilesWhereInput>
+    favorites?: ItemFavoriteListRelationFilter
+    likes?: ItemLikeListRelationFilter
+    inspoItems?: InspoItemsListRelationFilter
   }
 
   export type ItemOrderByWithRelationInput = {
@@ -16991,6 +17217,9 @@ export namespace Prisma {
     imageId?: SortOrder
     brand?: BrandOrderByWithRelationInput
     files?: FilesOrderByWithRelationInput
+    favorites?: ItemFavoriteOrderByRelationAggregateInput
+    likes?: ItemLikeOrderByRelationAggregateInput
+    inspoItems?: InspoItemsOrderByRelationAggregateInput
   }
 
   export type ItemWhereUniqueInput = Prisma.AtLeast<{
@@ -17006,6 +17235,9 @@ export namespace Prisma {
     imageId?: UuidFilter<"Item"> | string
     brand?: XOR<BrandScalarRelationFilter, BrandWhereInput>
     files?: XOR<FilesScalarRelationFilter, FilesWhereInput>
+    favorites?: ItemFavoriteListRelationFilter
+    likes?: ItemLikeListRelationFilter
+    inspoItems?: InspoItemsListRelationFilter
   }, "id">
 
   export type ItemOrderByWithAggregationInput = {
@@ -17535,9 +17767,9 @@ export namespace Prisma {
 
   export type ItemFavoriteCreateInput = {
     id?: string
-    itemUuid: string
     createdAt?: Date | string | null
     user: userCreateNestedOneWithoutItemFavoritesInput
+    item: ItemCreateNestedOneWithoutFavoritesInput
   }
 
   export type ItemFavoriteUncheckedCreateInput = {
@@ -17549,9 +17781,9 @@ export namespace Prisma {
 
   export type ItemFavoriteUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    itemUuid?: StringFieldUpdateOperationsInput | string
     createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     user?: userUpdateOneRequiredWithoutItemFavoritesNestedInput
+    item?: ItemUpdateOneRequiredWithoutFavoritesNestedInput
   }
 
   export type ItemFavoriteUncheckedUpdateInput = {
@@ -17570,7 +17802,6 @@ export namespace Prisma {
 
   export type ItemFavoriteUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    itemUuid?: StringFieldUpdateOperationsInput | string
     createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
@@ -17583,9 +17814,9 @@ export namespace Prisma {
 
   export type ItemLikeCreateInput = {
     id?: string
-    itemUuid: string
     createdAt?: Date | string | null
     user: userCreateNestedOneWithoutItemLikesInput
+    item: ItemCreateNestedOneWithoutLikesInput
   }
 
   export type ItemLikeUncheckedCreateInput = {
@@ -17597,9 +17828,9 @@ export namespace Prisma {
 
   export type ItemLikeUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    itemUuid?: StringFieldUpdateOperationsInput | string
     createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     user?: userUpdateOneRequiredWithoutItemLikesNestedInput
+    item?: ItemUpdateOneRequiredWithoutLikesNestedInput
   }
 
   export type ItemLikeUncheckedUpdateInput = {
@@ -17618,7 +17849,6 @@ export namespace Prisma {
 
   export type ItemLikeUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    itemUuid?: StringFieldUpdateOperationsInput | string
     createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
@@ -17741,9 +17971,9 @@ export namespace Prisma {
 
   export type InspoItemsCreateInput = {
     id?: string
-    itemUuid: string
     category: string
     index: number
+    item: ItemCreateNestedOneWithoutInspoItemsInput
   }
 
   export type InspoItemsUncheckedCreateInput = {
@@ -17755,9 +17985,9 @@ export namespace Prisma {
 
   export type InspoItemsUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    itemUuid?: StringFieldUpdateOperationsInput | string
     category?: StringFieldUpdateOperationsInput | string
     index?: IntFieldUpdateOperationsInput | number
+    item?: ItemUpdateOneRequiredWithoutInspoItemsNestedInput
   }
 
   export type InspoItemsUncheckedUpdateInput = {
@@ -17776,7 +18006,6 @@ export namespace Prisma {
 
   export type InspoItemsUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    itemUuid?: StringFieldUpdateOperationsInput | string
     category?: StringFieldUpdateOperationsInput | string
     index?: IntFieldUpdateOperationsInput | number
   }
@@ -17796,6 +18025,9 @@ export namespace Prisma {
     url: string
     brand: BrandCreateNestedOneWithoutItemInput
     files: FilesCreateNestedOneWithoutItemInput
+    favorites?: ItemFavoriteCreateNestedManyWithoutItemInput
+    likes?: ItemLikeCreateNestedManyWithoutItemInput
+    inspoItems?: InspoItemsCreateNestedManyWithoutItemInput
   }
 
   export type ItemUncheckedCreateInput = {
@@ -17806,6 +18038,9 @@ export namespace Prisma {
     url: string
     brandId: string
     imageId: string
+    favorites?: ItemFavoriteUncheckedCreateNestedManyWithoutItemInput
+    likes?: ItemLikeUncheckedCreateNestedManyWithoutItemInput
+    inspoItems?: InspoItemsUncheckedCreateNestedManyWithoutItemInput
   }
 
   export type ItemUpdateInput = {
@@ -17816,6 +18051,9 @@ export namespace Prisma {
     url?: StringFieldUpdateOperationsInput | string
     brand?: BrandUpdateOneRequiredWithoutItemNestedInput
     files?: FilesUpdateOneRequiredWithoutItemNestedInput
+    favorites?: ItemFavoriteUpdateManyWithoutItemNestedInput
+    likes?: ItemLikeUpdateManyWithoutItemNestedInput
+    inspoItems?: InspoItemsUpdateManyWithoutItemNestedInput
   }
 
   export type ItemUncheckedUpdateInput = {
@@ -17826,6 +18064,9 @@ export namespace Prisma {
     url?: StringFieldUpdateOperationsInput | string
     brandId?: StringFieldUpdateOperationsInput | string
     imageId?: StringFieldUpdateOperationsInput | string
+    favorites?: ItemFavoriteUncheckedUpdateManyWithoutItemNestedInput
+    likes?: ItemLikeUncheckedUpdateManyWithoutItemNestedInput
+    inspoItems?: InspoItemsUncheckedUpdateManyWithoutItemNestedInput
   }
 
   export type ItemCreateManyInput = {
@@ -18509,6 +18750,11 @@ export namespace Prisma {
     _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
+  export type ItemScalarRelationFilter = {
+    is?: ItemWhereInput
+    isNot?: ItemWhereInput
+  }
+
   export type ItemFavoriteUserIdItemUuidCompoundUniqueInput = {
     userId: string
     itemUuid: string
@@ -18668,6 +18914,36 @@ export namespace Prisma {
   export type BrandScalarRelationFilter = {
     is?: BrandWhereInput
     isNot?: BrandWhereInput
+  }
+
+  export type ItemFavoriteListRelationFilter = {
+    every?: ItemFavoriteWhereInput
+    some?: ItemFavoriteWhereInput
+    none?: ItemFavoriteWhereInput
+  }
+
+  export type ItemLikeListRelationFilter = {
+    every?: ItemLikeWhereInput
+    some?: ItemLikeWhereInput
+    none?: ItemLikeWhereInput
+  }
+
+  export type InspoItemsListRelationFilter = {
+    every?: InspoItemsWhereInput
+    some?: InspoItemsWhereInput
+    none?: InspoItemsWhereInput
+  }
+
+  export type ItemFavoriteOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ItemLikeOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type InspoItemsOrderByRelationAggregateInput = {
+    _count?: SortOrder
   }
 
   export type ItemCountOrderByAggregateInput = {
@@ -18967,18 +19243,6 @@ export namespace Prisma {
     isNot?: ClientWhereInput | null
   }
 
-  export type ItemFavoriteListRelationFilter = {
-    every?: ItemFavoriteWhereInput
-    some?: ItemFavoriteWhereInput
-    none?: ItemFavoriteWhereInput
-  }
-
-  export type ItemLikeListRelationFilter = {
-    every?: ItemLikeWhereInput
-    some?: ItemLikeWhereInput
-    none?: ItemLikeWhereInput
-  }
-
   export type RegisterInProgressListRelationFilter = {
     every?: RegisterInProgressWhereInput
     some?: RegisterInProgressWhereInput
@@ -18996,14 +19260,6 @@ export namespace Prisma {
   }
 
   export type sessionOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type ItemFavoriteOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type ItemLikeOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -19181,6 +19437,12 @@ export namespace Prisma {
     connect?: userWhereUniqueInput
   }
 
+  export type ItemCreateNestedOneWithoutFavoritesInput = {
+    create?: XOR<ItemCreateWithoutFavoritesInput, ItemUncheckedCreateWithoutFavoritesInput>
+    connectOrCreate?: ItemCreateOrConnectWithoutFavoritesInput
+    connect?: ItemWhereUniqueInput
+  }
+
   export type userUpdateOneRequiredWithoutItemFavoritesNestedInput = {
     create?: XOR<userCreateWithoutItemFavoritesInput, userUncheckedCreateWithoutItemFavoritesInput>
     connectOrCreate?: userCreateOrConnectWithoutItemFavoritesInput
@@ -19189,10 +19451,24 @@ export namespace Prisma {
     update?: XOR<XOR<userUpdateToOneWithWhereWithoutItemFavoritesInput, userUpdateWithoutItemFavoritesInput>, userUncheckedUpdateWithoutItemFavoritesInput>
   }
 
+  export type ItemUpdateOneRequiredWithoutFavoritesNestedInput = {
+    create?: XOR<ItemCreateWithoutFavoritesInput, ItemUncheckedCreateWithoutFavoritesInput>
+    connectOrCreate?: ItemCreateOrConnectWithoutFavoritesInput
+    upsert?: ItemUpsertWithoutFavoritesInput
+    connect?: ItemWhereUniqueInput
+    update?: XOR<XOR<ItemUpdateToOneWithWhereWithoutFavoritesInput, ItemUpdateWithoutFavoritesInput>, ItemUncheckedUpdateWithoutFavoritesInput>
+  }
+
   export type userCreateNestedOneWithoutItemLikesInput = {
     create?: XOR<userCreateWithoutItemLikesInput, userUncheckedCreateWithoutItemLikesInput>
     connectOrCreate?: userCreateOrConnectWithoutItemLikesInput
     connect?: userWhereUniqueInput
+  }
+
+  export type ItemCreateNestedOneWithoutLikesInput = {
+    create?: XOR<ItemCreateWithoutLikesInput, ItemUncheckedCreateWithoutLikesInput>
+    connectOrCreate?: ItemCreateOrConnectWithoutLikesInput
+    connect?: ItemWhereUniqueInput
   }
 
   export type userUpdateOneRequiredWithoutItemLikesNestedInput = {
@@ -19201,6 +19477,14 @@ export namespace Prisma {
     upsert?: userUpsertWithoutItemLikesInput
     connect?: userWhereUniqueInput
     update?: XOR<XOR<userUpdateToOneWithWhereWithoutItemLikesInput, userUpdateWithoutItemLikesInput>, userUncheckedUpdateWithoutItemLikesInput>
+  }
+
+  export type ItemUpdateOneRequiredWithoutLikesNestedInput = {
+    create?: XOR<ItemCreateWithoutLikesInput, ItemUncheckedCreateWithoutLikesInput>
+    connectOrCreate?: ItemCreateOrConnectWithoutLikesInput
+    upsert?: ItemUpsertWithoutLikesInput
+    connect?: ItemWhereUniqueInput
+    update?: XOR<XOR<ItemUpdateToOneWithWhereWithoutLikesInput, ItemUpdateWithoutLikesInput>, ItemUncheckedUpdateWithoutLikesInput>
   }
 
   export type userCreateNestedOneWithoutRegisterInProgressInput = {
@@ -19231,12 +19515,26 @@ export namespace Prisma {
     update?: XOR<XOR<userUpdateToOneWithWhereWithoutResetPasswordInProgressInput, userUpdateWithoutResetPasswordInProgressInput>, userUncheckedUpdateWithoutResetPasswordInProgressInput>
   }
 
+  export type ItemCreateNestedOneWithoutInspoItemsInput = {
+    create?: XOR<ItemCreateWithoutInspoItemsInput, ItemUncheckedCreateWithoutInspoItemsInput>
+    connectOrCreate?: ItemCreateOrConnectWithoutInspoItemsInput
+    connect?: ItemWhereUniqueInput
+  }
+
   export type IntFieldUpdateOperationsInput = {
     set?: number
     increment?: number
     decrement?: number
     multiply?: number
     divide?: number
+  }
+
+  export type ItemUpdateOneRequiredWithoutInspoItemsNestedInput = {
+    create?: XOR<ItemCreateWithoutInspoItemsInput, ItemUncheckedCreateWithoutInspoItemsInput>
+    connectOrCreate?: ItemCreateOrConnectWithoutInspoItemsInput
+    upsert?: ItemUpsertWithoutInspoItemsInput
+    connect?: ItemWhereUniqueInput
+    update?: XOR<XOR<ItemUpdateToOneWithWhereWithoutInspoItemsInput, ItemUpdateWithoutInspoItemsInput>, ItemUncheckedUpdateWithoutInspoItemsInput>
   }
 
   export type BrandCreateNestedOneWithoutItemInput = {
@@ -19249,6 +19547,48 @@ export namespace Prisma {
     create?: XOR<FilesCreateWithoutItemInput, FilesUncheckedCreateWithoutItemInput>
     connectOrCreate?: FilesCreateOrConnectWithoutItemInput
     connect?: FilesWhereUniqueInput
+  }
+
+  export type ItemFavoriteCreateNestedManyWithoutItemInput = {
+    create?: XOR<ItemFavoriteCreateWithoutItemInput, ItemFavoriteUncheckedCreateWithoutItemInput> | ItemFavoriteCreateWithoutItemInput[] | ItemFavoriteUncheckedCreateWithoutItemInput[]
+    connectOrCreate?: ItemFavoriteCreateOrConnectWithoutItemInput | ItemFavoriteCreateOrConnectWithoutItemInput[]
+    createMany?: ItemFavoriteCreateManyItemInputEnvelope
+    connect?: ItemFavoriteWhereUniqueInput | ItemFavoriteWhereUniqueInput[]
+  }
+
+  export type ItemLikeCreateNestedManyWithoutItemInput = {
+    create?: XOR<ItemLikeCreateWithoutItemInput, ItemLikeUncheckedCreateWithoutItemInput> | ItemLikeCreateWithoutItemInput[] | ItemLikeUncheckedCreateWithoutItemInput[]
+    connectOrCreate?: ItemLikeCreateOrConnectWithoutItemInput | ItemLikeCreateOrConnectWithoutItemInput[]
+    createMany?: ItemLikeCreateManyItemInputEnvelope
+    connect?: ItemLikeWhereUniqueInput | ItemLikeWhereUniqueInput[]
+  }
+
+  export type InspoItemsCreateNestedManyWithoutItemInput = {
+    create?: XOR<InspoItemsCreateWithoutItemInput, InspoItemsUncheckedCreateWithoutItemInput> | InspoItemsCreateWithoutItemInput[] | InspoItemsUncheckedCreateWithoutItemInput[]
+    connectOrCreate?: InspoItemsCreateOrConnectWithoutItemInput | InspoItemsCreateOrConnectWithoutItemInput[]
+    createMany?: InspoItemsCreateManyItemInputEnvelope
+    connect?: InspoItemsWhereUniqueInput | InspoItemsWhereUniqueInput[]
+  }
+
+  export type ItemFavoriteUncheckedCreateNestedManyWithoutItemInput = {
+    create?: XOR<ItemFavoriteCreateWithoutItemInput, ItemFavoriteUncheckedCreateWithoutItemInput> | ItemFavoriteCreateWithoutItemInput[] | ItemFavoriteUncheckedCreateWithoutItemInput[]
+    connectOrCreate?: ItemFavoriteCreateOrConnectWithoutItemInput | ItemFavoriteCreateOrConnectWithoutItemInput[]
+    createMany?: ItemFavoriteCreateManyItemInputEnvelope
+    connect?: ItemFavoriteWhereUniqueInput | ItemFavoriteWhereUniqueInput[]
+  }
+
+  export type ItemLikeUncheckedCreateNestedManyWithoutItemInput = {
+    create?: XOR<ItemLikeCreateWithoutItemInput, ItemLikeUncheckedCreateWithoutItemInput> | ItemLikeCreateWithoutItemInput[] | ItemLikeUncheckedCreateWithoutItemInput[]
+    connectOrCreate?: ItemLikeCreateOrConnectWithoutItemInput | ItemLikeCreateOrConnectWithoutItemInput[]
+    createMany?: ItemLikeCreateManyItemInputEnvelope
+    connect?: ItemLikeWhereUniqueInput | ItemLikeWhereUniqueInput[]
+  }
+
+  export type InspoItemsUncheckedCreateNestedManyWithoutItemInput = {
+    create?: XOR<InspoItemsCreateWithoutItemInput, InspoItemsUncheckedCreateWithoutItemInput> | InspoItemsCreateWithoutItemInput[] | InspoItemsUncheckedCreateWithoutItemInput[]
+    connectOrCreate?: InspoItemsCreateOrConnectWithoutItemInput | InspoItemsCreateOrConnectWithoutItemInput[]
+    createMany?: InspoItemsCreateManyItemInputEnvelope
+    connect?: InspoItemsWhereUniqueInput | InspoItemsWhereUniqueInput[]
   }
 
   export type BrandUpdateOneRequiredWithoutItemNestedInput = {
@@ -19265,6 +19605,90 @@ export namespace Prisma {
     upsert?: FilesUpsertWithoutItemInput
     connect?: FilesWhereUniqueInput
     update?: XOR<XOR<FilesUpdateToOneWithWhereWithoutItemInput, FilesUpdateWithoutItemInput>, FilesUncheckedUpdateWithoutItemInput>
+  }
+
+  export type ItemFavoriteUpdateManyWithoutItemNestedInput = {
+    create?: XOR<ItemFavoriteCreateWithoutItemInput, ItemFavoriteUncheckedCreateWithoutItemInput> | ItemFavoriteCreateWithoutItemInput[] | ItemFavoriteUncheckedCreateWithoutItemInput[]
+    connectOrCreate?: ItemFavoriteCreateOrConnectWithoutItemInput | ItemFavoriteCreateOrConnectWithoutItemInput[]
+    upsert?: ItemFavoriteUpsertWithWhereUniqueWithoutItemInput | ItemFavoriteUpsertWithWhereUniqueWithoutItemInput[]
+    createMany?: ItemFavoriteCreateManyItemInputEnvelope
+    set?: ItemFavoriteWhereUniqueInput | ItemFavoriteWhereUniqueInput[]
+    disconnect?: ItemFavoriteWhereUniqueInput | ItemFavoriteWhereUniqueInput[]
+    delete?: ItemFavoriteWhereUniqueInput | ItemFavoriteWhereUniqueInput[]
+    connect?: ItemFavoriteWhereUniqueInput | ItemFavoriteWhereUniqueInput[]
+    update?: ItemFavoriteUpdateWithWhereUniqueWithoutItemInput | ItemFavoriteUpdateWithWhereUniqueWithoutItemInput[]
+    updateMany?: ItemFavoriteUpdateManyWithWhereWithoutItemInput | ItemFavoriteUpdateManyWithWhereWithoutItemInput[]
+    deleteMany?: ItemFavoriteScalarWhereInput | ItemFavoriteScalarWhereInput[]
+  }
+
+  export type ItemLikeUpdateManyWithoutItemNestedInput = {
+    create?: XOR<ItemLikeCreateWithoutItemInput, ItemLikeUncheckedCreateWithoutItemInput> | ItemLikeCreateWithoutItemInput[] | ItemLikeUncheckedCreateWithoutItemInput[]
+    connectOrCreate?: ItemLikeCreateOrConnectWithoutItemInput | ItemLikeCreateOrConnectWithoutItemInput[]
+    upsert?: ItemLikeUpsertWithWhereUniqueWithoutItemInput | ItemLikeUpsertWithWhereUniqueWithoutItemInput[]
+    createMany?: ItemLikeCreateManyItemInputEnvelope
+    set?: ItemLikeWhereUniqueInput | ItemLikeWhereUniqueInput[]
+    disconnect?: ItemLikeWhereUniqueInput | ItemLikeWhereUniqueInput[]
+    delete?: ItemLikeWhereUniqueInput | ItemLikeWhereUniqueInput[]
+    connect?: ItemLikeWhereUniqueInput | ItemLikeWhereUniqueInput[]
+    update?: ItemLikeUpdateWithWhereUniqueWithoutItemInput | ItemLikeUpdateWithWhereUniqueWithoutItemInput[]
+    updateMany?: ItemLikeUpdateManyWithWhereWithoutItemInput | ItemLikeUpdateManyWithWhereWithoutItemInput[]
+    deleteMany?: ItemLikeScalarWhereInput | ItemLikeScalarWhereInput[]
+  }
+
+  export type InspoItemsUpdateManyWithoutItemNestedInput = {
+    create?: XOR<InspoItemsCreateWithoutItemInput, InspoItemsUncheckedCreateWithoutItemInput> | InspoItemsCreateWithoutItemInput[] | InspoItemsUncheckedCreateWithoutItemInput[]
+    connectOrCreate?: InspoItemsCreateOrConnectWithoutItemInput | InspoItemsCreateOrConnectWithoutItemInput[]
+    upsert?: InspoItemsUpsertWithWhereUniqueWithoutItemInput | InspoItemsUpsertWithWhereUniqueWithoutItemInput[]
+    createMany?: InspoItemsCreateManyItemInputEnvelope
+    set?: InspoItemsWhereUniqueInput | InspoItemsWhereUniqueInput[]
+    disconnect?: InspoItemsWhereUniqueInput | InspoItemsWhereUniqueInput[]
+    delete?: InspoItemsWhereUniqueInput | InspoItemsWhereUniqueInput[]
+    connect?: InspoItemsWhereUniqueInput | InspoItemsWhereUniqueInput[]
+    update?: InspoItemsUpdateWithWhereUniqueWithoutItemInput | InspoItemsUpdateWithWhereUniqueWithoutItemInput[]
+    updateMany?: InspoItemsUpdateManyWithWhereWithoutItemInput | InspoItemsUpdateManyWithWhereWithoutItemInput[]
+    deleteMany?: InspoItemsScalarWhereInput | InspoItemsScalarWhereInput[]
+  }
+
+  export type ItemFavoriteUncheckedUpdateManyWithoutItemNestedInput = {
+    create?: XOR<ItemFavoriteCreateWithoutItemInput, ItemFavoriteUncheckedCreateWithoutItemInput> | ItemFavoriteCreateWithoutItemInput[] | ItemFavoriteUncheckedCreateWithoutItemInput[]
+    connectOrCreate?: ItemFavoriteCreateOrConnectWithoutItemInput | ItemFavoriteCreateOrConnectWithoutItemInput[]
+    upsert?: ItemFavoriteUpsertWithWhereUniqueWithoutItemInput | ItemFavoriteUpsertWithWhereUniqueWithoutItemInput[]
+    createMany?: ItemFavoriteCreateManyItemInputEnvelope
+    set?: ItemFavoriteWhereUniqueInput | ItemFavoriteWhereUniqueInput[]
+    disconnect?: ItemFavoriteWhereUniqueInput | ItemFavoriteWhereUniqueInput[]
+    delete?: ItemFavoriteWhereUniqueInput | ItemFavoriteWhereUniqueInput[]
+    connect?: ItemFavoriteWhereUniqueInput | ItemFavoriteWhereUniqueInput[]
+    update?: ItemFavoriteUpdateWithWhereUniqueWithoutItemInput | ItemFavoriteUpdateWithWhereUniqueWithoutItemInput[]
+    updateMany?: ItemFavoriteUpdateManyWithWhereWithoutItemInput | ItemFavoriteUpdateManyWithWhereWithoutItemInput[]
+    deleteMany?: ItemFavoriteScalarWhereInput | ItemFavoriteScalarWhereInput[]
+  }
+
+  export type ItemLikeUncheckedUpdateManyWithoutItemNestedInput = {
+    create?: XOR<ItemLikeCreateWithoutItemInput, ItemLikeUncheckedCreateWithoutItemInput> | ItemLikeCreateWithoutItemInput[] | ItemLikeUncheckedCreateWithoutItemInput[]
+    connectOrCreate?: ItemLikeCreateOrConnectWithoutItemInput | ItemLikeCreateOrConnectWithoutItemInput[]
+    upsert?: ItemLikeUpsertWithWhereUniqueWithoutItemInput | ItemLikeUpsertWithWhereUniqueWithoutItemInput[]
+    createMany?: ItemLikeCreateManyItemInputEnvelope
+    set?: ItemLikeWhereUniqueInput | ItemLikeWhereUniqueInput[]
+    disconnect?: ItemLikeWhereUniqueInput | ItemLikeWhereUniqueInput[]
+    delete?: ItemLikeWhereUniqueInput | ItemLikeWhereUniqueInput[]
+    connect?: ItemLikeWhereUniqueInput | ItemLikeWhereUniqueInput[]
+    update?: ItemLikeUpdateWithWhereUniqueWithoutItemInput | ItemLikeUpdateWithWhereUniqueWithoutItemInput[]
+    updateMany?: ItemLikeUpdateManyWithWhereWithoutItemInput | ItemLikeUpdateManyWithWhereWithoutItemInput[]
+    deleteMany?: ItemLikeScalarWhereInput | ItemLikeScalarWhereInput[]
+  }
+
+  export type InspoItemsUncheckedUpdateManyWithoutItemNestedInput = {
+    create?: XOR<InspoItemsCreateWithoutItemInput, InspoItemsUncheckedCreateWithoutItemInput> | InspoItemsCreateWithoutItemInput[] | InspoItemsUncheckedCreateWithoutItemInput[]
+    connectOrCreate?: InspoItemsCreateOrConnectWithoutItemInput | InspoItemsCreateOrConnectWithoutItemInput[]
+    upsert?: InspoItemsUpsertWithWhereUniqueWithoutItemInput | InspoItemsUpsertWithWhereUniqueWithoutItemInput[]
+    createMany?: InspoItemsCreateManyItemInputEnvelope
+    set?: InspoItemsWhereUniqueInput | InspoItemsWhereUniqueInput[]
+    disconnect?: InspoItemsWhereUniqueInput | InspoItemsWhereUniqueInput[]
+    delete?: InspoItemsWhereUniqueInput | InspoItemsWhereUniqueInput[]
+    connect?: InspoItemsWhereUniqueInput | InspoItemsWhereUniqueInput[]
+    update?: InspoItemsUpdateWithWhereUniqueWithoutItemInput | InspoItemsUpdateWithWhereUniqueWithoutItemInput[]
+    updateMany?: InspoItemsUpdateManyWithWhereWithoutItemInput | InspoItemsUpdateManyWithWhereWithoutItemInput[]
+    deleteMany?: InspoItemsScalarWhereInput | InspoItemsScalarWhereInput[]
   }
 
   export type BrandCreateNestedManyWithoutFilesInput = {
@@ -20000,6 +20424,9 @@ export namespace Prisma {
     price: number
     url: string
     files: FilesCreateNestedOneWithoutItemInput
+    favorites?: ItemFavoriteCreateNestedManyWithoutItemInput
+    likes?: ItemLikeCreateNestedManyWithoutItemInput
+    inspoItems?: InspoItemsCreateNestedManyWithoutItemInput
   }
 
   export type ItemUncheckedCreateWithoutBrandInput = {
@@ -20009,6 +20436,9 @@ export namespace Prisma {
     price: number
     url: string
     imageId: string
+    favorites?: ItemFavoriteUncheckedCreateNestedManyWithoutItemInput
+    likes?: ItemLikeUncheckedCreateNestedManyWithoutItemInput
+    inspoItems?: InspoItemsUncheckedCreateNestedManyWithoutItemInput
   }
 
   export type ItemCreateOrConnectWithoutBrandInput = {
@@ -20294,6 +20724,35 @@ export namespace Prisma {
     create: XOR<userCreateWithoutItemFavoritesInput, userUncheckedCreateWithoutItemFavoritesInput>
   }
 
+  export type ItemCreateWithoutFavoritesInput = {
+    id?: string
+    name: string
+    description: string
+    price: number
+    url: string
+    brand: BrandCreateNestedOneWithoutItemInput
+    files: FilesCreateNestedOneWithoutItemInput
+    likes?: ItemLikeCreateNestedManyWithoutItemInput
+    inspoItems?: InspoItemsCreateNestedManyWithoutItemInput
+  }
+
+  export type ItemUncheckedCreateWithoutFavoritesInput = {
+    id?: string
+    name: string
+    description: string
+    price: number
+    url: string
+    brandId: string
+    imageId: string
+    likes?: ItemLikeUncheckedCreateNestedManyWithoutItemInput
+    inspoItems?: InspoItemsUncheckedCreateNestedManyWithoutItemInput
+  }
+
+  export type ItemCreateOrConnectWithoutFavoritesInput = {
+    where: ItemWhereUniqueInput
+    create: XOR<ItemCreateWithoutFavoritesInput, ItemUncheckedCreateWithoutFavoritesInput>
+  }
+
   export type userUpsertWithoutItemFavoritesInput = {
     update: XOR<userUpdateWithoutItemFavoritesInput, userUncheckedUpdateWithoutItemFavoritesInput>
     create: XOR<userCreateWithoutItemFavoritesInput, userUncheckedCreateWithoutItemFavoritesInput>
@@ -20341,6 +20800,41 @@ export namespace Prisma {
     ResetPasswordInProgress?: ResetPasswordInProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
+  export type ItemUpsertWithoutFavoritesInput = {
+    update: XOR<ItemUpdateWithoutFavoritesInput, ItemUncheckedUpdateWithoutFavoritesInput>
+    create: XOR<ItemCreateWithoutFavoritesInput, ItemUncheckedCreateWithoutFavoritesInput>
+    where?: ItemWhereInput
+  }
+
+  export type ItemUpdateToOneWithWhereWithoutFavoritesInput = {
+    where?: ItemWhereInput
+    data: XOR<ItemUpdateWithoutFavoritesInput, ItemUncheckedUpdateWithoutFavoritesInput>
+  }
+
+  export type ItemUpdateWithoutFavoritesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: IntFieldUpdateOperationsInput | number
+    url?: StringFieldUpdateOperationsInput | string
+    brand?: BrandUpdateOneRequiredWithoutItemNestedInput
+    files?: FilesUpdateOneRequiredWithoutItemNestedInput
+    likes?: ItemLikeUpdateManyWithoutItemNestedInput
+    inspoItems?: InspoItemsUpdateManyWithoutItemNestedInput
+  }
+
+  export type ItemUncheckedUpdateWithoutFavoritesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: IntFieldUpdateOperationsInput | number
+    url?: StringFieldUpdateOperationsInput | string
+    brandId?: StringFieldUpdateOperationsInput | string
+    imageId?: StringFieldUpdateOperationsInput | string
+    likes?: ItemLikeUncheckedUpdateManyWithoutItemNestedInput
+    inspoItems?: InspoItemsUncheckedUpdateManyWithoutItemNestedInput
+  }
+
   export type userCreateWithoutItemLikesInput = {
     id: string
     name: string
@@ -20380,6 +20874,35 @@ export namespace Prisma {
   export type userCreateOrConnectWithoutItemLikesInput = {
     where: userWhereUniqueInput
     create: XOR<userCreateWithoutItemLikesInput, userUncheckedCreateWithoutItemLikesInput>
+  }
+
+  export type ItemCreateWithoutLikesInput = {
+    id?: string
+    name: string
+    description: string
+    price: number
+    url: string
+    brand: BrandCreateNestedOneWithoutItemInput
+    files: FilesCreateNestedOneWithoutItemInput
+    favorites?: ItemFavoriteCreateNestedManyWithoutItemInput
+    inspoItems?: InspoItemsCreateNestedManyWithoutItemInput
+  }
+
+  export type ItemUncheckedCreateWithoutLikesInput = {
+    id?: string
+    name: string
+    description: string
+    price: number
+    url: string
+    brandId: string
+    imageId: string
+    favorites?: ItemFavoriteUncheckedCreateNestedManyWithoutItemInput
+    inspoItems?: InspoItemsUncheckedCreateNestedManyWithoutItemInput
+  }
+
+  export type ItemCreateOrConnectWithoutLikesInput = {
+    where: ItemWhereUniqueInput
+    create: XOR<ItemCreateWithoutLikesInput, ItemUncheckedCreateWithoutLikesInput>
   }
 
   export type userUpsertWithoutItemLikesInput = {
@@ -20427,6 +20950,41 @@ export namespace Prisma {
     itemFavorites?: ItemFavoriteUncheckedUpdateManyWithoutUserNestedInput
     RegisterInProgress?: RegisterInProgressUncheckedUpdateManyWithoutUserNestedInput
     ResetPasswordInProgress?: ResetPasswordInProgressUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type ItemUpsertWithoutLikesInput = {
+    update: XOR<ItemUpdateWithoutLikesInput, ItemUncheckedUpdateWithoutLikesInput>
+    create: XOR<ItemCreateWithoutLikesInput, ItemUncheckedCreateWithoutLikesInput>
+    where?: ItemWhereInput
+  }
+
+  export type ItemUpdateToOneWithWhereWithoutLikesInput = {
+    where?: ItemWhereInput
+    data: XOR<ItemUpdateWithoutLikesInput, ItemUncheckedUpdateWithoutLikesInput>
+  }
+
+  export type ItemUpdateWithoutLikesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: IntFieldUpdateOperationsInput | number
+    url?: StringFieldUpdateOperationsInput | string
+    brand?: BrandUpdateOneRequiredWithoutItemNestedInput
+    files?: FilesUpdateOneRequiredWithoutItemNestedInput
+    favorites?: ItemFavoriteUpdateManyWithoutItemNestedInput
+    inspoItems?: InspoItemsUpdateManyWithoutItemNestedInput
+  }
+
+  export type ItemUncheckedUpdateWithoutLikesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: IntFieldUpdateOperationsInput | number
+    url?: StringFieldUpdateOperationsInput | string
+    brandId?: StringFieldUpdateOperationsInput | string
+    imageId?: StringFieldUpdateOperationsInput | string
+    favorites?: ItemFavoriteUncheckedUpdateManyWithoutItemNestedInput
+    inspoItems?: InspoItemsUncheckedUpdateManyWithoutItemNestedInput
   }
 
   export type userCreateWithoutRegisterInProgressInput = {
@@ -20605,6 +21163,70 @@ export namespace Prisma {
     RegisterInProgress?: RegisterInProgressUncheckedUpdateManyWithoutUserNestedInput
   }
 
+  export type ItemCreateWithoutInspoItemsInput = {
+    id?: string
+    name: string
+    description: string
+    price: number
+    url: string
+    brand: BrandCreateNestedOneWithoutItemInput
+    files: FilesCreateNestedOneWithoutItemInput
+    favorites?: ItemFavoriteCreateNestedManyWithoutItemInput
+    likes?: ItemLikeCreateNestedManyWithoutItemInput
+  }
+
+  export type ItemUncheckedCreateWithoutInspoItemsInput = {
+    id?: string
+    name: string
+    description: string
+    price: number
+    url: string
+    brandId: string
+    imageId: string
+    favorites?: ItemFavoriteUncheckedCreateNestedManyWithoutItemInput
+    likes?: ItemLikeUncheckedCreateNestedManyWithoutItemInput
+  }
+
+  export type ItemCreateOrConnectWithoutInspoItemsInput = {
+    where: ItemWhereUniqueInput
+    create: XOR<ItemCreateWithoutInspoItemsInput, ItemUncheckedCreateWithoutInspoItemsInput>
+  }
+
+  export type ItemUpsertWithoutInspoItemsInput = {
+    update: XOR<ItemUpdateWithoutInspoItemsInput, ItemUncheckedUpdateWithoutInspoItemsInput>
+    create: XOR<ItemCreateWithoutInspoItemsInput, ItemUncheckedCreateWithoutInspoItemsInput>
+    where?: ItemWhereInput
+  }
+
+  export type ItemUpdateToOneWithWhereWithoutInspoItemsInput = {
+    where?: ItemWhereInput
+    data: XOR<ItemUpdateWithoutInspoItemsInput, ItemUncheckedUpdateWithoutInspoItemsInput>
+  }
+
+  export type ItemUpdateWithoutInspoItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: IntFieldUpdateOperationsInput | number
+    url?: StringFieldUpdateOperationsInput | string
+    brand?: BrandUpdateOneRequiredWithoutItemNestedInput
+    files?: FilesUpdateOneRequiredWithoutItemNestedInput
+    favorites?: ItemFavoriteUpdateManyWithoutItemNestedInput
+    likes?: ItemLikeUpdateManyWithoutItemNestedInput
+  }
+
+  export type ItemUncheckedUpdateWithoutInspoItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    price?: IntFieldUpdateOperationsInput | number
+    url?: StringFieldUpdateOperationsInput | string
+    brandId?: StringFieldUpdateOperationsInput | string
+    imageId?: StringFieldUpdateOperationsInput | string
+    favorites?: ItemFavoriteUncheckedUpdateManyWithoutItemNestedInput
+    likes?: ItemLikeUncheckedUpdateManyWithoutItemNestedInput
+  }
+
   export type BrandCreateWithoutItemInput = {
     name: string
     description: string
@@ -20655,6 +21277,72 @@ export namespace Prisma {
   export type FilesCreateOrConnectWithoutItemInput = {
     where: FilesWhereUniqueInput
     create: XOR<FilesCreateWithoutItemInput, FilesUncheckedCreateWithoutItemInput>
+  }
+
+  export type ItemFavoriteCreateWithoutItemInput = {
+    id?: string
+    createdAt?: Date | string | null
+    user: userCreateNestedOneWithoutItemFavoritesInput
+  }
+
+  export type ItemFavoriteUncheckedCreateWithoutItemInput = {
+    id?: string
+    userId: string
+    createdAt?: Date | string | null
+  }
+
+  export type ItemFavoriteCreateOrConnectWithoutItemInput = {
+    where: ItemFavoriteWhereUniqueInput
+    create: XOR<ItemFavoriteCreateWithoutItemInput, ItemFavoriteUncheckedCreateWithoutItemInput>
+  }
+
+  export type ItemFavoriteCreateManyItemInputEnvelope = {
+    data: ItemFavoriteCreateManyItemInput | ItemFavoriteCreateManyItemInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ItemLikeCreateWithoutItemInput = {
+    id?: string
+    createdAt?: Date | string | null
+    user: userCreateNestedOneWithoutItemLikesInput
+  }
+
+  export type ItemLikeUncheckedCreateWithoutItemInput = {
+    id?: string
+    userId: string
+    createdAt?: Date | string | null
+  }
+
+  export type ItemLikeCreateOrConnectWithoutItemInput = {
+    where: ItemLikeWhereUniqueInput
+    create: XOR<ItemLikeCreateWithoutItemInput, ItemLikeUncheckedCreateWithoutItemInput>
+  }
+
+  export type ItemLikeCreateManyItemInputEnvelope = {
+    data: ItemLikeCreateManyItemInput | ItemLikeCreateManyItemInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type InspoItemsCreateWithoutItemInput = {
+    id?: string
+    category: string
+    index: number
+  }
+
+  export type InspoItemsUncheckedCreateWithoutItemInput = {
+    id?: string
+    category: string
+    index: number
+  }
+
+  export type InspoItemsCreateOrConnectWithoutItemInput = {
+    where: InspoItemsWhereUniqueInput
+    create: XOR<InspoItemsCreateWithoutItemInput, InspoItemsUncheckedCreateWithoutItemInput>
+  }
+
+  export type InspoItemsCreateManyItemInputEnvelope = {
+    data: InspoItemsCreateManyItemInput | InspoItemsCreateManyItemInput[]
+    skipDuplicates?: boolean
   }
 
   export type BrandUpsertWithoutItemInput = {
@@ -20721,6 +21409,84 @@ export namespace Prisma {
     brand?: BrandUncheckedUpdateManyWithoutFilesNestedInput
   }
 
+  export type ItemFavoriteUpsertWithWhereUniqueWithoutItemInput = {
+    where: ItemFavoriteWhereUniqueInput
+    update: XOR<ItemFavoriteUpdateWithoutItemInput, ItemFavoriteUncheckedUpdateWithoutItemInput>
+    create: XOR<ItemFavoriteCreateWithoutItemInput, ItemFavoriteUncheckedCreateWithoutItemInput>
+  }
+
+  export type ItemFavoriteUpdateWithWhereUniqueWithoutItemInput = {
+    where: ItemFavoriteWhereUniqueInput
+    data: XOR<ItemFavoriteUpdateWithoutItemInput, ItemFavoriteUncheckedUpdateWithoutItemInput>
+  }
+
+  export type ItemFavoriteUpdateManyWithWhereWithoutItemInput = {
+    where: ItemFavoriteScalarWhereInput
+    data: XOR<ItemFavoriteUpdateManyMutationInput, ItemFavoriteUncheckedUpdateManyWithoutItemInput>
+  }
+
+  export type ItemFavoriteScalarWhereInput = {
+    AND?: ItemFavoriteScalarWhereInput | ItemFavoriteScalarWhereInput[]
+    OR?: ItemFavoriteScalarWhereInput[]
+    NOT?: ItemFavoriteScalarWhereInput | ItemFavoriteScalarWhereInput[]
+    id?: UuidFilter<"ItemFavorite"> | string
+    userId?: UuidFilter<"ItemFavorite"> | string
+    itemUuid?: UuidFilter<"ItemFavorite"> | string
+    createdAt?: DateTimeNullableFilter<"ItemFavorite"> | Date | string | null
+  }
+
+  export type ItemLikeUpsertWithWhereUniqueWithoutItemInput = {
+    where: ItemLikeWhereUniqueInput
+    update: XOR<ItemLikeUpdateWithoutItemInput, ItemLikeUncheckedUpdateWithoutItemInput>
+    create: XOR<ItemLikeCreateWithoutItemInput, ItemLikeUncheckedCreateWithoutItemInput>
+  }
+
+  export type ItemLikeUpdateWithWhereUniqueWithoutItemInput = {
+    where: ItemLikeWhereUniqueInput
+    data: XOR<ItemLikeUpdateWithoutItemInput, ItemLikeUncheckedUpdateWithoutItemInput>
+  }
+
+  export type ItemLikeUpdateManyWithWhereWithoutItemInput = {
+    where: ItemLikeScalarWhereInput
+    data: XOR<ItemLikeUpdateManyMutationInput, ItemLikeUncheckedUpdateManyWithoutItemInput>
+  }
+
+  export type ItemLikeScalarWhereInput = {
+    AND?: ItemLikeScalarWhereInput | ItemLikeScalarWhereInput[]
+    OR?: ItemLikeScalarWhereInput[]
+    NOT?: ItemLikeScalarWhereInput | ItemLikeScalarWhereInput[]
+    id?: UuidFilter<"ItemLike"> | string
+    userId?: UuidFilter<"ItemLike"> | string
+    itemUuid?: UuidFilter<"ItemLike"> | string
+    createdAt?: DateTimeNullableFilter<"ItemLike"> | Date | string | null
+  }
+
+  export type InspoItemsUpsertWithWhereUniqueWithoutItemInput = {
+    where: InspoItemsWhereUniqueInput
+    update: XOR<InspoItemsUpdateWithoutItemInput, InspoItemsUncheckedUpdateWithoutItemInput>
+    create: XOR<InspoItemsCreateWithoutItemInput, InspoItemsUncheckedCreateWithoutItemInput>
+  }
+
+  export type InspoItemsUpdateWithWhereUniqueWithoutItemInput = {
+    where: InspoItemsWhereUniqueInput
+    data: XOR<InspoItemsUpdateWithoutItemInput, InspoItemsUncheckedUpdateWithoutItemInput>
+  }
+
+  export type InspoItemsUpdateManyWithWhereWithoutItemInput = {
+    where: InspoItemsScalarWhereInput
+    data: XOR<InspoItemsUpdateManyMutationInput, InspoItemsUncheckedUpdateManyWithoutItemInput>
+  }
+
+  export type InspoItemsScalarWhereInput = {
+    AND?: InspoItemsScalarWhereInput | InspoItemsScalarWhereInput[]
+    OR?: InspoItemsScalarWhereInput[]
+    NOT?: InspoItemsScalarWhereInput | InspoItemsScalarWhereInput[]
+    id?: UuidFilter<"InspoItems"> | string
+    itemUuid?: UuidFilter<"InspoItems"> | string
+    category?: StringFilter<"InspoItems"> | string
+    index?: IntFilter<"InspoItems"> | number
+  }
+
   export type BrandCreateWithoutFilesInput = {
     name: string
     description: string
@@ -20754,6 +21520,9 @@ export namespace Prisma {
     price: number
     url: string
     brand: BrandCreateNestedOneWithoutItemInput
+    favorites?: ItemFavoriteCreateNestedManyWithoutItemInput
+    likes?: ItemLikeCreateNestedManyWithoutItemInput
+    inspoItems?: InspoItemsCreateNestedManyWithoutItemInput
   }
 
   export type ItemUncheckedCreateWithoutFilesInput = {
@@ -20763,6 +21532,9 @@ export namespace Prisma {
     price: number
     url: string
     brandId: string
+    favorites?: ItemFavoriteUncheckedCreateNestedManyWithoutItemInput
+    likes?: ItemLikeUncheckedCreateNestedManyWithoutItemInput
+    inspoItems?: InspoItemsUncheckedCreateNestedManyWithoutItemInput
   }
 
   export type ItemCreateOrConnectWithoutFilesInput = {
@@ -21104,8 +21876,8 @@ export namespace Prisma {
 
   export type ItemFavoriteCreateWithoutUserInput = {
     id?: string
-    itemUuid: string
     createdAt?: Date | string | null
+    item: ItemCreateNestedOneWithoutFavoritesInput
   }
 
   export type ItemFavoriteUncheckedCreateWithoutUserInput = {
@@ -21126,8 +21898,8 @@ export namespace Prisma {
 
   export type ItemLikeCreateWithoutUserInput = {
     id?: string
-    itemUuid: string
     createdAt?: Date | string | null
+    item: ItemCreateNestedOneWithoutLikesInput
   }
 
   export type ItemLikeUncheckedCreateWithoutUserInput = {
@@ -21325,16 +22097,6 @@ export namespace Prisma {
     data: XOR<ItemFavoriteUpdateManyMutationInput, ItemFavoriteUncheckedUpdateManyWithoutUserInput>
   }
 
-  export type ItemFavoriteScalarWhereInput = {
-    AND?: ItemFavoriteScalarWhereInput | ItemFavoriteScalarWhereInput[]
-    OR?: ItemFavoriteScalarWhereInput[]
-    NOT?: ItemFavoriteScalarWhereInput | ItemFavoriteScalarWhereInput[]
-    id?: UuidFilter<"ItemFavorite"> | string
-    userId?: UuidFilter<"ItemFavorite"> | string
-    itemUuid?: StringFilter<"ItemFavorite"> | string
-    createdAt?: DateTimeNullableFilter<"ItemFavorite"> | Date | string | null
-  }
-
   export type ItemLikeUpsertWithWhereUniqueWithoutUserInput = {
     where: ItemLikeWhereUniqueInput
     update: XOR<ItemLikeUpdateWithoutUserInput, ItemLikeUncheckedUpdateWithoutUserInput>
@@ -21349,16 +22111,6 @@ export namespace Prisma {
   export type ItemLikeUpdateManyWithWhereWithoutUserInput = {
     where: ItemLikeScalarWhereInput
     data: XOR<ItemLikeUpdateManyMutationInput, ItemLikeUncheckedUpdateManyWithoutUserInput>
-  }
-
-  export type ItemLikeScalarWhereInput = {
-    AND?: ItemLikeScalarWhereInput | ItemLikeScalarWhereInput[]
-    OR?: ItemLikeScalarWhereInput[]
-    NOT?: ItemLikeScalarWhereInput | ItemLikeScalarWhereInput[]
-    id?: UuidFilter<"ItemLike"> | string
-    userId?: UuidFilter<"ItemLike"> | string
-    itemUuid?: StringFilter<"ItemLike"> | string
-    createdAt?: DateTimeNullableFilter<"ItemLike"> | Date | string | null
   }
 
   export type RegisterInProgressUpsertWithWhereUniqueWithoutUserInput = {
@@ -21431,6 +22183,9 @@ export namespace Prisma {
     price?: IntFieldUpdateOperationsInput | number
     url?: StringFieldUpdateOperationsInput | string
     files?: FilesUpdateOneRequiredWithoutItemNestedInput
+    favorites?: ItemFavoriteUpdateManyWithoutItemNestedInput
+    likes?: ItemLikeUpdateManyWithoutItemNestedInput
+    inspoItems?: InspoItemsUpdateManyWithoutItemNestedInput
   }
 
   export type ItemUncheckedUpdateWithoutBrandInput = {
@@ -21440,6 +22195,9 @@ export namespace Prisma {
     price?: IntFieldUpdateOperationsInput | number
     url?: StringFieldUpdateOperationsInput | string
     imageId?: StringFieldUpdateOperationsInput | string
+    favorites?: ItemFavoriteUncheckedUpdateManyWithoutItemNestedInput
+    likes?: ItemLikeUncheckedUpdateManyWithoutItemNestedInput
+    inspoItems?: InspoItemsUncheckedUpdateManyWithoutItemNestedInput
   }
 
   export type ItemUncheckedUpdateManyWithoutBrandInput = {
@@ -21449,6 +22207,78 @@ export namespace Prisma {
     price?: IntFieldUpdateOperationsInput | number
     url?: StringFieldUpdateOperationsInput | string
     imageId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type ItemFavoriteCreateManyItemInput = {
+    id?: string
+    userId: string
+    createdAt?: Date | string | null
+  }
+
+  export type ItemLikeCreateManyItemInput = {
+    id?: string
+    userId: string
+    createdAt?: Date | string | null
+  }
+
+  export type InspoItemsCreateManyItemInput = {
+    id?: string
+    category: string
+    index: number
+  }
+
+  export type ItemFavoriteUpdateWithoutItemInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    user?: userUpdateOneRequiredWithoutItemFavoritesNestedInput
+  }
+
+  export type ItemFavoriteUncheckedUpdateWithoutItemInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type ItemFavoriteUncheckedUpdateManyWithoutItemInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type ItemLikeUpdateWithoutItemInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    user?: userUpdateOneRequiredWithoutItemLikesNestedInput
+  }
+
+  export type ItemLikeUncheckedUpdateWithoutItemInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type ItemLikeUncheckedUpdateManyWithoutItemInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type InspoItemsUpdateWithoutItemInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
+    index?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type InspoItemsUncheckedUpdateWithoutItemInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
+    index?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type InspoItemsUncheckedUpdateManyWithoutItemInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    category?: StringFieldUpdateOperationsInput | string
+    index?: IntFieldUpdateOperationsInput | number
   }
 
   export type BrandCreateManyFilesInput = {
@@ -21497,6 +22327,9 @@ export namespace Prisma {
     price?: IntFieldUpdateOperationsInput | number
     url?: StringFieldUpdateOperationsInput | string
     brand?: BrandUpdateOneRequiredWithoutItemNestedInput
+    favorites?: ItemFavoriteUpdateManyWithoutItemNestedInput
+    likes?: ItemLikeUpdateManyWithoutItemNestedInput
+    inspoItems?: InspoItemsUpdateManyWithoutItemNestedInput
   }
 
   export type ItemUncheckedUpdateWithoutFilesInput = {
@@ -21506,6 +22339,9 @@ export namespace Prisma {
     price?: IntFieldUpdateOperationsInput | number
     url?: StringFieldUpdateOperationsInput | string
     brandId?: StringFieldUpdateOperationsInput | string
+    favorites?: ItemFavoriteUncheckedUpdateManyWithoutItemNestedInput
+    likes?: ItemLikeUncheckedUpdateManyWithoutItemNestedInput
+    inspoItems?: InspoItemsUncheckedUpdateManyWithoutItemNestedInput
   }
 
   export type ItemUncheckedUpdateManyWithoutFilesInput = {
@@ -21645,8 +22481,8 @@ export namespace Prisma {
 
   export type ItemFavoriteUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
-    itemUuid?: StringFieldUpdateOperationsInput | string
     createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    item?: ItemUpdateOneRequiredWithoutFavoritesNestedInput
   }
 
   export type ItemFavoriteUncheckedUpdateWithoutUserInput = {
@@ -21663,8 +22499,8 @@ export namespace Prisma {
 
   export type ItemLikeUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
-    itemUuid?: StringFieldUpdateOperationsInput | string
     createdAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    item?: ItemUpdateOneRequiredWithoutLikesNestedInput
   }
 
   export type ItemLikeUncheckedUpdateWithoutUserInput = {

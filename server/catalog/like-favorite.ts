@@ -1,11 +1,14 @@
-import { CatalogResponseSchemaType } from "@/schemas/catalog/catalog-schema";
+import {
+  CatalogResponseSchemaType,
+  ItemSchemaType,
+} from "@/schemas/catalog/catalog-schema";
 import {
   ErrorSchemaType,
   SuccessSchemaType,
 } from "@/schemas/standar-response-schema";
 import { CheckLikeFavoriteResponseSchemaType } from "@/schemas/catalog/like-favorite-schema.ts";
 import { db } from "../db.config";
-import { GetItemsFromWeaviate } from "./functions";
+import { prisma } from "../db";
 
 // Funciones para likes
 export async function toggleLike(
@@ -153,78 +156,103 @@ export async function checkIfFavorited(
 }
 
 // Funciones para obtener todos los items liked y favorited
-export async function getAllLikedFavoritedItems(
-  type: "likes" | "favorites",
-  userEmail: string,
+export async function getAllLikedItems(
+  userId: string,
   page: number = 0,
   limit: number = 100
 ): Promise<CatalogResponseSchemaType | ErrorSchemaType> {
   let res: CatalogResponseSchemaType | ErrorSchemaType;
-  let likedFavoritedUuids: { itemUuid: string }[] = [];
-  const user = await db.user.findUnique({
-    where: { email: userEmail },
-  });
-  if (!user) {
-    res = { error: true, details: "User not found" };
-    return res;
-  }
 
   const offset = page * limit;
-  // const query = {
-  //   where: {
-  //     userId: user.id,
-  //   },
-  //   skip: offset,
-  //   take: limit,
-  //   select: {
-  //     itemUuid: true,
-  //   },
-  //   orderBy: {
-  //     createdAt: "desc",
-  //   },
-  // };
 
-  // Primero obtener los UUIDs de los items liked
-  if (type === "likes") {
-    likedFavoritedUuids = await db.itemLike.findMany({
-      where: {
-        userId: user.id,
+  const likedItems = await prisma.itemLike.findMany({
+    where: {
+      userId: userId,
+    },
+    skip: offset,
+    take: limit,
+    include: {
+      item: {
+        include: {
+          files: true, // Incluir la imagen del item
+        },
       },
-      skip: offset,
-      take: limit,
-      select: {
-        itemUuid: true,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-  } else if (type === "favorites") {
-    likedFavoritedUuids = await db.itemFavorite.findMany({
-      where: {
-        userId: user.id,
-      },
-      skip: offset,
-      take: limit,
-      select: {
-        itemUuid: true,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-  }
-  if (!likedFavoritedUuids || likedFavoritedUuids.length === 0) {
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  if (!likedItems || likedItems.length === 0) {
     res = { error: false, items: [] };
     return res;
   }
-  const uuids = likedFavoritedUuids.map(item => item.itemUuid);
-  // Obtener los items de weaviate
-  const itemsRespose = await GetItemsFromWeaviate(uuids, limit);
-  if (itemsRespose.error) {
-    return itemsRespose;
+
+  // Mapear los items obtenidos directamente de PostgreSQL
+  const items: ItemSchemaType[] = likedItems.map(like => ({
+    name: like.item.name,
+    description: like.item.description,
+    image: {
+      url: like.item.files.url,
+      updatedAt: like.item.files.updatedAt.toISOString(),
+    },
+    url: like.item.url,
+    brandId: like.item.brandId,
+    price: like.item.price,
+    uuid: like.item.id,
+  }));
+
+  res = { error: false, items: items };
+  return res;
+}
+
+// Funciones para obtener todos los items liked y favorited
+export async function getAllFavoritedItems(
+  userId: string,
+  page: number = 0,
+  limit: number = 100
+): Promise<CatalogResponseSchemaType | ErrorSchemaType> {
+  let res: CatalogResponseSchemaType | ErrorSchemaType;
+
+  const offset = page * limit;
+
+  const favoritedItems = await prisma.itemFavorite.findMany({
+    where: {
+      userId: userId,
+    },
+    skip: offset,
+    take: limit,
+    include: {
+      item: {
+        include: {
+          files: true, // Incluir la imagen del item
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  if (!favoritedItems || favoritedItems.length === 0) {
+    res = { error: false, items: [] };
+    return res;
   }
-  const items = itemsRespose.items;
+
+  // Mapear los items obtenidos directamente de PostgreSQL
+  const items: ItemSchemaType[] = favoritedItems.map(like => ({
+    name: like.item.name,
+    description: like.item.description,
+    image: {
+      url: like.item.files.url,
+      updatedAt: like.item.files.updatedAt.toISOString(),
+    },
+    url: like.item.url,
+    brandId: like.item.brandId,
+    price: like.item.price,
+    uuid: like.item.id,
+  }));
+
   res = { error: false, items: items };
   return res;
 }
