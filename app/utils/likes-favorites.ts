@@ -61,12 +61,34 @@ export const useToggleLike = () => {
       return res;
     },
 
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ["is-liked", variables.itemUuid],
+    onMutate: async ({ itemUuid }) => {
+      // Cancelar cualquier query en progreso para evitar conflictos
+      await queryClient.cancelQueries({
+        queryKey: ["is-liked", itemUuid],
       });
+
+      // Obtener el valor actual del cache
+      const previousLikeStatus = queryClient.getQueryData([
+        "is-liked",
+        itemUuid,
+      ]);
+
+      // Actualizar optimísticamente el cache
+      queryClient.setQueryData(["is-liked", itemUuid], (old: boolean) => !old);
+
+      // Retornar el valor anterior para poder revertir si hay error
+      return { previousLikeStatus };
     },
-    onError: error => {
+
+    onError: (error, variables, context) => {
+      // Revertir el cambio optimístico si hay error
+      if (context?.previousLikeStatus !== undefined) {
+        queryClient.setQueryData(
+          ["is-liked", variables.itemUuid],
+          context.previousLikeStatus
+        );
+      }
+
       console.error("Error toggling like:", error);
       Toast.show({
         type: "error",
@@ -74,7 +96,14 @@ export const useToggleLike = () => {
         visibilityTime: 3000,
       });
     },
+
     onSettled: (data, variables) => {
+      // Invalidar queries para sincronizar con el servidor
+      if (variables && "itemUuid" in variables) {
+        queryClient.invalidateQueries({
+          queryKey: ["is-liked", variables.itemUuid],
+        });
+      }
       queryClient.invalidateQueries({
         queryKey: ["all-liked-items", user?.email],
       });
@@ -98,13 +127,38 @@ export const useToggleFavorite = () => {
       }
       return res;
     },
-    onSuccess: (data, variables) => {
-      // Actualizar el estado del favorite
-      queryClient.invalidateQueries({
-        queryKey: ["is-favorited", variables.itemUuid],
+
+    onMutate: async ({ itemUuid }) => {
+      // Cancelar cualquier query en progreso para evitar conflictos
+      await queryClient.cancelQueries({
+        queryKey: ["is-favorited", itemUuid],
       });
+
+      // Obtener el valor actual del cache
+      const previousFavoriteStatus = queryClient.getQueryData([
+        "is-favorited",
+        itemUuid,
+      ]);
+
+      // Actualizar optimísticamente el cache
+      queryClient.setQueryData(
+        ["is-favorited", itemUuid],
+        (old: boolean) => !old
+      );
+
+      // Retornar el valor anterior para poder revertir si hay error
+      return { previousFavoriteStatus };
     },
-    onError: error => {
+
+    onError: (error, variables, context) => {
+      // Revertir el cambio optimístico si hay error
+      if (context?.previousFavoriteStatus !== undefined) {
+        queryClient.setQueryData(
+          ["is-favorited", variables.itemUuid],
+          context.previousFavoriteStatus
+        );
+      }
+
       console.error("Error toggling favorite:", error);
       Toast.show({
         type: "error",
@@ -112,7 +166,14 @@ export const useToggleFavorite = () => {
         visibilityTime: 3000,
       });
     },
+
     onSettled: (data, variables) => {
+      // Invalidar queries para sincronizar con el servidor
+      if (variables && "itemUuid" in variables) {
+        queryClient.invalidateQueries({
+          queryKey: ["is-favorited", variables.itemUuid],
+        });
+      }
       queryClient.invalidateQueries({
         queryKey: ["all-favorited-items", user?.email],
       });

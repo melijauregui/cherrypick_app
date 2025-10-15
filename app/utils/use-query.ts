@@ -80,7 +80,7 @@ export function useFetchBrandProfileItem(brandId: string): {
   const { data, isLoading, error } = useQuery({
     queryKey: ["brand-profile-item", brandId],
     queryFn: () => {
-      console.log("fetching brand profile item", brandId);
+      // console.log("fetching brand profile item", brandId);
       return getBrandProfile(brandId);
     },
     staleTime: 5 * 60 * 1000,

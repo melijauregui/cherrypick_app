@@ -61,10 +61,6 @@ const ItemDetail = () => {
   const bottomSheetRefAddItem = useRef<BottomSheet>(null);
   const [visibleModal, setVisibleModal] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
-  const likeData = useIsLiked(item?.uuid || "");
-  const favoriteData = useIsFavorited(item?.uuid || "");
-  const toggleLikeMutation = useToggleLike();
-  const toggleFavoriteMutation = useToggleFavorite();
 
   const openSheetUpdateItem = () => {
     bottomSheetRefAddItem.current?.snapToIndex(0);
@@ -87,16 +83,6 @@ const ItemDetail = () => {
       <View className="px-5 flex flex-col gap-6">
         <IconComponent
           uuid={item.uuid}
-          isLiked={likeData.data ?? false}
-          isFavorited={favoriteData.data ?? false}
-          onToggleLike={() =>
-            toggleLikeMutation.mutate({ itemUuid: item.uuid })
-          }
-          onToggleFavorite={() =>
-            toggleFavoriteMutation.mutate({ itemUuid: item.uuid })
-          }
-          isLoadingLike={toggleLikeMutation.isPending}
-          isLoadingFavorite={toggleFavoriteMutation.isPending}
           isBrandItem={isBrandItem || false}
           openSheetUpdateItem={openSheetUpdateItem}
           itemName={item.name}
@@ -264,25 +250,26 @@ const IconComponent = ({
   openSheetUpdateItem,
   itemName,
   setVisibleModal,
-  isLiked,
-  isFavorited,
-  onToggleLike,
-  onToggleFavorite,
-  isLoadingLike,
-  isLoadingFavorite,
 }: {
   uuid: string;
   isBrandItem: boolean;
   openSheetUpdateItem: () => void;
   itemName: string;
   setVisibleModal: (visible: boolean) => void;
-  isLiked: boolean;
-  isFavorited: boolean;
-  onToggleLike: () => void;
-  onToggleFavorite: () => void;
-  isLoadingLike: boolean;
-  isLoadingFavorite: boolean;
 }) => {
+  const {
+    data: likeData,
+    error: likeError,
+    isLoading: isLoadingGetLike,
+  } = useIsLiked(uuid);
+  const {
+    data: favoriteData,
+    error: favoriteError,
+    isLoading: isLoadingGetFavorite,
+  } = useIsFavorited(uuid);
+  const toggleLikeMutation = useToggleLike();
+  const toggleFavoriteMutation = useToggleFavorite();
+
   const handleShareItem = async () => {
     try {
       const itemLink = `cherrypick://item/${uuid}`;
@@ -312,24 +299,24 @@ const IconComponent = ({
       <View className="pt-4 flex-row items-center gap-8">
         <TouchableOpacity
           className="w-8 h-8 items-center justify-center"
-          onPress={onToggleLike}
-          disabled={isLoadingLike}
+          onPress={() => toggleLikeMutation.mutate({ itemUuid: uuid })}
+          disabled={isLoadingGetLike || toggleLikeMutation.isPending}
         >
           <Ionicons
-            name={isLiked ? "heart" : "heart-outline"}
+            name={likeData ? "heart" : "heart-outline"}
             size={24}
-            color={isLiked ? "#d8bc9e" : "white"}
+            color={likeData ? "#d8bc9e" : "white"}
           />
         </TouchableOpacity>
         <TouchableOpacity
           className="w-8 h-8 items-center justify-center"
-          onPress={onToggleFavorite}
-          disabled={isLoadingFavorite}
+          onPress={() => toggleFavoriteMutation.mutate({ itemUuid: uuid })}
+          disabled={toggleFavoriteMutation.isPending}
         >
           <FontAwesome
-            name={isFavorited ? "bookmark" : "bookmark-o"}
+            name={favoriteData ? "bookmark" : "bookmark-o"}
             size={24}
-            color={isFavorited ? "#d8bc9e" : "white"}
+            color={favoriteData ? "#d8bc9e" : "white"}
           />
         </TouchableOpacity>
 

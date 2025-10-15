@@ -13,7 +13,7 @@ const Home = () => {
   const { user } = useSession();
   const params = useLocalSearchParams();
 
-  console.log("user IN HOMEEEEE", user);
+  // console.log("user IN HOMEEEEE", user);
 
   // Puedes acceder al parámetro prefetch así:
   const alreadyPrefetched = params.prefetch === "true";

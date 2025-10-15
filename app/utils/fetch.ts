@@ -293,7 +293,7 @@ const checkLikeFavorite = async (
     CheckLikeFavoriteResponseSchema,
     "checkLikeFavorite"
   );
-  return res?.isSelected ?? null;
+  return res?.isSelected;
 };
 
 export const toggleLike = async (userEmail: string, itemUuid: string) => {
