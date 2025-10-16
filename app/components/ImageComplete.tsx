@@ -41,6 +41,10 @@ const ImageComplete = ({
   }, [imageUrl, imageUrlUpdatedAt, timestamp]);
 
   useEffect(() => {
+    setTimestamp({ timestamp: Date.now(), retries: 0 });
+  }, [imageUrl]);
+
+  useEffect(() => {
     if (src?.uri) {
       getImageSize(src.uri, screenWidth)
         .then(height => {
@@ -73,7 +77,6 @@ const ImageComplete = ({
             source={src}
             style={{ width: screenWidth, height: imageHeight }}
             resizeMode="cover"
-            // onError={(error) => console.error(error)}
           />
         </TouchableOpacity>
       ) : (
@@ -82,7 +85,6 @@ const ImageComplete = ({
           source={src}
           style={{ width: screenWidth, height: imageHeight }}
           resizeMode="cover"
-          // onError={(error) => console.error(error)}
         />
       )}
     </>

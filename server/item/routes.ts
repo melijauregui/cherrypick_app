@@ -9,6 +9,8 @@ import {
   ItemResponseSchema,
   ItemResponseSchemaType,
   UpdateItemBodySchema,
+  UploadItemImageResponseSchema,
+  UploadItemImageSchema,
 } from "@/schemas/catalog/catalog-schema";
 import { QueryIdSchema } from "@/schemas/standar-query-schema";
 import {
@@ -17,7 +19,7 @@ import {
   SuccessSchema,
   SuccessSchemaType,
 } from "@/schemas/standar-response-schema";
-import { GetEmbeddingItem, GetItem } from "./functions";
+import { GetEmbeddingItem, GetItem, UploadImage } from "./functions";
 import logger from "../logger";
 import { GetBrandId } from "../brand/functions";
 import { AppEnv } from "../app";
@@ -36,6 +38,7 @@ import {
   EmbbedingResponseSchema,
   EmbbedingResponseSchemaType,
 } from "@/schemas/search/search-schema";
+import { z } from "zod/v4";
 
 const ItemApp = new OpenAPIHono<AppEnv>({
   defaultHook: (result, c) => {
@@ -239,21 +242,14 @@ ItemApp.openapi(updateItemRoute, async c => {
   logger.info("/PATCH item/uuid: %s updatedItem: %s", id, updatedItem);
   let res: SuccessSchemaType | ErrorSchemaType;
   const user = c.get("user");
-  if (!user?.email) {
+  if (!user?.id) {
     res = {
       error: true,
       details: "Usuario no autenticado",
     };
     return c.json(res, 401);
   }
-  const userBrandId = await GetBrandId(user.email);
-  if (!userBrandId) {
-    res = {
-      error: true,
-      details: "Marca no encontrada",
-    };
-    return c.json(res, 404);
-  }
+
   const itemResult = await GetItem(id);
   if (itemResult.error) {
     res = {
@@ -263,12 +259,11 @@ ItemApp.openapi(updateItemRoute, async c => {
     return c.json(res, 404);
   }
 
-  if (userBrandId !== itemResult.item.brandId) {
-    res = {
-      error: true,
-      details: "No tienes permisos para actualizar este item",
-    };
-    return c.json(res, 401);
+  if (user.id !== itemResult.item.brandId) {
+    return c.json(
+      { error: true, details: "No tienes permisos para actualizar este item" },
+      401
+    );
   }
 
   const updateItemRes = await UpdateItem(id, updatedItem);
@@ -284,6 +279,99 @@ ItemApp.openapi(updateItemRoute, async c => {
     error: false,
   };
   return c.json(res, 200);
+});
+
+const updateItemImageRoute = createRoute({
+  method: "post",
+  path: "/{id}/image",
+  request: {
+    params: QueryIdSchema,
+    body: {
+      content: {
+        "application/json": { schema: UploadItemImageSchema },
+      },
+    },
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: UploadItemImageResponseSchema,
+        },
+      },
+      description: "Actualiza un item específico por nombre y marca",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Usuario no autenticado",
+    },
+    404: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Collection not found",
+    },
+    500: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Error interno del servidor",
+    },
+  },
+});
+
+ItemApp.openapi(updateItemImageRoute, async c => {
+  const { id } = c.req.valid("param");
+  const { contentType } = c.req.valid("json");
+  logger.info(
+    "POST /item/{id}/image - Update item image: %s contentType: %s",
+    id,
+    contentType
+  );
+  let res: SuccessSchemaType | ErrorSchemaType;
+
+  //verificar si el usuario es el propietario de la cancion
+  const user = c.get("user");
+  if (!user?.id) {
+    res = {
+      error: true,
+      details: "Usuario no autenticado",
+    };
+    return c.json(res, 401);
+  }
+
+  const itemResult = await GetItem(id);
+  if (itemResult.error) {
+    res = {
+      error: true,
+      details: "Item no encontrado" + itemResult.details,
+    };
+    return c.json(res, 404);
+  }
+
+  if (user.id !== itemResult.item.brandId) {
+    res = {
+      error: true,
+      details: "No tienes permisos para actualizar este item",
+    };
+    return c.json(res, 401);
+  }
+
+  const newFile = await UploadImage("items-images", id, contentType);
+
+  console.log("newFile", newFile.id);
+  return c.json(
+    { error: false, id: newFile.id, uploadUrl: newFile.uploadUrl as string },
+    200
+  );
 });
 
 // Endpoint para toggle like

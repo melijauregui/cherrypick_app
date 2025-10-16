@@ -14,7 +14,7 @@ import {
 import { EmbbedingResponseSchemaType } from "@/schemas/search/search-schema";
 import logger from "../logger";
 import { prisma } from "../db";
-import { getFileUrl } from "../file-uploader";
+import { getFileUrl, getSignedUrl } from "../file-uploader";
 
 // Function to query specific item from PostgreSQL
 export async function GetItem(
@@ -152,4 +152,26 @@ export async function GetEmbeddingItem(
     error: false,
     embedding: embedding,
   };
+}
+
+export async function UploadImage(
+  bucketName: string,
+  fileName: string,
+  contentType: string
+) {
+  const fileExtension = contentType.split("/")[1] ?? "";
+  if (fileExtension === "") {
+    throw new Error("File extension is empty");
+  }
+  const input = {
+    bucket: bucketName,
+    name: fileName,
+    contentType: contentType,
+    fileExtension: fileExtension,
+    replace: false,
+    hash: false,
+    metadata: {},
+  };
+  const newFile = await getSignedUrl(input);
+  return newFile;
 }

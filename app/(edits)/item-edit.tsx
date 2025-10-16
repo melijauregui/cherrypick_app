@@ -7,6 +7,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ItemSchemaType,
   MinimumPropertiesItemSchema,
+  UploadItemImageResponseSchema,
 } from "@/schemas/catalog/catalog-schema";
 import { StandardPageBottomSheet } from "../components/standar-page/standarPage";
 import { useState } from "react";
@@ -279,6 +280,7 @@ function useUpdateItem(
   itemUuid: string
 ) {
   const queryClient = useQueryClient();
+  const postImageMutation = usePostItemImage();
   const mutation = useMutation({
     mutationFn: async (data: { formData: ItemSchemaUpdateForm }) => {
       const formData = data.formData;
@@ -299,7 +301,11 @@ function useUpdateItem(
         itemUpdated.price = formData.price;
       }
       if (formData.image.url !== itemLastValue.image.url) {
-        const imageId = ""; //TODO SUBIR IMAGEN
+        //subir imagen
+        const imageId = await postImageMutation.mutateAsync({
+          fileUrl: formData.image.url,
+          itemUuid,
+        });
         itemUpdated.imageId = imageId;
       }
       if (formData.url !== itemLastValue.url) {
@@ -348,6 +354,61 @@ function useUpdateItem(
     onSettled: () => {
       setIsSubmitting(false);
       Keyboard.dismiss();
+    },
+  });
+
+  return mutation;
+}
+
+function usePostItemImage() {
+  const mutation = useMutation({
+    mutationFn: async (data: { fileUrl: string; itemUuid: string }) => {
+      const response = await fetch(data.fileUrl);
+      const blob = await response.blob();
+
+      const responsePost = await safeFetch({
+        url: `http://${LOCAL_IP}:3000/item/${data.itemUuid}/image`,
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contentType: blob.type }),
+      });
+      const imageUploadUrl = responsePost.data;
+      const { id: imageId, uploadUrl } =
+        UploadItemImageResponseSchema.parse(imageUploadUrl);
+
+      console.log("uploadUrl", uploadUrl);
+      console.log("imageId", imageId);
+
+      const res = await fetch(uploadUrl, {
+        method: "PUT",
+        headers: {
+          "Content-Type": blob.type,
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+        body: blob,
+      });
+      if (!res.ok) {
+        const txt = await res
+          .text()
+          .catch(e => (e instanceof Error ? e.message : "unknown error"));
+        throw new Error(
+          `Upload failed: ${res.status} ${res.statusText} ${txt}`
+        );
+      }
+      console.log("POST SUCCESSFULLY");
+      return imageId;
+    },
+    onError: (responseError, data) => {
+      if (responseError instanceof Error) {
+        console.error("ERROR UPLOADING ITEM IMAGE", responseError.message);
+        Toast.show({
+          type: "error",
+          text1: `Error uploading item image`,
+          visibilityTime: 6000,
+        });
+      }
     },
   });
 

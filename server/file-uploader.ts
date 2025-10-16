@@ -98,7 +98,7 @@ export async function getSignedUrl(input: z.infer<typeof uploadSchema>) {
     { expiresIn: 3600 }
   );
 
-  const url = `https://${input.bucket}.juampicarosi.com.ar/${filename}`;
+  const url = `https://${input.bucket}.cherrypick.com.ar/${filename}`;
 
   const newFile = await prisma.files.create({
     data: {

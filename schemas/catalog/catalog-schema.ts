@@ -137,3 +137,17 @@ export const jsonCatalogUploadSchema2 = z.object({
     .min(1, "Debe tener al menos un item"),
   brandEmail: z.string().min(1, "La marca es requerida"),
 });
+
+export const UploadItemImageSchema = z.object({
+  contentType: z.string().min(1, "El contentType es requerido"),
+});
+export type UploadItemImageSchemaType = z.infer<typeof UploadItemImageSchema>;
+
+export const UploadItemImageResponseSchema = z.object({
+  ...SuccessSchema.shape,
+  id: z.string().uuid({ message: "UUID is required" }),
+  uploadUrl: z.string().min(1, "El uploadUrl es requerido"),
+});
+export type UploadItemImageResponseSchemaType = z.infer<
+  typeof UploadItemImageResponseSchema
+>;

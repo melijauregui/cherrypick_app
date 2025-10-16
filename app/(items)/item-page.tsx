@@ -192,8 +192,6 @@ const ItemDetailComponent = ({
     [measured, item.description, lastDescription]
   );
 
-  console.log("price", item.price);
-
   return (
     <View className="gap-2">
       <TouchableOpacity
