@@ -102,7 +102,10 @@ const BrandProfile = ({
               name: "",
               price: "",
               url: "",
-              imageUrl: "",
+              image: {
+                url: "",
+                updatedAt: "",
+              },
               description: "",
             }}
           />

@@ -10303,7 +10303,7 @@ export namespace Prisma {
     readonly id: FieldRef<"Item", 'String'>
     readonly name: FieldRef<"Item", 'String'>
     readonly description: FieldRef<"Item", 'String'>
-    readonly price: FieldRef<"Item", 'Int'>
+    readonly price: FieldRef<"Item", 'Float'>
     readonly url: FieldRef<"Item", 'String'>
     readonly brandId: FieldRef<"Item", 'String'>
     readonly imageId: FieldRef<"Item", 'String'>
@@ -16785,13 +16785,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Boolean'
-   */
-  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
-    
-
-
-  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -16802,6 +16795,13 @@ export namespace Prisma {
    * Reference to a field of type 'Float[]'
    */
   export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Boolean'
+   */
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
   /**
    * Deep Input Types
@@ -17193,10 +17193,10 @@ export namespace Prisma {
     AND?: ItemWhereInput | ItemWhereInput[]
     OR?: ItemWhereInput[]
     NOT?: ItemWhereInput | ItemWhereInput[]
-    id?: StringFilter<"Item"> | string
+    id?: UuidFilter<"Item"> | string
     name?: StringFilter<"Item"> | string
     description?: StringFilter<"Item"> | string
-    price?: IntFilter<"Item"> | number
+    price?: FloatFilter<"Item"> | number
     url?: StringFilter<"Item"> | string
     brandId?: UuidFilter<"Item"> | string
     imageId?: UuidFilter<"Item"> | string
@@ -17229,7 +17229,7 @@ export namespace Prisma {
     NOT?: ItemWhereInput | ItemWhereInput[]
     name?: StringFilter<"Item"> | string
     description?: StringFilter<"Item"> | string
-    price?: IntFilter<"Item"> | number
+    price?: FloatFilter<"Item"> | number
     url?: StringFilter<"Item"> | string
     brandId?: UuidFilter<"Item"> | string
     imageId?: UuidFilter<"Item"> | string
@@ -17259,10 +17259,10 @@ export namespace Prisma {
     AND?: ItemScalarWhereWithAggregatesInput | ItemScalarWhereWithAggregatesInput[]
     OR?: ItemScalarWhereWithAggregatesInput[]
     NOT?: ItemScalarWhereWithAggregatesInput | ItemScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"Item"> | string
+    id?: UuidWithAggregatesFilter<"Item"> | string
     name?: StringWithAggregatesFilter<"Item"> | string
     description?: StringWithAggregatesFilter<"Item"> | string
-    price?: IntWithAggregatesFilter<"Item"> | number
+    price?: FloatWithAggregatesFilter<"Item"> | number
     url?: StringWithAggregatesFilter<"Item"> | string
     brandId?: UuidWithAggregatesFilter<"Item"> | string
     imageId?: UuidWithAggregatesFilter<"Item"> | string
@@ -18047,7 +18047,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
-    price?: IntFieldUpdateOperationsInput | number
+    price?: FloatFieldUpdateOperationsInput | number
     url?: StringFieldUpdateOperationsInput | string
     brand?: BrandUpdateOneRequiredWithoutItemNestedInput
     files?: FilesUpdateOneRequiredWithoutItemNestedInput
@@ -18060,7 +18060,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
-    price?: IntFieldUpdateOperationsInput | number
+    price?: FloatFieldUpdateOperationsInput | number
     url?: StringFieldUpdateOperationsInput | string
     brandId?: StringFieldUpdateOperationsInput | string
     imageId?: StringFieldUpdateOperationsInput | string
@@ -18083,7 +18083,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
-    price?: IntFieldUpdateOperationsInput | number
+    price?: FloatFieldUpdateOperationsInput | number
     url?: StringFieldUpdateOperationsInput | string
   }
 
@@ -18091,7 +18091,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
-    price?: IntFieldUpdateOperationsInput | number
+    price?: FloatFieldUpdateOperationsInput | number
     url?: StringFieldUpdateOperationsInput | string
     brandId?: StringFieldUpdateOperationsInput | string
     imageId?: StringFieldUpdateOperationsInput | string
@@ -18911,6 +18911,17 @@ export namespace Prisma {
     _max?: NestedIntFilter<$PrismaModel>
   }
 
+  export type FloatFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatFilter<$PrismaModel> | number
+  }
+
   export type BrandScalarRelationFilter = {
     is?: BrandWhereInput
     isNot?: BrandWhereInput
@@ -18982,6 +18993,22 @@ export namespace Prisma {
 
   export type ItemSumOrderByAggregateInput = {
     price?: SortOrder
+  }
+
+  export type FloatWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedFloatFilter<$PrismaModel>
+    _min?: NestedFloatFilter<$PrismaModel>
+    _max?: NestedFloatFilter<$PrismaModel>
   }
   export type JsonFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -19589,6 +19616,14 @@ export namespace Prisma {
     connectOrCreate?: InspoItemsCreateOrConnectWithoutItemInput | InspoItemsCreateOrConnectWithoutItemInput[]
     createMany?: InspoItemsCreateManyItemInputEnvelope
     connect?: InspoItemsWhereUniqueInput | InspoItemsWhereUniqueInput[]
+  }
+
+  export type FloatFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
   }
 
   export type BrandUpdateOneRequiredWithoutItemNestedInput = {
@@ -20284,6 +20319,22 @@ export namespace Prisma {
     not?: NestedFloatFilter<$PrismaModel> | number
   }
 
+  export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedFloatFilter<$PrismaModel>
+    _min?: NestedFloatFilter<$PrismaModel>
+    _max?: NestedFloatFilter<$PrismaModel>
+  }
+
   export type NestedDateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -20549,10 +20600,10 @@ export namespace Prisma {
     AND?: ItemScalarWhereInput | ItemScalarWhereInput[]
     OR?: ItemScalarWhereInput[]
     NOT?: ItemScalarWhereInput | ItemScalarWhereInput[]
-    id?: StringFilter<"Item"> | string
+    id?: UuidFilter<"Item"> | string
     name?: StringFilter<"Item"> | string
     description?: StringFilter<"Item"> | string
-    price?: IntFilter<"Item"> | number
+    price?: FloatFilter<"Item"> | number
     url?: StringFilter<"Item"> | string
     brandId?: UuidFilter<"Item"> | string
     imageId?: UuidFilter<"Item"> | string
@@ -20815,7 +20866,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
-    price?: IntFieldUpdateOperationsInput | number
+    price?: FloatFieldUpdateOperationsInput | number
     url?: StringFieldUpdateOperationsInput | string
     brand?: BrandUpdateOneRequiredWithoutItemNestedInput
     files?: FilesUpdateOneRequiredWithoutItemNestedInput
@@ -20827,7 +20878,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
-    price?: IntFieldUpdateOperationsInput | number
+    price?: FloatFieldUpdateOperationsInput | number
     url?: StringFieldUpdateOperationsInput | string
     brandId?: StringFieldUpdateOperationsInput | string
     imageId?: StringFieldUpdateOperationsInput | string
@@ -20967,7 +21018,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
-    price?: IntFieldUpdateOperationsInput | number
+    price?: FloatFieldUpdateOperationsInput | number
     url?: StringFieldUpdateOperationsInput | string
     brand?: BrandUpdateOneRequiredWithoutItemNestedInput
     files?: FilesUpdateOneRequiredWithoutItemNestedInput
@@ -20979,7 +21030,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
-    price?: IntFieldUpdateOperationsInput | number
+    price?: FloatFieldUpdateOperationsInput | number
     url?: StringFieldUpdateOperationsInput | string
     brandId?: StringFieldUpdateOperationsInput | string
     imageId?: StringFieldUpdateOperationsInput | string
@@ -21207,7 +21258,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
-    price?: IntFieldUpdateOperationsInput | number
+    price?: FloatFieldUpdateOperationsInput | number
     url?: StringFieldUpdateOperationsInput | string
     brand?: BrandUpdateOneRequiredWithoutItemNestedInput
     files?: FilesUpdateOneRequiredWithoutItemNestedInput
@@ -21219,7 +21270,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
-    price?: IntFieldUpdateOperationsInput | number
+    price?: FloatFieldUpdateOperationsInput | number
     url?: StringFieldUpdateOperationsInput | string
     brandId?: StringFieldUpdateOperationsInput | string
     imageId?: StringFieldUpdateOperationsInput | string
@@ -22180,7 +22231,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
-    price?: IntFieldUpdateOperationsInput | number
+    price?: FloatFieldUpdateOperationsInput | number
     url?: StringFieldUpdateOperationsInput | string
     files?: FilesUpdateOneRequiredWithoutItemNestedInput
     favorites?: ItemFavoriteUpdateManyWithoutItemNestedInput
@@ -22192,7 +22243,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
-    price?: IntFieldUpdateOperationsInput | number
+    price?: FloatFieldUpdateOperationsInput | number
     url?: StringFieldUpdateOperationsInput | string
     imageId?: StringFieldUpdateOperationsInput | string
     favorites?: ItemFavoriteUncheckedUpdateManyWithoutItemNestedInput
@@ -22204,7 +22255,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
-    price?: IntFieldUpdateOperationsInput | number
+    price?: FloatFieldUpdateOperationsInput | number
     url?: StringFieldUpdateOperationsInput | string
     imageId?: StringFieldUpdateOperationsInput | string
   }
@@ -22324,7 +22375,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
-    price?: IntFieldUpdateOperationsInput | number
+    price?: FloatFieldUpdateOperationsInput | number
     url?: StringFieldUpdateOperationsInput | string
     brand?: BrandUpdateOneRequiredWithoutItemNestedInput
     favorites?: ItemFavoriteUpdateManyWithoutItemNestedInput
@@ -22336,7 +22387,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
-    price?: IntFieldUpdateOperationsInput | number
+    price?: FloatFieldUpdateOperationsInput | number
     url?: StringFieldUpdateOperationsInput | string
     brandId?: StringFieldUpdateOperationsInput | string
     favorites?: ItemFavoriteUncheckedUpdateManyWithoutItemNestedInput
@@ -22348,7 +22399,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
-    price?: IntFieldUpdateOperationsInput | number
+    price?: FloatFieldUpdateOperationsInput | number
     url?: StringFieldUpdateOperationsInput | string
     brandId?: StringFieldUpdateOperationsInput | string
   }

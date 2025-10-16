@@ -71,7 +71,7 @@ export async function UpdateItem(
   const collection = collectionResult.collection!;
 
   // Prepare properties to update (only include fields that are provided)
-  const propertiesToUpdate: any = {};
+  const propertiesToUpdate: UpdateItemBodySchemaType = {};
   if (updatedItem.name !== undefined)
     propertiesToUpdate.name = updatedItem.name;
   if (updatedItem.description !== undefined)
@@ -82,7 +82,6 @@ export async function UpdateItem(
     propertiesToUpdate.imageId = updatedItem.imageId;
   if (updatedItem.url !== undefined) propertiesToUpdate.url = updatedItem.url;
 
-  // Update PostgreSQL table
   await prisma.item.update({
     where: { id: uuid },
     data: propertiesToUpdate,

@@ -97,6 +97,13 @@ const RootLayout = () => {
             animation: "slide_from_right",
           }}
         />
+        <Stack.Screen
+          name="(edits)"
+          options={{
+            headerShown: false,
+            animation: "slide_from_bottom",
+          }}
+        />
       </Stack>
       <Toast config={toastConfig} />
     </QueryClientProvider>

@@ -81,7 +81,7 @@ const ClothingItemComponent = ({
 
   const handlePress = () => {
     router.push({
-      pathname: "/(items)/[uuid]",
+      pathname: "/(items)/item-page",
       params: {
         uuid: item.uuid,
       },

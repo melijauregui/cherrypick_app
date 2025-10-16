@@ -16,11 +16,16 @@ export const MinimumPropertiesItemSchema = z.object({
       if (typeof val === "string") {
         const normalized = val.replace(",", ".").trim();
         const num = Number(normalized);
-        return isNaN(num) ? val : num;
+        return isNaN(num) ? undefined : num;
       }
       return val;
     },
-    z.number().positive({ message: "Price must be a positive number" })
+    z
+      .number({
+        required_error: "Price must be a positive number",
+        invalid_type_error: "Price must be a positive number",
+      })
+      .positive({ message: "Price must be a positive number" })
   ),
   url: z
     .string()

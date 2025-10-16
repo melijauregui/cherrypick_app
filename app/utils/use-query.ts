@@ -95,25 +95,6 @@ export function useFetchBrandProfileItem(brandId: string): {
   return { brand: data };
 }
 
-export function useFetchItem(itemUuid: string): {
-  item: ItemSchemaType;
-} | null {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["item-detail", itemUuid],
-    queryFn: () => getItem(itemUuid),
-    staleTime: 5 * 60 * 1000,
-  });
-
-  if (isLoading) {
-    return null;
-  }
-  if (!data) {
-    return null;
-  }
-
-  return data;
-}
-
 export function useFetchItemEmbedding(itemUuid: string): {
   embedding: number[];
 } | null {

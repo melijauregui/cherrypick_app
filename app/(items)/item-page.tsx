@@ -10,11 +10,10 @@ import {
 } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import Toast from "react-native-toast-message";
-import { useQueryClient } from "@tanstack/react-query";
-import { getClothingItemsSimilar } from "@/app/utils/fetch";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { getClothingItemsSimilar, getItem } from "@/app/utils/fetch";
 import useIsMyItem, {
   useFetchBrandProfileItem,
-  useFetchItem,
   useFetchItemEmbedding,
 } from "@/app/utils/use-query";
 import useIsLiked from "@/app/utils/likes-favorites";
@@ -23,8 +22,6 @@ import {
   useToggleLike,
   useToggleFavorite,
 } from "@/app/utils/likes-favorites";
-import { UpdateItemModal } from "@/app/components/profile/insertNewItems";
-import { FormDataItem } from "@/app/utils/update";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useSession } from "@/lib/auth-client";
@@ -36,19 +33,42 @@ import List2 from "@/app/components/List2";
 import { ItemSchemaType } from "@/schemas/catalog/catalog-schema";
 import { BrandSchemaType } from "@/schemas/brand/brand-schema";
 import ImageComplete from "../components/ImageComplete";
+import ErrorPage from "../(auth)/error";
 
-const ItemDetail = () => {
+export default function ItemDetailPage() {
   const params = useLocalSearchParams();
-  const decodedUuid = decodeURIComponent(params.uuid as string);
+  const itemUuid = decodeURIComponent(params.uuid as string);
+  const { user } = useSession();
+  const {
+    data: itemData,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["item-detail", itemUuid],
+    queryFn: () => getItem(itemUuid),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  if (isLoading) {
+    return <LoadingPage />;
+  }
+  if (isLoading || !itemData) {
+    return <LoadingPage />;
+  }
+
+  if (error) {
+    return <ErrorPage />;
+  }
+
+  return <ItemDetail item={itemData.item} />;
+}
+
+const ItemDetail = ({ item }: { item: ItemSchemaType }) => {
   const { user } = useSession();
   const queryClient = useQueryClient();
-
-  const itemData = useFetchItem(decodedUuid);
-  const itemEmbeddingData = useFetchItemEmbedding(decodedUuid);
-
-  const item = itemData?.item;
+  const itemEmbeddingData = useFetchItemEmbedding(item.uuid);
   const brand = useFetchBrandProfileItem(item?.brandId || "");
-  const isBrandItem = useIsMyItem(item?.uuid || "") || false;
+  // const isBrandItem = useIsMyItem(item?.uuid || "") || false;
   const deleteItem = useDeleteItem(item?.uuid || "");
 
   // Ejecutar prefetch solo una vez cuando se monta el componente
@@ -62,11 +82,7 @@ const ItemDetail = () => {
   const [visibleModal, setVisibleModal] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
 
-  const openSheetUpdateItem = () => {
-    bottomSheetRefAddItem.current?.snapToIndex(0);
-  };
-
-  const handleSubmitAddItem = (data: FormDataItem) => {
+  const handleSubmitAddItem = (data: ItemSchemaType) => {
     // console.log("Form submitted with data:", data);
   };
 
@@ -77,14 +93,17 @@ const ItemDetail = () => {
   const content = (
     <>
       <View className="relative">
-        <ImageComplete imageUrl={item.image.url} url={item.url} />
+        <ImageComplete
+          imageUrl={item.image.url}
+          url={item.url}
+          maxHeight={750}
+        />
       </View>
 
       <View className="px-5 flex flex-col gap-6">
         <IconComponent
           uuid={item.uuid}
-          isBrandItem={isBrandItem || false}
-          openSheetUpdateItem={openSheetUpdateItem}
+          isBrandItem={user.id === item.brandId}
           itemName={item.name}
           setVisibleModal={setVisibleModal}
         />
@@ -131,19 +150,6 @@ const ItemDetail = () => {
           columnCount={2}
           contentUp={content}
         />
-
-        <UpdateItemModal
-          bottomSheetRef={bottomSheetRefAddItem}
-          onSubmit={handleSubmitAddItem}
-          formDataLastValue={{
-            name: item.name,
-            price: item.price.toString(),
-            url: item.url,
-            imageUrl: item.image.url,
-            description: item.description,
-          }}
-          itemUuid={decodedUuid}
-        />
       </View>
       <CustomModal
         title="Eliminar producto"
@@ -158,8 +164,6 @@ const ItemDetail = () => {
     </GestureHandlerRootView>
   );
 };
-
-export default ItemDetail;
 
 const ItemDetailComponent = ({
   item,
@@ -187,6 +191,8 @@ const ItemDetailComponent = ({
     },
     [measured, item.description, lastDescription]
   );
+
+  console.log("price", item.price);
 
   return (
     <View className="gap-2">
@@ -247,13 +253,11 @@ const ItemDetailComponent = ({
 const IconComponent = ({
   isBrandItem,
   uuid,
-  openSheetUpdateItem,
   itemName,
   setVisibleModal,
 }: {
   uuid: string;
   isBrandItem: boolean;
-  openSheetUpdateItem: () => void;
   itemName: string;
   setVisibleModal: (visible: boolean) => void;
 }) => {
@@ -334,7 +338,12 @@ const IconComponent = ({
             style={{
               backgroundColor: "rgba(107, 114, 128, 0.5)",
             }}
-            onPress={openSheetUpdateItem}
+            onPress={() =>
+              router.push({
+                pathname: "/item-edit",
+                params: { uuid: uuid },
+              })
+            }
           >
             <Ionicons name="pencil-outline" size={20} color="white" />
           </TouchableOpacity>

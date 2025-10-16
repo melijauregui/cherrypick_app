@@ -13,7 +13,7 @@ const AuthLayout = () => {
     <OnlyAuthenticated>
       <View style={{ flex: 1 }}>
         <Stack screenOptions={{ headerShown: false }}></Stack>
-        {pagesToHideTabBar.includes(page) ? null : <CustomTabBar />}
+        <CustomTabBar />
       </View>
     </OnlyAuthenticated>
   );

@@ -155,7 +155,7 @@ const ProductCard = ({ itemId }: { itemId: string }) => {
       className="flex-row bg-white/90 w-64 rounded-xl p-3 mb-4 gap-3"
       onPress={() => {
         router.push({
-          pathname: "/(items)/[uuid]",
+          pathname: "/(items)/item-page",
           params: {
             uuid: item.uuid,
           },

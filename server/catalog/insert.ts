@@ -89,7 +89,7 @@ export async function insertCatalogItems(
           ...(item.uuid && { id: item.uuid }), // Solo incluir id si item.uuid está definido
           name: item.name,
           description: item.description,
-          price: Math.round(item.price * 100), // Convertir a centavos
+          price: item.price,
           url: item.url,
           brandId: brandId,
           imageId: item.imageId,

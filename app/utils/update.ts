@@ -7,8 +7,12 @@ import { Keyboard } from "react-native";
 import { authClient, useSession } from "@/lib/auth-client";
 import { router } from "expo-router";
 import { SuccessSchema } from "@/schemas/standar-response-schema";
-import { ItemSchema, ItemSchemaId } from "@/schemas/catalog/catalog-schema";
 import { ZodError } from "zod";
+import {
+  ItemSchema,
+  ItemSchemaType,
+  MinimumPropertiesItemSchema,
+} from "@/schemas/catalog/catalog-schema";
 
 export default function useUpdateBrand(brandEmail: string) {
   const queryClient = useQueryClient();
@@ -207,137 +211,6 @@ export function useDeleteAccount(logout: () => Promise<void>) {
     onError: error => {
       // TODO PUSH TOAST
       console.log(`could not delete user:`, error);
-    },
-  });
-
-  return mutation;
-}
-
-export type FormErrors = {
-  name?: string;
-  description?: string;
-  price?: string;
-  url?: string;
-  imageUrl?: string;
-};
-
-export type FormDataItem = {
-  name: string;
-  description: string;
-  price: string;
-  url: string;
-  imageUrl: string;
-};
-
-export function useUpdateItem(
-  setFormData: React.Dispatch<React.SetStateAction<FormDataItem>>,
-  setIsSubmitting: (isSubmitting: boolean) => void,
-  setErrors: (errors: FormErrors) => void,
-  onSubmit: (data: FormDataItem) => void,
-  bottomSheetRef: React.RefObject<BottomSheet>,
-  formDataLastValue: FormDataItem,
-  itemUuid: string
-) {
-  const queryClient = useQueryClient();
-  const mutation = useMutation({
-    mutationFn: async (data: { formData: FormDataItem }) => {
-      const result = ItemSchemaId.safeParse({
-        ...data.formData,
-        uuid: itemUuid,
-      });
-      if (!result.success) {
-        throw new ZodError(result.error.errors);
-      }
-      setErrors({});
-
-      setIsSubmitting(true);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      bottomSheetRef.current?.close();
-
-      // Only include fields that have changed compared to formDataLastValue
-      const itemUpdated: Partial<FormDataItem> = {};
-
-      if (result.data.name !== formDataLastValue.name) {
-        itemUpdated.name = result.data.name;
-      }
-      if (result.data.description !== formDataLastValue.description) {
-        itemUpdated.description = result.data.description;
-      }
-      if (result.data.price.toString() !== formDataLastValue.price) {
-        itemUpdated.price = result.data.price.toString();
-      }
-      if (result.data.imageUrl !== formDataLastValue.imageUrl) {
-        itemUpdated.imageUrl = result.data.imageUrl;
-      }
-      if (result.data.url !== formDataLastValue.url) {
-        itemUpdated.url = result.data.url;
-      }
-
-      setFormData({
-        ...formDataLastValue,
-        ...itemUpdated,
-      });
-
-      const response = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/item/${itemUuid}`,
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(itemUpdated),
-      });
-      if (response.data.error) {
-        throw new Error(response.data.details);
-      }
-      return response.data;
-    },
-    onSuccess: (data, variables) => {
-      void queryClient.invalidateQueries({
-        queryKey: ["item-detail", itemUuid],
-      });
-      onSubmit(variables.formData);
-      Toast.show({
-        type: "success",
-        text1: `The item ${variables.formData.name} has been successfully updated in the catalog!`,
-        visibilityTime: 2000,
-      });
-    },
-    onError: (responseError, data) => {
-      const newErrors: FormErrors = {};
-      if (responseError instanceof ZodError) {
-        responseError.errors.forEach(error => {
-          const field = error.path[0] as keyof FormDataItem;
-          console.log("field", field);
-          newErrors[field] = error.message;
-        });
-        setErrors(newErrors);
-        setIsSubmitting(false);
-        return;
-      }
-      if (responseError instanceof Error) {
-        if (responseError.message.includes("[1] duplicados")) {
-          Toast.show({
-            type: "error",
-            text1: `The item ${data.formData.name} already exists in the catalog.`,
-            visibilityTime: 6000,
-          });
-        } else if (responseError.message.includes("[1] mal formados")) {
-          Toast.show({
-            type: "error",
-            text1: `The item ${data.formData.name} is not valid.`,
-            visibilityTime: 6000,
-          });
-        } else {
-          Toast.show({
-            type: "error",
-            text1: `Error updating item ${data.formData.name}: ${responseError.message}`,
-            visibilityTime: 6000,
-          });
-        }
-        setIsSubmitting(false);
-      }
-    },
-    onSettled: () => {
-      setIsSubmitting(false);
-      Keyboard.dismiss();
     },
   });
 

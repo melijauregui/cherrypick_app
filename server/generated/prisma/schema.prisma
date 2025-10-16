@@ -99,10 +99,10 @@ model InspoItems {
 }
 
 model Item {
-  id          String @id @default(uuid())
+  id          String @id @default(uuid()) @db.Uuid
   name        String @db.VarChar(50)
   description String @db.VarChar(512)
-  price       Int    @db.Integer
+  price       Float  @db.Real
   url         String @db.VarChar(255)
   brandId     String @db.Uuid
   imageId     String @db.Uuid
