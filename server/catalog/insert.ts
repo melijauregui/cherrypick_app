@@ -142,7 +142,6 @@ export async function UpdateCatalog(
   console.log(
     `Total objects in collection before insertion: ${totalCountBefore}`
   );
-  //await clearCollection(collection, brandId); //solo para testing
 
   const validationResult = await validateJsonItems(items);
   if (validationResult.error) {

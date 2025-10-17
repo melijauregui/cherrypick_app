@@ -1,9 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
-import { Dimensions, Image, Linking, TouchableOpacity } from "react-native";
-
+import {
+  Dimensions,
+  Image,
+  Linking,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { addMinutes, isAfter } from "date-fns";
-import { Asset } from "expo-asset";
 import { imageDefault } from "@/lib/constants";
+import { Skeleton } from "moti/skeleton";
 
 const ImageComplete = ({
   imageUrl,
@@ -11,15 +16,27 @@ const ImageComplete = ({
   imageUrlUpdatedAt,
   maxHeight,
   setImageHeighteExternal,
+  imageWidth,
+  imageHeight: storedImageHeight,
 }: {
   imageUrl: string;
   url?: string;
   imageUrlUpdatedAt?: Date;
   maxHeight?: number;
   setImageHeighteExternal?: (height: number) => void;
+  imageWidth?: number;
+  imageHeight?: number;
 }) => {
   const { width: screenWidth } = Dimensions.get("window");
-  const [imageHeight, setImageHeight] = useState(0);
+  const [imageHeight, setImageHeight] = useState(
+    storedImageHeight && imageWidth
+      ? calculateImageHeight({
+          imageWidth,
+          imageHeight: storedImageHeight,
+          screenWidth,
+        })
+      : 0
+  );
   const [timestamp, setTimestamp] = useState<{
     timestamp: number;
     retries: number;
@@ -45,6 +62,23 @@ const ImageComplete = ({
   }, [imageUrl]);
 
   useEffect(() => {
+    // If we already have stored dimensions, use them
+    if (storedImageHeight && imageWidth) {
+      const calculatedHeight = calculateImageHeight({
+        imageWidth,
+        imageHeight: storedImageHeight,
+        screenWidth,
+      });
+      const finalHeight =
+        maxHeight && calculatedHeight > maxHeight
+          ? maxHeight
+          : calculatedHeight;
+      setImageHeight(finalHeight);
+      setImageHeighteExternal?.(finalHeight);
+      return;
+    }
+
+    // Otherwise, calculate dimensions from the image
     if (src?.uri) {
       getImageSize(src.uri, screenWidth)
         .then(height => {
@@ -66,11 +100,24 @@ const ImageComplete = ({
           });
         });
     }
-  }, [imageUrl, screenWidth, src, timestamp, setImageHeighteExternal]);
+  }, [
+    imageUrl,
+    screenWidth,
+    src,
+    timestamp,
+    setImageHeighteExternal,
+    storedImageHeight,
+    imageWidth,
+    maxHeight,
+  ]);
 
   return (
     <>
-      {url ? (
+      {imageHeight === 0 ? (
+        <View style={{ width: screenWidth, height: 400 }}>
+          {/* <Skeleton colorMode={"dark"} width={screenWidth - 5} height={450} /> */}
+        </View>
+      ) : url ? (
         <TouchableOpacity onPress={() => Linking.openURL(url)}>
           <Image
             className="rounded-3xl"

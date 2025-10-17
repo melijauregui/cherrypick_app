@@ -97,6 +97,8 @@ const ItemDetail = ({ item }: { item: ItemSchemaType }) => {
           imageUrl={item.image.url}
           url={item.url}
           maxHeight={750}
+          imageWidth={item.image.width}
+          imageHeight={item.image.height}
         />
       </View>
 

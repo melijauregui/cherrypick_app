@@ -121,6 +121,8 @@ model Files {
   bucket      String
   url         String
   uploadUrl   String
+  width       Int?
+  height      Int?
   metadata    Json
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

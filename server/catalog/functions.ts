@@ -52,6 +52,8 @@ export async function GetCatalog(
       image: {
         url: item.files.url,
         updatedAt: item.files.updatedAt.toISOString(),
+        width: item.files.width ?? undefined,
+        height: item.files.height ?? undefined,
       },
       url: item.url,
       brandId: item.brandId,

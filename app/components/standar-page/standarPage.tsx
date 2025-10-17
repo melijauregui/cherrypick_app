@@ -9,12 +9,14 @@ export function StandardPageBottomSheet({
   onLoading,
   children,
   section,
+  disableSave = false,
 }: {
   onSave: () => void;
   onCancel: () => void;
   onLoading: boolean;
   children: React.ReactNode;
   section: string;
+  disableSave?: boolean;
 }) {
   return (
     <SafeAreaProvider>
@@ -29,6 +31,7 @@ export function StandardPageBottomSheet({
               onCancel={onCancel}
               onLoading={onLoading}
               section={section}
+              disableSave={disableSave}
             />
           </View>
           <View className="flex-1 pt-10 pb-4">{children}</View>
@@ -43,11 +46,13 @@ export function StandardBar({
   onSave,
   onLoading = false,
   section,
+  disableSave = false,
 }: {
   onSave: () => void;
   onCancel: () => void;
   section: string;
   onLoading?: boolean;
+  disableSave?: boolean;
 }) {
   return (
     <View className="flex flex-row justify-between items-center">
@@ -61,8 +66,12 @@ export function StandardBar({
       <Text className=" text-black text-lg font-pmedium">{section}</Text>
       {onLoading && <LoadingDots color="#9297a1" size="medium" />}
       {!onLoading && (
-        <TouchableOpacity onPress={onSave}>
-          <Text className="text-xl text-black font-plight">Save</Text>
+        <TouchableOpacity onPress={onSave} disabled={disableSave}>
+          <Text
+            className={`text-xl  font-plight ${disableSave ? "text-neutral-400" : "text-black"}`}
+          >
+            Save
+          </Text>
         </TouchableOpacity>
       )}
     </View>

@@ -26,6 +26,8 @@ export const uploadSchema = z.object({
   fileExtension: z.string(),
   replace: z.boolean(),
   hash: z.boolean(),
+  width: z.number().optional(),
+  height: z.number().optional(),
   metadata: z.record(z.any(), z.any()).optional(),
 });
 
@@ -70,10 +72,10 @@ export type UploadSchema = z.infer<typeof uploadSchema>;
 
 export async function getFileUrl(
   fileId: string
-): Promise<{ url: string; updatedAt: Date }> {
+): Promise<{ url: string; updatedAt: Date; width?: number; height?: number }> {
   const image = await prisma.files.findUnique({
     where: { id: fileId },
-    select: { url: true, updatedAt: true },
+    select: { url: true, updatedAt: true, width: true, height: true },
   });
   if (!image) {
     throw new NotFoundError(
@@ -82,7 +84,12 @@ export async function getFileUrl(
       "Image Not Found" + fileId
     );
   }
-  return image;
+  return {
+    url: image.url,
+    updatedAt: image.updatedAt,
+    width: image.width ?? undefined,
+    height: image.height ?? undefined,
+  };
 }
 
 export async function getSignedUrl(input: z.infer<typeof uploadSchema>) {
@@ -107,6 +114,8 @@ export async function getSignedUrl(input: z.infer<typeof uploadSchema>) {
       contentType: input.contentType,
       uploadUrl: uploadUrl,
       url: url,
+      width: input.width,
+      height: input.height,
       metadata: input.metadata ?? {},
     },
   });

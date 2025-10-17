@@ -189,6 +189,8 @@ exports.Prisma.FilesScalarFieldEnum = {
   bucket: 'bucket',
   url: 'url',
   uploadUrl: 'uploadUrl',
+  width: 'width',
+  height: 'height',
   metadata: 'metadata',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

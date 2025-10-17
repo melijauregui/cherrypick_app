@@ -46,6 +46,8 @@ export const ItemSchema = MinimumPropertiesItemSchema.extend({
   image: z.object({
     url: z.string().url({ message: "Please enter a valid URL" }),
     updatedAt: z.string(),
+    width: z.number().optional(),
+    height: z.number().optional(),
   }),
   brandId: z.string().uuid({ message: "El id de la marca es requerido" }),
   uuid: z.string().uuid({ message: "UUID is required" }),
@@ -140,6 +142,9 @@ export const jsonCatalogUploadSchema2 = z.object({
 
 export const UploadItemImageSchema = z.object({
   contentType: z.string().min(1, "El contentType es requerido"),
+  // fileName: z.string().min(1, "El nombre del archivo es requerido"),
+  width: z.number().optional(),
+  height: z.number().optional(),
 });
 export type UploadItemImageSchemaType = z.infer<typeof UploadItemImageSchema>;
 

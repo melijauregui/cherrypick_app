@@ -39,6 +39,8 @@ import {
   EmbbedingResponseSchemaType,
 } from "@/schemas/search/search-schema";
 import { z } from "zod/v4";
+import { VerifyUserExists } from "../user/functions";
+import { log } from "console";
 
 const ItemApp = new OpenAPIHono<AppEnv>({
   defaultHook: (result, c) => {
@@ -268,6 +270,7 @@ ItemApp.openapi(updateItemRoute, async c => {
 
   const updateItemRes = await UpdateItem(id, updatedItem);
   if (updateItemRes.error) {
+    logger.error("Error updating item: %s", updateItemRes.details);
     res = {
       error: true,
       details: updateItemRes.details,

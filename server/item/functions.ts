@@ -43,6 +43,8 @@ export async function GetItem(
     image: {
       url: item.files.url,
       updatedAt: item.files.updatedAt.toISOString(),
+      width: item.files.width ?? undefined,
+      height: item.files.height ?? undefined,
     },
     url: item.url,
     brandId: item.brandId,
@@ -157,7 +159,9 @@ export async function GetEmbeddingItem(
 export async function UploadImage(
   bucketName: string,
   fileName: string,
-  contentType: string
+  contentType: string,
+  width?: number,
+  height?: number
 ) {
   const fileExtension = contentType.split("/")[1] ?? "";
   if (fileExtension === "") {
@@ -170,6 +174,8 @@ export async function UploadImage(
     fileExtension: fileExtension,
     replace: false,
     hash: false,
+    width: width,
+    height: height,
     metadata: {},
   };
   const newFile = await getSignedUrl(input);

@@ -10799,8 +10799,20 @@ export namespace Prisma {
 
   export type AggregateFiles = {
     _count: FilesCountAggregateOutputType | null
+    _avg: FilesAvgAggregateOutputType | null
+    _sum: FilesSumAggregateOutputType | null
     _min: FilesMinAggregateOutputType | null
     _max: FilesMaxAggregateOutputType | null
+  }
+
+  export type FilesAvgAggregateOutputType = {
+    width: number | null
+    height: number | null
+  }
+
+  export type FilesSumAggregateOutputType = {
+    width: number | null
+    height: number | null
   }
 
   export type FilesMinAggregateOutputType = {
@@ -10810,6 +10822,8 @@ export namespace Prisma {
     bucket: string | null
     url: string | null
     uploadUrl: string | null
+    width: number | null
+    height: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -10821,6 +10835,8 @@ export namespace Prisma {
     bucket: string | null
     url: string | null
     uploadUrl: string | null
+    width: number | null
+    height: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -10832,12 +10848,24 @@ export namespace Prisma {
     bucket: number
     url: number
     uploadUrl: number
+    width: number
+    height: number
     metadata: number
     createdAt: number
     updatedAt: number
     _all: number
   }
 
+
+  export type FilesAvgAggregateInputType = {
+    width?: true
+    height?: true
+  }
+
+  export type FilesSumAggregateInputType = {
+    width?: true
+    height?: true
+  }
 
   export type FilesMinAggregateInputType = {
     id?: true
@@ -10846,6 +10874,8 @@ export namespace Prisma {
     bucket?: true
     url?: true
     uploadUrl?: true
+    width?: true
+    height?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -10857,6 +10887,8 @@ export namespace Prisma {
     bucket?: true
     url?: true
     uploadUrl?: true
+    width?: true
+    height?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -10868,6 +10900,8 @@ export namespace Prisma {
     bucket?: true
     url?: true
     uploadUrl?: true
+    width?: true
+    height?: true
     metadata?: true
     createdAt?: true
     updatedAt?: true
@@ -10912,6 +10946,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: FilesAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: FilesSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: FilesMinAggregateInputType
@@ -10942,6 +10988,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: FilesCountAggregateInputType | true
+    _avg?: FilesAvgAggregateInputType
+    _sum?: FilesSumAggregateInputType
     _min?: FilesMinAggregateInputType
     _max?: FilesMaxAggregateInputType
   }
@@ -10953,10 +11001,14 @@ export namespace Prisma {
     bucket: string
     url: string
     uploadUrl: string
+    width: number | null
+    height: number | null
     metadata: JsonValue
     createdAt: Date
     updatedAt: Date
     _count: FilesCountAggregateOutputType | null
+    _avg: FilesAvgAggregateOutputType | null
+    _sum: FilesSumAggregateOutputType | null
     _min: FilesMinAggregateOutputType | null
     _max: FilesMaxAggregateOutputType | null
   }
@@ -10982,6 +11034,8 @@ export namespace Prisma {
     bucket?: boolean
     url?: boolean
     uploadUrl?: boolean
+    width?: boolean
+    height?: boolean
     metadata?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -10997,6 +11051,8 @@ export namespace Prisma {
     bucket?: boolean
     url?: boolean
     uploadUrl?: boolean
+    width?: boolean
+    height?: boolean
     metadata?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -11009,6 +11065,8 @@ export namespace Prisma {
     bucket?: boolean
     url?: boolean
     uploadUrl?: boolean
+    width?: boolean
+    height?: boolean
     metadata?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -11021,12 +11079,14 @@ export namespace Prisma {
     bucket?: boolean
     url?: boolean
     uploadUrl?: boolean
+    width?: boolean
+    height?: boolean
     metadata?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type FilesOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "contentType" | "bucket" | "url" | "uploadUrl" | "metadata" | "createdAt" | "updatedAt", ExtArgs["result"]["files"]>
+  export type FilesOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "contentType" | "bucket" | "url" | "uploadUrl" | "width" | "height" | "metadata" | "createdAt" | "updatedAt", ExtArgs["result"]["files"]>
   export type FilesInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     brand?: boolean | Files$brandArgs<ExtArgs>
     item?: boolean | Files$itemArgs<ExtArgs>
@@ -11048,6 +11108,8 @@ export namespace Prisma {
       bucket: string
       url: string
       uploadUrl: string
+      width: number | null
+      height: number | null
       metadata: Prisma.JsonValue
       createdAt: Date
       updatedAt: Date
@@ -11482,6 +11544,8 @@ export namespace Prisma {
     readonly bucket: FieldRef<"Files", 'String'>
     readonly url: FieldRef<"Files", 'String'>
     readonly uploadUrl: FieldRef<"Files", 'String'>
+    readonly width: FieldRef<"Files", 'Int'>
+    readonly height: FieldRef<"Files", 'Int'>
     readonly metadata: FieldRef<"Files", 'Json'>
     readonly createdAt: FieldRef<"Files", 'DateTime'>
     readonly updatedAt: FieldRef<"Files", 'DateTime'>
@@ -16608,6 +16672,8 @@ export namespace Prisma {
     bucket: 'bucket',
     url: 'url',
     uploadUrl: 'uploadUrl',
+    width: 'width',
+    height: 'height',
     metadata: 'metadata',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -17278,6 +17344,8 @@ export namespace Prisma {
     bucket?: StringFilter<"Files"> | string
     url?: StringFilter<"Files"> | string
     uploadUrl?: StringFilter<"Files"> | string
+    width?: IntNullableFilter<"Files"> | number | null
+    height?: IntNullableFilter<"Files"> | number | null
     metadata?: JsonFilter<"Files">
     createdAt?: DateTimeFilter<"Files"> | Date | string
     updatedAt?: DateTimeFilter<"Files"> | Date | string
@@ -17292,6 +17360,8 @@ export namespace Prisma {
     bucket?: SortOrder
     url?: SortOrder
     uploadUrl?: SortOrder
+    width?: SortOrderInput | SortOrder
+    height?: SortOrderInput | SortOrder
     metadata?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -17309,6 +17379,8 @@ export namespace Prisma {
     bucket?: StringFilter<"Files"> | string
     url?: StringFilter<"Files"> | string
     uploadUrl?: StringFilter<"Files"> | string
+    width?: IntNullableFilter<"Files"> | number | null
+    height?: IntNullableFilter<"Files"> | number | null
     metadata?: JsonFilter<"Files">
     createdAt?: DateTimeFilter<"Files"> | Date | string
     updatedAt?: DateTimeFilter<"Files"> | Date | string
@@ -17323,12 +17395,16 @@ export namespace Prisma {
     bucket?: SortOrder
     url?: SortOrder
     uploadUrl?: SortOrder
+    width?: SortOrderInput | SortOrder
+    height?: SortOrderInput | SortOrder
     metadata?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: FilesCountOrderByAggregateInput
+    _avg?: FilesAvgOrderByAggregateInput
     _max?: FilesMaxOrderByAggregateInput
     _min?: FilesMinOrderByAggregateInput
+    _sum?: FilesSumOrderByAggregateInput
   }
 
   export type FilesScalarWhereWithAggregatesInput = {
@@ -17341,6 +17417,8 @@ export namespace Prisma {
     bucket?: StringWithAggregatesFilter<"Files"> | string
     url?: StringWithAggregatesFilter<"Files"> | string
     uploadUrl?: StringWithAggregatesFilter<"Files"> | string
+    width?: IntNullableWithAggregatesFilter<"Files"> | number | null
+    height?: IntNullableWithAggregatesFilter<"Files"> | number | null
     metadata?: JsonWithAggregatesFilter<"Files">
     createdAt?: DateTimeWithAggregatesFilter<"Files"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Files"> | Date | string
@@ -18104,6 +18182,8 @@ export namespace Prisma {
     bucket: string
     url: string
     uploadUrl: string
+    width?: number | null
+    height?: number | null
     metadata: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -18118,6 +18198,8 @@ export namespace Prisma {
     bucket: string
     url: string
     uploadUrl: string
+    width?: number | null
+    height?: number | null
     metadata: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -18132,6 +18214,8 @@ export namespace Prisma {
     bucket?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
     uploadUrl?: StringFieldUpdateOperationsInput | string
+    width?: NullableIntFieldUpdateOperationsInput | number | null
+    height?: NullableIntFieldUpdateOperationsInput | number | null
     metadata?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -18146,6 +18230,8 @@ export namespace Prisma {
     bucket?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
     uploadUrl?: StringFieldUpdateOperationsInput | string
+    width?: NullableIntFieldUpdateOperationsInput | number | null
+    height?: NullableIntFieldUpdateOperationsInput | number | null
     metadata?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -18160,6 +18246,8 @@ export namespace Prisma {
     bucket: string
     url: string
     uploadUrl: string
+    width?: number | null
+    height?: number | null
     metadata: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -18172,6 +18260,8 @@ export namespace Prisma {
     bucket?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
     uploadUrl?: StringFieldUpdateOperationsInput | string
+    width?: NullableIntFieldUpdateOperationsInput | number | null
+    height?: NullableIntFieldUpdateOperationsInput | number | null
     metadata?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -18184,6 +18274,8 @@ export namespace Prisma {
     bucket?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
     uploadUrl?: StringFieldUpdateOperationsInput | string
+    width?: NullableIntFieldUpdateOperationsInput | number | null
+    height?: NullableIntFieldUpdateOperationsInput | number | null
     metadata?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -19010,6 +19102,17 @@ export namespace Prisma {
     _min?: NestedFloatFilter<$PrismaModel>
     _max?: NestedFloatFilter<$PrismaModel>
   }
+
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
   export type JsonFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
@@ -19062,9 +19165,16 @@ export namespace Prisma {
     bucket?: SortOrder
     url?: SortOrder
     uploadUrl?: SortOrder
+    width?: SortOrder
+    height?: SortOrder
     metadata?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type FilesAvgOrderByAggregateInput = {
+    width?: SortOrder
+    height?: SortOrder
   }
 
   export type FilesMaxOrderByAggregateInput = {
@@ -19074,6 +19184,8 @@ export namespace Prisma {
     bucket?: SortOrder
     url?: SortOrder
     uploadUrl?: SortOrder
+    width?: SortOrder
+    height?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -19085,8 +19197,31 @@ export namespace Prisma {
     bucket?: SortOrder
     url?: SortOrder
     uploadUrl?: SortOrder
+    width?: SortOrder
+    height?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type FilesSumOrderByAggregateInput = {
+    width?: SortOrder
+    height?: SortOrder
+  }
+
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
   }
   export type JsonWithAggregatesFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -19754,6 +19889,14 @@ export namespace Prisma {
     connect?: ItemWhereUniqueInput | ItemWhereUniqueInput[]
   }
 
+  export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
   export type DateTimeFieldUpdateOperationsInput = {
     set?: Date | string
   }
@@ -20345,6 +20488,33 @@ export namespace Prisma {
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
+
+  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
   export type NestedJsonFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
@@ -20509,6 +20679,8 @@ export namespace Prisma {
     bucket: string
     url: string
     uploadUrl: string
+    width?: number | null
+    height?: number | null
     metadata: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -20522,6 +20694,8 @@ export namespace Prisma {
     bucket: string
     url: string
     uploadUrl: string
+    width?: number | null
+    height?: number | null
     metadata: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -20627,6 +20801,8 @@ export namespace Prisma {
     bucket?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
     uploadUrl?: StringFieldUpdateOperationsInput | string
+    width?: NullableIntFieldUpdateOperationsInput | number | null
+    height?: NullableIntFieldUpdateOperationsInput | number | null
     metadata?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20640,6 +20816,8 @@ export namespace Prisma {
     bucket?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
     uploadUrl?: StringFieldUpdateOperationsInput | string
+    width?: NullableIntFieldUpdateOperationsInput | number | null
+    height?: NullableIntFieldUpdateOperationsInput | number | null
     metadata?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -21306,6 +21484,8 @@ export namespace Prisma {
     bucket: string
     url: string
     uploadUrl: string
+    width?: number | null
+    height?: number | null
     metadata: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -21319,6 +21499,8 @@ export namespace Prisma {
     bucket: string
     url: string
     uploadUrl: string
+    width?: number | null
+    height?: number | null
     metadata: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -21441,6 +21623,8 @@ export namespace Prisma {
     bucket?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
     uploadUrl?: StringFieldUpdateOperationsInput | string
+    width?: NullableIntFieldUpdateOperationsInput | number | null
+    height?: NullableIntFieldUpdateOperationsInput | number | null
     metadata?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -21454,6 +21638,8 @@ export namespace Prisma {
     bucket?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
     uploadUrl?: StringFieldUpdateOperationsInput | string
+    width?: NullableIntFieldUpdateOperationsInput | number | null
+    height?: NullableIntFieldUpdateOperationsInput | number | null
     metadata?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
