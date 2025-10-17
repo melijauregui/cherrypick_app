@@ -18,8 +18,11 @@
     "db:studio": "prisma studio",
     "db:reset": "prisma migrate reset",
     "db:seed": "npx ts-node prisma/seed.ts",
-    "db:up": "cd database-users && docker compose up",
-    "db:rm": "cd database-users && docker compose down && docker volume rm database-users_postgres_data"
+    "db:seed-brands": "npx tsx scripts/seed-brands.ts",
+    "db:seed-inspiration": "npx tsx scripts/seed-inspiration.ts",
+    "db:seed-items": "node scripts/test-catalog-upload.js",
+    "db:cleanup": "npx tsx scripts/cleanup-database.ts",
+    "db:seed-complete": "npm run db:cleanup && npm run db:seed-brands && npm run db:seed-items && npm run db:seed-inspiration"
   },
   "jest": {
     "preset": "jest-expo"
