@@ -35,19 +35,19 @@ export default function splitDescriptionByLinesOrWords(
 }
 
 export const AddAndDeleteItems = ({
-  openUsernameSheetAddItem,
-  openUsernameSheetDeleteItem,
-  openUsernameSheetEdit,
+  onAddItem,
+  onDeleteItem,
+  onEdit,
 }: {
-  openUsernameSheetAddItem: () => void;
-  openUsernameSheetDeleteItem: () => void;
-  openUsernameSheetEdit: () => void;
+  onAddItem: () => void;
+  onDeleteItem: () => void;
+  onEdit: () => void;
 }) => {
   return (
     <View className="flex flex-row w-full gap-3 py-4">
-      <ButtonLarge onPress={openUsernameSheetAddItem} text="Agregar Item" />
-      <ButtonLarge onPress={openUsernameSheetDeleteItem} text="Eliminar Item" />
-      <ButtonEdit onPress={openUsernameSheetEdit} />
+      <ButtonLarge onPress={onAddItem} text="Agregar Item" />
+      <ButtonLarge onPress={onDeleteItem} text="Eliminar Item" />
+      <ButtonEdit onPress={onEdit} />
     </View>
   );
 };

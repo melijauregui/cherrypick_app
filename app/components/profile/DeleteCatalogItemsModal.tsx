@@ -10,7 +10,6 @@ import {
 import BottomSheet from "@gorhom/bottom-sheet";
 import Toast from "react-native-toast-message";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
-import { ButtonSubmit } from "./insertNewItems";
 import { useDelete } from "@/app/utils/update";
 import { UuidNameSchemaType } from "@/schemas/catalog/catalog-schema";
 import ListSearch from "../explore/listSearch";
@@ -136,7 +135,7 @@ const DeleteCatalogItemsModal = ({
           toggleSelect={toggleSelect}
           fetchNextPage={fetchNextPage}
         />
-        <ButtonSubmit
+        {/* <ButtonSubmit
           isSubmitting={deleting}
           isFormValid={selected.size > 0}
           handleSubmit={() => {
@@ -144,7 +143,7 @@ const DeleteCatalogItemsModal = ({
           }}
           text="Eliminar Items"
           loadingText="Eliminando..."
-        />
+        /> */}
       </View>
     </BottomSheet>
   );

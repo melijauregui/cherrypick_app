@@ -14,11 +14,7 @@ import { Entypo, Ionicons } from "@expo/vector-icons";
 import LoadingPage from "../LoadingPage";
 import DeleteCatalogItemsModal from "./DeleteCatalogItemsModal";
 import EditBrandProfile from "./editBrandProfile";
-import splitDescriptionByLinesOrWords, {
-  AddAndDeleteItems,
-} from "./brandComponents";
-import { InsertNewItemsModal } from "./insertNewItems";
-import { FormDataItem } from "@/app/utils/update";
+import { AddAndDeleteItems } from "./brandComponents";
 import { CustomBottomLogout } from "./bottomSheets";
 import { router } from "expo-router";
 import { getBrandItems, getSelfBrandItems } from "@/app/utils/fetch";
@@ -46,12 +42,6 @@ const BrandProfile = ({
     bottomSheetRefDeleteItem.current?.close();
     bottomSheetRefEdit.current?.close();
     bottomSheetRefLogout.current?.snapToIndex(0);
-  };
-  const openUsernameSheetAddItem = () => {
-    bottomSheetRefLogout.current?.close();
-    bottomSheetRefDeleteItem.current?.close();
-    bottomSheetRefEdit.current?.close();
-    bottomSheetRefAddItem.current?.snapToIndex(0);
   };
 
   const openUsernameSheetDeleteItem = () => {
@@ -82,9 +72,9 @@ const BrandProfile = ({
               openUsernameSheetLogout={openUsernameSheetLogout}
             />
             <AddAndDeleteItems
-              openUsernameSheetAddItem={openUsernameSheetAddItem}
-              openUsernameSheetDeleteItem={openUsernameSheetDeleteItem}
-              openUsernameSheetEdit={openUsernameSheetEdit}
+              onAddItem={() => router.push("/item-insert")}
+              onDeleteItem={openUsernameSheetDeleteItem}
+              onEdit={openUsernameSheetEdit}
             />
           </View>
           <List2
@@ -92,22 +82,6 @@ const BrandProfile = ({
             getClothingItems={getSelfBrandItems}
             limit={18}
             columnCount={3}
-          />
-
-          <InsertNewItemsModal
-            bottomSheetRef={bottomSheetRefAddItem}
-            onSubmit={handleSubmitAddItem}
-            brandEmail={user.email}
-            formDataLastValue={{
-              name: "",
-              price: "",
-              url: "",
-              image: {
-                url: "",
-                updatedAt: "",
-              },
-              description: "",
-            }}
           />
 
           <DeleteCatalogItemsModal
@@ -140,10 +114,6 @@ const BrandProfile = ({
 };
 
 export default BrandProfile;
-
-const handleSubmitAddItem = (data: FormDataItem) => {
-  // console.log("Form submitted with data:", data);
-};
 
 const BrandProfilePage = ({ brandId }: { brandId: string }) => {
   const [isPressed, setIsPressed] = useState(false);
