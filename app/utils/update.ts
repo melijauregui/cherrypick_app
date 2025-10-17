@@ -14,49 +14,6 @@ import {
   MinimumPropertiesItemSchema,
 } from "@/schemas/catalog/catalog-schema";
 
-export default function useUpdateBrand(brandEmail: string) {
-  const queryClient = useQueryClient();
-  const mutation = useMutation({
-    mutationFn: async (brand: { description: string; url: string }) => {
-      const { data } = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/brand`,
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          description: brand.description,
-          url: brand.url,
-        }),
-      });
-      if (data.error) {
-        throw new Error(data.details);
-      }
-      SuccessSchema.parse(data);
-    },
-    onSuccess: () => {
-      Toast.show({
-        type: "success",
-        text1: `Brand updated successfully`,
-        visibilityTime: 4000,
-      });
-    },
-    onError: error => {
-      Toast.show({
-        type: "error",
-        text1: `could not update user:`,
-        visibilityTime: 4000,
-      });
-      console.log(`could not update user:`, error);
-    },
-    onSettled: () => {
-      void queryClient.invalidateQueries({
-        queryKey: ["self-brand-profile", brandEmail],
-      });
-    },
-  });
-
-  return mutation;
-}
-
 export function useUpdateClient(email: string) {
   const queryClient = useQueryClient();
   const mutation = useMutation({

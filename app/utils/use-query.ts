@@ -56,24 +56,6 @@ export function useFetchClientProfile(user: UserInfo): {
   return { user: data };
 }
 
-export function useFetchBrandProfile(email: string): {
-  brand: BrandSchemaType;
-} | null {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["self-brand-profile", email],
-    queryFn: () => getSelfBrandProfile(),
-    staleTime: 5 * 60 * 1000,
-  });
-
-  if (isLoading) {
-    return null;
-  }
-  if (!data) {
-    return null;
-  }
-  return { brand: data };
-}
-
 export function useFetchBrandProfileItem(brandId: string): {
   brand: BrandSchemaType;
 } | null {

@@ -41,14 +41,14 @@ export async function GetBrandId(brandEmail: string): Promise<string | null> {
 export async function UpdateBrand(
   userId: string,
   description: string,
-  url: string
+  url: string,
+  logoId: string
 ): Promise<SuccessSchemaType | ErrorSchemaType> {
   let res: SuccessSchemaType | ErrorSchemaType;
-  const brandUpdated = await db.brand.update({
+  await db.brand.update({
     where: { userId: userId },
-    data: { description: description, url: url },
+    data: { description: description, url: url, logoId: logoId },
   });
-  logger.info("brand updated", brandUpdated);
   res = {
     error: false,
   };

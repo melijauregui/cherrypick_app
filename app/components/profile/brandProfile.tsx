@@ -1,11 +1,7 @@
 import { useState } from "react";
 import { useRef } from "react";
 import BottomSheet from "@gorhom/bottom-sheet";
-import useUpdateBrand from "@/app/utils/update";
-import {
-  useFetchBrandProfile,
-  useFetchBrandProfileItem,
-} from "@/app/utils/use-query";
+import { useFetchBrandProfileItem } from "@/app/utils/use-query";
 import { UserInfo } from "@/app/utils/use-query";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
@@ -13,14 +9,19 @@ import { View, Text, TouchableOpacity, Image, Linking } from "react-native";
 import { Entypo, Ionicons } from "@expo/vector-icons";
 import LoadingPage from "../LoadingPage";
 import DeleteCatalogItemsModal from "./DeleteCatalogItemsModal";
-import EditBrandProfile from "./editBrandProfile";
 import { AddAndDeleteItems } from "./brandComponents";
 import { CustomBottomLogout } from "./bottomSheets";
 import { router } from "expo-router";
-import { getBrandItems, getSelfBrandItems } from "@/app/utils/fetch";
+import {
+  getBrandItems,
+  getSelfBrandItems,
+  getSelfBrandProfile,
+} from "@/app/utils/fetch";
 import React from "react";
 import List2 from "../../components/List2";
 import { BrandSchemaType } from "@/schemas/brand/brand-schema";
+import { useQuery } from "@tanstack/react-query";
+import ErrorPage from "@/app/(auth)/error";
 
 const BrandProfile = ({
   user,
@@ -29,9 +30,6 @@ const BrandProfile = ({
   user: UserInfo;
   logout: () => Promise<void>;
 }) => {
-  const data = useFetchBrandProfile(user.email);
-  const mutateBrand = useUpdateBrand(user.email);
-
   const bottomSheetRefLogout = useRef<BottomSheet>(null);
   const bottomSheetRefAddItem = useRef<BottomSheet>(null);
   const bottomSheetRefDeleteItem = useRef<BottomSheet>(null);
@@ -51,15 +49,22 @@ const BrandProfile = ({
     bottomSheetRefDeleteItem.current?.snapToIndex(0);
   };
 
-  const openUsernameSheetEdit = () => {
-    bottomSheetRefLogout.current?.close();
-    bottomSheetRefAddItem.current?.close();
-    bottomSheetRefDeleteItem.current?.close();
-    bottomSheetRefEdit.current?.snapToIndex(0);
-  };
+  const {
+    data: brand,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["self-brand-profile", user?.email],
+    queryFn: () => getSelfBrandProfile(),
+    staleTime: 5 * 60 * 1000,
+  });
 
-  if (!data) {
-    return <LoadingPage alreadyPrefetched={true} />;
+  if (isLoading) {
+    return <LoadingPage />;
+  }
+
+  if (error || !brand) {
+    return <ErrorPage />;
   }
 
   return (
@@ -68,13 +73,13 @@ const BrandProfile = ({
         <SafeAreaView className="bg-brown-strong w-full flex-1 ">
           <View className="flex flex-col w-full px-10 ">
             <BrandDetails
-              brand={data.brand}
+              brand={brand}
               openUsernameSheetLogout={openUsernameSheetLogout}
             />
             <AddAndDeleteItems
               onAddItem={() => router.push("/item-insert")}
               onDeleteItem={openUsernameSheetDeleteItem}
-              onEdit={openUsernameSheetEdit}
+              onEdit={() => router.push("/brand-edit")}
             />
           </View>
           <List2
@@ -86,20 +91,8 @@ const BrandProfile = ({
 
           <DeleteCatalogItemsModal
             bottomSheetRef={bottomSheetRefDeleteItem}
-            brandId={data.brand.id}
+            brandId={brand.id}
             onDelete={() => {}}
-          />
-
-          <EditBrandProfile
-            bottomSheetRef={bottomSheetRefEdit}
-            onSubmit={(editLinkValue, editDescriptionValue) => {
-              mutateBrand.mutate({
-                description: editDescriptionValue,
-                url: editLinkValue,
-              });
-            }}
-            lastValueLink={data.brand.url}
-            lastValueDescription={data.brand.description}
           />
 
           <CustomBottomLogout
@@ -217,7 +210,7 @@ const BrandDetails = ({
               uri: brand.logo.url,
             }}
             className="w-32 h-32 rounded-full"
-            resizeMode="contain"
+            resizeMode="cover"
           />
         ) : null}
         <Text className="text-right text-white font-plight text-3xl pt-10">

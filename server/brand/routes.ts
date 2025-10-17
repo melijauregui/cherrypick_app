@@ -7,6 +7,7 @@ import {
   BrandSchemaPropertiesResponseType,
   BrandSchemaResponse,
   BrandSchemaResponseType,
+  MinimumPropertiesBrandSchema,
   UpdateBrandSchema,
 } from "@/schemas/brand/brand-schema";
 import {
@@ -153,7 +154,7 @@ const updateBrandRoute = createRoute({
 });
 
 BrandApp.openapi(updateBrandRoute, async c => {
-  var { description, url } = c.req.valid("json");
+  var { description, url, logoId } = c.req.valid("json");
   const user = c.get("user");
   const brandId = user?.id;
   let res: SuccessSchemaType | ErrorSchemaType;
@@ -164,14 +165,11 @@ BrandApp.openapi(updateBrandRoute, async c => {
     };
     return c.json(res, 401);
   }
-  logger.info("Updating brand:", description, url);
-  res = await UpdateBrand(brandId, description, url);
+  logger.info("Updating brand:", description, url, logoId);
+  res = await UpdateBrand(brandId, description, url, logoId);
   if (res.error) {
     return c.json(res, 404);
   }
-  res = {
-    error: false,
-  };
   return c.json(res, 200);
 });
 

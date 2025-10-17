@@ -65,7 +65,7 @@ function EditItem({ item }: { item: UpdateItemSchema }) {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const mutation = useUpdateItem(setIsSubmitting, item, item.uuid);
+  const mutation = useUpdateItem(item);
 
   const onSave = async (data: UpdateItemSchema) => {
     const result = MinimumPropertiesItemSchema.safeParse({
@@ -78,12 +78,18 @@ function EditItem({ item }: { item: UpdateItemSchema }) {
         newErrors[field] = error.message;
       });
       setErrors(newErrors);
-      setIsSubmitting(false);
       return;
     }
     setErrors({});
 
-    await mutation.mutateAsync({ formData: { ...formData, uuid: item.uuid } });
+    try {
+      setIsSubmitting(true);
+      await mutation.mutateAsync({
+        formData: { ...formData, uuid: item.uuid },
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
     router.back();
   };
 
@@ -123,18 +129,12 @@ function EditItem({ item }: { item: UpdateItemSchema }) {
   );
 }
 
-function useUpdateItem(
-  setIsSubmitting: (isSubmitting: boolean) => void,
-  itemLastValue: UpdateItemSchema,
-  itemUuid: string
-) {
+function useUpdateItem(itemLastValue: UpdateItemSchema) {
   const queryClient = useQueryClient();
   const postImageMutation = usePostItemImage();
   const mutation = useMutation({
     mutationFn: async (data: { formData: UpdateItemSchema }) => {
       const formData = data.formData;
-
-      setIsSubmitting(true);
 
       // Only include fields that have changed compared to formDataLastValue
       const itemUpdated: Partial<InsertItemImageIdSchema> = {};
@@ -161,7 +161,7 @@ function useUpdateItem(
       }
 
       const response = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/item/${itemUuid}`,
+        url: `http://${LOCAL_IP}:3000/item/${itemLastValue.uuid}`,
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(itemUpdated),
@@ -174,7 +174,7 @@ function useUpdateItem(
     },
     onSuccess: (data, variables) => {
       void queryClient.invalidateQueries({
-        queryKey: ["item-detail", itemUuid],
+        queryKey: ["item-detail", itemLastValue.uuid],
       });
       Toast.show({
         type: "success",
@@ -197,11 +197,9 @@ function useUpdateItem(
             visibilityTime: 6000,
           });
         }
-        setIsSubmitting(false);
       }
     },
     onSettled: () => {
-      setIsSubmitting(false);
       Keyboard.dismiss();
     },
   });

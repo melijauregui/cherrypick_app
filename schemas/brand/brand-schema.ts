@@ -1,16 +1,19 @@
 import { z } from "zod";
 import { SuccessSchema } from "../standar-response-schema";
 
-export const UpdateBrandSchema = z.object({
+export const MinimumPropertiesBrandSchema = z.object({
   description: z.string().describe("Descripción de la marca"),
   url: z
     .string({ required_error: "URL de la marca es requerida" })
     .url({ message: "URL de la marca debe ser una URL válida" })
     .describe("URL de la marca"),
 });
+export const UpdateBrandSchema = MinimumPropertiesBrandSchema.extend({
+  logoId: z.string().describe("ID del logo de la marca"),
+});
 export type UpdateBrandSchemaType = z.infer<typeof UpdateBrandSchema>;
 
-export const BrandSchema = UpdateBrandSchema.extend({
+export const BrandSchema = MinimumPropertiesBrandSchema.extend({
   id: z.string().describe("ID de la marca"),
   name: z.string().describe("Nombre de la marca"),
   logo: z
@@ -19,6 +22,8 @@ export const BrandSchema = UpdateBrandSchema.extend({
         .string({ required_error: "URL del logo de la marca es requerida" })
         .url({ message: "URL del logo de la marca debe ser una URL válida" }),
       updatedAt: z.string(),
+      width: z.number().optional(),
+      height: z.number().optional(),
     })
     .describe("Logo de la marca"),
 });

@@ -50,7 +50,7 @@ export default function InsertItemPage() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const mutation = useInsertItem(setIsSubmitting);
+  const mutation = useInsertItem();
 
   const onSave = async (data: InsertItemSchema) => {
     const result = MinimumPropertiesItemSchema.safeParse({
@@ -63,12 +63,16 @@ export default function InsertItemPage() {
         newErrors[field] = error.message;
       });
       setErrors(newErrors);
-      setIsSubmitting(false);
       return;
     }
     setErrors({});
 
-    await mutation.mutateAsync({ formData });
+    try {
+      setIsSubmitting(true);
+      await mutation.mutateAsync({ formData });
+    } finally {
+      setIsSubmitting(false);
+    }
     router.back();
   };
   const isFormValid = Boolean(
@@ -183,7 +187,7 @@ export function ItemsBottomSheetDetails({
                   lastValue={formData.name}
                   isScrollable={false}
                   keyboardType="default"
-                  autoCapitalize="words"
+                  autoCapitalize="none"
                   placeholder="Escribe el nombre del nuevo item"
                 />
 
@@ -196,6 +200,7 @@ export function ItemsBottomSheetDetails({
                   isScrollable={true}
                   placeholder="Escribe una descripción del nuevo item"
                   height={120}
+                  autoCapitalize="none"
                 />
 
                 <InputBoxWithName
@@ -236,13 +241,12 @@ export type InsertItemImageIdSchema = Partial<
   imageId: string;
 };
 
-function useInsertItem(setIsSubmitting: (isSubmitting: boolean) => void) {
+function useInsertItem() {
   const queryClient = useQueryClient();
   const postImageMutation = usePostItemImage();
   const mutation = useMutation({
     mutationFn: async (data: { formData: InsertItemSchema }) => {
       const formData = data.formData;
-      setIsSubmitting(true);
 
       const imageId = await postImageMutation.mutateAsync({
         fileUrl: formData.image.url,
@@ -281,11 +285,9 @@ function useInsertItem(setIsSubmitting: (isSubmitting: boolean) => void) {
           text1: `Error inserting item ${data.formData.name}`,
           visibilityTime: 6000,
         });
-        setIsSubmitting(false);
       }
     },
     onSettled: () => {
-      setIsSubmitting(false);
       Keyboard.dismiss();
     },
   });
