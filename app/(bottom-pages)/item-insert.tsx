@@ -1,9 +1,5 @@
-import { useSession } from "@/lib/auth-client";
-import ErrorPage from "../(auth)/error";
-import LoadingPage from "../components/LoadingPage";
-import { router, useLocalSearchParams } from "expo-router";
-import { getItem } from "../utils/fetch";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { router } from "expo-router";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   ItemSchemaType,
   MinimumPropertiesItemSchema,
@@ -12,6 +8,7 @@ import {
 import { StandardPageBottomSheet } from "../components/standar-page/standarPage";
 import { useState } from "react";
 import {
+  Image,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -27,63 +24,42 @@ import InputBoxWithName from "../components/profile/inputBox";
 import safeFetch from "../utils/safe-fetch";
 import { LOCAL_IP } from "@/config/api";
 import Toast from "react-native-toast-message";
+import { sanitizeFilename } from "../utils/sanitize-filename";
+import { FormErrors } from "./item-edit";
 
-type ItemSchemaUpdateForm = Omit<ItemSchemaType, "price"> & {
+export type InsertItemSchema = Omit<
+  ItemSchemaType,
+  "price" | "brandId" | "uuid"
+> & {
   price: string;
 };
 
-export default function EditItemPage() {
-  const params = useLocalSearchParams();
-  const itemUuid = decodeURIComponent(params.uuid as string);
-  const { user } = useSession();
-  const {
-    data: itemData,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ["item-detail", itemUuid],
-    queryFn: () => getItem(itemUuid),
-    staleTime: 5 * 60 * 1000,
-  });
-
-  if (isLoading) {
-    return <LoadingPage />;
-  }
-  if (isLoading || !itemData) {
-    return <LoadingPage />;
-  }
-
-  if (error) {
-    return <ErrorPage />;
-  }
-
-  const item = {
-    ...itemData.item,
-    price: itemData.item.price.toString(),
-  };
-
-  return <EditItem item={item} />;
-}
-
-export type FormErrors = Partial<Record<keyof ItemSchemaUpdateForm, string>>;
-
-function EditItem({ item }: { item: ItemSchemaUpdateForm }) {
-  const [formData, setFormData] = useState<ItemSchemaUpdateForm>({
-    ...item,
+export default function InsertItemPage() {
+  const [formData, setFormData] = useState<InsertItemSchema>({
+    name: "",
+    description: "",
+    price: "",
+    url: "",
+    image: {
+      url: "",
+      updatedAt: "",
+      width: undefined,
+      height: undefined,
+    },
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const mutation = useUpdateItem(setIsSubmitting, item, item.uuid);
+  const mutation = useInsertItem(setIsSubmitting);
 
-  const onSave = async (data: ItemSchemaUpdateForm) => {
+  const onSave = async (data: InsertItemSchema) => {
     const result = MinimumPropertiesItemSchema.safeParse({
       ...data,
     });
     if (!result.success) {
       const newErrors: FormErrors = {};
       result.error.errors.forEach(error => {
-        const field = error.path[0] as keyof ItemSchemaUpdateForm;
+        const field = error.path[0] as keyof InsertItemSchema;
         newErrors[field] = error.message;
       });
       setErrors(newErrors);
@@ -95,19 +71,25 @@ function EditItem({ item }: { item: ItemSchemaUpdateForm }) {
     await mutation.mutateAsync({ formData });
     router.back();
   };
+  const isFormValid = Boolean(
+    formData.name &&
+      formData.price &&
+      formData.url &&
+      formData.image.url &&
+      formData.description &&
+      formData.price
+  );
   return (
     <StandardPageBottomSheet
       onSave={() => onSave(formData)}
       onCancel={() => router.back()}
       onLoading={isSubmitting}
-      section="Edit Item"
+      section="Insertar nuevo item"
+      disableSave={!isFormValid}
     >
       <ItemsBottomSheetDetails
-        onSubmit={onSave}
-        formDataLastValue={item}
-        submitMutate={onSave}
+        formDataLastValue={formData}
         setFormData={setFormData}
-        setIsSubmitting={setIsSubmitting}
         setErrors={setErrors}
         errors={errors}
         formData={formData}
@@ -116,42 +98,32 @@ function EditItem({ item }: { item: ItemSchemaUpdateForm }) {
   );
 }
 
-//oncancel  Keyboard.dismiss();
-const ItemsBottomSheetDetails: React.FC<{
-  onSubmit: (data: ItemSchemaUpdateForm) => void;
-  formDataLastValue: ItemSchemaUpdateForm;
-  submitMutate: (formData: ItemSchemaUpdateForm) => void;
-  setFormData: React.Dispatch<React.SetStateAction<ItemSchemaUpdateForm>>;
-  formData: ItemSchemaUpdateForm;
-  setIsSubmitting: (isSubmitting: boolean) => void;
-  setErrors: React.Dispatch<React.SetStateAction<FormErrors>>;
-  errors: FormErrors;
-}> = ({
-  onSubmit,
+export function ItemsBottomSheetDetails({
   formDataLastValue,
-  submitMutate,
   setFormData,
-  setIsSubmitting,
   setErrors,
   formData,
   errors,
-}) => {
-  const handleFieldChange = (
-    field: keyof ItemSchemaUpdateForm,
-    value: string
-  ) => {
+}: {
+  formDataLastValue: InsertItemSchema;
+  setFormData: React.Dispatch<React.SetStateAction<InsertItemSchema>>;
+  setErrors: React.Dispatch<React.SetStateAction<FormErrors>>;
+  formData: InsertItemSchema;
+  errors: FormErrors;
+}) {
+  const handleFieldChange = (field: keyof InsertItemSchema, value: string) => {
     // Validar que el valor no sea undefined o null para evitar NaN
     const safeValue = value || "";
 
     // Solo para el campo price, convertir comas a puntos
     if (field === "price") {
       const priceValue = safeValue.replace(",", ".");
-      setFormData((prev: ItemSchemaUpdateForm) => ({
+      setFormData((prev: InsertItemSchema) => ({
         ...prev,
         [field]: priceValue,
       }));
     } else {
-      setFormData((prev: ItemSchemaUpdateForm) => ({
+      setFormData((prev: InsertItemSchema) => ({
         ...prev,
         [field]: safeValue,
       }));
@@ -161,20 +133,6 @@ const ItemsBottomSheetDetails: React.FC<{
       setErrors((prev: FormErrors) => ({ ...prev, [field]: undefined }));
     }
   };
-
-  const isFormValid = Boolean(
-    formData.name &&
-      formData.price &&
-      formData.url &&
-      formData.image.url &&
-      formData.description &&
-      formData.price &&
-      (formData.name !== formDataLastValue.name ||
-        formData.description !== formDataLastValue.description ||
-        formData.price !== formDataLastValue.price ||
-        formData.url !== formDataLastValue.url ||
-        formData.image.url !== formDataLastValue.image.url)
-  );
 
   return (
     <KeyboardAvoidingView
@@ -193,8 +151,6 @@ const ItemsBottomSheetDetails: React.FC<{
                   imageUrl={formData.image.url ?? imageDefault}
                   imageUrlUpdatedAt={undefined}
                   maxHeight={600}
-                  imageWidth={formData.image.width}
-                  imageHeight={formData.image.height}
                 />
                 <View className="flex justify-center items-center">
                   <ImagePickerButton
@@ -204,6 +160,8 @@ const ItemsBottomSheetDetails: React.FC<{
                         image: {
                           url: image,
                           updatedAt: new Date().toISOString(),
+                          width: formData.image.width,
+                          height: formData.image.height,
                         },
                       })
                     }
@@ -270,86 +228,59 @@ const ItemsBottomSheetDetails: React.FC<{
       </ScrollView>
     </KeyboardAvoidingView>
   );
-};
+}
 
-type ItemSchemaTypeUpload = Partial<Omit<ItemSchemaUpdateForm, "image">> & {
+export type InsertItemImageIdSchema = Partial<
+  Omit<InsertItemSchema, "image">
+> & {
   imageId: string;
 };
 
-function useUpdateItem(
-  setIsSubmitting: (isSubmitting: boolean) => void,
-  itemLastValue: ItemSchemaUpdateForm,
-  itemUuid: string
-) {
+function useInsertItem(setIsSubmitting: (isSubmitting: boolean) => void) {
   const queryClient = useQueryClient();
   const postImageMutation = usePostItemImage();
   const mutation = useMutation({
-    mutationFn: async (data: { formData: ItemSchemaUpdateForm }) => {
+    mutationFn: async (data: { formData: InsertItemSchema }) => {
       const formData = data.formData;
-
       setIsSubmitting(true);
-      await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Only include fields that have changed compared to formDataLastValue
-      const itemUpdated: Partial<ItemSchemaTypeUpload> = {};
-
-      if (formData.name !== itemLastValue.name) {
-        itemUpdated.name = formData.name;
-      }
-      if (formData.description !== itemLastValue.description) {
-        itemUpdated.description = formData.description;
-      }
-      if (formData.price !== itemLastValue.price) {
-        itemUpdated.price = formData.price;
-      }
-      if (formData.image.url !== itemLastValue.image.url) {
-        //subir imagen
-        const imageId = await postImageMutation.mutateAsync({
-          fileUrl: formData.image.url,
-          itemUuid,
-        });
-        itemUpdated.imageId = imageId;
-      }
-      if (formData.url !== itemLastValue.url) {
-        itemUpdated.url = formData.url;
-      }
+      const imageId = await postImageMutation.mutateAsync({
+        fileUrl: formData.image.url,
+        fileName: formData.name,
+      });
+      const insertItem: Partial<InsertItemImageIdSchema> = {
+        ...formData,
+        imageId: imageId,
+      };
 
       const response = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/item/${itemUuid}`,
-        method: "PATCH",
+        url: `http://${LOCAL_IP}:3000/brand/insert-items`,
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(itemUpdated),
+        body: JSON.stringify({
+          items: [insertItem],
+        }),
       });
       if (response.data.error) {
-        throw new Error(response.data.details);
+        throw new Error(response.data.details + "\n" + response.data.info);
       }
       return response.data;
     },
     onSuccess: (data, variables) => {
-      void queryClient.invalidateQueries({
-        queryKey: ["item-detail", itemUuid],
-      });
       Toast.show({
         type: "success",
-        text1: `The item ${variables.formData.name} has been successfully updated in the catalog!`,
+        text1: `The item ${variables.formData.name} has been successfully added to the catalog.`,
         visibilityTime: 2000,
       });
     },
     onError: (responseError, data) => {
       if (responseError instanceof Error) {
-        if (responseError.message.includes("[1] mal formados")) {
-          Toast.show({
-            type: "error",
-            text1: `The item ${data.formData.name} is not valid.`,
-            visibilityTime: 6000,
-          });
-        } else {
-          Toast.show({
-            type: "error",
-            text1: `Error updating item ${data.formData.name}: ${responseError.message}`,
-            visibilityTime: 6000,
-          });
-        }
+        console.log("responseError", responseError.message);
+        Toast.show({
+          type: "error",
+          text1: `Error inserting item ${data.formData.name}`,
+          visibilityTime: 6000,
+        });
         setIsSubmitting(false);
       }
     },
@@ -362,24 +293,42 @@ function useUpdateItem(
   return mutation;
 }
 
-function usePostItemImage() {
+export function usePostItemImage() {
   const mutation = useMutation({
-    mutationFn: async (data: { fileUrl: string; itemUuid: string }) => {
+    mutationFn: async (data: { fileUrl: string; fileName: string }) => {
       const response = await fetch(data.fileUrl);
       const blob = await response.blob();
 
+      // Calculate image dimensions
+      const imageDimensions = await new Promise<{
+        width: number;
+        height: number;
+      }>((resolve, reject) => {
+        Image.getSize(
+          data.fileUrl,
+          (width, height) => {
+            resolve({ width, height });
+          },
+          error => {
+            reject(error);
+          }
+        );
+      });
+
       const responsePost = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/item/${data.itemUuid}/image`,
+        url: `http://${LOCAL_IP}:3000/item/image`,
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contentType: blob.type }),
+        body: JSON.stringify({
+          contentType: blob.type,
+          width: imageDimensions.width,
+          height: imageDimensions.height,
+          fileName: sanitizeFilename(data.fileName),
+        }),
       });
       const imageUploadUrl = responsePost.data;
       const { id: imageId, uploadUrl } =
         UploadItemImageResponseSchema.parse(imageUploadUrl);
-
-      console.log("uploadUrl", uploadUrl);
-      console.log("imageId", imageId);
 
       const res = await fetch(uploadUrl, {
         method: "PUT",
@@ -416,3 +365,58 @@ function usePostItemImage() {
 
   return mutation;
 }
+
+// export function usePostItemImage() {
+//   const mutation = useMutation({
+//     mutationFn: async (data: { fileUrl: string; itemUuid: string }) => {
+//       const response = await fetch(data.fileUrl);
+//       const blob = await response.blob();
+
+//       const responsePost = await safeFetch({
+//         url: `http://${LOCAL_IP}:3000/item/${data.itemUuid}/image`,
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({ contentType: blob.type }),
+//       });
+//       const imageUploadUrl = responsePost.data;
+//       const { id: imageId, uploadUrl } =
+//         UploadItemImageResponseSchema.parse(imageUploadUrl);
+
+//       console.log("uploadUrl", uploadUrl);
+//       console.log("imageId", imageId);
+
+//       const res = await fetch(uploadUrl, {
+//         method: "PUT",
+//         headers: {
+//           "Content-Type": blob.type,
+//           "Cache-Control": "no-cache, no-store, must-revalidate",
+//           Pragma: "no-cache",
+//           Expires: "0",
+//         },
+//         body: blob,
+//       });
+//       if (!res.ok) {
+//         const txt = await res
+//           .text()
+//           .catch(e => (e instanceof Error ? e.message : "unknown error"));
+//         throw new Error(
+//           `Upload failed: ${res.status} ${res.statusText} ${txt}`
+//         );
+//       }
+//       console.log("POST SUCCESSFULLY");
+//       return imageId;
+//     },
+//     onError: (responseError, data) => {
+//       if (responseError instanceof Error) {
+//         console.error("ERROR UPLOADING ITEM IMAGE", responseError.message);
+//         Toast.show({
+//           type: "error",
+//           text1: `Error uploading item image`,
+//           visibilityTime: 6000,
+//         });
+//       }
+//     },
+//   });
+
+//   return mutation;
+// }

@@ -142,7 +142,7 @@ export const jsonCatalogUploadSchema2 = z.object({
 
 export const UploadItemImageSchema = z.object({
   contentType: z.string().min(1, "El contentType es requerido"),
-  // fileName: z.string().min(1, "El nombre del archivo es requerido"),
+  fileName: z.string().min(1, "El nombre del archivo es requerido"),
   width: z.number().optional(),
   height: z.number().optional(),
 });

@@ -284,11 +284,11 @@ ItemApp.openapi(updateItemRoute, async c => {
   return c.json(res, 200);
 });
 
+// endpoint que actualiza la imagen de un item específico por name y brand
 const updateItemImageRoute = createRoute({
   method: "post",
-  path: "/{id}/image",
+  path: "/image",
   request: {
-    params: QueryIdSchema,
     body: {
       content: {
         "application/json": { schema: UploadItemImageSchema },
@@ -310,15 +310,7 @@ const updateItemImageRoute = createRoute({
           schema: ErrorSchema,
         },
       },
-      description: "Usuario no autenticado",
-    },
-    404: {
-      content: {
-        "application/json": {
-          schema: ErrorSchema,
-        },
-      },
-      description: "Collection not found",
+      description: "Usuario no autorizado",
     },
     500: {
       content: {
@@ -332,12 +324,13 @@ const updateItemImageRoute = createRoute({
 });
 
 ItemApp.openapi(updateItemImageRoute, async c => {
-  const { id } = c.req.valid("param");
-  const { contentType } = c.req.valid("json");
+  const { contentType, fileName, width, height } = c.req.valid("json");
   logger.info(
-    "POST /item/{id}/image - Update item image: %s contentType: %s",
-    id,
-    contentType
+    "POST /item/image - Update item image: contentType: %s fileName: %s width: %s height: %s",
+    contentType,
+    fileName,
+    width,
+    height
   );
   let res: SuccessSchemaType | ErrorSchemaType;
 
@@ -350,25 +343,23 @@ ItemApp.openapi(updateItemImageRoute, async c => {
     };
     return c.json(res, 401);
   }
-
-  const itemResult = await GetItem(id);
-  if (itemResult.error) {
+  //verificar que el user sea una brand
+  const brandResult = await VerifyUserExists(user.email);
+  if (!brandResult.exists || brandResult.userType !== "brand") {
     res = {
       error: true,
-      details: "Item no encontrado" + itemResult.details,
-    };
-    return c.json(res, 404);
-  }
-
-  if (user.id !== itemResult.item.brandId) {
-    res = {
-      error: true,
-      details: "No tienes permisos para actualizar este item",
+      details: "Usuario no autorizado",
     };
     return c.json(res, 401);
   }
 
-  const newFile = await UploadImage("items-images", id, contentType);
+  const newFile = await UploadImage(
+    "items-images",
+    fileName,
+    contentType,
+    width,
+    height
+  );
 
   console.log("newFile", newFile.id);
   return c.json(

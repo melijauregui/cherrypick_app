@@ -114,9 +114,7 @@ const ImageComplete = ({
   return (
     <>
       {imageHeight === 0 ? (
-        <View style={{ width: screenWidth, height: 400 }}>
-          {/* <Skeleton colorMode={"dark"} width={screenWidth - 5} height={450} /> */}
-        </View>
+        <View style={{ width: screenWidth, height: 400 }}></View>
       ) : url ? (
         <TouchableOpacity onPress={() => Linking.openURL(url)}>
           <Image
