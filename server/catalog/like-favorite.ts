@@ -153,14 +153,13 @@ export async function checkIfFavorited(
 }
 
 // Funciones para obtener todos los items liked y favorited
-export async function getAllLikedFavoritedItems(
+export async function getUserAllLikedFavoritedItems(
   type: "likes" | "favorites",
   userEmail: string,
   page: number = 0,
   limit: number = 100
 ): Promise<CatalogResponseSchemaType | ErrorSchemaType> {
   let res: CatalogResponseSchemaType | ErrorSchemaType;
-  let likedFavoritedUuids: { itemUuid: string }[] = [];
   const user = await db.user.findUnique({
     where: { email: userEmail },
   });
@@ -169,26 +168,32 @@ export async function getAllLikedFavoritedItems(
     return res;
   }
 
-  const offset = page * limit;
-  // const query = {
-  //   where: {
-  //     userId: user.id,
-  //   },
-  //   skip: offset,
-  //   take: limit,
-  //   select: {
-  //     itemUuid: true,
-  //   },
-  //   orderBy: {
-  //     createdAt: "desc",
-  //   },
-  // };
+  return getAllLikedFavoritedItems(type, user.id, page, limit);
+}
 
-  // Primero obtener los UUIDs de los items liked
+export async function getBrandAllLikedFavoritedItems(
+  type: "likes" | "favorites",
+  brandId: string,
+  page: number = 0,
+  limit: number = 100
+): Promise<CatalogResponseSchemaType | ErrorSchemaType> {
+  return getAllLikedFavoritedItems(type, brandId, page, limit);
+}
+
+async function getAllLikedFavoritedItems(
+  type: "likes" | "favorites",
+  id: string,
+  page: number = 0,
+  limit: number = 100
+): Promise<CatalogResponseSchemaType | ErrorSchemaType> {
+  let res: CatalogResponseSchemaType | ErrorSchemaType;
+  let likedFavoritedUuids: { itemUuid: string }[] = [];
+  const offset = page * limit;
+
   if (type === "likes") {
     likedFavoritedUuids = await db.itemLike.findMany({
       where: {
-        userId: user.id,
+        userId: id,
       },
       skip: offset,
       take: limit,
@@ -202,7 +207,7 @@ export async function getAllLikedFavoritedItems(
   } else if (type === "favorites") {
     likedFavoritedUuids = await db.itemFavorite.findMany({
       where: {
-        userId: user.id,
+        userId: id,
       },
       skip: offset,
       take: limit,

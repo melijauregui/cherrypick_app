@@ -11,6 +11,9 @@ import { ErrorSchemaType } from "@/schemas/standar-response-schema";
 import { config } from "../../config";
 import logger from "../logger";
 import { GetEmbedding, SearchItems, SearchPersonalizedItems, SearchPersonalizedItems2 } from "../search/functions";
+import { getBrandAllLikedFavoritedItems, getUserAllLikedFavoritedItems } from "./like-favorite";
+import { GetClient } from "../client/functions";
+import { UserData } from "@/schemas/client/client-schema";
 
 //funcion para hacer query a pinecone
 export async function GetCatalog(
@@ -557,6 +560,51 @@ export async function GetItemsFromWeaviate(
     error: false,
     items: items,
   };
+}
+
+const LIKES_PAGE = 0;
+const LIKES_LIMIT = 5;
+
+
+export async function GetUserFeed(user: UserData, page: number, limit: number
+): Promise<CatalogResponseSchemaType | ErrorSchemaType> {
+  const resultClient = await GetClient(user.id);
+  if (resultClient.error) {
+    return {
+      error: true,
+      details: "Cliente no encontrado",
+    };
+  }
+  const client = resultClient.user;
+
+  const preferencesArray = client.preferences;
+  const resultLikes = await getUserAllLikedFavoritedItems("likes", user.email, LIKES_PAGE, LIKES_LIMIT);
+  if (resultLikes.error) {
+    return {
+      error: true,
+      details: "Error obteniendo los likes del cliente",
+    };
+  }
+
+  const likes = resultLikes.items;
+  const likesDescriptions = likes.map(item => item.description);
+  console.log("Descriptions: ", preferencesArray, likesDescriptions);
+
+  return await GetPersonalizedFeed(preferencesArray, likesDescriptions, page, limit);
+}
+
+export async function GetBrandFeed(brand: UserData, page: number, limit: number): Promise<CatalogResponseSchemaType | ErrorSchemaType> {
+  const resultLikes = await getBrandAllLikedFavoritedItems("likes", brand.id, LIKES_PAGE, LIKES_LIMIT);
+  if (resultLikes.error) {
+    return {
+      error: true,
+      details: "Error obteniendo los likes de la marca",
+    };
+  }
+
+  const likes = resultLikes.items;
+  const likesDescriptions = likes.map(item => item.description);
+  return await GetPersonalizedFeed([], likesDescriptions, page, limit);
 }
 
 export async function GetPersonalizedFeed(

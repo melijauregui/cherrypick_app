@@ -11,10 +11,11 @@ import {
   ErrorSchema,
   ErrorSchemaType,
 } from "@/schemas/standar-response-schema";
-import { GetCatalog, GetPersonalizedFeed as GetPersonalizedFeed } from "../catalog/functions";
+import { GetBrandFeed, GetCatalog, GetPersonalizedFeed as GetPersonalizedFeed, GetUserFeed } from "../catalog/functions";
 import logger from "../logger";
 import { GetClient } from "../client/functions";
-import { getAllLikedFavoritedItems } from "../catalog/like-favorite";
+import { getUserAllLikedFavoritedItems } from "../catalog/like-favorite";
+import { GetBrandById } from "../brand/functions";
 
 const FeedApp = new OpenAPIHono<AppEnv>({
   defaultHook: (result, c) => {
@@ -111,33 +112,15 @@ FeedApp.openapi(getPersonalizedFeedRoute, async c => {
     logger.info("/GET feed personalized page: %s limit: %s, email: %s", page, limit, user?.email);
 
     let res: CatalogResponseSchemaType | ErrorSchemaType;
-    const resultClient = await GetClient(user.id);
-    if (resultClient.error) {
-      res = {
-        error: true,
-        details: "Cliente no encontrado",
-      };
-      return c.json(res, 404);
-    }
-    const client = resultClient.user;
 
-    const preferencesArray = client.preferences;
-    const resultLikes = await getAllLikedFavoritedItems("likes", user.email, 0, 5);
-    if (resultLikes.error) {
-      res = {
-        error: true,
-        details: "Error obteniendo los likes del cliente",
-      };
-      return c.json(res, 500);
+    if (user.userType !== "brand") {
+      res = await GetBrandFeed(user, page, limit);
+    }
+    else {
+      res = await GetUserFeed(user, page, limit);
     }
 
-    const likes = resultLikes.items;
-    const likesDescriptions = likes.map(item => item.description);
-    console.log("Descriptions: ", preferencesArray, likesDescriptions);
-
-    const result = await GetPersonalizedFeed(preferencesArray, likesDescriptions, page, limit);
-
-    if (result.error) {
+    if (res.error) {
       res = {
         error: true,
         details: "Error querying Weaviate",
@@ -146,7 +129,7 @@ FeedApp.openapi(getPersonalizedFeedRoute, async c => {
     }
     res = {
       error: false,
-      items: result.items,
+      items: res.items,
     };
     return c.json(res, 200);
   }

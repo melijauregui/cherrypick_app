@@ -21,7 +21,7 @@ import {
   CatalogResponseSchemaType,
   PaginationSchema,
 } from "@/schemas/catalog/catalog-schema";
-import { getAllLikedFavoritedItems } from "../catalog/like-favorite";
+import { getUserAllLikedFavoritedItems } from "../catalog/like-favorite";
 
 const UserApp = new OpenAPIHono<AppEnv>({
   defaultHook: (result, c) => {
@@ -178,7 +178,7 @@ UserApp.openapi(getAllLikedItemsRoute, async c => {
     return c.json(res, 401);
   }
 
-  res = await getAllLikedFavoritedItems("likes", user.email, page, limit);
+  res = await getUserAllLikedFavoritedItems("likes", user.email, page, limit);
   if (res.error) {
     return c.json(res, 404);
   }
@@ -235,7 +235,7 @@ UserApp.openapi(getAllFavoritedItemsRoute, async c => {
     return c.json(res, 401);
   }
 
-  res = await getAllLikedFavoritedItems("favorites", user.email, page, limit);
+  res = await getUserAllLikedFavoritedItems("favorites", user.email, page, limit);
   if (res.error) {
     return c.json(res, 404);
   }
