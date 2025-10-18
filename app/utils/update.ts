@@ -52,19 +52,11 @@ export function useUpdateClient(email: string) {
   return mutation;
 }
 
-export function useDelete(
-  setSelected: (selected: Map<string, string>) => void,
-  onDelete: () => void,
-  bottomSheetRef: React.RefObject<BottomSheet>,
-  brandEmail: string,
-  setDeleting: (deleting: boolean) => void
-) {
+export function useDelete() {
   const queryClient = useQueryClient();
+  const { user } = useSession();
   const mutation = useMutation({
     mutationFn: async (selected: Set<string>) => {
-      setDeleting(true);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      bottomSheetRef.current?.close();
       const { data } = await safeFetch({
         url: `http://${LOCAL_IP}:3000/brand/delete-items`,
         method: "POST",
@@ -82,22 +74,19 @@ export function useDelete(
     },
     onSuccess: data => {
       void queryClient.invalidateQueries({
-        queryKey: ["delete-catalog-items", brandEmail],
+        queryKey: ["delete-catalog-items", user?.email],
       });
 
       Toast.show({
         type: "success",
         text1: `${data.numberDeleted} productos eliminados correctamente`,
       });
-      setSelected(new Map());
-      onDelete();
     },
     onError: error => {
       console.log("error", error.message);
       Toast.show({ type: "error", text1: error.message });
     },
     onSettled: () => {
-      setDeleting(false);
       Keyboard.dismiss();
     },
   });

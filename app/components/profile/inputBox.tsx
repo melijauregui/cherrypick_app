@@ -121,7 +121,7 @@ const InputBoxWithName = ({
   keyboardType?: KeyboardTypeOptions;
 }) => {
   return (
-    <View className="flex flex-col px-[16px] bg-white rounded-2xl border-[2px] border-gray-300 w-full py-2">
+    <View className="flex flex-col px-[16px] bg-white rounded-2xl border-[1.4px] border-gray-300 w-full py-2">
       <View className="flex flex-row justify-between items-center">
         <Text className="text-black font-pmedium">{name}</Text>
         {length && (

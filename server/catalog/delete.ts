@@ -77,32 +77,22 @@ async function deleteFromDatabase(itemsUuids: string[]) {
 
 async function deleteCatalogItemsFromWeaviate(
   itemsUuids: string[],
-  collection: Collection,
-  brandId: string
+  collection: Collection
 ): Promise<DeleteItemsResponseSchemaType | ErrorSchemaType> {
   try {
     let numberDeleted = 0;
     const invalidItems: string[] = [];
     for (const itemUuid of itemsUuids) {
-      // 1. Buscar el objeto por su id (uuid)
-      const result = await collection.query.fetchObjects({
-        filters: collection.filter.byId().equal(itemUuid),
-        limit: 1,
-        returnProperties: ["brandId"],
-      });
-
-      if (
-        result.objects.length > 0 &&
-        result.objects[0]?.properties?.brandId === brandId
-      ) {
+      try {
+        // Eliminar directamente por UUID sin verificar propiedades
         const response = await collection.data.deleteById(itemUuid);
         if (response) {
           numberDeleted++;
         } else {
           invalidItems.push(itemUuid);
         }
-      } else {
-        console.log("No se encontró un objeto con ese id y brandId.");
+      } catch (error) {
+        console.warn(`Failed to delete ${itemUuid} from Weaviate:`, error);
         invalidItems.push(itemUuid);
       }
     }
@@ -156,7 +146,7 @@ export async function DeleteFromCatalog(
   }
   await deleteFromDatabase(itemsUuids);
 
-  res = await deleteCatalogItemsFromWeaviate(itemsUuids, collection, brandId);
+  res = await deleteCatalogItemsFromWeaviate(itemsUuids, collection);
 
   return res;
 }

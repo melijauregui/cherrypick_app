@@ -3,7 +3,10 @@ import LoadingPage from "../components/LoadingPage";
 import { router } from "expo-router";
 import { getSelfBrandProfile } from "../utils/fetch";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { StandardPageBottomSheet } from "../components/standar-page/standarPage";
+import {
+  StandardDescription,
+  StandardPageBottomSheet,
+} from "../components/standar-page/standarPage";
 import { useState } from "react";
 import { Keyboard, ScrollView, Text, View } from "react-native";
 import { useSession } from "@/lib/auth-client";
@@ -31,7 +34,7 @@ export default function EditBrandPage() {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["self-brand-profile", user?.email],
+    queryKey: ["self-brand-profile"],
     queryFn: () => getSelfBrandProfile(),
     staleTime: 5 * 60 * 1000,
   });
@@ -43,6 +46,8 @@ export default function EditBrandPage() {
   if (error || !brand) {
     return <ErrorPage />;
   }
+
+  console.log("brand", brand);
 
   return <EditBrandProfile brand={brand} />;
 }
@@ -100,12 +105,15 @@ function EditBrandProfile({ brand }: { brand: BrandSchemaType }) {
       section="Editar marca"
     >
       <ScrollView>
-        <View className="flex flex-col justify-center items-center px-5 py-6 gap-5">
+        <StandardDescription description="Completa la información de tu marca para que los clientes puedan conocerte mejor. Una descripción atractiva y una página web oficial ayudarán a generar más confianza y ventas." />
+        <View className="flex flex-col justify-center items-center px-5 gap-5">
           <View>
             <ImageComplete
               imageUrl={formData.logo.url ?? imageDefault}
               imageUrlUpdatedAt={undefined}
               maxHeight={600}
+              imageWidth={formData.logo.width}
+              imageHeight={formData.logo.height}
             />
             <View className="flex justify-center items-center">
               <ImagePickerButton
@@ -129,7 +137,7 @@ function EditBrandProfile({ brand }: { brand: BrandSchemaType }) {
               </ImagePickerButton>
             </View>
           </View>
-          <View className="w-full">
+          <View className="gap-4 w-full">
             <InputBoxWithName
               name="página oficial url"
               value={formData.url}
@@ -143,20 +151,20 @@ function EditBrandProfile({ brand }: { brand: BrandSchemaType }) {
               autoCapitalize="none"
               keyboardType="url"
             />
-          </View>
 
-          <InputBoxWithName
-            name="descripción"
-            value={formData.description}
-            setValue={text => {
-              setFormData({ ...formData, description: text });
-            }}
-            lastValue={brand.description}
-            isScrollable={true}
-            length={200}
-            placeholder="Escribe una descripción de tu marca"
-            height={120}
-          />
+            <InputBoxWithName
+              name="descripción"
+              value={formData.description}
+              setValue={text => {
+                setFormData({ ...formData, description: text });
+              }}
+              lastValue={brand.description}
+              isScrollable={true}
+              length={200}
+              placeholder="Escribe una descripción de tu marca"
+              height={120}
+            />
+          </View>
         </View>
       </ScrollView>
     </StandardPageBottomSheet>

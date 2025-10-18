@@ -24,6 +24,8 @@ export async function GetBrandById(
     logo: {
       url: brand.files?.url,
       updatedAt: brand.files?.updatedAt.toISOString(),
+      width: brand.files?.width ?? undefined,
+      height: brand.files?.height ?? undefined,
     },
   };
 }

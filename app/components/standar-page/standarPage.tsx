@@ -34,10 +34,34 @@ export function StandardPageBottomSheet({
               disableSave={disableSave}
             />
           </View>
-          <View className="flex-1 pt-10 pb-4">{children}</View>
+
+          <View className="flex-1 pb-4 pt-10">{children}</View>
         </View>
       </SafeAreaView>
     </SafeAreaProvider>
+  );
+}
+
+export function StandardDescription({
+  description,
+  descriptionRed,
+}: {
+  description: string;
+  descriptionRed?: string;
+}) {
+  return (
+    <View className="pb-2">
+      <View className="flex flex-col justify-center">
+        <Text className="text-neutral-600 text-base font-plight text-center  px-3">
+          {description}
+        </Text>
+        {descriptionRed && (
+          <Text className="text-red-500 text-base font-plight text-center">
+            {descriptionRed}
+          </Text>
+        )}
+      </View>
+    </View>
   );
 }
 

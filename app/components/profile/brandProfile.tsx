@@ -31,22 +31,9 @@ const BrandProfile = ({
   logout: () => Promise<void>;
 }) => {
   const bottomSheetRefLogout = useRef<BottomSheet>(null);
-  const bottomSheetRefAddItem = useRef<BottomSheet>(null);
-  const bottomSheetRefDeleteItem = useRef<BottomSheet>(null);
-  const bottomSheetRefEdit = useRef<BottomSheet>(null);
 
   const openUsernameSheetLogout = () => {
-    bottomSheetRefAddItem.current?.close();
-    bottomSheetRefDeleteItem.current?.close();
-    bottomSheetRefEdit.current?.close();
     bottomSheetRefLogout.current?.snapToIndex(0);
-  };
-
-  const openUsernameSheetDeleteItem = () => {
-    bottomSheetRefLogout.current?.close();
-    bottomSheetRefAddItem.current?.close();
-    bottomSheetRefEdit.current?.close();
-    bottomSheetRefDeleteItem.current?.snapToIndex(0);
   };
 
   const {
@@ -54,7 +41,7 @@ const BrandProfile = ({
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["self-brand-profile", user?.email],
+    queryKey: ["self-brand-profile"],
     queryFn: () => getSelfBrandProfile(),
     staleTime: 5 * 60 * 1000,
   });
@@ -78,7 +65,8 @@ const BrandProfile = ({
             />
             <AddAndDeleteItems
               onAddItem={() => router.push("/item-insert")}
-              onDeleteItem={openUsernameSheetDeleteItem}
+              // onAddItem={() => setModalDeleteItemsOpen(true)}
+              onDeleteItem={() => router.push("/items-delete")}
               onEdit={() => router.push("/brand-edit")}
             />
           </View>
@@ -87,12 +75,6 @@ const BrandProfile = ({
             getClothingItems={getSelfBrandItems}
             limit={18}
             columnCount={3}
-          />
-
-          <DeleteCatalogItemsModal
-            bottomSheetRef={bottomSheetRefDeleteItem}
-            brandId={brand.id}
-            onDelete={() => {}}
           />
 
           <CustomBottomLogout
