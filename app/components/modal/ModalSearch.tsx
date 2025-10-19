@@ -88,7 +88,7 @@ export function ItemStylePhotoAndName({
   return (
     <TouchableOpacity
       key={item.id}
-      className={`flex-row items-center py-3 px-2 gap-2 ${shouldDim ? "opacity-40" : "opacity-100"}`}
+      className={`flex-row items-center py-3 px-2 gap-2 ${shouldDim ? "opacity-50" : "opacity-100"}`}
       disabled={shouldDim}
       onPress={() => toggleSelect(item)}
     >

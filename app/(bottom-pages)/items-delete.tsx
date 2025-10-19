@@ -73,7 +73,11 @@ export default function DeleteItemsPage() {
                 toggleSelect={toggleSelect}
                 isSelected={isSelected}
                 disable={disable || isInInspo}
-                textDisabled={isInInspo ? "Está en inspo semanal" : undefined}
+                textDisabled={
+                  isInInspo
+                    ? "Este item se encuentra en Inspo Semanal"
+                    : undefined
+                }
               />
             );
           }}
