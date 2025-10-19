@@ -15,7 +15,9 @@ const LogOutButton: React.FC<{ logout: () => Promise<void> }> = ({
       className="flex flex-row bg-white h-[50px] justify-center items-center rounded-full border-[1.15px] border-gray-400"
       onPress={handleLogout}
     >
-      <Text className="text-black font-psemibold text-[15px]">Log Out</Text>
+      <Text className="text-black font-psemibold text-[15px]">
+        Cerrar sesión
+      </Text>
     </TouchableOpacity>
   );
 };
@@ -42,7 +44,7 @@ const DeleteAccountButton: React.FC<{
         onPress={() => setVisibleModal(true)}
       >
         <Text className="text-black font-psemibold text-[15px]">
-          Delete Account
+          Eliminar cuenta
         </Text>
       </TouchableOpacity>
       <CustomModal

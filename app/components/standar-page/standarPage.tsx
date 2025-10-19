@@ -85,7 +85,7 @@ export function StandardBar({
           onCancel();
         }}
       >
-        <Text className="text-xl text-black font-plight">Cancel</Text>
+        <Text className="text-xl text-black font-plight">Cancelar</Text>
       </TouchableOpacity>
       <Text className=" text-black text-lg font-pmedium">{section}</Text>
       {onLoading && <LoadingDots color="#9297a1" size="medium" />}
@@ -94,7 +94,7 @@ export function StandardBar({
           <Text
             className={`text-xl  font-plight ${disableSave ? "text-neutral-400" : "text-black"}`}
           >
-            Save
+            Guardar
           </Text>
         </TouchableOpacity>
       )}

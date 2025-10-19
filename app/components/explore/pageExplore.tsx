@@ -346,7 +346,7 @@ function SearchInput({
         className="text-lg text-white font-pregular flex-1 mx-3"
         onChangeText={onChangeTextSearch}
         value={searchText}
-        placeholder="Search Item"
+        placeholder="Buscar item"
         placeholderTextColor="#999999"
         onSubmitEditing={handleSearch}
         returnKeyType="search"

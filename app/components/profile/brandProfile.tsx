@@ -8,7 +8,6 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { View, Text, TouchableOpacity, Image, Linking } from "react-native";
 import { Entypo, Ionicons } from "@expo/vector-icons";
 import LoadingPage from "../LoadingPage";
-import DeleteCatalogItemsModal from "./DeleteCatalogItemsModal";
 import { AddAndDeleteItems } from "./brandComponents";
 import { CustomBottomLogout } from "./bottomSheets";
 import { router } from "expo-router";

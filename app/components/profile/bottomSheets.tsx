@@ -96,7 +96,7 @@ function CustomBottomLogout({
         bottomSheetRef={bottomSheetRef}
         hasDone={false}
         componentView={buttonsLogoutDelete}
-        value={"Account Settings"}
+        value={"Configuración"}
       />
     </>
   );
