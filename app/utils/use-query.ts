@@ -3,13 +3,10 @@ import { useQuery } from "@tanstack/react-query";
 import {
   checkIsMyItem,
   getSelfClientProfile,
-  getSelfBrandProfile,
   getBrandProfile,
-  getItem,
   getItemEmbedding,
   getEmbedding,
 } from "./fetch";
-import { ItemSchemaType } from "@/schemas/catalog/catalog-schema";
 import { ClientSchemaType } from "@/schemas/client/client-schema";
 import { BrandSchemaType } from "@/schemas/brand/brand-schema";
 

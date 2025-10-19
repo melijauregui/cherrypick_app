@@ -228,20 +228,20 @@ export async function prefetchInspirationItems(
 ) {
   const queryKey = ["inspiration-items", category];
   prefetchIfNeeded(queryClient, queryKey, () => getInspirationItems(category));
-  //por cada item de la lista de items, prefetch el item detail
-  for (let i = 0; i < 100; i++) {
-    const isInspirationItemsFetching = queryClient.isFetching({
-      queryKey: queryKey,
-    });
-    if (!isInspirationItemsFetching) {
-      break;
-    }
-    await new Promise(resolve => setTimeout(resolve, 200));
-  }
-  const items = queryClient.getQueryData<QueryIdSchemaType[]>(queryKey);
-  if (items) {
-    items.forEach(item => {
-      prefetchItemDetail(queryClient, { uuid: item.id }, userEmail, "");
-    });
-  }
+  // //por cada item de la lista de items, prefetch el item detail
+  // for (let i = 0; i < 100; i++) {
+  //   const isInspirationItemsFetching = queryClient.isFetching({
+  //     queryKey: queryKey,
+  //   });
+  //   if (!isInspirationItemsFetching) {
+  //     break;
+  //   }
+  //   await new Promise(resolve => setTimeout(resolve, 200));
+  // }
+  // const items = queryClient.getQueryData<QueryIdSchemaType[]>(queryKey);
+  // if (items) {
+  //   items.forEach(item => {
+  //     prefetchItemDetail(queryClient, { uuid: item.id }, userEmail, "");
+  //   });
+  // }
 }

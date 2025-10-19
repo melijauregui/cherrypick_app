@@ -5,7 +5,10 @@ import {
   MinimumPropertiesItemSchema,
   UploadItemImageResponseSchema,
 } from "@/schemas/catalog/catalog-schema";
-import { StandardPageBottomSheet } from "../components/standar-page/standarPage";
+import {
+  StandardDescription,
+  StandardPageBottomSheet,
+} from "../components/standar-page/standarPage";
 import { useState } from "react";
 import {
   Image,
@@ -91,6 +94,7 @@ export default function InsertItemPage() {
       section="Insertar nuevo item"
       disableSave={!isFormValid}
     >
+      <StandardDescription description="Crea una descripción detallada y atractiva para maximizar las ventas. En lo posible, una foto de alta calidad que muestre únicamente el producto en un fondo limpio. Esto mejorará significativamente la visibilidad y precisión de búsqueda de tu item." />
       <ItemsBottomSheetDetails
         formDataLastValue={formData}
         setFormData={setFormData}

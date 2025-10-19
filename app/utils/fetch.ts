@@ -526,16 +526,16 @@ export async function getItemEmbedding(
 
 export async function getInspirationItems(
   category: string
-): Promise<QueryIdSchemaType[] | null> {
+): Promise<ItemSchemaType[] | null> {
   const res = await handleApiResponse<{
-    items: QueryIdSchemaType[];
+    items: ItemSchemaType[];
   }>(
     () =>
       safeFetch({
         url: `http://${LOCAL_IP}:3000/search/all-inspiration-items?category=${category}`,
         method: "GET",
       }),
-    AllInspirationItemsResponseSchema,
+    CatalogResponseSchema,
     "getInspirationItems"
   );
   return res?.items || null;

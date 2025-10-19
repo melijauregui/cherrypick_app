@@ -204,15 +204,33 @@ export async function GetAllBrands(
 
 export async function GetAllInspirationItems(
   category: string
-): Promise<QueryIdSchemaType[]> {
+): Promise<ItemSchemaType[]> {
   const res = await db.inspoItems.findMany({
     where: {
       category: category,
     },
+    include: {
+      item: {
+        include: {
+          files: true,
+        },
+      },
+    },
   });
   res.sort((a, b) => a.index - b.index);
   const data = res.map(inspoItem => ({
-    id: inspoItem.itemUuid,
+    name: inspoItem.item.name,
+    description: inspoItem.item.description,
+    image: {
+      url: inspoItem.item.files.url,
+      updatedAt: inspoItem.item.files.updatedAt.toISOString(),
+      width: inspoItem.item.files.width ?? undefined,
+      height: inspoItem.item.files.height ?? undefined,
+    },
+    url: inspoItem.item.url,
+    brandId: inspoItem.item.brandId,
+    price: inspoItem.item.price,
+    uuid: inspoItem.item.id,
   }));
 
   return data;

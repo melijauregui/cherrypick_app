@@ -13,10 +13,10 @@ import { router, useLocalSearchParams } from "expo-router";
 import { Entypo } from "@expo/vector-icons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getInspirationItems } from "../utils/fetch";
-import LoadingPage from "../components/LoadingPage";
+import { ItemSchemaType } from "@/schemas/catalog/catalog-schema";
+import LoadingPage, { LoadingItem } from "../components/LoadingPage";
 import ErrorPage from "../(auth)/error";
 import { useFetchBrandProfileItem } from "../utils/use-query";
-import useFetchItem from "../utils/use-query";
 import { prefetchInspirationItems } from "../utils/prefetchs";
 import { useSession } from "@/lib/auth-client";
 
@@ -97,7 +97,7 @@ export default function WeeklyInspo() {
           >
             <View className="flex-col gap-1 justify-center flex-1 px-4 mt-4">
               {data?.map(item => (
-                <ProductCard key={item.id} itemId={item.id} />
+                <ProductCard key={item.uuid} item={item} />
               ))}
             </View>
           </ScrollView>
@@ -130,16 +130,14 @@ function ImageBackgroundComponent({ children }: { children: React.ReactNode }) {
   );
 }
 
-const ProductCard = ({ itemId }: { itemId: string }) => {
-  const itemData = useFetchItem(itemId);
-  const item = itemData?.item;
-  const brandData = useFetchBrandProfileItem(item?.brandId || "");
+const ProductCard = ({ item }: { item: ItemSchemaType }) => {
+  const brandData = useFetchBrandProfileItem(item.brandId);
   const brand = brandData?.brand;
 
   const [titleLines, setTitleLines] = useState(1);
 
   if (!item) {
-    return null; // O un componente de loading
+    return <ErrorPage />;
   }
 
   const handleTitleLayout = (e: any) => {

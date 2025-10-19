@@ -13,6 +13,7 @@ import {
 import {
   CatalogResponseSchema,
   CatalogResponseSchemaType,
+  ItemSchemaType,
   PaginationSchema,
   ImageUrlSchema,
   PaginationFilterSchema,
@@ -435,10 +436,11 @@ const allInspirationItemsRoute = createRoute({
     200: {
       content: {
         "application/json": {
-          schema: AllInspirationItemsResponseSchema,
+          schema: CatalogResponseSchema,
         },
       },
-      description: "Devuelve todos los items de la categoría de inspiración",
+      description:
+        "Devuelve todos los items completos de la categoría de inspiración",
     },
     500: {
       content: {
@@ -456,7 +458,7 @@ SearchApp.openapi(allInspirationItemsRoute, async c => {
   const { category } = c.req.valid("query");
   logger.info("/GET search/all-inspiration-items category: %s", category);
 
-  const result: QueryIdSchemaType[] = await GetAllInspirationItems(category);
+  const result: ItemSchemaType[] = await GetAllInspirationItems(category);
 
   logger.info("result: %s", result);
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { View, TouchableOpacity, Image, Text } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import {
@@ -10,9 +10,9 @@ import {
 } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import Toast from "react-native-toast-message";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { getClothingItemsSimilar, getItem } from "@/app/utils/fetch";
-import useIsMyItem, {
+import {
   useFetchBrandProfileItem,
   useFetchItemEmbedding,
 } from "@/app/utils/use-query";
@@ -22,13 +22,11 @@ import {
   useToggleLike,
   useToggleFavorite,
 } from "@/app/utils/likes-favorites";
-import BottomSheet from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useSession } from "@/lib/auth-client";
 import CustomModal from "@/app/components/Modal";
 import LoadingPage from "@/app/components/LoadingPage";
 import { useDeleteItem } from "@/app/utils/update";
-import { prefetchBrandPageItem } from "@/app/utils/prefetchs";
 import List2 from "@/app/components/List2";
 import { ItemSchemaType } from "@/schemas/catalog/catalog-schema";
 import { BrandSchemaType } from "@/schemas/brand/brand-schema";
@@ -38,7 +36,6 @@ import ErrorPage from "../(auth)/error";
 export default function ItemDetailPage() {
   const params = useLocalSearchParams();
   const itemUuid = decodeURIComponent(params.uuid as string);
-  const { user } = useSession();
   const {
     data: itemData,
     isLoading,
@@ -65,26 +62,12 @@ export default function ItemDetailPage() {
 
 const ItemDetail = ({ item }: { item: ItemSchemaType }) => {
   const { user } = useSession();
-  const queryClient = useQueryClient();
   const itemEmbeddingData = useFetchItemEmbedding(item.uuid);
   const brand = useFetchBrandProfileItem(item?.brandId || "");
-  // const isBrandItem = useIsMyItem(item?.uuid || "") || false;
   const deleteItem = useDeleteItem(item?.uuid || "");
 
-  // Ejecutar prefetch solo una vez cuando se monta el componente
-  useEffect(() => {
-    if (item?.brandId && user?.email) {
-      prefetchBrandPageItem(queryClient, item.brandId, user.email);
-    }
-  }, []); // Array vacío = solo se ejecuta una vez al montar
-
-  const bottomSheetRefAddItem = useRef<BottomSheet>(null);
   const [visibleModal, setVisibleModal] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
-
-  const handleSubmitAddItem = (data: ItemSchemaType) => {
-    // console.log("Form submitted with data:", data);
-  };
 
   if (!item || !user) {
     return <LoadingPage alreadyPrefetched={true} />;
