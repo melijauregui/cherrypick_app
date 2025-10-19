@@ -1,7 +1,7 @@
-import { View } from "react-native";
+import { Keyboard, View } from "react-native";
 import { useState } from "react";
 import ListSearch from "@/app/components/modal/list-search";
-import { getSelfBrandItems } from "@/app/utils/fetch";
+import { getSelfBrandItems, getSelfBrandInspoItems } from "@/app/utils/fetch";
 import {
   StandardDescription,
   StandardPageBottomSheet,
@@ -11,7 +11,11 @@ import {
   ModalSearchSchemaType,
 } from "@/app/components/modal/ModalSearch";
 import { router } from "expo-router";
-import { useDelete } from "../utils/update";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useSession } from "@/lib/auth-client";
+import safeFetch from "../utils/safe-fetch";
+import { Toast } from "react-native-toast-message/lib/src/Toast";
+import { LOCAL_IP } from "@/config/api";
 
 export default function DeleteItemsPage() {
   const [itemsSelected, setItemsSelected] = useState<
@@ -24,6 +28,12 @@ export default function DeleteItemsPage() {
   };
   const [deleting, setDeleting] = useState(false);
   const deleteMutation = useDelete();
+
+  // Query para obtener los items de inspo semanal
+  const { data: inspoItems = [] } = useQuery({
+    queryKey: ["self-inspo-items"],
+    queryFn: getSelfBrandInspoItems,
+  });
 
   return (
     <StandardPageBottomSheet
@@ -53,14 +63,20 @@ export default function DeleteItemsPage() {
           fetchFunction={fetchItems}
           queryKey={["items"]}
           forceKey={forceKey?.toString()}
-          renderItem={(item, index, isSelected, toggleSelect, disable) => (
-            <ItemStylePhotoAndName
-              item={item}
-              toggleSelect={toggleSelect}
-              isSelected={isSelected}
-              disable={disable}
-            />
-          )}
+          renderItem={(item, index, isSelected, toggleSelect, disable) => {
+            const isInInspo = inspoItems.some(
+              inspoItem => inspoItem.id === item.id
+            );
+            return (
+              <ItemStylePhotoAndName
+                item={item}
+                toggleSelect={toggleSelect}
+                isSelected={isSelected}
+                disable={disable || isInInspo}
+                textDisabled={isInInspo ? "Está en inspo semanal" : undefined}
+              />
+            );
+          }}
         />
       </View>
     </StandardPageBottomSheet>
@@ -80,4 +96,46 @@ async function fetchItems(
       updatedAt: item.image.updatedAt,
     },
   }));
+}
+
+function useDelete() {
+  const queryClient = useQueryClient();
+  const { user } = useSession();
+  const mutation = useMutation({
+    mutationFn: async (selected: Set<string>) => {
+      const { data } = await safeFetch({
+        url: `http://${LOCAL_IP}:3000/brand/delete-items`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          items: Array.from(selected).map(uuid => ({ id: uuid })),
+        }),
+      });
+      if (data.error) {
+        throw new Error(data.details + "\n" + data.info);
+      }
+      return data;
+    },
+    onSuccess: data => {
+      void queryClient.invalidateQueries({
+        queryKey: ["delete-catalog-items", user?.email],
+      });
+
+      Toast.show({
+        type: "success",
+        text1: `${data.numberDeleted} productos eliminados correctamente`,
+      });
+    },
+    onError: error => {
+      console.log("error", error.message);
+      Toast.show({ type: "error", text1: error.message });
+    },
+    onSettled: () => {
+      Keyboard.dismiss();
+    },
+  });
+
+  return mutation;
 }

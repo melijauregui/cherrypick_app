@@ -64,15 +64,36 @@ export async function DeleteFromWeaviate(
   }
 }
 
-async function deleteFromDatabase(itemsUuids: string[]) {
-  // Delete from items table - cascade will handle likes and favorites
-  await db.item.deleteMany({
-    where: {
-      id: {
-        in: itemsUuids,
+async function deleteFromDatabase(
+  itemsUuids: string[]
+): Promise<SuccessSchemaType | ErrorSchemaType> {
+  try {
+    // Delete from items table - cascade will handle likes and favorites
+    await db.item.deleteMany({
+      where: {
+        id: {
+          in: itemsUuids,
+        },
       },
-    },
-  });
+    });
+    return {
+      error: false,
+    };
+  } catch (error: any) {
+    // Check if it's a foreign key constraint error from InspoItems table
+    if (error.code === "23503" && error.constraint?.includes("InspoItems")) {
+      return {
+        error: true,
+        details:
+          "Este item esta en inspo semanal, no puede ser eliminado hasta no haber finalizado la semana",
+      };
+    }
+    // Return other database errors
+    return {
+      error: true,
+      details: `Error deleting items from database: ${error.message}`,
+    };
+  }
 }
 
 async function deleteCatalogItemsFromWeaviate(
@@ -144,7 +165,10 @@ export async function DeleteFromCatalog(
   for (const itemUuid of itemsUuids) {
     if (!itemUuid) continue; // Skip empty lines
   }
-  await deleteFromDatabase(itemsUuids);
+  const deleteResult = await deleteFromDatabase(itemsUuids);
+  if (deleteResult.error) {
+    return deleteResult;
+  }
 
   res = await deleteCatalogItemsFromWeaviate(itemsUuids, collection);
 

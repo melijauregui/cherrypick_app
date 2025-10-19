@@ -5,6 +5,7 @@ import {
   ErrorSchemaType,
   SuccessSchemaType,
 } from "@/schemas/standar-response-schema";
+import { QueryIdSchemaType } from "@/schemas/standar-query-schema";
 
 export async function GetBrandById(
   id: string
@@ -55,4 +56,23 @@ export async function UpdateBrand(
     error: false,
   };
   return res;
+}
+
+export async function GetBrandInspoItems(
+  brandId: string
+): Promise<QueryIdSchemaType[]> {
+  const inspoItems = await db.inspoItems.findMany({
+    where: {
+      item: {
+        brandId: brandId,
+      },
+    },
+    select: {
+      itemUuid: true,
+    },
+  });
+
+  const itemUuids = inspoItems.map(item => ({ id: item.itemUuid }));
+
+  return itemUuids;
 }

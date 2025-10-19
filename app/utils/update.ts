@@ -52,48 +52,6 @@ export function useUpdateClient(email: string) {
   return mutation;
 }
 
-export function useDelete() {
-  const queryClient = useQueryClient();
-  const { user } = useSession();
-  const mutation = useMutation({
-    mutationFn: async (selected: Set<string>) => {
-      const { data } = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/brand/delete-items`,
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          items: Array.from(selected).map(uuid => ({ id: uuid })),
-        }),
-      });
-      if (data.error) {
-        throw new Error(data.details + "\n" + data.info);
-      }
-      return data;
-    },
-    onSuccess: data => {
-      void queryClient.invalidateQueries({
-        queryKey: ["delete-catalog-items", user?.email],
-      });
-
-      Toast.show({
-        type: "success",
-        text1: `${data.numberDeleted} productos eliminados correctamente`,
-      });
-    },
-    onError: error => {
-      console.log("error", error.message);
-      Toast.show({ type: "error", text1: error.message });
-    },
-    onSettled: () => {
-      Keyboard.dismiss();
-    },
-  });
-
-  return mutation;
-}
-
 export function useDeleteItem(itemUuid: string) {
   const queryClient = useQueryClient();
   const { user } = useSession();

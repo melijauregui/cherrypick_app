@@ -6,6 +6,7 @@ import {
   IsMyItemSchema,
   ItemResponseSchema,
   ItemSchemaType,
+  UuidItemsSchemaResponse,
   UuidNameResponseSchema,
   UuidNameSchemaType,
 } from "@/schemas/catalog/catalog-schema";
@@ -201,6 +202,21 @@ export async function getSelfBrandItems(
       }),
     CatalogResponseSchema,
     "getSelfBrandItems"
+  );
+  return res?.items || [];
+}
+
+export async function getSelfBrandInspoItems(): Promise<QueryIdSchemaType[]> {
+  const res = await handleApiResponse<{
+    items: QueryIdSchemaType[];
+  }>(
+    () =>
+      safeFetch({
+        url: `http://${LOCAL_IP}:3000/brand/inspo-items`,
+        method: "GET",
+      }),
+    UuidItemsSchemaResponse,
+    "getSelfBrandInspoItems"
   );
   return res?.items || [];
 }

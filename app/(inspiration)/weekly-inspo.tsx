@@ -15,7 +15,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getInspirationItems } from "../utils/fetch";
 import LoadingPage from "../components/LoadingPage";
 import ErrorPage from "../(auth)/error";
-import { useFetchBrandProfileItem, useFetchItem } from "../utils/use-query";
+import { useFetchBrandProfileItem } from "../utils/use-query";
+import useFetchItem from "../utils/use-query";
 import { prefetchInspirationItems } from "../utils/prefetchs";
 import { useSession } from "@/lib/auth-client";
 
@@ -169,11 +170,6 @@ const ProductCard = ({ itemId }: { itemId: string }) => {
             className="w-24 h-36 rounded-lg"
             resizeMode="cover"
           />
-          {/* <View className="absolute bottom-1 left-1 bg-black/60  rounded">
-            <Text className="text-white font-pmedium text-xs">
-              ${item.price}
-            </Text>
-          </View> */}
         </View>
         <TouchableOpacity
           onPress={() => {

@@ -89,6 +89,11 @@ export const UuidItemsSchema = z.object({
   items: z.array(QueryIdSchema).min(1, "Debe tener al menos un item"),
 });
 
+export const UuidItemsSchemaResponse = z.object({
+  ...SuccessSchema.shape,
+  ...UuidItemsSchema.shape,
+});
+
 export const DeleteItemsResponseSchema = z.object({
   ...SuccessSchema.shape,
   numberDeleted: z.number().min(0),

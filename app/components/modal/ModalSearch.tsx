@@ -1,14 +1,8 @@
 import { Modal, View, Text, TouchableOpacity, Image } from "react-native";
-import { MaterialIcons, Octicons } from "@expo/vector-icons";
-import { useState } from "react";
-import ListSearch from "./list-search";
+import { Octicons } from "@expo/vector-icons";
 import z from "zod";
 import { imageDefault } from "@/lib/constants";
-import { getSelfBrandItems } from "@/app/utils/fetch";
-import {
-  StandardBar,
-  StandardPageBottomSheet,
-} from "../standar-page/standarPage";
+import { StandardBar } from "../standar-page/standarPage";
 
 export const ModalSearchSchema = z.object({
   id: z.string().uuid(),
@@ -81,12 +75,14 @@ export function ItemStylePhotoAndName({
   isSelected,
   disable,
   imageRounded = false,
+  textDisabled,
 }: {
   item: ModalSearchSchemaType;
   toggleSelect: (item: ModalSearchSchemaType) => void;
   isSelected: boolean;
   disable?: boolean;
   imageRounded?: boolean;
+  textDisabled?: string;
 }) {
   const shouldDim = disable && !isSelected;
   return (
@@ -110,13 +106,25 @@ export function ItemStylePhotoAndName({
       </View>
 
       <View className="flex-1 flex-row items-center justify-between">
-        {/* Title and details */}
-        <Text
-          className="text-black text-lg font-pmedium mb-1"
-          numberOfLines={1}
-        >
-          {item.name}
-        </Text>
+        <View className="flex-1">
+          {/* Title and details */}
+          <Text
+            className="text-black text-lg font-pmedium mb-1"
+            numberOfLines={1}
+          >
+            {item.name}
+          </Text>
+
+          {/* Show message if item is in inspo */}
+          {textDisabled && (
+            <Text
+              className="text-red-500 text-sm font-plight"
+              numberOfLines={1}
+            >
+              {textDisabled}
+            </Text>
+          )}
+        </View>
 
         <View className="w-8 h-8 items-center justify-center">
           {isSelected ? (

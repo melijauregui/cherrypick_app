@@ -9,7 +9,6 @@ const AuthLayout = () => {
     <OnlyAuthenticated>
       <View style={{ flex: 1 }}>
         <Stack screenOptions={{ headerShown: false }}></Stack>
-        <CustomTabBar />
       </View>
     </OnlyAuthenticated>
   );

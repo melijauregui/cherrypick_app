@@ -2,6 +2,7 @@ import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { Context } from "hono";
 import { errorHandler } from "../errorHandler";
 import { AppEnv } from "../app";
+import { z } from "zod";
 import {
   BrandSchemaPropertiesResponse,
   BrandSchemaPropertiesResponseType,
@@ -16,7 +17,12 @@ import {
   SuccessSchema,
   SuccessSchemaType,
 } from "@/schemas/standar-response-schema";
-import { GetBrandById, GetBrandId, UpdateBrand } from "./functions";
+import {
+  GetBrandById,
+  GetBrandId,
+  UpdateBrand,
+  GetBrandInspoItems,
+} from "./functions";
 import { QueryIdSchema } from "@/schemas/standar-query-schema";
 import logger from "../logger";
 import { VerifyUserExists } from "../user/functions";
@@ -33,6 +39,7 @@ import {
   PaginationFilterSchema,
   UuidNameResponseSchema,
   UuidNameResponseSchemaType,
+  UuidItemsSchemaResponse,
 } from "@/schemas/catalog/catalog-schema";
 import { GetCatalog } from "../catalog/functions";
 import { UpdateCatalog } from "../catalog/insert";
@@ -304,6 +311,58 @@ BrandApp.openapi(paginatedRouteBrand, async c => {
     items: result.items,
   };
   return c.json(res, 200);
+});
+
+// endpoint que obtiene todos los items de inspo semanal de una marca
+const getInspoItemsRoute = createRoute({
+  method: "get",
+  path: "/inspo-items",
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: UuidItemsSchemaResponse,
+        },
+      },
+      description: "Devuelve los IDs de los items que están en inspo semanal",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "No tienes permisos para obtener los items de inspo",
+    },
+    500: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Error interno del servidor",
+    },
+  },
+});
+
+BrandApp.openapi(getInspoItemsRoute, async c => {
+  logger.info("/GET brand/inspo-items");
+  const user = c.get("user");
+  const brandId = user?.id;
+
+  if (!brandId) {
+    return c.json(
+      {
+        error: true,
+        details: "No tienes permisos para obtener los items de inspo",
+      },
+      401
+    );
+  }
+
+  const items = await GetBrandInspoItems(brandId);
+
+  return c.json({ error: false, items: items }, 200);
 });
 
 // endpoint que obtiene la información de la marca con su id

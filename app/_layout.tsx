@@ -104,6 +104,13 @@ const RootLayout = () => {
             animation: "slide_from_bottom",
           }}
         />
+        <Stack.Screen
+          name="(camera)"
+          options={{
+            headerShown: false,
+            animation: "slide_from_right",
+          }}
+        />
       </Stack>
       <Toast config={toastConfig} />
     </QueryClientProvider>
