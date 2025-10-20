@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { Pool } from "pg";
 import { expo } from "@better-auth/expo";
+import { randomUUID } from "crypto";
 import { CreateClient } from "@/server/client/functions";
 import {
   GenerateVerificationCode,
@@ -18,6 +19,9 @@ export const auth = betterAuth({
   database: new Pool({
     connectionString: config.DATABASE_URL,
   }),
+  advanced: {
+    generateId: () => randomUUID(),
+  },
   emailAndPassword: {
     enabled: true,
     sendResetPassword: async ({ user, url, token }, request) => {

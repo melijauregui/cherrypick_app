@@ -18469,7 +18469,7 @@ export namespace Prisma {
   }
 
   export type userCreateInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -18488,7 +18488,7 @@ export namespace Prisma {
   }
 
   export type userUncheckedCreateInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -18545,7 +18545,7 @@ export namespace Prisma {
   }
 
   export type userCreateManyInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -20598,7 +20598,7 @@ export namespace Prisma {
   }
 
   export type userCreateWithoutBrandInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -20616,7 +20616,7 @@ export namespace Prisma {
   }
 
   export type userUncheckedCreateWithoutBrandInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -20825,7 +20825,7 @@ export namespace Prisma {
   }
 
   export type userCreateWithoutClientInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -20843,7 +20843,7 @@ export namespace Prisma {
   }
 
   export type userUncheckedCreateWithoutClientInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -20913,7 +20913,7 @@ export namespace Prisma {
   }
 
   export type userCreateWithoutItemFavoritesInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -20931,7 +20931,7 @@ export namespace Prisma {
   }
 
   export type userUncheckedCreateWithoutItemFavoritesInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -21065,7 +21065,7 @@ export namespace Prisma {
   }
 
   export type userCreateWithoutItemLikesInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -21083,7 +21083,7 @@ export namespace Prisma {
   }
 
   export type userUncheckedCreateWithoutItemLikesInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -21217,7 +21217,7 @@ export namespace Prisma {
   }
 
   export type userCreateWithoutRegisterInProgressInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -21235,7 +21235,7 @@ export namespace Prisma {
   }
 
   export type userUncheckedCreateWithoutRegisterInProgressInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -21305,7 +21305,7 @@ export namespace Prisma {
   }
 
   export type userCreateWithoutResetPasswordInProgressInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -21323,7 +21323,7 @@ export namespace Prisma {
   }
 
   export type userUncheckedCreateWithoutResetPasswordInProgressInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -21828,7 +21828,7 @@ export namespace Prisma {
   }
 
   export type userCreateWithoutAccountInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -21846,7 +21846,7 @@ export namespace Prisma {
   }
 
   export type userUncheckedCreateWithoutAccountInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -21916,7 +21916,7 @@ export namespace Prisma {
   }
 
   export type userCreateWithoutSessionInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean
@@ -21934,7 +21934,7 @@ export namespace Prisma {
   }
 
   export type userUncheckedCreateWithoutSessionInput = {
-    id: string
+    id?: string
     name: string
     email: string
     emailVerified: boolean

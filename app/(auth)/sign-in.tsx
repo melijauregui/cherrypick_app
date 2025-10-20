@@ -123,6 +123,7 @@ const handlePress = async () => {
       errorCallbackURL: "cherrypick:///error",
       //newUserCallbackURL: "cherrypick:///preferences",
     });
+    console.log("result", result);
   } catch (error) {
     console.error("Error in Google sign-in:", error);
   }

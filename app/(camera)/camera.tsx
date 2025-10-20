@@ -33,6 +33,7 @@ import {
   getEmbedding,
 } from "../utils/fetch";
 import FilterSearchBottomSheet from "../components/explore/filterSearch";
+import { IdNameImageSchemaType } from "@/schemas/catalog/catalog-schema";
 
 const CameraPage = () => {
   const [uri, setUri] = useState<string | null>(null);
@@ -277,6 +278,7 @@ const RenderPicture = ({
   setUri: (uri: string | null) => void;
 }) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
+  const [isFilterSearchModalOpen, setIsFilterSearchModalOpen] = useState(false);
   const handleSheetChanges = useCallback((index: number) => {
     // console.log("index", index);
     setSnapIndex(index);
@@ -290,10 +292,9 @@ const RenderPicture = ({
 
   const [minPrice, setMinPrice] = useState<string | undefined>(undefined);
   const [maxPrice, setMaxPrice] = useState<string | undefined>(undefined);
-  const [brandsSelected, setBrandsSelected] = useState<Map<string, string>>(
-    new Map()
-  );
-  const bottomSheetRefFilter = useRef<BottomSheet>(null);
+  const [brandsSelected, setBrandsSelected] = useState<
+    Map<string, IdNameImageSchemaType>
+  >(new Map<string, IdNameImageSchemaType>());
 
   if (!uri) return null;
 
@@ -323,7 +324,7 @@ const RenderPicture = ({
         />
         <ControlsRenderPicture
           setUri={setUri}
-          onPressTune={() => bottomSheetRefFilter.current?.expand()}
+          onPressTune={() => setIsFilterSearchModalOpen(true)}
           filterCount={
             (minPrice ? 1 : 0) + (maxPrice ? 1 : 0) + brandsSelected.size
           }
@@ -389,7 +390,8 @@ const RenderPicture = ({
           )}
         </BottomSheet>
         <FilterSearchBottomSheet
-          bottomSheetRef={bottomSheetRefFilter}
+          isModalOpen={isFilterSearchModalOpen}
+          setIsModalOpen={setIsFilterSearchModalOpen}
           onSubmit={(minPrice, maxPrice, brandsSelected) => {
             setMinPrice(minPrice);
             setMaxPrice(maxPrice);

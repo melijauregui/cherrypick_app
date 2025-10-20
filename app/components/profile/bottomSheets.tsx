@@ -371,9 +371,12 @@ const RenderProfileItemPreferences = ({
         }}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={() => (
-          <View className="flex-1 justify-center items-center py-8">
-            <Text className="text-grey-lighter font-pregular text-center">
-              No hay elementos disponibles
+          <View className="flex-1 items-center py-1">
+            <Text className="text-grey-lighter font-pmedium text-center">
+              Aún no has seleccionado preferencias
+            </Text>
+            <Text className="text-grey-lighter font-plight text-center mt-1">
+              Elige al menos una para personalizar tu feed.
             </Text>
           </View>
         )}
