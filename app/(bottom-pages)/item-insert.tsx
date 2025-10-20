@@ -190,6 +190,7 @@ export function ItemsBottomSheetDetails({
                   keyboardType="default"
                   autoCapitalize="none"
                   placeholder="Escribe el nombre del nuevo item"
+                  length={50}
                 />
 
                 <InputBoxWithName
@@ -202,6 +203,7 @@ export function ItemsBottomSheetDetails({
                   placeholder="Escribe una descripción del nuevo item"
                   height={120}
                   autoCapitalize="none"
+                  length={200}
                 />
 
                 <InputBoxWithName

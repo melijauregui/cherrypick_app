@@ -14,10 +14,13 @@ export const UpdatePreferencesSchema = z.object({
 });
 
 export const UpdateClientSchema = z.object({
-  name: z.string({
-    required_error: "Name is required",
-    invalid_type_error: "Name must be a string",
-  }),
+  name: z
+    .string({
+      required_error: "Name is required",
+      invalid_type_error: "Name must be a string",
+    })
+    .min(1, { message: "Name is required" })
+    .max(50, { message: "Name must be less than 50 characters" }),
   dateOfBirth: z
     .string()
     .transform(val => {
@@ -51,7 +54,8 @@ const ClientFormSchemaSignUp = z.object({
     .string({
       required_error: "Name must ve valid",
     })
-    .min(1, { message: "Name is required" }),
+    .min(1, { message: "Name is required" })
+    .max(50, { message: "Name must be less than 50 characters" }),
   email: z
     .string({
       required_error: "Email is required",

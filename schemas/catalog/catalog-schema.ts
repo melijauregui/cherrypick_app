@@ -7,10 +7,14 @@ export const MinimumPropertiesItemSchema = z.object({
   name: z
     .string()
     .min(1, { message: "Product name is required" })
+    .max(50, { message: "Product name must be less than 50 characters" })
     .refine(val => /[a-zA-Z0-9]/.test(val), {
       message: "Product name must contain at least one letter or number",
     }),
-  description: z.string().min(1, { message: "Description is required" }),
+  description: z
+    .string()
+    .min(1, { message: "Description is required" })
+    .max(200, { message: "Description must be less than 200 characters" }),
   price: z.preprocess(
     val => {
       if (typeof val === "string") {
@@ -106,6 +110,7 @@ export const IdNameImageSchema = z.object({
   name: z
     .string()
     .min(1, { message: "Product name is required" })
+    .max(50, { message: "Product name must be less than 50 characters" })
     .refine(val => /[a-zA-Z0-9]/.test(val), {
       message: "Product name must contain at least one letter or number",
     }),
