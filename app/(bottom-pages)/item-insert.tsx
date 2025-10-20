@@ -96,7 +96,6 @@ export default function InsertItemPage() {
     >
       <StandardDescription description="Crea una descripción detallada y atractiva para maximizar las ventas. En lo posible, una foto de alta calidad que muestre únicamente el producto en un fondo limpio. Esto mejorará significativamente la visibilidad y precisión de búsqueda de tu item." />
       <ItemsBottomSheetDetails
-        formDataLastValue={formData}
         setFormData={setFormData}
         setErrors={setErrors}
         errors={errors}
@@ -107,13 +106,11 @@ export default function InsertItemPage() {
 }
 
 export function ItemsBottomSheetDetails({
-  formDataLastValue,
   setFormData,
   setErrors,
   formData,
   errors,
 }: {
-  formDataLastValue: InsertItemSchema;
   setFormData: React.Dispatch<React.SetStateAction<InsertItemSchema>>;
   setErrors: React.Dispatch<React.SetStateAction<FormErrors>>;
   formData: InsertItemSchema;

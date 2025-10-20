@@ -114,10 +114,22 @@ export async function UpdateItem(
     vectorsToUpdate.text_vector = textFeatures.features;
   }
 
+  // Prepare properties to update in Weaviate
+  const propertiesToUpdateWeaviate: any = {};
+  if (updatedItem.price !== undefined) {
+    propertiesToUpdateWeaviate.price = updatedItem.price;
+  }
+
   const updateData: any = {
     id: uuid,
     vectors: vectorsToUpdate,
   };
+
+  // Only include properties if there are any to update
+  if (Object.keys(propertiesToUpdate).length > 0) {
+    updateData.properties = propertiesToUpdateWeaviate;
+  }
+
   await collection.data.update(updateData);
 
   return {

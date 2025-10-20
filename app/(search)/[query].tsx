@@ -8,6 +8,7 @@ import PageExplore, {
 const SearchResults = () => {
   const { query, minPrice, maxPrice, brands } = useLocalSearchParams();
 
+  console.log("brands SEARCH QUERY", brands);
   return (
     <SafeAreaProvider>
       <PageExplore>
@@ -15,7 +16,7 @@ const SearchResults = () => {
           query={query as string}
           initialMinPrice={typeof minPrice === "string" ? minPrice : undefined}
           initialMaxPrice={typeof maxPrice === "string" ? maxPrice : undefined}
-          initialBrandPairsCsv={typeof brands === "string" ? brands : undefined}
+          initialBrands={typeof brands === "string" ? brands : undefined}
         />
       </PageExplore>
     </SafeAreaProvider>

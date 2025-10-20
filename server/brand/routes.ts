@@ -2,14 +2,15 @@ import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { Context } from "hono";
 import { errorHandler } from "../errorHandler";
 import { AppEnv } from "../app";
-import { z } from "zod";
 import {
   BrandSchemaPropertiesResponse,
   BrandSchemaPropertiesResponseType,
   BrandSchemaResponse,
   BrandSchemaResponseType,
-  MinimumPropertiesBrandSchema,
   UpdateBrandSchema,
+  GetBrandsByIdsSchema,
+  BrandsResponseSchema,
+  BrandsResponseSchemaType,
 } from "@/schemas/brand/brand-schema";
 import {
   ErrorSchema,
@@ -22,6 +23,7 @@ import {
   GetBrandId,
   UpdateBrand,
   GetBrandInspoItems,
+  GetBrandsByIds,
 } from "./functions";
 import { QueryIdSchema } from "@/schemas/standar-query-schema";
 import logger from "../logger";
@@ -37,8 +39,6 @@ import {
   PaginationSchema,
   DeleteItemsResponseSchemaType,
   PaginationFilterSchema,
-  UuidNameResponseSchema,
-  UuidNameResponseSchemaType,
   UuidItemsSchemaResponse,
 } from "@/schemas/catalog/catalog-schema";
 import { GetCatalog } from "../catalog/functions";
@@ -363,6 +363,70 @@ BrandApp.openapi(getInspoItemsRoute, async c => {
   const items = await GetBrandInspoItems(brandId);
 
   return c.json({ error: false, items: items }, 200);
+});
+
+// endpoint que obtiene múltiples marcas por sus IDs
+const getBrandsSomeRoute = createRoute({
+  method: "post",
+  path: "/some",
+  request: {
+    body: {
+      content: {
+        "application/json": {
+          schema: GetBrandsByIdsSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: "Obtiene las marcas por sus IDs",
+      content: {
+        "application/json": {
+          schema: BrandsResponseSchema,
+        },
+      },
+    },
+    400: {
+      description: "Error en los datos enviados",
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+    },
+    500: {
+      description: "Error interno del servidor",
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+    },
+  },
+});
+
+BrandApp.openapi(getBrandsSomeRoute, async c => {
+  const { ids } = await c.req.valid("json");
+  logger.info("/POST brand/some ids: %s", ids);
+
+  try {
+    const brands = await GetBrandsByIds(ids);
+
+    const res: BrandsResponseSchemaType = {
+      error: false,
+      brands: brands,
+    };
+
+    return c.json(res, 200);
+  } catch (error) {
+    logger.error("Error getting brands by IDs:", error);
+    const resError: ErrorSchemaType = {
+      error: true,
+      details: "Error interno del servidor",
+    };
+    return c.json(resError, 500);
+  }
 });
 
 // endpoint que obtiene la información de la marca con su id

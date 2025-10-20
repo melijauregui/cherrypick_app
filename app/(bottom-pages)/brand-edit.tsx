@@ -104,8 +104,9 @@ function EditBrandProfile({ brand }: { brand: BrandSchemaType }) {
       onLoading={isSubmitting}
       section="Editar marca"
     >
+      <StandardDescription description="Completa la información de tu marca para que los clientes puedan conocerte mejor. Una descripción atractiva y una página web oficial ayudarán a generar más confianza y ventas." />
+
       <ScrollView>
-        <StandardDescription description="Completa la información de tu marca para que los clientes puedan conocerte mejor. Una descripción atractiva y una página web oficial ayudarán a generar más confianza y ventas." />
         <View className="flex flex-col justify-center items-center px-5 gap-5">
           <View>
             <ImageComplete

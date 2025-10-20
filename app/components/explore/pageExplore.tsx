@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   TextInput,
@@ -8,13 +8,16 @@ import {
   ScrollView,
   ImageBackground,
 } from "react-native";
-import { Link, router, useRouter } from "expo-router";
+import { router, useRouter } from "expo-router";
 import { Entypo, Ionicons } from "@expo/vector-icons";
 import List2 from "@/app/components/List2";
-import { getClothingItemsTextSearch } from "@/app/utils/fetch";
+import { getBrandsByIds, getClothingItemsTextSearch } from "@/app/utils/fetch";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import LoadingPage from "../LoadingPage";
-import { ItemSchemaType } from "@/schemas/catalog/catalog-schema";
+import {
+  IdNameImageSchemaType,
+  ItemSchemaType,
+} from "@/schemas/catalog/catalog-schema";
 import {
   SafeAreaProvider,
   SafeAreaView,
@@ -22,10 +25,8 @@ import {
 } from "react-native-safe-area-context";
 import { useFetchEmbedding } from "@/app/utils/use-query";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import BottomSheet from "@gorhom/bottom-sheet";
 import FilterSearchBottomSheet from "./filterSearch";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { StatusBar } from "expo-status-bar";
 import { prefetchInspirationItems } from "@/app/utils/prefetchs";
 import { useSession } from "@/lib/auth-client";
 
@@ -49,10 +50,10 @@ export function PageExploreStandard({ query }: { query: string }) {
   const [searchText, setSearchText] = useState((query as string) || "");
   const [minPrice, setMinPrice] = useState<string | undefined>(undefined);
   const [maxPrice, setMaxPrice] = useState<string | undefined>(undefined);
-  const bottomSheetRef = useRef<BottomSheet>(null);
-  const [brandsSelected, setBrandsSelected] = useState<Map<string, string>>(
-    new Map<string, string>()
-  );
+  const [isFilterSearchModalOpen, setIsFilterSearchModalOpen] = useState(false);
+  const [brandsSelected, setBrandsSelected] = useState<
+    Map<string, IdNameImageSchemaType>
+  >(new Map<string, IdNameImageSchemaType>());
   const insets = useSafeAreaInsets();
   const [overHeaderImage, setOverHeaderImage] = useState(true);
   const HEADER_IMAGE_HEIGHT = 320; // keep in sync with ImageBackgroundComponent
@@ -84,9 +85,7 @@ export function PageExploreStandard({ query }: { query: string }) {
         ...(maxPrice ? { maxPrice } : {}),
         ...(brandsSelected.size > 0
           ? {
-              brands: Array.from(brandsSelected.entries())
-                .map(([uuid, name]) => `${uuid},${name}`)
-                .join(";"),
+              brands: Array.from(brandsSelected.keys()).join(";"),
             }
           : {}),
       },
@@ -103,10 +102,10 @@ export function PageExploreStandard({ query }: { query: string }) {
           onChangeTextSearch={onChangeTextSearch}
           searchText={searchText}
           handleSearch={handleSearch}
-          bottomSheetRef={bottomSheetRef}
           minPrice={minPrice}
           maxPrice={maxPrice}
           brandsSelected={brandsSelected}
+          onPressFilter={() => setIsFilterSearchModalOpen(true)}
         />
       </View>
       <ScrollView
@@ -138,7 +137,8 @@ export function PageExploreStandard({ query }: { query: string }) {
       </ScrollView>
 
       <FilterSearchBottomSheet
-        bottomSheetRef={bottomSheetRef}
+        isModalOpen={isFilterSearchModalOpen}
+        setIsModalOpen={setIsFilterSearchModalOpen}
         onSubmit={(minPrice, maxPrice, brandsSelected) => {
           setMinPrice(minPrice);
           setMaxPrice(maxPrice);
@@ -154,39 +154,83 @@ export function PageExploreStandard({ query }: { query: string }) {
 
 export const PageExploreQuery = ({
   query,
+  initialBrands,
   initialMinPrice,
   initialMaxPrice,
-  initialBrandPairsCsv,
 }: {
   query: string;
   initialMinPrice?: string | undefined;
   initialMaxPrice?: string | undefined;
-  initialBrandPairsCsv?: string | undefined;
+  initialBrands?: string | undefined;
 }) => {
   const router = useRouter();
   const [searchText, setSearchText] = useState((query as string) || "");
   const embeddingData = useFetchEmbedding("text", query);
-  const bottomSheetRef = useRef<BottomSheet>(null);
+  const [isFilterSearchModalOpen, setIsFilterSearchModalOpen] = useState(false);
   const [minPrice, setMinPrice] = useState<string | undefined>(initialMinPrice);
   const [maxPrice, setMaxPrice] = useState<string | undefined>(initialMaxPrice);
-  const [brandsSelected, setBrandsSelected] = useState<Map<string, string>>(
-    () => {
-      const initial = new Map<string, string>();
-      if (initialBrandPairsCsv) {
-        initialBrandPairsCsv
-          .split(";")
-          .map(s => s.trim())
-          .filter(s => s.length > 0)
-          .forEach(pair => {
-            const [uuid, name] = pair.split(",");
-            if (uuid) {
-              initial.set(uuid, name ?? uuid);
-            }
-          });
-      }
-      return initial;
+  // Extraer los IDs de brands del CSV inicial
+  const initialBrandIds = initialBrands
+    ? initialBrands
+        .split(";")
+        .map(s => s.trim())
+        .filter((id): id is string => Boolean(id))
+    : [];
+
+  // Obtener las brands usando el hook
+  const {
+    data: brandsData,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["brands-by-ids", initialBrandIds],
+    queryFn: () => getBrandsByIds(initialBrandIds),
+    staleTime: 5 * 60 * 1000,
+    enabled: initialBrandIds.length > 0, // Solo ejecutar si hay IDs
+  });
+
+  console.log("brandsData PAGE EXPLORE QUERY", brandsData);
+
+  // Inicializar el estado con las brands obtenidas
+  const [brandsSelected, setBrandsSelected] = useState<
+    Map<string, IdNameImageSchemaType>
+  >(() => {
+    const initial = new Map<string, IdNameImageSchemaType>();
+    if (brandsData) {
+      brandsData.forEach(brand => {
+        initial.set(brand.id, {
+          id: brand.id,
+          name: brand.name,
+          image: {
+            url: brand.logo.url,
+            updatedAt: brand.logo.updatedAt,
+          },
+        });
+      });
     }
-  );
+
+    return initial;
+  });
+
+  console.log("brandsSelected PAGE EXPLORE QUERY", brandsSelected);
+
+  // Actualizar el estado cuando lleguen los datos de las brands
+  useEffect(() => {
+    if (brandsData) {
+      const newBrandsMap = new Map<string, IdNameImageSchemaType>();
+      brandsData.forEach(brand => {
+        newBrandsMap.set(brand.id, {
+          id: brand.id,
+          name: brand.name,
+          image: {
+            url: brand.logo.url,
+            updatedAt: brand.logo.updatedAt,
+          },
+        });
+      });
+      setBrandsSelected(newBrandsMap);
+    }
+  }, [brandsData]);
 
   const onChangeTextSearch = (text: string) => {
     setSearchText(text);
@@ -205,9 +249,7 @@ export const PageExploreQuery = ({
         ...(maxPrice ? { maxPrice } : {}),
         ...(brandsSelected.size > 0
           ? {
-              brands: Array.from(brandsSelected.entries())
-                .map(([uuid, name]) => `${uuid},${name}`)
-                .join(";"),
+              brands: Array.from(brandsSelected.keys()).join(";"),
             }
           : {}),
       },
@@ -229,7 +271,7 @@ export const PageExploreQuery = ({
           onChangeTextSearch={onChangeTextSearch}
           searchText={searchText}
           handleSearch={handleSearch}
-          bottomSheetRef={bottomSheetRef}
+          onPressFilter={() => setIsFilterSearchModalOpen(true)}
           minPrice={minPrice}
           maxPrice={maxPrice}
           brandsSelected={brandsSelected}
@@ -269,7 +311,8 @@ export const PageExploreQuery = ({
         )}
       />
       <FilterSearchBottomSheet
-        bottomSheetRef={bottomSheetRef}
+        isModalOpen={isFilterSearchModalOpen}
+        setIsModalOpen={setIsFilterSearchModalOpen}
         onSubmit={(minPrice, maxPrice, brandsSelected) => {
           setMinPrice(minPrice);
           setMaxPrice(maxPrice);
@@ -321,7 +364,7 @@ function SearchInput({
   onChangeTextSearch,
   searchText,
   handleSearch,
-  bottomSheetRef,
+  onPressFilter,
   minPrice,
   maxPrice,
   brandsSelected,
@@ -330,12 +373,14 @@ function SearchInput({
   onChangeTextSearch: (text: string) => void;
   searchText: string;
   handleSearch: () => void;
-  bottomSheetRef: React.RefObject<BottomSheet>;
+  onPressFilter: () => void;
   minPrice: string | undefined;
   maxPrice: string | undefined;
-  brandsSelected: Map<string, string>;
+  brandsSelected: Map<string, IdNameImageSchemaType>;
   opacity?: boolean;
 }) {
+  console.log("brandsSelected SEARCH INPUT", brandsSelected);
+
   const router = useRouter();
   return (
     <View
@@ -352,10 +397,7 @@ function SearchInput({
         returnKeyType="search"
       />
       <View className="flex-row items-center gap-2">
-        <TouchableOpacity
-          onPress={() => bottomSheetRef.current?.expand()}
-          className="relative"
-        >
+        <TouchableOpacity onPress={onPressFilter} className="relative">
           <MaterialCommunityIcons
             name="tune-vertical-variant"
             size={20}

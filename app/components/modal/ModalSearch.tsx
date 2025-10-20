@@ -1,21 +1,8 @@
 import { Modal, View, Text, TouchableOpacity, Image } from "react-native";
 import { Octicons } from "@expo/vector-icons";
-import z from "zod";
 import { imageDefault } from "@/lib/constants";
 import { StandardBar } from "../standar-page/standarPage";
-
-export const ModalSearchSchema = z.object({
-  id: z.string().uuid(),
-  name: z.string().min(1).max(50),
-  imageUrl: z
-    .object({
-      url: z.string().url(),
-      updatedAt: z.string(),
-    })
-    .nullable(),
-});
-
-export type ModalSearchSchemaType = z.infer<typeof ModalSearchSchema>;
+import { IdNameImageSchemaType } from "@/schemas/catalog/catalog-schema";
 
 export function ModalStandar({
   isModalOpen,
@@ -76,13 +63,15 @@ export function ItemStylePhotoAndName({
   disable,
   imageRounded = false,
   textDisabled,
+  size = "medium",
 }: {
-  item: ModalSearchSchemaType;
-  toggleSelect: (item: ModalSearchSchemaType) => void;
+  item: IdNameImageSchemaType;
+  toggleSelect: (item: IdNameImageSchemaType) => void;
   isSelected: boolean;
   disable?: boolean;
   imageRounded?: boolean;
   textDisabled?: string;
+  size?: "small" | "medium" | "large";
 }) {
   const shouldDim = disable && !isSelected;
   return (
@@ -93,11 +82,11 @@ export function ItemStylePhotoAndName({
       onPress={() => toggleSelect(item)}
     >
       <View
-        className={`w-20 h-20 ${imageRounded ? "rounded-full" : "rounded-lg"} overflow-hidden mr-3`}
+        className={`${size === "small" ? "w-14 h-14" : size === "medium" ? "w-20 h-20" : "w-24 h-24"} ${imageRounded ? "rounded-full" : "rounded-lg"} overflow-hidden mr-3`}
       >
         <Image
           source={{
-            uri: item.imageUrl?.url ?? imageDefault,
+            uri: item.image?.url ?? imageDefault,
             cache: "force-cache",
           }}
           className="w-full h-full"
@@ -109,7 +98,7 @@ export function ItemStylePhotoAndName({
         <View className="flex-1">
           {/* Title and details */}
           <Text
-            className="text-black text-lg font-pmedium mb-1"
+            className={`text-black ${size === "small" ? "text-base" : size === "medium" ? "text-lg" : "text-xl"} font-pmedium mb-1`}
             numberOfLines={1}
           >
             {item.name}
@@ -118,7 +107,7 @@ export function ItemStylePhotoAndName({
           {/* Show message if item is in inspo */}
           {textDisabled && (
             <Text
-              className="text-red-500 text-sm font-plight"
+              className={`text-red-500 ${size === "small" ? "text-xs" : size === "medium" ? "text-sm" : "text-base"} font-plight`}
               numberOfLines={1}
             >
               {textDisabled}
@@ -128,9 +117,17 @@ export function ItemStylePhotoAndName({
 
         <View className="w-8 h-8 items-center justify-center">
           {isSelected ? (
-            <Octicons name="check-circle-fill" size={16} color="#22c55e" />
+            <Octicons
+              name="check-circle-fill"
+              size={size === "small" ? 12 : size === "medium" ? 14 : 16}
+              color="#22c55e"
+            />
           ) : (
-            <Octicons name="circle" size={16} color="#242424" />
+            <Octicons
+              name="circle"
+              size={size === "small" ? 12 : size === "medium" ? 14 : 16}
+              color="#242424"
+            />
           )}
         </View>
       </View>

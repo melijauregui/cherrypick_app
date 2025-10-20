@@ -20,7 +20,10 @@ async function cleanupDatabase() {
   console.log("⚠️  ESTO ELIMINARÁ TODOS LOS DATOS PERMANENTEMENTE");
 
   try {
-    // Paso 1: Eliminar tablas de datos relacionados con items
+    // Paso 1: Eliminar tablas de datos relacionados con inpo
+    console.log("📦 Eliminando todos los inspo...");
+    const deletedInspos = await prisma.inspoItems.deleteMany();
+    console.log(`✅ Eliminados ${deletedInspos.count} inspo`);
 
     // Paso 2: Eliminar todos los items
     console.log("📦 Eliminando todos los items...");

@@ -6,20 +6,18 @@ import {
   StandardDescription,
   StandardPageBottomSheet,
 } from "@/app/components/standar-page/standarPage";
-import {
-  ItemStylePhotoAndName,
-  ModalSearchSchemaType,
-} from "@/app/components/modal/ModalSearch";
+import { ItemStylePhotoAndName } from "@/app/components/modal/ModalSearch";
 import { router } from "expo-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSession } from "@/lib/auth-client";
 import safeFetch from "../utils/safe-fetch";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { LOCAL_IP } from "@/config/api";
+import { IdNameImageSchemaType } from "@/schemas/catalog/catalog-schema";
 
 export default function DeleteItemsPage() {
   const [itemsSelected, setItemsSelected] = useState<
-    Map<string, ModalSearchSchemaType>
+    Map<string, IdNameImageSchemaType>
   >(new Map());
   const [forceKey, setForceKey] = useState(0);
   const onCancel = () => {
@@ -90,12 +88,12 @@ export default function DeleteItemsPage() {
 async function fetchItems(
   search: string,
   pageParam: number
-): Promise<ModalSearchSchemaType[]> {
+): Promise<IdNameImageSchemaType[]> {
   const items = await getSelfBrandItems(pageParam, 20, search);
   return items.map(item => ({
     id: item.uuid,
     name: item.name,
-    imageUrl: {
+    image: {
       url: item.image.url,
       updatedAt: item.image.updatedAt,
     },

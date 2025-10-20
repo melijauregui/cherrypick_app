@@ -4,7 +4,6 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import { Context } from "hono";
 import { errorHandler } from "../errorHandler";
 import {
-  AllInspirationItemsResponseSchema,
   EmbbedingResponseSchema,
   EmbbedingResponseSchemaType,
   EmbbedingWithFiltersSchema,
@@ -17,7 +16,7 @@ import {
   PaginationSchema,
   ImageUrlSchema,
   PaginationFilterSchema,
-  UuidNameResponseSchema,
+  IdNameImageResponseSchema,
 } from "@/schemas/catalog/catalog-schema";
 import { ErrorSchema } from "@/schemas/standar-response-schema";
 import {
@@ -27,10 +26,6 @@ import {
   SearchItems,
 } from "./functions";
 import logger from "../logger";
-import {
-  QueryIdSchema,
-  QueryIdSchemaType,
-} from "@/schemas/standar-query-schema";
 
 const SearchApp = new OpenAPIHono<AppEnv>({
   defaultHook: (result, c) => {
@@ -374,7 +369,7 @@ const allBrandItemsRoute = createRoute({
     200: {
       content: {
         "application/json": {
-          schema: UuidNameResponseSchema,
+          schema: IdNameImageResponseSchema,
         },
       },
       description: "Devuelve los nombres con sus ids de las marcas registradas",

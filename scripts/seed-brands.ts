@@ -80,10 +80,10 @@ async function seedBrands() {
         userId: "ca8cce7e-792a-11f0-b577-0242ac120002",
         name: "tienda napoli",
         description: `10% off abonando con transferencia
-  3 cuotas sin interés con tarj bancarias
-  Envíos a todo el país
-  Malabia 1574 , Palermo Soho
-  Lun a sab: 11 a 19 hs`,
+3 cuotas sin interés con tarj bancarias
+Envíos a todo el país
+Malabia 1574 , Palermo Soho
+Lun a sab: 11 a 19 hs`,
         url: "https://www.tiendanapoli.com/",
         logoId: "ca8cce7e-792a-11f0-b577-0242ac120002",
       },
@@ -96,11 +96,11 @@ async function seedBrands() {
         userId: "ca8ce0ae-792a-11f0-b577-0242ac120002",
         name: "charo",
         description: `Info vía WhatsApp 📲 1161428031
-  Stores:
-  España 3012 Florencio varela
-  Calle 13 4777 Berazategui
-  Brown 509 Quilmes
-  Av 844 2509 Solano`,
+Stores:
+España 3012 Florencio varela
+Calle 13 4777 Berazategui
+Brown 509 Quilmes
+Av 844 2509 Solano`,
         url: "https://www.charostoreok.com/",
         logoId: "ca8ce0ae-792a-11f0-b577-0242ac120002",
       },

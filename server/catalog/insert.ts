@@ -102,6 +102,10 @@ export async function insertCatalogItems(
           image_vector: featuresResult.features.image_features,
           text_vector: featuresResult.features.text_features,
         },
+        properties: {
+          brandId: brandId,
+          price: item.price,
+        },
       });
 
       console.log(`Item inserted with UUID: ${dbItem.id}`);

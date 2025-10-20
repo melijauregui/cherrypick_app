@@ -7,7 +7,10 @@ import {
   ItemSchemaType,
   MinimumPropertiesItemSchema,
 } from "@/schemas/catalog/catalog-schema";
-import { StandardPageBottomSheet } from "../components/standar-page/standarPage";
+import {
+  StandardDescription,
+  StandardPageBottomSheet,
+} from "../components/standar-page/standarPage";
 import { useState } from "react";
 import { Keyboard } from "react-native";
 import safeFetch from "../utils/safe-fetch";
@@ -118,8 +121,8 @@ function EditItem({ item }: { item: UpdateItemSchema }) {
       onLoading={isSubmitting}
       section="Editar item"
     >
+      <StandardDescription description="Edita la descripción del item para maximizar las ventas. En lo posible, una foto de alta calidad que muestre únicamente el producto en un fondo limpio. Esto mejorará significativamente la visibilidad y precisión de búsqueda de tu item." />
       <ItemsBottomSheetDetails
-        formDataLastValue={item}
         setFormData={setFormData}
         setErrors={setErrors}
         errors={errors}
@@ -166,7 +169,6 @@ function useUpdateItem(itemLastValue: UpdateItemSchema) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(itemUpdated),
       });
-      console.log("response!!!????", response);
       if (response.data.error) {
         console.log("response.data.error WHY HERE", response.data.error);
         throw new Error(response.data.details);

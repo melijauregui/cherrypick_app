@@ -102,22 +102,28 @@ export type DeleteItemsResponseSchemaType = z.infer<
   typeof DeleteItemsResponseSchema
 >;
 
-export const UuidNameSchema = z.object({
+export const IdNameImageSchema = z.object({
   name: z
     .string()
     .min(1, { message: "Product name is required" })
     .refine(val => /[a-zA-Z0-9]/.test(val), {
       message: "Product name must contain at least one letter or number",
     }),
-  uuid: z.string().uuid({ message: "UUID is required" }),
+  id: z.string().uuid({ message: "ID is required" }),
+  image: z.object({
+    url: z.string(),
+    updatedAt: z.string(),
+  }),
 });
-export type UuidNameSchemaType = z.infer<typeof UuidNameSchema>;
+export type IdNameImageSchemaType = z.infer<typeof IdNameImageSchema>;
 
-export const UuidNameResponseSchema = z.object({
+export const IdNameImageResponseSchema = z.object({
   ...SuccessSchema.shape,
-  data: z.array(UuidNameSchema),
+  data: z.array(IdNameImageSchema),
 });
-export type UuidNameResponseSchemaType = z.infer<typeof UuidNameResponseSchema>;
+export type IdNameImageResponseSchemaType = z.infer<
+  typeof IdNameImageResponseSchema
+>;
 
 export const IsMyItemSchema = z.object({
   ...SuccessSchema.shape,

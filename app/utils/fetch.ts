@@ -7,8 +7,8 @@ import {
   ItemResponseSchema,
   ItemSchemaType,
   UuidItemsSchemaResponse,
-  UuidNameResponseSchema,
-  UuidNameSchemaType,
+  IdNameImageResponseSchema,
+  IdNameImageSchemaType,
 } from "@/schemas/catalog/catalog-schema";
 import { CheckLikeFavoriteResponseSchema } from "@/schemas/catalog/like-favorite-schema.ts";
 import z, { ZodSchema } from "zod";
@@ -20,6 +20,7 @@ import {
   BrandSchemaPropertiesResponse,
   BrandSchemaType,
   BrandSchemaResponse,
+  BrandsResponseSchema,
 } from "@/schemas/brand/brand-schema";
 import {
   ErrorSchemaType,
@@ -170,6 +171,31 @@ export async function getSelfBrandProfile(): Promise<BrandSchemaType | null> {
   return res?.brand || null;
 }
 
+export async function getBrandsByIds(
+  ids: string[]
+): Promise<BrandSchemaType[]> {
+  if (!ids || ids.length === 0) {
+    return [];
+  }
+
+  const res = await handleApiResponse<{
+    brands: BrandSchemaType[];
+  }>(
+    () =>
+      safeFetch({
+        url: `http://${LOCAL_IP}:3000/brand/some`,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ids }),
+      }),
+    BrandsResponseSchema,
+    "getBrandsByIds"
+  );
+  return res?.brands || [];
+}
+
 export async function getSelfClientProfile(): Promise<ClientSchemaType | null> {
   // console.log("getSelfClientProfile");
   const res = await handleApiResponse<{
@@ -243,17 +269,17 @@ export async function getClothingItemsHome(
 export const getAllBrands = async (
   search: string,
   page: number
-): Promise<UuidNameSchemaType[]> => {
+): Promise<IdNameImageSchemaType[]> => {
   const limit = 10;
   const res = await handleApiResponse<{
-    data: UuidNameSchemaType[];
+    data: IdNameImageSchemaType[];
   }>(
     () =>
       safeFetch({
         url: `http://${LOCAL_IP}:3000/search/all-brands?filter=${search}&page=${page}&limit=${limit}`,
         method: "GET",
       }),
-    UuidNameResponseSchema,
+    IdNameImageResponseSchema,
     "getAllBrands"
   );
   return res?.data || [];
@@ -262,7 +288,7 @@ export const getAllBrands = async (
 export async function getItem(itemUuid: string): Promise<{
   item: ItemSchemaType;
 } | null> {
-  console.log("getting item", itemUuid);
+  // console.log("getting item", itemUuid);
   return handleApiResponse<{ item: ItemSchemaType }>(
     () =>
       safeFetch({

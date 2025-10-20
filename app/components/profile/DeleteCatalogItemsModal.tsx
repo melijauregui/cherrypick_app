@@ -11,7 +11,7 @@ import BottomSheet from "@gorhom/bottom-sheet";
 import Toast from "react-native-toast-message";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { useDelete } from "@/app/utils/update";
-import { UuidNameSchemaType } from "@/schemas/catalog/catalog-schema";
+import { IdNameImageSchemaType } from "@/schemas/catalog/catalog-schema";
 import ListSearch from "../explore/listSearch";
 import { getSelfBrandItems } from "@/app/utils/fetch";
 
@@ -83,13 +83,13 @@ const DeleteCatalogItemsModal = ({
     }
   }, [error]);
 
-  const toggleSelect = (item: UuidNameSchemaType) => {
+  const toggleSelect = (item: IdNameImageSchemaType) => {
     setSelected(prev => {
       const newMap = new Map(prev);
-      if (newMap.has(item.uuid)) {
-        newMap.delete(item.uuid);
+      if (newMap.has(item.id)) {
+        newMap.delete(item.id);
       } else {
-        newMap.set(item.uuid, item.name);
+        newMap.set(item.id, item.name);
       }
       return newMap;
     });

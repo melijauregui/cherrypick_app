@@ -1,84 +1,48 @@
-import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Keyboard,
-} from "react-native";
-import BottomSheet from "@gorhom/bottom-sheet";
+import React, { useState } from "react";
+import { View, Text, TextInput, Keyboard } from "react-native";
 import Toast from "react-native-toast-message";
-import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import ListSearch from "@/app/components/modal/list-search";
+import { ItemStylePhotoAndName, ModalStandar } from "../modal/ModalSearch";
 import { getAllBrands } from "@/app/utils/fetch";
-import { UuidNameSchemaType } from "@/schemas/catalog/catalog-schema";
-import ListSearch from "./listSearch";
-import { HeaderDoneAndCancel } from "../profile/bottomSheets";
+import { IdNameImageSchemaType } from "@/schemas/catalog/catalog-schema";
 
 const FilterSearchBottomSheet = ({
-  bottomSheetRef,
+  isModalOpen,
+  setIsModalOpen,
   onSubmit,
   initialMinPrice,
   initialMaxPrice,
   initialBrandsSelected,
 }: {
-  bottomSheetRef: React.RefObject<BottomSheet>;
+  isModalOpen: boolean;
+  setIsModalOpen: (isModalOpen: boolean) => void;
   onSubmit: (
     minPrice: string | undefined,
     maxPrice: string | undefined,
-    brandsSelected: Map<string, string>
+    brandsSelected: Map<string, IdNameImageSchemaType>
   ) => void;
 
   initialMinPrice: string | undefined;
   initialMaxPrice: string | undefined;
-  initialBrandsSelected: Map<string, string>;
+  initialBrandsSelected: Map<string, IdNameImageSchemaType>;
 }) => {
-  const [search, setSearch] = useState("");
-
   const [minPrice, setMinPrice] = useState<string | undefined>(initialMinPrice);
   const [maxPrice, setMaxPrice] = useState<string | undefined>(initialMaxPrice);
-  const [brandsSelected, setBrandsSelected] = useState<Map<string, string>>(
-    () => new Map(initialBrandsSelected)
-  );
+  const [brandsSelected, setBrandsSelected] = useState<
+    Map<string, IdNameImageSchemaType>
+  >(new Map(initialBrandsSelected));
+  const [forceKey, setForceKey] = useState(0);
 
-  const { data, fetchNextPage, isLoading, error, isPending, isRefetching } =
-    useInfiniteQuery({
-      queryKey: ["all-brands", search],
-      queryFn: async ({ pageParam }) => {
-        const res = await getAllBrands(search, pageParam);
-        return res;
-      },
-      initialPageParam: 0,
-      getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
-        if (lastPage.length === 0) {
-          return undefined;
-        }
-        return lastPageParam + 1;
-      },
-    });
-  const isStillLoading = isLoading || isPending || isRefetching;
-
-  const queryClient = useQueryClient();
-  const resetInfiniteQueryPagination = () => {
-    return queryClient.setQueryData(["all-brands", search], (oldData: any) => {
-      if (!oldData) return undefined;
-
-      return {
-        ...oldData,
-        pages: [],
-        pageParams: [],
-      };
-    });
-  };
-
-  const handleCancel = () => {
+  const onCancel = () => {
     Keyboard.dismiss();
+    setForceKey(forceKey + 1);
     setBrandsSelected(initialBrandsSelected);
     setMinPrice(initialMinPrice);
     setMaxPrice(initialMaxPrice);
-    bottomSheetRef.current?.close();
+    setIsModalOpen(false);
   };
 
-  const handleSubmit = () => {
+  const onSave = async () => {
     const min = minPrice ? parseFloat(minPrice) : undefined;
     const max = maxPrice ? parseFloat(maxPrice) : undefined;
 
@@ -96,52 +60,22 @@ const FilterSearchBottomSheet = ({
       });
       return;
     }
-    bottomSheetRef.current?.close();
+    setIsModalOpen(false);
     Keyboard.dismiss();
-    onSubmit(minPrice, maxPrice, brandsSelected);
-  };
-
-
-  useEffect(() => {
-    if (error) {
-      Toast.show({
-        type: "error",
-        text1: "Error al cargar marcas: " + error?.message,
-      });
-    }
-  }, [error]);
-
-  const toggleSelect = (item: UuidNameSchemaType) => {
-    setBrandsSelected(prev => {
-      const newMap = new Map(prev);
-      if (newMap.has(item.uuid)) {
-        newMap.delete(item.uuid);
-      } else {
-        newMap.set(item.uuid, item.name);
-      }
-      return newMap;
-    });
+    await onSubmit(minPrice, maxPrice, brandsSelected);
   };
 
   return (
-    <BottomSheet
-      ref={bottomSheetRef}
-      onChange={() => { }}
-      index={-1}
-      enableDynamicSizing={false}
-      snapPoints={[450]}
-      keyboardBehavior="interactive"
-      keyboardBlurBehavior="restore"
-      android_keyboardInputMode="adjustResize"
-      enableOverDrag={false}
+    <ModalStandar
+      isModalOpen={isModalOpen}
+      onCancel={onCancel}
+      onSave={onSave}
+      onLoading={false}
+      section="Filtros"
+      description="Selecciona los filtros que deseas aplicar a tu búsqueda."
+      maxHeight={680}
     >
-      <HeaderDoneAndCancel
-        onCancel={handleCancel}
-        onSubmit={handleSubmit}
-        isEnabledDone
-      />
-
-      <View className="flex-1 px-6 py-4 gap-4">
+      <View className="flex-1 px-1 gap-4">
         <View>
           <Text className="text-lg font-pmedium text-black mb-2">Precio</Text>
           <View className="flex-row items-center gap-2">
@@ -151,6 +85,7 @@ const FilterSearchBottomSheet = ({
               value={minPrice}
               onChangeText={setMinPrice}
               keyboardType="numeric"
+              placeholderTextColor="grey"
             />
             <Text className="text-gray-500 text-lg">-</Text>
             <TextInput
@@ -159,25 +94,106 @@ const FilterSearchBottomSheet = ({
               value={maxPrice}
               onChangeText={setMaxPrice}
               keyboardType="numeric"
+              placeholderTextColor="grey"
             />
           </View>
         </View>
         <View className="flex-1">
           <Text className="text-lg font-pmedium text-black mb-2">Marcas</Text>
           <ListSearch
-            placeholder="marcas"
-            search={search}
-            setSearch={setSearch}
-            resetInfiniteQueryPagination={resetInfiniteQueryPagination}
-            loading={isStillLoading}
-            filteredItems={data?.pages.flat() || []}
+            placeholder={"marcas"}
             selected={brandsSelected}
-            toggleSelect={toggleSelect}
-            fetchNextPage={fetchNextPage}
+            setSelected={setBrandsSelected}
+            fetchFunction={fetchBrands}
+            queryKey={["brands"]}
+            maxAllowSelect={5}
+            forceKey={forceKey?.toString()}
+            renderItem={(item, index, isSelected, toggleSelect, disable) => (
+              <ItemStylePhotoAndName
+                item={{
+                  id: item.id,
+                  name: item.name,
+                  image: item.image,
+                }}
+                toggleSelect={() => toggleSelect(item)}
+                isSelected={isSelected}
+                disable={disable}
+                imageRounded
+                size="small"
+              />
+            )}
           />
         </View>
       </View>
-    </BottomSheet>
+    </ModalStandar>
   );
 };
 export default FilterSearchBottomSheet;
+
+async function fetchBrands(
+  search: string,
+  pageParam: number
+): Promise<IdNameImageSchemaType[]> {
+  const brands = await getAllBrands(search, pageParam);
+  return brands.map(brand => ({
+    id: brand.id,
+    name: brand.name,
+    image: {
+      url: brand.image.url,
+      updatedAt: brand.image.updatedAt,
+    },
+  }));
+}
+
+// export function ColabsModal({
+//   isColabsModalOpen,
+//   setIsColabsModalOpen,
+//   colabsSelected,
+//   setColabsSelected,
+// }: {
+//   isColabsModalOpen: boolean;
+//   setIsColabsModalOpen: (isColabsModalOpen: boolean) => void;
+//   colabsSelected: Map<string, ModalSearchSchemaType>;
+//   setColabsSelected: React.Dispatch<
+//     React.SetStateAction<Map<string, ModalSearchSchemaType>>
+//   >;
+// }) {
+//   const [forceKey, setForceKey] = useState(0);
+//   const onClose = () => {
+//     setForceKey(forceKey + 1);
+//     setIsColabsModalOpen(false);
+//   };
+//   return (
+//     <ModalStandar
+//       isModalOpen={isColabsModalOpen}
+//       onClose={onClose}
+//       type="colabs"
+//       description="Select the artists who collaborated on this song. Collaborators will be credited on the track. Search by artist name and select up to 5 collaborators."
+//     >
+//       <View style={{ flex: 1 }}>
+//         <ListSearch
+//           placeholder={"colabs"}
+//           selected={colabsSelected}
+//           setSelected={setColabsSelected}
+//           fetchFunction={fetchColabs}
+//           queryKey={["colabs"]}
+//           maxAllowSelect={5}
+//           forceKey={forceKey?.toString()}
+//           renderItem={(item, index, isSelected, toggleSelect, disable) => (
+//             <ItemStylePhotoAndName
+//               item={{
+//                 id: item.id,
+//                 name: item.name,
+//                 urlImage: item.imageProfileUrl?.url || imageProfileDefault,
+//               }}
+//               toggleSelect={() => toggleSelect(item)}
+//               isSelected={isSelected}
+//               disable={disable}
+//               imageRounded
+//             />
+//           )}
+//         />
+//       </View>
+//     </ModalStandar>
+//   );
+// }

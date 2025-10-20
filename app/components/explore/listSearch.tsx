@@ -1,4 +1,4 @@
-import { UuidNameSchemaType } from "@/schemas/catalog/catalog-schema";
+import { IdNameImageSchemaType } from "@/schemas/catalog/catalog-schema";
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 
@@ -17,9 +17,9 @@ export default function ListSearch({
   search: string;
   setSearch: (text: string) => void;
   loading: boolean;
-  filteredItems: UuidNameSchemaType[];
+  filteredItems: IdNameImageSchemaType[];
   selected: Map<string, string>;
-  toggleSelect: (item: UuidNameSchemaType) => void;
+  toggleSelect: (item: IdNameImageSchemaType) => void;
   fetchNextPage: () => void;
   resetInfiniteQueryPagination: () => void;
 }) {
@@ -35,7 +35,7 @@ export default function ListSearch({
 
       // Items del fetch que NO están seleccionados
       const nonSelectedItems = filteredItems.filter(
-        item => !selected.has(item.uuid)
+        item => !selected.has(item.id)
       );
 
       // Ordenar items seleccionados por nombre
@@ -101,18 +101,18 @@ function ItemStyle({
   toggleSelect,
   selected,
 }: {
-  item: UuidNameSchemaType;
-  toggleSelect: (item: UuidNameSchemaType) => void;
+  item: IdNameImageSchemaType;
+  toggleSelect: (item: IdNameImageSchemaType) => void;
   selected: Map<string, string>;
 }) {
   return (
     <TouchableOpacity
-      key={item.uuid}
+      key={item.id}
       className="flex-row items-center py-2 gap-3"
       onPress={() => toggleSelect(item)}
     >
       <View
-        className={`w-7 h-7 rounded border border-gray-300  ${selected.has(item.uuid) ? "bg-beige opacity-70" : "bg-white"}`}
+        className={`w-7 h-7 rounded border border-gray-300  ${selected.has(item.id) ? "bg-beige opacity-70" : "bg-white"}`}
       ></View>
       <Text className="text-lg text-black font-pregular">{item.name}</Text>
     </TouchableOpacity>

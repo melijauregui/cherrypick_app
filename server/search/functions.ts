@@ -1,7 +1,7 @@
 import {
   CatalogResponseSchemaType,
   ItemSchemaType,
-  UuidNameSchemaType,
+  IdNameImageSchemaType,
 } from "@/schemas/catalog/catalog-schema";
 import { ErrorSchemaType } from "@/schemas/standar-response-schema";
 import logger from "../logger";
@@ -14,7 +14,6 @@ import {
 import { EmbbedingResponseSchemaType } from "@/schemas/search/search-schema";
 import { db } from "../db.config";
 import { Filters } from "weaviate-client";
-import { QueryIdSchemaType } from "@/schemas/standar-query-schema";
 
 export async function SearchItems(
   page: number,
@@ -46,7 +45,8 @@ export async function SearchItems(
       details: "Embedding must be 768 numbers",
     };
   }
-  // Build filters array
+
+  // Build filters array for Weaviate
   const filterConditions = [];
 
   // Price filters
@@ -75,7 +75,7 @@ export async function SearchItems(
   const queryOptions = {
     limit: limit,
     offset: offset,
-    targetVector: type === "text" ? "image_vector" : "text_vector", // ToDo: ver si con image_vector funciona mejor en ambos casos
+    targetVector: type === "text" ? "image_vector" : "text_vector",
     includeDistance: true,
     includeMatchDistance: true,
     filters,
@@ -175,7 +175,7 @@ export async function GetAllBrands(
   filter: string | undefined,
   page: number,
   limit: number
-): Promise<UuidNameSchemaType[]> {
+): Promise<IdNameImageSchemaType[]> {
   //busco en mi bdd de brands
   const res = await db.brand.findMany({
     where: {
@@ -186,6 +186,12 @@ export async function GetAllBrands(
     select: {
       name: true,
       userId: true,
+      files: {
+        select: {
+          url: true,
+          updatedAt: true,
+        },
+      },
     },
     skip: page * limit,
     take: limit,
@@ -196,7 +202,11 @@ export async function GetAllBrands(
 
   const data = res.map(brand => ({
     name: brand.name,
-    uuid: brand.userId,
+    id: brand.userId,
+    image: {
+      url: brand.files.url,
+      updatedAt: brand.files.updatedAt.toISOString(),
+    },
   }));
 
   return data;

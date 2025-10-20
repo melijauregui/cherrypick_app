@@ -1,13 +1,5 @@
-import {
-  CatalogResponseSchemaType,
-  ItemSchema,
-  ItemSchemaType,
-  UuidNameResponseSchemaType,
-  UuidNameSchema,
-  UuidNameSchemaType,
-} from "@/schemas/catalog/catalog-schema";
-import weaviate, { Collection, Filters } from "weaviate-client";
-import { ErrorSchemaType } from "@/schemas/standar-response-schema";
+import { ItemSchemaType } from "@/schemas/catalog/catalog-schema";
+import weaviate, { Collection } from "weaviate-client";
 import { config } from "../../config";
 import logger from "../logger";
 import { prisma } from "../db";
@@ -344,6 +336,16 @@ export async function getCollection(): Promise<
         vectorizers: [
           weaviate.configure.vectors.selfProvided({ name: "image_vector" }),
           weaviate.configure.vectors.selfProvided({ name: "text_vector" }),
+        ],
+        properties: [
+          {
+            name: "brandId",
+            dataType: weaviate.configure.dataType.TEXT,
+          },
+          {
+            name: "price",
+            dataType: weaviate.configure.dataType.NUMBER,
+          },
         ],
       })) as Collection;
     } else {

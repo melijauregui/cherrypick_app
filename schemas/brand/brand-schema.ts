@@ -42,3 +42,15 @@ export const BrandSchemaPropertiesResponse = z.object({
 export type BrandSchemaPropertiesResponseType = z.infer<
   typeof BrandSchemaPropertiesResponse
 >;
+
+// Schema for getting multiple brands by IDs
+export const GetBrandsByIdsSchema = z.object({
+  ids: z.array(z.string().uuid()).describe("Array de IDs de marcas"),
+});
+export type GetBrandsByIdsSchemaType = z.infer<typeof GetBrandsByIdsSchema>;
+
+export const BrandsResponseSchema = z.object({
+  ...SuccessSchema.shape,
+  brands: z.array(BrandSchema),
+});
+export type BrandsResponseSchemaType = z.infer<typeof BrandsResponseSchema>;

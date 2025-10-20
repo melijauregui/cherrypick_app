@@ -76,3 +76,31 @@ export async function GetBrandInspoItems(
 
   return itemUuids;
 }
+
+export async function GetBrandsByIds(
+  ids: string[]
+): Promise<BrandSchemaType[]> {
+  const brands = await db.brand.findMany({
+    where: {
+      userId: {
+        in: ids,
+      },
+    },
+    include: {
+      files: true,
+    },
+  });
+
+  return brands.map(brand => ({
+    id: brand.userId,
+    name: brand.name,
+    description: brand.description,
+    url: brand.url,
+    logo: {
+      url: brand.files.url,
+      updatedAt: brand.files.updatedAt.toISOString(),
+      width: brand.files.width ?? undefined,
+      height: brand.files.height ?? undefined,
+    },
+  }));
+}

@@ -128,13 +128,15 @@ export default function ListSearch<T extends { id: string; name: string }>({
     <View className="flex flex-col flex-1">
       <TextInput
         className="text-black border border-gray-300 rounded-3xl px-3 py-3 mb-3 text-lg font-pregular"
-        placeholder={"Search " + placeholder + "..."}
+        placeholder={"Buscar " + placeholder + "..."}
         placeholderTextColor="grey"
         value={search}
         onChangeText={text => {
           setSearch(text);
           resetInfiniteQueryPagination();
         }}
+        keyboardType="default"
+        autoCapitalize="none"
       />
       {children}
       {isStillLoading ? (
