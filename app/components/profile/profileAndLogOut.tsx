@@ -7,7 +7,7 @@ const ProfileAndLogOut: React.FC<{
   return (
     <View className="flex flex-row w-full items-center relative py-6">
       <Text className="text-white text-[27px] font-plight  absolute left-0 right-0 text-center">
-        Profile
+        Perfil
       </Text>
       <View className="flex flex-row mr-auto">
         <TouchableOpacity onPress={openUsernameSheetLogout}>

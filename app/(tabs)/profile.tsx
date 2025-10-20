@@ -129,7 +129,7 @@ const ClientProfile = ({
               openUsernameSheetLogout={openUsernameSheetLogout}
             />
             <RenderProfileItem
-              label="Username"
+              label="Nombre de usuario"
               value={data.user.name}
               canEdit={true}
               onPress={openUsernameSheet}
@@ -140,7 +140,7 @@ const ClientProfile = ({
               canEdit={false}
             />
             <RenderProfileItem
-              label="Date of Birth"
+              label="Fecha de nacimiento"
               value={
                 data.user.dateOfBirth
                   ? format(data.user.dateOfBirth, "dd/MM/yyyy")
@@ -151,7 +151,7 @@ const ClientProfile = ({
             />
           </View>
           <RenderProfileItemPreferences
-            label="Preferences"
+            label="Preferencias"
             value={data.user.preferences.map(item => ({
               title: item,
               image: DATA_MAP.get(item) ?? images.bohoChicImage, // TODO !!

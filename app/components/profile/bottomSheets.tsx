@@ -40,13 +40,13 @@ function CustomBottomSheet({
   const userNameInput = (
     <View className="flex flex-col justify-center items-center px-5 py-4">
       <InputBoxWithName
-        name="username"
+        name="nombre de usuario"
         value={editInputValue}
         setValue={setEditInputValue}
         lastValue={lastValue}
         isScrollable={false}
-        placeholder="Escribe tu username"
-        length={25}
+        placeholder="Escribe tu nombre de usuario"
+        length={50}
       />
     </View>
   );
@@ -214,7 +214,7 @@ function BottomSheetSame({
   isReady,
   hasDone = true,
   componentView,
-  value = "Edit Profile",
+  value = "Editar Perfil",
 }: {
   bottomSheetRef: React.RefObject<BottomSheet>;
   onSubmit?: () => void;
