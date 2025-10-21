@@ -13,6 +13,9 @@ import {
 } from "@/schemas/standar-response-schema";
 import { GetCatalog } from "../catalog/functions";
 import logger from "../logger";
+import { GetClient } from "../client/functions";
+import { GetBrandById } from "../brand/functions";
+import { GetBrandFeed, GetUserFeed } from "./functions";
 
 const FeedApp = new OpenAPIHono<AppEnv>({
   defaultHook: (result, c) => {
@@ -31,7 +34,7 @@ FeedApp.onError((err: Error, c: Context) => {
 
 export default FeedApp;
 
-const paginatedRoute = createRoute({
+/* const paginatedRoute = createRoute({
   method: "get",
   path: "/",
   request: {
@@ -75,4 +78,62 @@ FeedApp.openapi(paginatedRoute, async c => {
     items: result.items,
   };
   return c.json(res, 200);
+}); */
+
+
+const getPersonalizedFeedRoute = createRoute({
+  method: "get",
+  path: "/",
+  request: {
+    query: PaginationSchema,
+  },
+  responses: {
+    200: {
+      description: "Obtiene el feed personalizado del cliente",
+      content: {
+        "application/json": {
+          schema: CatalogResponseSchema,
+        },
+      },
+    },
+    401: { description: "Unauthorized" },
+    404: { description: "Cliente no encontrado" },
+  },
+});
+
+FeedApp.openapi(getPersonalizedFeedRoute, async c => {
+  try {
+    const { page, limit } = c.req.valid("query");
+    const user = c.get("user");
+    if (!user) {
+      return c.json({ error: true, details: "Unauthorized" }, 401);
+    }
+    logger.info("/GET feed personalized page: %s limit: %s, email: %s", page, limit, user?.email);
+
+    let res: CatalogResponseSchemaType | ErrorSchemaType;
+
+    if (user.userType !== "brand") {
+      res = await GetUserFeed(user, page, limit);
+    }
+    else {
+      res = await GetBrandFeed(user, page, limit);
+    }
+
+    if (res.error) {
+      res = {
+        error: true,
+        details: "Error querying Weaviate",
+      };
+      return c.json(res, 500);
+    }
+    res = {
+      error: false,
+      items: res.items,
+    };
+    return c.json(res, 200);
+  }
+  catch (error) {
+    logger.error("Error parsing query parameters: %o", error);
+    return c.json({ error: true, details: "Invalid query parameters" }, 400);
+  }
 });

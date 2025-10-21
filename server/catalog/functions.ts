@@ -1,8 +1,9 @@
-import { ItemSchemaType } from "@/schemas/catalog/catalog-schema";
+import { CatalogResponseSchemaType, ItemSchema, ItemSchemaType } from "@/schemas/catalog/catalog-schema";
 import weaviate, { Collection } from "weaviate-client";
 import { config } from "../../config";
 import logger from "../logger";
 import { prisma } from "../db";
+import { ErrorSchemaType } from "@/schemas/standar-response-schema";
 
 //funcion para obtener items de PostgreSQL
 export async function GetCatalog(
@@ -309,13 +310,13 @@ export async function searchText(
 // Función para verificar si ya existe un elemento con el mismo nombre y brand en Weaviate
 export async function getCollection(): Promise<
   | {
-      error: true;
-      details: string;
-    }
+    error: true;
+    details: string;
+  }
   | {
-      error: false;
-      collection: Collection;
-    }
+    error: false;
+    collection: Collection;
+  }
 > {
   try {
     const client = await weaviate.connectToWeaviateCloud(config.WEAVIATE_URL, {
@@ -401,3 +402,76 @@ export const Preferences = {
 export const preferencesRepr: string[] = Object.values(Preferences).map(
   pref => pref.searchName
 ); // ["minimalista", "boho chic", ...]
+
+export async function GetItemsFromWeaviate(
+  uuids: string[],
+  limit: number
+): Promise<CatalogResponseSchemaType | ErrorSchemaType> {
+  const resCollection = await getCollection();
+  if (resCollection.error) {
+    return {
+      error: true,
+      details: resCollection.details || "Error getting collection",
+    };
+  }
+  const collection = resCollection.collection;
+
+  const filters = collection.filter.byId().containsAny(uuids);
+
+  const queryOptions: any = {
+    filters: filters,
+    limit: limit,
+    returnProperties: [
+      "name",
+      "description",
+      "imageUrl",
+      "url",
+      "brandId",
+      "price",
+    ],
+  };
+
+  const result = await collection.query.fetchObjects(queryOptions);
+
+  if (result.objects.length === 0) {
+    return {
+      error: true,
+      details: "Items not found",
+    };
+  }
+
+  // Crear un mapa para mantener el orden original de los UUIDs
+  const uuidOrderMap = new Map();
+  uuids.forEach((uuid, index) => {
+    uuidOrderMap.set(uuid, index);
+  });
+
+  const items = result.objects
+    .map(obj => {
+      const item = {
+        name: obj.properties?.name || "",
+        description: obj.properties?.description || "",
+        imageUrl: obj.properties?.imageUrl || "",
+        url: obj.properties?.url || "",
+        brandId: obj.properties?.brandId || "",
+        price: obj.properties?.price || 0,
+        uuid: obj.uuid || "",
+      };
+      const validationResult = ItemSchema.safeParse(item);
+      if (!validationResult.success) {
+        console.log("Item validation failed:", validationResult.error);
+        return null;
+      }
+      return validationResult.data;
+    })
+    .filter((item): item is ItemSchemaType => item !== null)
+    .sort((a, b) => {
+      const orderA = uuidOrderMap.get(a.uuid) ?? Number.MAX_SAFE_INTEGER;
+      const orderB = uuidOrderMap.get(b.uuid) ?? Number.MAX_SAFE_INTEGER;
+      return orderA - orderB;
+    });
+  return {
+    error: false,
+    items: items,
+  };
+}

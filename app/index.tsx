@@ -70,12 +70,14 @@ export default function App() {
 
   // Redirect based on authentication status
   if (user) {
-    if (!user.emailVerified && pathname !== "/code-verification") {
-      // Usuario nuevo - redirigir a sign-in para que el useEffect maneje el redirect a preferences
-      return <Redirect href="/code-verification-register" />;
-    } else {
-      // Usuario existente - redirigir directamente a home
-      return <Redirect href={`/home?prefetch=${hasPrefetched}`} />;
+    if (hasPrefetched) {
+      if (!user.emailVerified && pathname !== "/code-verification") {
+        // Usuario nuevo - redirigir a sign-in para que el useEffect maneje el redirect a preferences
+        return <Redirect href="/code-verification-register" />;
+      } else {
+        // Usuario existente - redirigir directamente a home
+        return <Redirect href={`/home?prefetch=${hasPrefetched}`} />;
+      }
     }
   } else {
     console.log("Index: No user found, redirecting to sign-in");

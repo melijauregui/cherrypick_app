@@ -64,3 +64,14 @@ const ClientFormSchemaSignUp = z.object({
   ...PasswordSchema.shape,
 });
 export { ClientFormSchemaSignUp };
+
+export type UserData = {
+  id: string;
+  email: string;
+  emailVerified: boolean;
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+  image?: string | null | undefined;
+  userType: string;
+}

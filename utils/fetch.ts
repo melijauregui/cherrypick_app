@@ -251,7 +251,7 @@ export async function getClothingItemsHome(
   page: number,
   limit: number
 ): Promise<ItemSchemaType[]> {
-  // console.log("getClothingItemsHome", page, limit);
+  console.log("getClothingItemsHome", page, limit);
   const res = await handleApiResponse<{
     items: ItemSchemaType[];
   }>(
