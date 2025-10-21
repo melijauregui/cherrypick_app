@@ -18,7 +18,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import LoadingPage from "./LoadingPage";
-import { prefetchItemDetail } from "../utils/prefetchs";
+import { prefetchItemDetail } from "../../utils/prefetchs";
 import { useSession } from "@/lib/auth-client";
 import { ItemSchemaType } from "@/schemas/catalog/catalog-schema";
 
@@ -121,9 +121,8 @@ const ImageGallery = ({
   ) : (
     <>
       <View
-        className={`flex-row ${
-          itemQuantity < columnCount ? `justify-start ` : "justify-between"
-        }`}
+        className={`flex-row ${itemQuantity < columnCount ? `justify-start ` : "justify-between"
+          }`}
         style={{
           gap: itemQuantity < columnCount ? resto : 0,
         }}

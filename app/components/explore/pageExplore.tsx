@@ -11,7 +11,7 @@ import {
 import { router, useRouter } from "expo-router";
 import { Entypo, Ionicons } from "@expo/vector-icons";
 import List2 from "@/app/components/List2";
-import { getBrandsByIds, getClothingItemsTextSearch } from "@/app/utils/fetch";
+import { getBrandsByIds, getClothingItemsTextSearch } from "@/utils/fetch";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import LoadingPage from "../LoadingPage";
 import {
@@ -23,11 +23,11 @@ import {
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
-import { useFetchEmbedding } from "@/app/utils/use-query";
+import { useFetchEmbedding } from "@/utils/use-query";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import FilterSearchBottomSheet from "./filterSearch";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { prefetchInspirationItems } from "@/app/utils/prefetchs";
+import { prefetchInspirationItems } from "@/utils/prefetchs";
 import { useSession } from "@/lib/auth-client";
 
 export default function PageExplore({
@@ -85,8 +85,8 @@ export function PageExploreStandard({ query }: { query: string }) {
         ...(maxPrice ? { maxPrice } : {}),
         ...(brandsSelected.size > 0
           ? {
-              brands: Array.from(brandsSelected.keys()).join(";"),
-            }
+            brands: Array.from(brandsSelected.keys()).join(";"),
+          }
           : {}),
       },
     });
@@ -172,9 +172,9 @@ export const PageExploreQuery = ({
   // Extraer los IDs de brands del CSV inicial
   const initialBrandIds = initialBrands
     ? initialBrands
-        .split(";")
-        .map(s => s.trim())
-        .filter((id): id is string => Boolean(id))
+      .split(";")
+      .map(s => s.trim())
+      .filter((id): id is string => Boolean(id))
     : [];
 
   // Obtener las brands usando el hook
@@ -249,8 +249,8 @@ export const PageExploreQuery = ({
         ...(maxPrice ? { maxPrice } : {}),
         ...(brandsSelected.size > 0
           ? {
-              brands: Array.from(brandsSelected.keys()).join(";"),
-            }
+            brands: Array.from(brandsSelected.keys()).join(";"),
+          }
           : {}),
       },
     });

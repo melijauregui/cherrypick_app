@@ -1,7 +1,7 @@
 import ErrorPage from "../(auth)/error";
 import LoadingPage from "../components/LoadingPage";
 import { router, useLocalSearchParams } from "expo-router";
-import { getItem } from "../utils/fetch";
+import { getItem } from "../../utils/fetch";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ItemSchemaType,
@@ -13,7 +13,7 @@ import {
 } from "../components/standar-page/standarPage";
 import { useState } from "react";
 import { Keyboard } from "react-native";
-import safeFetch from "../utils/safe-fetch";
+import safeFetch from "../../utils/safe-fetch";
 import { LOCAL_IP } from "@/config/api";
 import Toast from "react-native-toast-message";
 import {
@@ -98,16 +98,16 @@ function EditItem({ item }: { item: UpdateItemSchema }) {
 
   const isFormValid = Boolean(
     formData.name &&
-      formData.price &&
-      formData.url &&
-      formData.image.url &&
-      formData.description &&
-      formData.price &&
-      (formData.name !== item.name ||
-        formData.description !== item.description ||
-        formData.price !== item.price ||
-        formData.url !== item.url ||
-        formData.image.url !== item.image.url)
+    formData.price &&
+    formData.url &&
+    formData.image.url &&
+    formData.description &&
+    formData.price &&
+    (formData.name !== item.name ||
+      formData.description !== item.description ||
+      formData.price !== item.price ||
+      formData.url !== item.url ||
+      formData.image.url !== item.image.url)
   );
 
   return (

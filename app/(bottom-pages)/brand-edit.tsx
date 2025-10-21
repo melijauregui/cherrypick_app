@@ -1,7 +1,7 @@
 import ErrorPage from "../(auth)/error";
 import LoadingPage from "../components/LoadingPage";
 import { router } from "expo-router";
-import { getSelfBrandProfile } from "../utils/fetch";
+import { getSelfBrandProfile } from "../../utils/fetch";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   StandardDescription,
@@ -13,7 +13,7 @@ import { useSession } from "@/lib/auth-client";
 import { BrandSchema, BrandSchemaType } from "@/schemas/brand/brand-schema";
 import z from "zod";
 import InputBoxWithName from "../components/profile/inputBox";
-import safeFetch from "../utils/safe-fetch";
+import safeFetch from "../../utils/safe-fetch";
 import { SuccessSchema } from "@/schemas/standar-response-schema";
 import Toast from "react-native-toast-message";
 import { LOCAL_IP } from "@/config/api";

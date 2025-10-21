@@ -1,7 +1,7 @@
 import { Keyboard, View } from "react-native";
 import { useState } from "react";
 import ListSearch from "@/app/components/modal/list-search";
-import { getSelfBrandItems, getSelfBrandInspoItems } from "@/app/utils/fetch";
+import { getSelfBrandItems, getSelfBrandInspoItems } from "@/utils/fetch";
 import {
   StandardDescription,
   StandardPageBottomSheet,
@@ -10,7 +10,7 @@ import { ItemStylePhotoAndName } from "@/app/components/modal/ModalSearch";
 import { router } from "expo-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSession } from "@/lib/auth-client";
-import safeFetch from "../utils/safe-fetch";
+import safeFetch from "../../utils/safe-fetch";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { LOCAL_IP } from "@/config/api";
 import { IdNameImageSchemaType } from "@/schemas/catalog/catalog-schema";

@@ -1,7 +1,7 @@
 import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AppName from "@/app/components/AppName";
 import LogoSquareBeige from "@/app/components/logo/LogoSquareBeige";
 import "../global.css";
@@ -12,7 +12,7 @@ import prefetchHome, {
   prefetchExplorePage,
   prefetchLikeAndFavoritePage,
   prefetchProfile,
-} from "@/app/utils/prefetchs";
+} from "@/utils/prefetchs";
 import Toast from "react-native-toast-message";
 
 export default function App() {
@@ -25,29 +25,36 @@ export default function App() {
   const [hasPrefetched, setHasPrefetched] = useState(false);
   const pathname = usePathname();
 
-  if (!timeout) {
-    setTimeout(() => setHasTimedOut(true), 2000);
-  }
+  useEffect(() => {
+    const timer = setTimeout(() => setHasTimedOut(true), 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (user && user.emailVerified && !hasPrefetched) {
+      const prefetchTimer = setTimeout(() => {
+        prefetchHome(queryClient, user.email);
+        setHasPrefetched(true);
+      }, 100);
+      return () => clearTimeout(prefetchTimer);
+    }
+  }, [user, queryClient, hasPrefetched]);
+
+  useEffect(() => {
+    if (error) {
+      Toast.show({
+        text1: "Error al iniciar sesión",
+        type: "error",
+      });
+    }
+  }, [error]);
 
   if (error) {
-    Toast.show({
-      text1: "Error al iniciar sesión",
-      type: "error",
-    });
     return <Redirect href="/sign-in" />;
   }
 
+
   if (loading || !timeout) {
-    if (user && user.emailVerified && !hasPrefetched) {
-      // Solo ejecutar prefetch para usuarios existentes
-      setTimeout(() => {
-        prefetchHome(queryClient, user.email);
-        // prefetchProfile(user, queryClient);
-        // prefetchLikeAndFavoritePage(queryClient, user.email);
-        // prefetchExplorePage(queryClient);
-        setHasPrefetched(true);
-      }, 100);
-    }
     return (
       <SafeAreaView className="flex-1 h-full bg-brown-strong">
         <ScrollView className="my-1 ">

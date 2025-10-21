@@ -20,8 +20,8 @@ import { authClient, useSession } from "@/lib/auth-client";
 import { useQueryClient } from "@tanstack/react-query";
 import { CustomBottomLogout } from "@/app/components/profile/bottomSheets";
 import LoadingPage from "../components/LoadingPage";
-import { useUpdateClient } from "@/app/utils/update";
-import { useFetchClientProfile, UserInfo } from "@/app/utils/use-query";
+import { useUpdateClient } from "@/utils/update";
+import { useFetchClientProfile, UserInfo } from "@/utils/use-query";
 import BrandProfile from "../components/profile/brandProfile";
 
 const Profile = () => {

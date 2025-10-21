@@ -187,3 +187,4 @@ export function ItemStylePhotoAndName({
 //     </ModalStandar>
 //   );
 // }
+export default () => null;

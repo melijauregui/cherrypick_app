@@ -18,7 +18,7 @@ import SignPage, {
 import { useMutation } from "@tanstack/react-query";
 import { UpdatePreferencesSchema } from "@/schemas/client/client-schema";
 import { SuccessSchema } from "@/schemas/standar-response-schema";
-import safeFetch from "../utils/safe-fetch";
+import safeFetch from "../../utils/safe-fetch";
 import Toast from "react-native-toast-message";
 import { LOCAL_IP } from "@/config/api";
 

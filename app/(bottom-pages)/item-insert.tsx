@@ -24,10 +24,10 @@ import ImageComplete from "../components/ImageComplete";
 import { imageDefault } from "@/lib/constants";
 import ImagePickerButton from "../components/imagePicker";
 import InputBoxWithName from "../components/profile/inputBox";
-import safeFetch from "../utils/safe-fetch";
+import safeFetch from "../../utils/safe-fetch";
 import { LOCAL_IP } from "@/config/api";
 import Toast from "react-native-toast-message";
-import { sanitizeFilename } from "../utils/sanitize-filename";
+import { sanitizeFilename } from "../../utils/sanitize-filename";
 import { FormErrors } from "./item-edit";
 
 export type InsertItemSchema = Omit<
@@ -80,11 +80,11 @@ export default function InsertItemPage() {
   };
   const isFormValid = Boolean(
     formData.name &&
-      formData.price &&
-      formData.url &&
-      formData.image.url &&
-      formData.description &&
-      formData.price
+    formData.price &&
+    formData.url &&
+    formData.image.url &&
+    formData.description &&
+    formData.price
   );
   return (
     <StandardPageBottomSheet

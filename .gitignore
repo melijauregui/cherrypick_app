@@ -52,3 +52,9 @@ database/cached_images/**
 
 .venv-mp/
 /logs
+
+server/generated/prisma/**
+database/__pycache__/server.cpython-312.pyc
+.vscode/settings.json
+server/generated/prisma/edge.js
+server/generated/prisma/index.js

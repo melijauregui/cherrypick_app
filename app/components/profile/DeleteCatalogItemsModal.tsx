@@ -10,10 +10,10 @@ import {
 import BottomSheet from "@gorhom/bottom-sheet";
 import Toast from "react-native-toast-message";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
-import { useDelete } from "@/app/utils/update";
+import { useDelete } from "@/utils/update";
 import { IdNameImageSchemaType } from "@/schemas/catalog/catalog-schema";
 import ListSearch from "../explore/listSearch";
-import { getSelfBrandItems } from "@/app/utils/fetch";
+import { getSelfBrandItems } from "@/utils/fetch";
 
 const DeleteCatalogItemsModal = ({
   bottomSheetRef,
@@ -98,7 +98,7 @@ const DeleteCatalogItemsModal = ({
   return (
     <BottomSheet
       ref={bottomSheetRef}
-      onChange={() => {}}
+      onChange={() => { }}
       index={-1}
       enableDynamicSizing={false}
       snapPoints={[520]}

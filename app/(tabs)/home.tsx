@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import LoadingPage from "../components/LoadingPage";
 import { useQueryClient } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
-import { getClothingItemsHome } from "../utils/fetch";
+import { getClothingItemsHome } from "../../utils/fetch";
 import List2 from "@/app/components/List2";
 import { useSession } from "@/lib/auth-client";
 

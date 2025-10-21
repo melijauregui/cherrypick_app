@@ -37,7 +37,7 @@ export function useUpdateClient(email: string) {
       }
       SuccessSchema.parse(data);
     },
-    onSuccess: () => {},
+    onSuccess: () => { },
     onError: error => {
       // TODO PUSH TOAST
       console.log(`could not update user:`, error);

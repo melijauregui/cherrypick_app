@@ -1,11 +1,11 @@
 import React from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import safeFetch from "@/app/utils/safe-fetch";
+import safeFetch from "@/utils/safe-fetch";
 import { LOCAL_IP } from "@/config/api";
 import { useMutation } from "@tanstack/react-query";
 import Toast from "react-native-toast-message";
-import { getExpirationCodeResetPassword } from "../utils/fetch";
-import { useResendCodeResetPassword } from "../utils/update";
+import { getExpirationCodeResetPassword } from "../../utils/fetch";
+import { useResendCodeResetPassword } from "../../utils/update";
 import CodeVerification from "../components/(auth)/codeVerificationPage";
 import { VerifyCodeResponseSchemaResetPassword } from "@/schemas/formUser-schema";
 

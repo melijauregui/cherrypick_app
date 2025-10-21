@@ -1,13 +1,13 @@
 import { useEffect } from "react";
 import React from "react";
 import { useRouter } from "expo-router";
-import safeFetch from "@/app/utils/safe-fetch";
+import safeFetch from "@/utils/safe-fetch";
 import { LOCAL_IP } from "@/config/api";
 import { useSession } from "@/lib/auth-client";
 import { useMutation } from "@tanstack/react-query";
 import Toast from "react-native-toast-message";
-import { getExpirationCode } from "../utils/fetch";
-import { useResendCode } from "../utils/update";
+import { getExpirationCode } from "../../utils/fetch";
+import { useResendCode } from "../../utils/update";
 import CodeVerification from "../components/(auth)/codeVerificationPage";
 
 const CodeVerificationRegister = () => {

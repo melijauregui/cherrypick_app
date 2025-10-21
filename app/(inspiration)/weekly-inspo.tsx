@@ -12,12 +12,12 @@ import {
 import { router, useLocalSearchParams } from "expo-router";
 import { Entypo } from "@expo/vector-icons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getInspirationItems } from "../utils/fetch";
+import { getInspirationItems } from "../../utils/fetch";
 import { ItemSchemaType } from "@/schemas/catalog/catalog-schema";
 import LoadingPage, { LoadingItem } from "../components/LoadingPage";
 import ErrorPage from "../(auth)/error";
-import { useFetchBrandProfileItem } from "../utils/use-query";
-import { prefetchInspirationItems } from "../utils/prefetchs";
+import { useFetchBrandProfileItem } from "../../utils/use-query";
+import { prefetchInspirationItems } from "../../utils/prefetchs";
 import { useSession } from "@/lib/auth-client";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");

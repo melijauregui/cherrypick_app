@@ -3,7 +3,7 @@ import { TouchableOpacity, View, Text } from "react-native";
 import LoadingDots from "./animated";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
-export function StandardPageBottomSheet({
+export default function StandardPageBottomSheet({
   onSave,
   onCancel,
   onLoading,

@@ -3,7 +3,7 @@ import { View, Text, TextInput, Keyboard } from "react-native";
 import Toast from "react-native-toast-message";
 import ListSearch from "@/app/components/modal/list-search";
 import { ItemStylePhotoAndName, ModalStandar } from "../modal/ModalSearch";
-import { getAllBrands } from "@/app/utils/fetch";
+import { getAllBrands } from "@/utils/fetch";
 import { IdNameImageSchemaType } from "@/schemas/catalog/catalog-schema";
 
 const FilterSearchBottomSheet = ({

@@ -1,5 +1,5 @@
 import { Text } from "react-native";
-import cn from "@/app/utils/cn";
+import cn from "@/utils/cn";
 
 const AppName = ({ classname: classNamee }: { classname: string }) => {
   return <Text className={cn(classNamee)}>CHERRYPICK</Text>;

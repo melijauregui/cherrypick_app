@@ -13,13 +13,13 @@ import {
   ErrorSchemaType,
   SuccessSchemaType,
 } from "@/schemas/standar-response-schema";
-import safeFetch from "../utils/safe-fetch";
+import safeFetch from "../../utils/safe-fetch";
 import { VerifyUserExistsResponseSchema } from "@/schemas/user/user-schema";
 import { LOCAL_IP } from "@/config/api";
 import { authClient } from "@/lib/auth-client";
 import Toast from "react-native-toast-message";
-import { useResendCode } from "../utils/update";
-import { verifyMailAvailability } from "../utils/fetch";
+import { useResendCode } from "../../utils/update";
+import { verifyMailAvailability } from "../../utils/fetch";
 
 const SignIn = () => {
   const [name, setName] = useState<string>("");

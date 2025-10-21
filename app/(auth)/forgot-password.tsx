@@ -11,9 +11,9 @@ import SignPage, {
   SignPageItems,
 } from "@/app/components/(auth)/signPage";
 import { router } from "expo-router";
-import { verifyMailAvailability } from "../utils/fetch";
+import { verifyMailAvailability } from "../../utils/fetch";
 import { QueryEmailSchema } from "@/schemas/standar-query-schema";
-import { useResendCodeResetPassword } from "../utils/update";
+import { useResendCodeResetPassword } from "../../utils/update";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");

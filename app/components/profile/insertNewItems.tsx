@@ -5,8 +5,10 @@ import { ZodError } from "zod";
 import { LOCAL_IP } from "@/config/api";
 import Toast from "react-native-toast-message";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import safeFetch from "@/app/utils/safe-fetch";
+import safeFetch from "@/utils/safe-fetch";
 import { MinimumPropertiesItemSchema } from "@/schemas/catalog/catalog-schema";
+
+export default function InsertNewItems() { }
 
 // export const InsertNewItemsModal: React.FC<{
 //   bottomSheetRef: React.RefObject<BottomSheet>;

@@ -2,7 +2,7 @@ import BottomSheet from "@gorhom/bottom-sheet";
 import { TouchableOpacity, View, Text } from "react-native";
 import LoadingDots from "@/app/components/standar-page/animated";
 
-export function BottomSheetStandar({
+export default function BottomSheetStandar({
   bottomSheetRef,
   onSave,
   onCancel,

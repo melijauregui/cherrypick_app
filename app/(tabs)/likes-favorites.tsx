@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, Dimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { getAllLikedItems, getAllFavoritedItems } from "../utils/fetch";
+import { getAllLikedItems, getAllFavoritedItems } from "../../utils/fetch";
 import { useSession } from "@/lib/auth-client";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import List2 from "@/app/components/List2";
@@ -101,9 +101,8 @@ const TabNavigation = ({
 }) => {
   return (
     <TouchableOpacity
-      className={`flex-1 py-4 px-6 ${
-        activeTab === tab ? "border-b-2 border-beige" : ""
-      }`}
+      className={`flex-1 py-4 px-6 ${activeTab === tab ? "border-b-2 border-beige" : ""
+        }`}
       onPress={() => setActiveTab()}
     >
       <View className="flex-row items-center justify-center gap-1">{icon}</View>

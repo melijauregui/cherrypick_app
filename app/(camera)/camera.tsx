@@ -31,7 +31,7 @@ import {
   convertUriToBase64,
   getClothingItemsSimilarBase64,
   getEmbedding,
-} from "../utils/fetch";
+} from "../../utils/fetch";
 import FilterSearchBottomSheet from "../components/explore/filterSearch";
 import { IdNameImageSchemaType } from "@/schemas/catalog/catalog-schema";
 

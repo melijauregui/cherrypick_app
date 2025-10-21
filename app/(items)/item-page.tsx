@@ -11,22 +11,22 @@ import {
 import * as Clipboard from "expo-clipboard";
 import Toast from "react-native-toast-message";
 import { useQuery } from "@tanstack/react-query";
-import { getClothingItemsSimilar, getItem } from "@/app/utils/fetch";
+import { getClothingItemsSimilar, getItem } from "@/utils/fetch";
 import {
   useFetchBrandProfileItem,
   useFetchItemEmbedding,
-} from "@/app/utils/use-query";
-import useIsLiked from "@/app/utils/likes-favorites";
+} from "@/utils/use-query";
+import useIsLiked from "@/utils/likes-favorites";
 import {
   useIsFavorited,
   useToggleLike,
   useToggleFavorite,
-} from "@/app/utils/likes-favorites";
+} from "@/utils/likes-favorites";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useSession } from "@/lib/auth-client";
 import CustomModal from "@/app/components/Modal";
 import LoadingPage from "@/app/components/LoadingPage";
-import { useDeleteItem } from "@/app/utils/update";
+import { useDeleteItem } from "@/utils/update";
 import List2 from "@/app/components/List2";
 import { ItemSchemaType } from "@/schemas/catalog/catalog-schema";
 import { BrandSchemaType } from "@/schemas/brand/brand-schema";
@@ -109,9 +109,8 @@ const ItemDetail = ({ item }: { item: ItemSchemaType }) => {
           onPress={() => router.back()}
           onPressIn={() => setIsPressed(true)}
           onPressOut={() => setIsPressed(false)}
-          className={`absolute top-12 left-4 w-14 h-14 rounded-2xl bg-black items-center justify-center z-50 ${
-            isPressed ? "opacity-100" : "opacity-80"
-          }`}
+          className={`absolute top-12 left-4 w-14 h-14 rounded-2xl bg-black items-center justify-center z-50 ${isPressed ? "opacity-100" : "opacity-80"
+            }`}
           activeOpacity={1}
         >
           <Entypo name="chevron-thin-left" size={22} color="white" />
