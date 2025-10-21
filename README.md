@@ -2,7 +2,7 @@
 - front:  npx expo run:ios   
 - server: npx ts-node -r tsconfig-paths/register server/index.ts
 - database: (cd database && source .venv/bin/activate) uvicorn server:app --reload 
-- ejecutar script: node test-endpoints/test-catalog-upload.js
+- ejecutar script: node scripts/test-catalog-upload.js
 
 en ios dentro de Info.plist:
 <key>NSCameraUsageDescription</key>

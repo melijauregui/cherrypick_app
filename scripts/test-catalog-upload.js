@@ -7,8 +7,17 @@ const prisma = new PrismaClient();
 // Función para insertar imagen directamente en la tabla files
 async function insertImageToFiles(imageUrl, uuid, name) {
   try {
-    const fileRecord = await prisma.files.create({
-      data: {
+    const fileRecord = await prisma.files.upsert({
+      where: { id: uuid },
+      update: {
+        name: `item-image-${name}`,
+        contentType: "image/jpeg",
+        bucket: "fashion-items",
+        url: imageUrl,
+        uploadUrl: imageUrl,
+        metadata: {},
+      },
+      create: {
         id: uuid, // Usar el mismo UUID que el item
         name: `item-image-${name}`,
         contentType: "image/jpeg",
@@ -28,7 +37,7 @@ async function insertImageToFiles(imageUrl, uuid, name) {
 }
 
 // Función para procesar y subir items
-async function processAndUploadItems(brandEmail, filePath) {
+async function processAndUploadItems(brandEmail, filePath, onlyWeaviate = false) {
   const items = JSON.parse(await fs.readFile(filePath, "utf-8"));
 
   console.log(`Processing ${items.length} items...`);
@@ -37,16 +46,20 @@ async function processAndUploadItems(brandEmail, filePath) {
   const processedItems = [];
 
   for (const item of items) {
+
+    let fileId;
     console.log(`Uploading image for item: ${item.name} (${item.uuid})`);
+    if (!onlyWeaviate) {
+      // Insertar imagen directamente en la tabla files
+      fileId = await insertImageToFiles(
+        item.imageUrl,
+        item.uuid,
+        item.name
+      );
 
-    // Insertar imagen directamente en la tabla files
-    const fileId = await insertImageToFiles(
-      item.imageUrl,
-      item.uuid,
-      item.name
-    );
+    }
 
-    if (fileId) {
+    if (fileId || onlyWeaviate) {
       // Crear item modificado con imageId en lugar de imageUrl
       const processedItem = {
         uuid: item.uuid,
@@ -66,7 +79,9 @@ async function processAndUploadItems(brandEmail, filePath) {
     await new Promise(resolve => setTimeout(resolve, 100));
   }
 
-  console.log(`Successfully processed ${processedItems.length} items`);
+  if (!onlyWeaviate) {
+    console.log(`Successfully processed ${processedItems.length} items`);
+  }
 
   // Paso 2: Subir los items modificados
   if (processedItems.length > 0) {
@@ -95,9 +110,14 @@ async function processAndUploadItems(brandEmail, filePath) {
 // Ejecutar el proceso
 async function main() {
   console.log("Starting upload process for Napoli items...");
+  const onlyWeaviate = process.argv.includes("--w");
+  if (onlyWeaviate) {
+    console.log("Running in Weaviate-only mode (skipping image uploads)...");
+  }
   await processAndUploadItems(
     "cherrypick.brand.example@gmail.com",
-    "test-endpoints/archivos/catalog-items-tienda-napoli.json"
+    "test-endpoints/archivos/catalog-items-tienda-napoli.json",
+    onlyWeaviate
   );
 
   console.log("\nWaiting 5 seconds before Charo items...");
@@ -106,7 +126,8 @@ async function main() {
   console.log("Starting upload process for Charo items...");
   await processAndUploadItems(
     "charostoreok@gmail.com",
-    "test-endpoints/archivos/catalog-items-charo.json"
+    "test-endpoints/archivos/catalog-items-charo.json",
+    onlyWeaviate
   );
 }
 

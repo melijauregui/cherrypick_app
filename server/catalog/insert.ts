@@ -14,13 +14,13 @@ import { getFileUrl } from "../file-uploader";
 // Función para validar items JSON
 async function validateJsonItems(items: CreateItemSchemaType[]): Promise<
   | {
-      error: true;
-      details: string;
-    }
+    error: true;
+    details: string;
+  }
   | {
-      error: false;
-      catalogItems: CreateItemSchemaType[];
-    }
+    error: false;
+    catalogItems: CreateItemSchemaType[];
+  }
 > {
   if (!Array.isArray(items) || items.length === 0) {
     return {
@@ -83,10 +83,21 @@ export async function insertCatalogItems(
         );
       }
 
+      console.log(`Inserting item: ${item.name}, UUID: ${item.uuid}`);
+
       // 3. Insertar el item en PostgreSQL
-      const dbItem = await prisma.item.create({
-        data: {
-          ...(item.uuid && { id: item.uuid }), // Solo incluir id si item.uuid está definido
+      const dbItem = await prisma.item.upsert({
+        where: { id: item.uuid ?? "" }, // si item.uuid es undefined, se podría generar un error: mejor asegurar UUID
+        update: {
+          name: item.name,
+          description: item.description,
+          price: item.price,
+          url: item.url,
+          brandId: brandId,
+          imageId: item.imageId,
+        },
+        create: {
+          id: item.uuid, // solo si tienes un UUID generado
           name: item.name,
           description: item.description,
           price: item.price,
