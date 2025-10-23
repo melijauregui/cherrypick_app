@@ -3,9 +3,8 @@ import LoadingPage from "../components/LoadingPage";
 import { router } from "expo-router";
 import { getSelfBrandProfile } from "../../utils/fetch";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
+import StandardPageBottomSheet, {
   StandardDescription,
-  StandardPageBottomSheet,
 } from "../components/standar-page/standarPage";
 import { useState } from "react";
 import { Keyboard, ScrollView, Text, View } from "react-native";

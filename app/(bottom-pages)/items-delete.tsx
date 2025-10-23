@@ -2,9 +2,8 @@ import { Keyboard, View } from "react-native";
 import { useState } from "react";
 import ListSearch from "@/app/components/modal/list-search";
 import { getSelfBrandItems, getSelfBrandInspoItems } from "@/utils/fetch";
-import {
+import StandardPageBottomSheet, {
   StandardDescription,
-  StandardPageBottomSheet,
 } from "@/app/components/standar-page/standarPage";
 import { ItemStylePhotoAndName } from "@/app/components/modal/ModalSearch";
 import { router } from "expo-router";

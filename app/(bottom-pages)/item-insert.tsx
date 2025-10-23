@@ -5,9 +5,8 @@ import {
   MinimumPropertiesItemSchema,
   UploadItemImageResponseSchema,
 } from "@/schemas/catalog/catalog-schema";
-import {
+import StandardPageBottomSheet, {
   StandardDescription,
-  StandardPageBottomSheet,
 } from "../components/standar-page/standarPage";
 import { useState } from "react";
 import {
