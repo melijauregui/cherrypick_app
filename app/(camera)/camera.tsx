@@ -24,7 +24,7 @@ import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import { useMediaLibraryPermissions } from "expo-image-picker";
 import ImageComplete from "../components/ImageComplete";
-import BottomSheet from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import List2 from "../components/List2";
 import {
@@ -34,6 +34,7 @@ import {
 } from "../../utils/fetch";
 import FilterSearchBottomSheet from "../components/explore/filterSearch";
 import { IdNameImageSchemaType } from "@/schemas/catalog/catalog-schema";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const CameraPage = () => {
   const [uri, setUri] = useState<string | null>(null);
@@ -302,6 +303,7 @@ const RenderPicture = ({
   const snapPoints = [minHeight, 400, 600, 800, 1000].filter(
     point => point >= minHeight
   );
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     const fetchImageBase64 = async () => {
@@ -344,50 +346,57 @@ const RenderPicture = ({
           }}
           enablePanDownToClose={false}
         >
-          <View className="flex flex-row justify-center pb-3 px-6">
-            <Text className="text-white text-lg font-psemibold">
-              Items Similares
-            </Text>
-          </View>
-          {isLoadingBase64 ? (
-            <View className="flex-1 items-center justify-center">
-              <Text className="text-white">Procesando imagen...</Text>
+          <BottomSheetScrollView
+            contentContainerStyle={{
+              paddingBottom: insets.bottom,
+            }}
+            showsVerticalScrollIndicator={false}
+          >
+            <View className="flex flex-row justify-center pb-3 px-6">
+              <Text className="text-white text-lg font-psemibold">
+                Items Similares
+              </Text>
             </View>
-          ) : (
-            <View
-              style={{
-                height: (snapPoints[snapIndex] ?? 1000) - 90,
-              }}
-            >
-              <List2
-                queryKey={[
-                  "similar-items",
-                  uri,
-                  embedding?.length || 0,
-                  minPrice,
-                  maxPrice,
-                  brandsSelected.size > 0
-                    ? Array.from(brandsSelected.keys())
-                    : undefined,
-                ]}
-                getClothingItems={(page, limit) =>
-                  getClothingItemsSimilarBase64(
-                    page,
-                    limit,
-                    embedding || [],
-                    minPrice ? parseFloat(minPrice) : undefined,
-                    maxPrice ? parseFloat(maxPrice) : undefined,
+            {isLoadingBase64 ? (
+              <View className="flex-1 items-center justify-center">
+                <Text className="text-white">Procesando imagen...</Text>
+              </View>
+            ) : (
+              <View
+                style={{
+                  height: (snapPoints[snapIndex] ?? 1000) - 90,
+                }}
+              >
+                <List2
+                  queryKey={[
+                    "similar-items",
+                    uri,
+                    embedding?.length || 0,
+                    minPrice,
+                    maxPrice,
                     brandsSelected.size > 0
                       ? Array.from(brandsSelected.keys())
-                      : undefined
-                  )
-                }
-                limit={6}
-                columnCount={2}
-                canRefresh={false}
-              />
-            </View>
-          )}
+                      : undefined,
+                  ]}
+                  getClothingItems={(page, limit) =>
+                    getClothingItemsSimilarBase64(
+                      page,
+                      limit,
+                      embedding || [],
+                      minPrice ? parseFloat(minPrice) : undefined,
+                      maxPrice ? parseFloat(maxPrice) : undefined,
+                      brandsSelected.size > 0
+                        ? Array.from(brandsSelected.keys())
+                        : undefined
+                    )
+                  }
+                  limit={6}
+                  columnCount={2}
+                  canRefresh={false}
+                />
+              </View>
+            )}
+          </BottomSheetScrollView>
         </BottomSheet>
         <FilterSearchBottomSheet
           isModalOpen={isFilterSearchModalOpen}
@@ -402,6 +411,6 @@ const RenderPicture = ({
           initialBrandsSelected={brandsSelected}
         />
       </View>
-    </GestureHandlerRootView>
+    </GestureHandlerRootView >
   );
 };
