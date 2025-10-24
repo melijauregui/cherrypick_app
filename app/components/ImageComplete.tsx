@@ -31,10 +31,10 @@ const ImageComplete = ({
   const [imageHeight, setImageHeight] = useState(
     storedImageHeight && imageWidth
       ? calculateImageHeight({
-          imageWidth,
-          imageHeight: storedImageHeight,
-          screenWidth,
-        })
+        imageWidth,
+        imageHeight: storedImageHeight,
+        screenWidth,
+      })
       : 0
   );
   const [timestamp, setTimestamp] = useState<{
@@ -42,7 +42,7 @@ const ImageComplete = ({
     retries: number;
   }>({ timestamp: Date.now(), retries: 0 });
 
-  const src = useMemo(() => {
+  /* const src = useMemo(() => {
     if (timestamp.retries >= 50) {
       return { uri: imageDefault };
     }
@@ -55,7 +55,13 @@ const ImageComplete = ({
       }
     }
     return src;
-  }, [imageUrl, imageUrlUpdatedAt, timestamp]);
+  }, [imageUrl, imageUrlUpdatedAt, timestamp]); */
+  const src = useMemo(() => {
+    if (!imageUrl) return { uri: imageDefault };
+
+    return { uri: `${imageUrl}?t=${timestamp.timestamp}` };
+  }, [imageUrl, timestamp]);
+
 
   useEffect(() => {
     setTimestamp({ timestamp: Date.now(), retries: 0 });
