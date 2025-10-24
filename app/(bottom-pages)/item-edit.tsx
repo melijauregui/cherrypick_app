@@ -29,6 +29,7 @@ type UpdateItemSchema = Omit<ItemSchemaType, "price" | "brandId"> & {
 export default function EditItemPage() {
   const params = useLocalSearchParams();
   const itemUuid = decodeURIComponent(params.uuid as string);
+  const brandEmail = decodeURIComponent(params.email as string);
   const {
     data: itemData,
     isLoading,
@@ -55,19 +56,19 @@ export default function EditItemPage() {
     price: itemData.item.price.toString(),
   };
 
-  return <EditItem item={item} />;
+  return <EditItem item={item} brandEmail={brandEmail} />;
 }
 
 export type FormErrors = Partial<Record<keyof UpdateItemSchema, string>>;
 
-function EditItem({ item }: { item: UpdateItemSchema }) {
+function EditItem({ item, brandEmail }: { item: UpdateItemSchema, brandEmail: string }) {
   const [formData, setFormData] = useState<InsertItemSchema>({
     ...item,
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const mutation = useUpdateItem(item);
+  const mutation = useUpdateItem(item, brandEmail);
 
   const onSave = async (data: UpdateItemSchema) => {
     const result = MinimumPropertiesItemSchema.safeParse({
@@ -131,7 +132,7 @@ function EditItem({ item }: { item: UpdateItemSchema }) {
   );
 }
 
-function useUpdateItem(itemLastValue: UpdateItemSchema) {
+function useUpdateItem(itemLastValue: UpdateItemSchema, brandEmail: string) {
   const queryClient = useQueryClient();
   const postImageMutation = usePostItemImage();
   const mutation = useMutation({
@@ -176,6 +177,19 @@ function useUpdateItem(itemLastValue: UpdateItemSchema) {
     onSuccess: (data, variables) => {
       void queryClient.invalidateQueries({
         queryKey: ["item-detail", itemLastValue.uuid],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["item-embedding", itemLastValue.uuid],
+        exact: true,
+      });
+
+      void queryClient.invalidateQueries({
+        queryKey: ["similar-items", itemLastValue.uuid],
+        exact: false,
+      });
+
+      void queryClient.invalidateQueries({
+        queryKey: ["self-brand-items", brandEmail],
       });
       Toast.show({
         type: "success",

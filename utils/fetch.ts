@@ -451,6 +451,7 @@ export const getClothingItemsSimilar = async (
   if (embedding.length === 0) {
     return [];
   }
+  console.log("fetching getClothingItemsSimilar", imageUrl);
   const res = await handleApiResponse<{
     items: ItemSchemaType[];
   }>(

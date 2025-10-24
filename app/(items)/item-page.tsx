@@ -36,15 +36,15 @@ import ErrorPage from "../(auth)/error";
 export default function ItemDetailPage() {
   const params = useLocalSearchParams();
   const itemUuid = decodeURIComponent(params.uuid as string);
-  const {
-    data: itemData,
-    isLoading,
-    error,
-  } = useQuery({
+  const itemData = useQuery({
     queryKey: ["item-detail", itemUuid],
     queryFn: () => getItem(itemUuid),
     staleTime: 5 * 60 * 1000,
   });
+
+  const item = itemData.data?.item as ItemSchemaType;
+  const isLoading = itemData.isLoading;
+  const error = itemData.error;
 
   if (isLoading) {
     return <LoadingPage />;
@@ -57,7 +57,7 @@ export default function ItemDetailPage() {
     return <ErrorPage />;
   }
 
-  return <ItemDetail item={itemData.item} />;
+  return <ItemDetail item={item} />;
 }
 
 const ItemDetail = ({ item }: { item: ItemSchemaType }) => {
@@ -91,6 +91,7 @@ const ItemDetail = ({ item }: { item: ItemSchemaType }) => {
           isBrandItem={user.id === item.brandId}
           itemName={item.name}
           setVisibleModal={setVisibleModal}
+          email={user.email}
         />
 
         <ItemDetailComponent item={item} brand={brand?.brand} />
@@ -121,6 +122,8 @@ const ItemDetail = ({ item }: { item: ItemSchemaType }) => {
             "similar-items",
             item.uuid,
             itemEmbeddingData?.embedding?.length || 0,
+            item.image.url,
+            itemEmbeddingData?.embedding?.join(","),
           ]}
           getClothingItems={(page, limit) =>
             getClothingItemsSimilar(
@@ -237,11 +240,13 @@ const IconComponent = ({
   uuid,
   itemName,
   setVisibleModal,
+  email
 }: {
   uuid: string;
   isBrandItem: boolean;
   itemName: string;
   setVisibleModal: (visible: boolean) => void;
+  email: string;
 }) => {
   const {
     data: likeData,
@@ -323,7 +328,7 @@ const IconComponent = ({
             onPress={() =>
               router.push({
                 pathname: "/item-edit",
-                params: { uuid: uuid },
+                params: { uuid: uuid, email: email },
               })
             }
           >
