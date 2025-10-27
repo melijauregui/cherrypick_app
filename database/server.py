@@ -11,7 +11,8 @@ import numpy as np
 
 
 app = FastAPI()
-model_name = "Sofia-gb/cherrypick-sigLip11"
+#model_name = "Sofia-gb/cherrypick-sigLip11"
+model_name="Cherrypick-group/sigLip"
 pretrained_model_name = "Marqo/marqo-fashionSigLIP"
 device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 

@@ -20,7 +20,7 @@ import torch.nn.functional as F
 import multiprocessing
 from nltk.corpus import stopwords
 import re
-from utils import *
+from database.fashionclipFinetuned.utils import *
 
 # --- CONFIGURACIÓN ---
 BATCH_SIZE = 30
