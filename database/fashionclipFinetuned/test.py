@@ -181,26 +181,12 @@ def run_tests_general(image_paths, images, test):
 if __name__ == "__main__":
     input_folder = "images-testing-roturas"
     output_folder = "images-testing-roturas-nobg"
-    # run_tests(input_folder, output_folder, run_tests_roturas)
+    run_tests(input_folder, output_folder, run_tests_roturas)
 
     input_folder = "images-testing-preferences"
     output_folder = "images-testing-preferences-nobg"
-    # run_tests(input_folder, output_folder, run_tests_preferences)
+    run_tests(input_folder, output_folder, run_tests_preferences)
 
     input_folder = "images_testing_general"
     output_folder = "images-testing-general-nobg"
-    # run_tests(input_folder, output_folder, run_tests_general)
-
-    input_folder = "../test-endpoints/images-catalog"
-    output_folder = "../test-endpoints/images-catalog-nobg"
-    # run_tests(input_folder, output_folder, run_tests_roturas, test=False)
-
-    text = "top corto o remera verde claro de algodon con volados en los hombros y fruncido ajustable con cordón en el frente"
-    text_inputs = processor(text=text, return_tensors="pt",
-                            padding=True, truncation=True).to(DEVICE)
-
-    with torch.no_grad():
-        text_features = model.get_text_features(**text_inputs)
-        text_features = text_features / \
-            text_features.norm(p=2, dim=-1, keepdim=True)
-    print(text_features)
+    run_tests(input_folder, output_folder, run_tests_general)

@@ -2,6 +2,7 @@ fine_tune(csv_path="datasets/unificado/roturas-preferencias-v6.csv", original_mo
               model_name_to_push="Sofia-gb/cherrypick-sigLip11", data_aug=False,
               loss_func=contrastive_loss_InfoNCE, batch_size=16, epochs=32, lr=2e-5,
               n_layers=2)
+Nuevo nombre: Cherrypick-group/sigLip
 
 Descripcion: jean liso
    1. images-testing-roturas-nobg\recto3.png → Similitud: 0.530
