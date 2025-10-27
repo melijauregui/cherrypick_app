@@ -5,7 +5,7 @@ module.exports = {
     extend: {},
   },
   plugins: [],
-}
+};
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -16,19 +16,16 @@ module.exports = {
     extend: {
       colors: {
         black: "#000000",
-        white : "#ffffff",
+        white: "#ffffff",
         grey: {
-          light : "#999999",
-          strong : "#242424",
+          lighter: "#d7d7d7",
+          light: "#9297a1",
+          strong: "#242424",
         },
-        brown : {
-          light : "#af785a",
-          strong : "#301c11",
-        } ,
-        pink : {
-          light: "#F8BFBF",
-          strong: "#DE7070",
+        brown: {
+          strong: "#301c11",
         },
+        beige: "#d8bc9e",
       },
       fontFamily: {
         pthin: ["Poppins-Thin", "sans-serif"],
@@ -47,4 +44,4 @@ module.exports = {
     },
   },
   plugins: [],
-}
+};

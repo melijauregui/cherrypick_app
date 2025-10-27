@@ -2,9 +2,16 @@ import { Stack } from "expo-router";
 import { SplashScreen } from "expo-router";
 import { useFonts } from "expo-font";
 import { useEffect } from "react";
+import Toast from "react-native-toast-message";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { View, Text, TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 SplashScreen.preventAutoHideAsync();
 
+const queryClient = new QueryClient();
+
+// const queryClient = new QueryClient();
 const RootLayout = () => {
   const [fontsLoaded, error] = useFonts({
     "Poppins-Black": require("../assets/fonts/poppins/Poppins-Black.ttf"),
@@ -38,31 +45,109 @@ const RootLayout = () => {
   }
 
   return (
-    <Stack
-      screenOptions={{
-        animation: "fade",
-      }}
-    >
-      <Stack.Screen
-        name="index"
-        options={{
-          headerShown: false,
+    <QueryClientProvider client={queryClient}>
+      <Stack
+        screenOptions={{
+          animation: "none",
         }}
-      />
-      <Stack.Screen
-        name="(auth)"
-        options={{
-          headerShown: false,
-        }}
-      />
-      <Stack.Screen
-        name="(tabs)"
-        options={{
-          headerShown: false,
-        }}
-      />
-    </Stack>
+      >
+        <Stack.Screen
+          name="index"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="(auth)"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="(tabs)"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="(items)"
+          options={{
+            headerShown: false,
+            animation: "slide_from_right",
+          }}
+        />
+        <Stack.Screen
+          name="(brand)"
+          options={{
+            headerShown: false,
+            animation: "slide_from_right",
+          }}
+        />
+        <Stack.Screen
+          name="(search)"
+          options={{
+            headerShown: false,
+            animation: "slide_from_right",
+          }}
+        />
+        <Stack.Screen
+          name="(inspiration)"
+          options={{
+            headerShown: false,
+            animation: "slide_from_right",
+          }}
+        />
+        <Stack.Screen
+          name="(bottom-pages)"
+          options={{
+            headerShown: false,
+            animation: "slide_from_bottom",
+          }}
+        />
+        <Stack.Screen
+          name="(camera)"
+          options={{
+            headerShown: false,
+            animation: "slide_from_right",
+          }}
+        />
+      </Stack>
+      <Toast config={toastConfig} />
+    </QueryClientProvider>
   );
 };
 
 export default RootLayout;
+
+const CustomToast = ({ text1, text2, onHide, type }: any) => {
+  return (
+    <View className="flex-row items-center rounded-2xl py-4 px-[18px] mx-2 min-h-[70px] bg-white">
+      <View style={{ flex: 1 }}>
+        <Text
+          className={`text-black text-xl mb-0.5 ${type === "success" ? "text-black font-plight" : "text-red-500 font-pregular"}`}
+        >
+          {text1}
+        </Text>
+        {text2 && (
+          <Text
+            className={`text-black text-xl mb-0.5 ${type === "success" ? "text-black font-plight" : "text-red-500 font-pregular"}`}
+          >
+            {text2}
+          </Text>
+        )}
+      </View>
+      <TouchableOpacity onPress={onHide} style={{ marginLeft: 10 }}>
+        <Ionicons name="close" size={22} color="#888" />
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+export const toastConfig = {
+  success: (props: any) => (
+    <CustomToast {...props} type="success" onHide={() => Toast.hide()} />
+  ),
+  error: (props: any) => (
+    <CustomToast {...props} type="error" onHide={() => Toast.hide()} />
+  ),
+};

@@ -13,7 +13,55 @@ const AuthLayout = () => {
           }}
         />
         <Stack.Screen
+          name="sign-up-brand"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
           name="sign-in"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="code-verification-register"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="preferences"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="error"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="log-in"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="forgot-password"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="reset-password"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="code-verification-password"
           options={{
             headerShown: false,
           }}

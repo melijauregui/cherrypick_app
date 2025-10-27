@@ -8,6 +8,7 @@ node_modules/
 dist/
 web-build/
 expo-env.d.ts
+eas.json
 
 # Native
 *.orig.*
@@ -41,3 +42,19 @@ app-example
 android/
 ios/
 .env
+
+# database
+
+database/Sofia-gb/**
+database/melijauregui/**
+database/fashionclipFinetuned/__pycache__/**
+database/cached_images/**
+
+.venv-mp/
+/logs
+
+server/generated/prisma/**
+database/__pycache__/server.cpython-312.pyc
+.vscode/settings.json
+server/generated/prisma/edge.js
+server/generated/prisma/index.js

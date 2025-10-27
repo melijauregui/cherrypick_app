@@ -1,75 +1,56 @@
-import fs from "fs";
-import { OpenAPIHono, createRoute } from '@hono/zod-openapi'
-import { callVGGNet, ImageParamSchema, queryPinecone, TopMatchesSchema } from './app/routeVector';
-import { PaginationSchema } from "./app/allDatabase";
+import { OpenAPIHono } from "@hono/zod-openapi";
+import { auth } from "../lib/auth";
+import FormUserApp from "./formUser/routes";
+import UserApp from "./user/routes";
+import ClientApp from "./client/routes";
+import BrandApp from "./brand/routes";
+import FeedApp from "./feed/routes";
+import ItemApp from "./item/routes";
+import SearchApp from "./search/routes";
 
+export type AppEnv = {
+  Variables: {
+    user: typeof auth.$Infer.Session.user | null;
+    session: typeof auth.$Infer.Session.session | null;
+  };
+};
 
-const app = new OpenAPIHono()
-export default app
+const app = new OpenAPIHono<AppEnv>();
+export default app;
 
-// api que recibe una imagen y devuelve los 10 resultados más similares paginados
-const routeVector = createRoute({
-  method: 'get',
-  path: '/images/{image_path}',
-  request: {
-    params: ImageParamSchema,
-  },
-  responses: {
-    200: {
-      content: {
-        'application/json': {
-          schema: TopMatchesSchema,
-        },
-      },
-      description: 'Retrieve the user',
-    },
-  },
-})
+app.use("*", async (c, next) => {
+  console.log("c.req.path", c.req.method, c.req.path);
+  const session = await auth.api.getSession({ headers: c.req.raw.headers });
 
-app.openapi(routeVector, async (c) => {
-  const topK = 10;
-  const { image_path } = c.req.valid('param')
-  const image_path_complete = `./server/images/${image_path}`;
-  const queryVector = await callVGGNet(image_path_complete);
-  fs.writeFileSync('result.json', JSON.stringify(queryVector));
-  const res = await queryPinecone(queryVector, topK);
-  return c.json(
-    res,
-    200 
-  )
-})
+  if (!session) {
+    if (
+      c.req.path.startsWith("/api/auth/") ||
+      c.req.path === "/user/verify" ||
+      c.req.path === "/brand/form" ||
+      c.req.path === "/brand/insert-items2" || //TODO NO DEBERIA ESTAR SOLO PARA ENDPOINTS
+      c.req.path.startsWith("/code-verification") ||
+      c.req.path.startsWith("/search/") || // Temporarily allow search endpoints for testing
+      (c.req.path === "/client" && c.req.method === "POST")
+    ) {
+      return next();
+    }
+    c.set("user", null);
+    c.set("session", null);
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+  c.set("user", session.user);
+  c.set("session", session.session);
+  return next();
+});
 
-// api que devuelve los resultados paginados de la base de datos
-const paginatedRoute = createRoute({
-  method: 'get',
-  path: '/all',
-  request: {
-    query: PaginationSchema,
-  },
-  responses: {
-    200: {
-      content: {
-        'application/json': {
-          schema: TopMatchesSchema,
-        },
-      },
-      description: 'Devuelve los datos de la base de datos de forma paginada',
-    },
-  },
-})
+app.on(["POST", "GET"], "/api/auth/*", c => {
+  return auth.handler(c.req.raw);
+});
 
-// Registrar el endpoint en la aplicación
-app.openapi(paginatedRoute, async (c) => {
-  const { page, limit } = c.req.valid('query')
-  const topK = 10;
-  
-  const embedding = Array.from({ length: 768 }, () => Math.random());
-
-  const res = await queryPinecone(embedding, topK);
-  return c.json(
-    res,
-    200 
-  )
-})
-
-
+app.route("/code-verification", FormUserApp);
+app.route("/user", UserApp);
+app.route("/client", ClientApp);
+app.route("/brand", BrandApp);
+app.route("/feed", FeedApp);
+app.route("/item", ItemApp);
+app.route("/search", SearchApp);

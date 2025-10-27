@@ -1,0 +1,154 @@
+[
+  {
+    "uuid": "7ba7b810-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Remera verde",
+    "description": "Remera verde claro de algodón con volados en los hombros y fruncido ajustable con cordón en el frente.",
+    "price": "29.99",
+    "imageUrl": "https://i.pinimg.com/736x/ea/4d/bf/ea4dbf3538415b0ea85f62e1e4ac8482.jpg",
+    "url": "https://ar.pinterest.com/pin/99501473012502315/"
+  },
+  {
+    "uuid": "7ba7b811-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Remera Marrón",
+    "description": "Remera Marrón manga larga de algodón.",
+    "price": "29.99",
+    "imageUrl": "https://i.pinimg.com/736x/cb/b3/08/cbb308be443a379611fac31dd1d6ab6d.jpg",
+    "url": "https://ar.pinterest.com/pin/1011128553843906145/"
+  },
+  {
+    "uuid": "7ba7b812-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Remera Beige",
+    "description": "Remera Beige sin mangas de algodón.",
+    "price": "10.99",
+    "imageUrl": "https://i.pinimg.com/736x/3c/fa/5b/3cfa5b8d28c35b61b948943657a7e069.jpg",
+    "url": "https://ar.pinterest.com/pin/332281278774356667/"
+  },
+  {
+    "uuid": "7ba7b813-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Remera Blanca",
+    "description": "Remera Blanca de algodón.",
+    "price": "10.99",
+    "imageUrl": "https://i.pinimg.com/736x/1b/4c/86/1b4c86378c1f65bf0c28530f0320a78f.jpg",
+    "url": "https://ar.pinterest.com/pin/182677328631359582/"
+  },
+  {
+    "uuid": "7ba7b814-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Remera una Manga",
+    "description": "Top asimétrico de un solo hombro en color beige y con un ligero drapeado en el lateral.",
+    "price": "10.99",
+    "imageUrl": "https://i.pinimg.com/736x/15/59/f1/1559f11514a207a68cec9a51a3791da9.jpg",
+    "url": "https://ar.pinterest.com/pin/55943220366818811/"
+  },
+  {
+    "uuid": "7ba7b815-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Remera verde lima",
+    "description": "Top verde lima con diseño ajustado, sin tirantes y drapeado en la parte frontal.",
+    "price": "10.99",
+    "imageUrl": "https://i.pinimg.com/736x/9f/4f/4a/9f4f4abb504170e9b8d213aefc59c02b.jpg",
+    "url": "https://ar.pinterest.com/pin/90705379990422160/"
+  },
+  {
+    "uuid": "7ba7b816-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Remera gris",
+    "description": "Top halter gris oscuro con escote profundo en V y tela con finas rayas verticales tipo sastrero.",
+    "price": "10.99",
+    "imageUrl": "https://i.pinimg.com/736x/eb/f3/73/ebf373597d8cf5bccc50d089ceeecc7d.jpg",
+    "url": "https://ar.pinterest.com/pin/55943220366818703/"
+  },
+  {
+    "uuid": "7ba7b817-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Top Marrón",
+    "description": "Top marrón con tirantes finos y copas en triángulo.",
+    "price": "10.99",
+    "imageUrl": "https://i.pinimg.com/736x/06/08/f0/0608f0dfd06f53f8c5727402aea288ec.jpg",
+    "url": "https://ar.pinterest.com/pin/117797346500072992/"
+  },
+  {
+    "uuid": "7ba7b818-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Top Rosa",
+    "description": "Top de tirantes finos de color rosa, beige o champagne y acabado satinado. Tiene escote en V y los laterales cuentan con cordones ajustables.",
+    "price": "10.99",
+    "imageUrl": "https://i.pinimg.com/736x/4c/4e/7f/4c4e7ffaaa7b772669fbe8a200ceb635.jpg",
+    "url": "https://ar.pinterest.com/pin/128634133101640829/"
+  },
+  {
+    "uuid": "7ba7b819-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Top negro",
+    "description": "Top negro sin mangas con escote cuadrado y tirantes que se conectan atrás del cuello.",
+    "price": "10.99",
+    "imageUrl": "https://i.pinimg.com/736x/61/96/6e/61966e7c1b855272b334b7fb82c7f836.jpg",
+    "url": "https://ar.pinterest.com/pin/505177283221426094/"
+  },
+  {
+    "uuid": "7ba7b820-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Pantalón marron",
+    "description": "Pantalón marron acampanado con estampado blanco, en estilo boho chic.",
+    "price": "29.99",
+    "imageUrl": "https://i.pinimg.com/1200x/d3/e4/34/d3e43435ff4936d3e3c066b92aed893a.jpg",
+    "url": "https://ar.pinterest.com/pin/11188699074590364/"
+  },
+  {
+    "uuid": "7ba7b821-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Top marron",
+    "description": "Top marron boho chic con tirantes para atar en el cuello. Estampado de hilo amarillo.",
+    "price": "29.99",
+    "imageUrl": "https://i.pinimg.com/736x/99/fe/b6/99feb6479857de4e8892c20f68f1cc44.jpg",
+    "url": "https://ar.pinterest.com/pin/250935010483923095/"
+  },
+  {
+    "uuid": "7ba7b822-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Pollera lila",
+    "description": "Pollera lila coquette con volados.",
+    "price": "29.99",
+    "imageUrl": "https://i.pinimg.com/736x/74/79/58/747958225afae8260e5b9aca5a91efbe.jpg",
+    "url": "https://ar.pinterest.com/pin/619456123784996637/"
+  },
+  {
+    "uuid": "7ba7b823-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Top negro musculosa",
+    "description": "Top negro minimalista tipo musculosa.",
+    "price": "29.99",
+    "imageUrl": "https://i.pinimg.com/1200x/89/bd/90/89bd9061e8edb3d2953ee9bcedf40017.jpg",
+    "url": "https://ar.pinterest.com/pin/18507048459460126/"
+  },
+  {
+    "uuid": "7ba7b824-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Pantalón sastrero gris",
+    "description": "Pantalón sastrero gris de pierna recta, en estilo old money y minimalista.",
+    "price": "29.99",
+    "imageUrl": "https://i.pinimg.com/736x/51/f8/9e/51f89ea328babc55b10e614d0dbdf0b0.jpg",
+    "url": "https://ar.pinterest.com/pin/6896205672005315/"
+  },
+  {
+    "uuid": "7ba7b825-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Short deportivo azul",
+    "description": "Short deportivo azul con cintura elástica y detalles en blanco.",
+    "price": "9.99",
+    "imageUrl": "https://i.pinimg.com/1200x/ec/26/c3/ec26c3e470bebb7ccae8f3f69f1552e8.jpg",
+    "url": "https://ar.pinterest.com/pin/3377768467813113/"
+  },
+  {
+    "uuid": "7ba7b826-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Remera retro",
+    "description": "Remera retro roja con mangas negras y estampado escrito, en estilo streetwear.",
+    "price": "9.99",
+    "imageUrl": "https://i.pinimg.com/1200x/af/6c/69/af6c6912150022aa70c88d86cd05e4dd.jpg",
+    "url": "http://ar.pinterest.com/pin/955607614668091406/"
+  },
+  {
+    "uuid": "7ba7b827-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Kana white",
+    "description": "Top blanco de lycra con cuello recto",
+    "price": "9.99",
+    "imageUrl": "https://i.pinimg.com/736x/5a/23/7c/5a237c320b9cd5c5bd9d9ed08ac3610b.jpg",
+    "url": "https://ar.pinterest.com/pin/4601060432427917824/"
+  },
+  {
+    "uuid": "7ba7b828-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Noelle Texanas",
+    "description": "Botas texanas negras con puntas y suela de caucho",
+    "price": "30.99",
+    "imageUrl": "https://i.pinimg.com/1200x/1b/6b/d2/1b6bd23f88e7a472a8fc6214546f2c7d.jpg",
+    "url": "https://ar.pinterest.com/pin/734297914286091569/"
+  }
+]

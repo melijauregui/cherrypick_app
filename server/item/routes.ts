@@ -1,0 +1,636 @@
+import { createRoute } from "@hono/zod-openapi";
+
+import { OpenAPIHono } from "@hono/zod-openapi";
+import { Context } from "hono";
+import { errorHandler } from "../errorHandler";
+import {
+  IsMyItemSchema,
+  IsMyItemSchemaType,
+  ItemResponseSchema,
+  ItemResponseSchemaType,
+  UpdateItemBodySchema,
+  UploadItemImageResponseSchema,
+  UploadItemImageSchema,
+} from "@/schemas/catalog/catalog-schema";
+import { QueryIdSchema } from "@/schemas/standar-query-schema";
+import {
+  ErrorSchema,
+  ErrorSchemaType,
+  SuccessSchema,
+  SuccessSchemaType,
+} from "@/schemas/standar-response-schema";
+import { GetEmbeddingItem, GetItem, UploadImage } from "./functions";
+import logger from "../logger";
+import { GetBrandId } from "../brand/functions";
+import { AppEnv } from "../app";
+import { UpdateItem } from "./functions";
+import {
+  checkIfFavorited,
+  checkIfLiked,
+  toggleFavorite,
+  toggleLike,
+} from "../catalog/like-favorite";
+import {
+  CheckLikeFavoriteResponseSchema,
+  CheckLikeFavoriteResponseSchemaType,
+} from "@/schemas/catalog/like-favorite-schema.ts";
+import {
+  EmbbedingResponseSchema,
+  EmbbedingResponseSchemaType,
+} from "@/schemas/search/search-schema";
+import { z } from "zod/v4";
+import { VerifyUserExists } from "../user/functions";
+import { log } from "console";
+
+const ItemApp = new OpenAPIHono<AppEnv>({
+  defaultHook: (result, c) => {
+    //https://github.com/honojs/middleware/tree/main/packages/zod-openapi
+    if (!result.success) {
+      throw result.error; // deja que onError formatee el JSON
+    }
+  },
+});
+
+// Middleware to handle validation errors
+ItemApp.onError((err: Error, c: Context) => {
+  //https://hono.dev/docs/api/hono#error-handling
+  return errorHandler(err, c);
+});
+
+export default ItemApp;
+
+// endpoint que verifica si un item pertenece al usuario autenticado
+const isMyItemRoute = createRoute({
+  method: "get",
+  path: "/{id}/is-mine",
+  request: {
+    params: QueryIdSchema,
+    required: true,
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: IsMyItemSchema,
+        },
+      },
+      description: "Verifica si un item pertenece al usuario autenticado",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Usuario no autenticado",
+    },
+    404: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Item o marca no encontrada",
+    },
+    500: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Error interno del servidor",
+    },
+  },
+});
+
+ItemApp.openapi(isMyItemRoute, async c => {
+  const { id } = c.req.valid("param");
+  const user = c.get("user");
+  logger.info("/GET item/is-mine id: %s user: %s", id, user?.email);
+  let res: IsMyItemSchemaType | ErrorSchemaType;
+
+  if (!user?.email) {
+    res = {
+      error: true,
+      details: "Usuario no autenticado",
+    };
+    return c.json(res, 401);
+  }
+
+  const itemResult = await GetItem(id);
+  if (itemResult.error) {
+    res = {
+      error: true,
+      details: itemResult.details,
+    };
+    return c.json(res, 404);
+  }
+
+  const item = itemResult.item;
+
+  // Obtener el brandId del usuario autenticado
+  const userBrandId = await GetBrandId(user.email);
+  if (!userBrandId) {
+    res = {
+      error: false,
+      isMyItem: false,
+    };
+    return c.json(res, 200);
+  }
+
+  // Comparar si el brandId del item coincide con el brandId del usuario
+  const isMyItem = item.brandId === userBrandId;
+
+  res = {
+    error: false,
+    isMyItem,
+  };
+
+  return c.json(res, 200);
+});
+
+// endpoint que busca un item específico por name y brand
+const getItemRoute = createRoute({
+  method: "get",
+  path: "/{id}",
+  request: {
+    params: QueryIdSchema,
+    required: true,
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: ItemResponseSchema,
+        },
+      },
+      description: "Devuelve un item específico por nombre y marca",
+    },
+    500: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Error interno del servidor",
+    },
+  },
+});
+
+ItemApp.openapi(getItemRoute, async c => {
+  const { id } = c.req.valid("param");
+  logger.info("/GET item/uuid: %s", id);
+  let res: ItemResponseSchemaType | ErrorSchemaType;
+
+  res = await GetItem(id);
+  if (res.error) {
+    return c.json(res, 500);
+  }
+
+  return c.json(res, 200);
+});
+
+// endpoint que actualiza un item específico por name y brand
+const updateItemRoute = createRoute({
+  method: "patch",
+  path: "/{id}",
+  request: {
+    params: QueryIdSchema,
+    body: {
+      content: {
+        "application/json": { schema: UpdateItemBodySchema },
+      },
+    },
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: SuccessSchema,
+        },
+      },
+      description: "Actualiza un item específico por nombre y marca",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Usuario no autenticado",
+    },
+    404: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Item no encontrado",
+    },
+    500: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Error interno del servidor",
+    },
+  },
+});
+
+ItemApp.openapi(updateItemRoute, async c => {
+  const { id } = c.req.valid("param");
+  const updatedItem = await c.req.valid("json");
+  logger.info("/PATCH item/uuid: %s updatedItem: %s", id, updatedItem);
+  let res: SuccessSchemaType | ErrorSchemaType;
+  const user = c.get("user");
+  if (!user?.id) {
+    res = {
+      error: true,
+      details: "Usuario no autenticado",
+    };
+    return c.json(res, 401);
+  }
+
+  const itemResult = await GetItem(id);
+  if (itemResult.error) {
+    res = {
+      error: true,
+      details: "Item no encontrado" + itemResult.details,
+    };
+    return c.json(res, 404);
+  }
+
+  if (user.id !== itemResult.item.brandId) {
+    return c.json(
+      { error: true, details: "No tienes permisos para actualizar este item" },
+      401
+    );
+  }
+
+  const updateItemRes = await UpdateItem(id, updatedItem);
+  if (updateItemRes.error) {
+    logger.error("Error updating item: %s", updateItemRes.details);
+    res = {
+      error: true,
+      details: updateItemRes.details,
+    };
+    return c.json(res, 404);
+  }
+
+  res = {
+    error: false,
+  };
+  return c.json(res, 200);
+});
+
+// endpoint que actualiza la imagen de un item específico por name y brand
+const updateItemImageRoute = createRoute({
+  method: "post",
+  path: "/image",
+  request: {
+    body: {
+      content: {
+        "application/json": { schema: UploadItemImageSchema },
+      },
+    },
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: UploadItemImageResponseSchema,
+        },
+      },
+      description: "Actualiza un item específico por nombre y marca",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Usuario no autorizado",
+    },
+    500: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Error interno del servidor",
+    },
+  },
+});
+
+ItemApp.openapi(updateItemImageRoute, async c => {
+  const { contentType, fileName, width, height } = c.req.valid("json");
+  logger.info(
+    "POST /item/image - Update item image: contentType: %s fileName: %s width: %s height: %s",
+    contentType,
+    fileName,
+    width,
+    height
+  );
+  let res: SuccessSchemaType | ErrorSchemaType;
+
+  //verificar si el usuario es el propietario de la cancion
+  const user = c.get("user");
+  if (!user?.id) {
+    res = {
+      error: true,
+      details: "Usuario no autenticado",
+    };
+    return c.json(res, 401);
+  }
+  //verificar que el user sea una brand
+  const brandResult = await VerifyUserExists(user.email);
+  if (!brandResult.exists || brandResult.userType !== "brand") {
+    res = {
+      error: true,
+      details: "Usuario no autorizado",
+    };
+    return c.json(res, 401);
+  }
+
+  const newFile = await UploadImage(
+    "items-images",
+    fileName,
+    contentType,
+    width,
+    height
+  );
+
+  console.log("newFile", newFile.id);
+  return c.json(
+    { error: false, id: newFile.id, uploadUrl: newFile.uploadUrl as string },
+    200
+  );
+});
+
+// Endpoint para toggle like
+const toggleLikeRoute = createRoute({
+  method: "post",
+  path: "/{id}/toggle-like",
+  request: {
+    params: QueryIdSchema,
+    required: true,
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: SuccessSchema,
+        },
+      },
+      description: "Toggle like de un item",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Usuario no autenticado",
+    },
+    404: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Item no encontrado",
+    },
+  },
+});
+
+ItemApp.openapi(toggleLikeRoute, async c => {
+  const { id } = c.req.valid("param");
+  const user = c.get("user");
+  let res: SuccessSchemaType | ErrorSchemaType;
+  if (!user?.email) {
+    res = {
+      error: true,
+      details: "Usuario no autenticado",
+    };
+    return c.json(res, 401);
+  }
+
+  res = await toggleLike(user.email, id);
+  if (res.error) {
+    return c.json(res, 404);
+  }
+  return c.json(res, 200);
+});
+
+// Endpoint para toggle favorite
+const toggleFavoriteRoute = createRoute({
+  method: "post",
+  path: "/{id}/toggle-favorite",
+  request: {
+    params: QueryIdSchema,
+    required: true,
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: SuccessSchema,
+        },
+      },
+      description: "Toggle favorite de un item",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Usuario no autenticado",
+    },
+    404: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Item no encontrado",
+    },
+  },
+});
+
+ItemApp.openapi(toggleFavoriteRoute, async c => {
+  const { id } = c.req.valid("param");
+  const user = c.get("user");
+  let res: SuccessSchemaType | ErrorSchemaType;
+
+  if (!user?.email) {
+    res = {
+      error: true,
+      details: "Usuario no autenticado",
+    };
+    return c.json(res, 401);
+  }
+  res = await toggleFavorite(user.email, id);
+  if (res.error) {
+    return c.json(res, 404);
+  }
+  return c.json(res, 200);
+});
+
+// Endpoint para verificar si un item está liked
+const checkLikeRoute = createRoute({
+  method: "get",
+  path: "/{id}/check-like",
+  request: {
+    params: QueryIdSchema,
+    required: true,
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: CheckLikeFavoriteResponseSchema,
+        },
+      },
+      description: "Verifica si un item está liked",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Usuario no autenticado",
+    },
+    404: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Item no encontrado",
+    },
+  },
+});
+
+ItemApp.openapi(checkLikeRoute, async c => {
+  const { id } = c.req.valid("param");
+  const user = c.get("user");
+  let res: CheckLikeFavoriteResponseSchemaType | ErrorSchemaType;
+
+  if (!user?.email) {
+    res = {
+      error: true,
+      details: "Usuario no autenticado",
+    };
+    return c.json(res, 401);
+  }
+  res = await checkIfLiked(user.email, id);
+  if (res.error) {
+    return c.json(res, 404);
+  }
+  return c.json(res, 200);
+});
+
+// Endpoint para verificar si un item está favorited
+const checkFavoriteRoute = createRoute({
+  method: "get",
+  path: "/{id}/check-favorite",
+  request: {
+    params: QueryIdSchema,
+    required: true,
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: CheckLikeFavoriteResponseSchema,
+        },
+      },
+      description: "Verifica si un item está favorited",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "No autorizado",
+    },
+    404: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Item no encontrado",
+    },
+  },
+});
+
+ItemApp.openapi(checkFavoriteRoute, async c => {
+  const { id } = c.req.valid("param");
+  const user = c.get("user");
+  let res: CheckLikeFavoriteResponseSchemaType | ErrorSchemaType;
+
+  if (!user?.email) {
+    res = {
+      error: true,
+      details: "Usuario no autenticado",
+    };
+    return c.json(res, 401);
+  }
+  res = await checkIfFavorited(user.email, id);
+  if (res.error) {
+    return c.json(res, 404);
+  }
+  return c.json(res, 200);
+});
+
+// /item get embedding endpoint
+const itemEmbeddingRoute = createRoute({
+  method: "get",
+  path: "/{id}/embedding",
+  request: {
+    params: QueryIdSchema,
+    required: true,
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: EmbbedingResponseSchema,
+        },
+      },
+      description:
+        "Devuelve items que coinciden con la búsqueda de texto usando embeddings vectoriales",
+    },
+    500: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Error interno del servidor o en la búsqueda",
+    },
+  },
+});
+
+ItemApp.openapi(itemEmbeddingRoute, async c => {
+  const { id } = c.req.valid("param");
+  logger.info("GET /search/embedding/image - query: %s", id);
+
+  const result = await GetEmbeddingItem(id);
+
+  if (result.error) {
+    return c.json(result, 500);
+  }
+
+  const successResponse: EmbbedingResponseSchemaType = {
+    error: false,
+    embedding: result.embedding,
+  };
+
+  return c.json(successResponse, 200);
+});

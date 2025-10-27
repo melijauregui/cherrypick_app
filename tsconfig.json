@@ -6,13 +6,15 @@
       "@/*": [
         "./*"
       ]
-    }
+    },
+    "noUncheckedIndexedAccess": true
   },
   "include": [
     "**/*.ts",
     "**/*.tsx",
+    "nativewind-env.d.ts",
+    ".eslintrc.json",
     ".expo/types/**/*.ts",
-    "expo-env.d.ts",
-    "nativewind-env.d.ts"
+    "expo-env.d.ts"
   ]
 }
