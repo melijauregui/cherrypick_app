@@ -46,11 +46,30 @@ const ImageGallery = ({
   const { user } = useSession();
   const lastTriggeredHeightRef = useRef(0);
   const queryClient = useQueryClient();
-  const { data, fetchNextPage, refetch } = useInfiniteGetItems(
+  const {
+    data,
+    fetchNextPage,
+    refetch,
+    isLoading,
+    isFetching,
+    isPending,
+    isLoadingError,
+    isRefetching,
+    isError,
+  } = useInfiniteGetItems(
     queryKey,
     pageParam => getClothingItems(pageParam, limit),
     item =>
       prefetchItemDetail(queryClient, item, user?.email ?? "", item.brandId)
+  );
+
+  console.log(
+    "isLoading",
+    isLoading,
+    "isFetching",
+    isFetching,
+    "data",
+    data?.pages.flat().length
   );
 
   const serializedQueryKey = JSON.stringify(queryKey);
@@ -114,45 +133,49 @@ const ImageGallery = ({
   const itemQuantity = data?.pages.flat().length;
   const resto =
     (width - (width / columnCount - 6) * columnCount) / (columnCount - 1);
-  const content = !data ? (
-    <LoadingPage alreadyPrefetched={true} />
-  ) : itemQuantity === 0 ? (
-    itemWhenNothingFound?.()
-  ) : (
-    <>
-      <View
-        className={`flex-row ${itemQuantity < columnCount ? `justify-start ` : "justify-between"
+  const content =
+    isLoading || isFetching ? (
+      <LoadingPage alreadyPrefetched={true} />
+    ) : itemQuantity === 0 ? (
+      itemWhenNothingFound?.()
+    ) : (
+      <>
+        <View
+          className={`flex-row ${
+            itemQuantity && itemQuantity < columnCount
+              ? `justify-start `
+              : "justify-between"
           }`}
-        style={{
-          gap: itemQuantity < columnCount ? resto : 0,
-        }}
-      >
-        {organizedColumns.map((items, columnIndex) => (
-          <View key={columnIndex}>
-            {items?.map((item, i) => {
-              return item ? (
-                <ClothingItemComponent
-                  key={item.uuid}
-                  i={i * columnCount + columnIndex}
-                  item={item as ItemSchemaType}
-                  numColumns={columnCount}
-                  renderedHeight={item.renderedHeight}
-                  renderedWidth={item.renderedWidth}
-                />
-              ) : (
-                <ItemPlaceholder
-                  key={i}
-                  width={width / columnCount - 10}
-                  height={280}
-                  marginTop={i < columnCount ? 0 : 18}
-                />
-              );
-            })}
-          </View>
-        ))}
-      </View>
-    </>
-  );
+          style={{
+            gap: itemQuantity && itemQuantity < columnCount ? resto : 0,
+          }}
+        >
+          {organizedColumns.map((items, columnIndex) => (
+            <View key={columnIndex}>
+              {items?.map((item, i) => {
+                return item ? (
+                  <ClothingItemComponent
+                    key={item.uuid}
+                    i={i * columnCount + columnIndex}
+                    item={item as ItemSchemaType}
+                    numColumns={columnCount}
+                    renderedHeight={item.renderedHeight}
+                    renderedWidth={item.renderedWidth}
+                  />
+                ) : (
+                  <ItemPlaceholder
+                    key={i}
+                    width={width / columnCount - 10}
+                    height={280}
+                    marginTop={i < columnCount ? 0 : 18}
+                  />
+                );
+              })}
+            </View>
+          ))}
+        </View>
+      </>
+    );
 
   return (
     <ScrollView
@@ -198,7 +221,7 @@ function useInfiniteGetItems(
   queryKey: any[],
   getClothingItems: (pageParam: number) => Promise<ItemSchemaType[]>,
   prefetchItemDetail: (item: ItemSchemaType) => Promise<void>
-): { data: any; fetchNextPage: any; refetch: any } {
+) {
   return useInfiniteQuery({
     queryKey: queryKey,
     queryFn: async ({ pageParam }) => {

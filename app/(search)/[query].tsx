@@ -7,8 +7,6 @@ import PageExplore, {
 
 const SearchResults = () => {
   const { query, minPrice, maxPrice, brands } = useLocalSearchParams();
-
-  console.log("brands SEARCH QUERY", brands);
   return (
     <SafeAreaProvider>
       <PageExplore>

@@ -432,6 +432,7 @@ export const getClothingItemsTextSearch = async (
     CatalogResponseSchema,
     "getClothingItemsTextSearch"
   );
+  console.log("getClothingItemsTextSearch!!!!", res?.items?.length);
   return res?.items || [];
 };
 

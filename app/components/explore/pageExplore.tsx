@@ -11,7 +11,11 @@ import {
 import { router, useRouter } from "expo-router";
 import { Entypo, Ionicons } from "@expo/vector-icons";
 import List2 from "@/app/components/List2";
-import { getBrandsByIds, getClothingItemsTextSearch } from "@/utils/fetch";
+import {
+  getBrandsByIds,
+  getClothingItemsTextSearch,
+  getEmbedding,
+} from "@/utils/fetch";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import LoadingPage from "../LoadingPage";
 import {
@@ -23,12 +27,12 @@ import {
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
-import { useFetchEmbedding } from "@/utils/use-query";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import FilterSearchBottomSheet from "./filterSearch";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { prefetchInspirationItems } from "@/utils/prefetchs";
 import { useSession } from "@/lib/auth-client";
+import ErrorPage from "@/app/(auth)/error";
 
 export default function PageExplore({
   children,
@@ -65,10 +69,6 @@ export function PageExploreStandard({ query }: { query: string }) {
 
   //prefetch inspiration items
   useEffect(() => {
-    console.log(
-      "prefetching inspiration items for user: ",
-      session.user?.email
-    );
     prefetchInspirationItems(queryClient, session.user?.email || "");
   }, []);
 
@@ -85,8 +85,8 @@ export function PageExploreStandard({ query }: { query: string }) {
         ...(maxPrice ? { maxPrice } : {}),
         ...(brandsSelected.size > 0
           ? {
-            brands: Array.from(brandsSelected.keys()).join(";"),
-          }
+              brands: Array.from(brandsSelected.keys()).join(";"),
+            }
           : {}),
       },
     });
@@ -165,17 +165,26 @@ export const PageExploreQuery = ({
 }) => {
   const router = useRouter();
   const [searchText, setSearchText] = useState((query as string) || "");
-  const embeddingData = useFetchEmbedding("text", query);
   const [isFilterSearchModalOpen, setIsFilterSearchModalOpen] = useState(false);
   const [minPrice, setMinPrice] = useState<string | undefined>(initialMinPrice);
   const [maxPrice, setMaxPrice] = useState<string | undefined>(initialMaxPrice);
   // Extraer los IDs de brands del CSV inicial
   const initialBrandIds = initialBrands
     ? initialBrands
-      .split(";")
-      .map(s => s.trim())
-      .filter((id): id is string => Boolean(id))
+        .split(";")
+        .map(s => s.trim())
+        .filter((id): id is string => Boolean(id))
     : [];
+
+  const {
+    data: embeddingData,
+    isLoading: isLoadingEmbedding,
+    error: isErrorEmbedding,
+  } = useQuery({
+    queryKey: ["embedding", "text", query],
+    queryFn: () => getEmbedding("text", query),
+    staleTime: 60 * 60 * 1000,
+  });
 
   // Obtener las brands usando el hook
   const {
@@ -185,7 +194,7 @@ export const PageExploreQuery = ({
   } = useQuery({
     queryKey: ["brands-by-ids", initialBrandIds],
     queryFn: () => getBrandsByIds(initialBrandIds),
-    staleTime: 5 * 60 * 1000,
+    staleTime: 60 * 60 * 1000,
     enabled: initialBrandIds.length > 0, // Solo ejecutar si hay IDs
   });
 
@@ -211,8 +220,6 @@ export const PageExploreQuery = ({
 
     return initial;
   });
-
-  console.log("brandsSelected PAGE EXPLORE QUERY", brandsSelected);
 
   // Actualizar el estado cuando lleguen los datos de las brands
   useEffect(() => {
@@ -249,13 +256,17 @@ export const PageExploreQuery = ({
         ...(maxPrice ? { maxPrice } : {}),
         ...(brandsSelected.size > 0
           ? {
-            brands: Array.from(brandsSelected.keys()).join(";"),
-          }
+              brands: Array.from(brandsSelected.keys()).join(";"),
+            }
           : {}),
       },
     });
     onChangeTextSearch(query as string);
   };
+
+  if (isErrorEmbedding || error) {
+    return <ErrorPage />;
+  }
 
   return (
     <>
@@ -277,39 +288,43 @@ export const PageExploreQuery = ({
           brandsSelected={brandsSelected}
         />
       </View>
-      <List2
-        queryKey={[
-          "search-results",
-          query,
-          embeddingData?.embedding?.length || 0,
-          minPrice,
-          maxPrice,
-          brandsSelected.size > 0
-            ? Array.from(brandsSelected.keys())
-            : undefined,
-        ]}
-        getClothingItems={(page, limit) =>
-          getClothingItemsTextSearch(
-            page,
-            limit,
-            embeddingData?.embedding || [],
-            minPrice ? parseFloat(minPrice) : undefined,
-            maxPrice ? parseFloat(maxPrice) : undefined,
+      {isLoadingEmbedding || isLoading ? (
+        <LoadingPage alreadyPrefetched={true} />
+      ) : (
+        <List2
+          queryKey={[
+            "search-results",
+            query,
+            embeddingData?.length || 0,
+            minPrice,
+            maxPrice,
             brandsSelected.size > 0
               ? Array.from(brandsSelected.keys())
-              : undefined
-          )
-        }
-        limit={10}
-        columnCount={2}
-        itemWhenNothingFound={() => (
-          <View className="flex-1 items-center justify-center py-10">
-            <Text className="text-gray-400 text-base">
-              No hay ítems que coincidan con tu búsqueda
-            </Text>
-          </View>
-        )}
-      />
+              : undefined,
+          ]}
+          getClothingItems={(page, limit) =>
+            getClothingItemsTextSearch(
+              page,
+              limit,
+              embeddingData || [],
+              minPrice ? parseFloat(minPrice) : undefined,
+              maxPrice ? parseFloat(maxPrice) : undefined,
+              brandsSelected.size > 0
+                ? Array.from(brandsSelected.keys())
+                : undefined
+            )
+          }
+          limit={10}
+          columnCount={2}
+          itemWhenNothingFound={() => (
+            <View className="flex-1 items-center justify-center py-10">
+              <Text className="text-gray-400 text-base">
+                No hay ítems que coincidan con tu búsqueda
+              </Text>
+            </View>
+          )}
+        />
+      )}
       <FilterSearchBottomSheet
         isModalOpen={isFilterSearchModalOpen}
         setIsModalOpen={setIsFilterSearchModalOpen}
@@ -379,8 +394,6 @@ function SearchInput({
   brandsSelected: Map<string, IdNameImageSchemaType>;
   opacity?: boolean;
 }) {
-  console.log("brandsSelected SEARCH INPUT", brandsSelected);
-
   const router = useRouter();
   return (
     <View
@@ -458,23 +471,33 @@ const FashionIdeasSection = ({ query }: { query: string }) => {
 };
 
 const GridImages = ({ query }: { query: string }) => {
-  const embeddingData = useFetchEmbedding("text", query);
-  const { data } = useQuery({
-    queryKey: [
-      "explore-items",
-      query,
-      String(embeddingData?.embedding?.length || 0),
-    ],
-    queryFn: () =>
-      getClothingItemsTextSearch(0, 4, embeddingData?.embedding || []),
-    staleTime: 5 * 60 * 1000,
+  const {
+    data: embeddingData,
+    isLoading: isLoadingEmbedding,
+    error: isErrorEmbedding,
+  } = useQuery({
+    queryKey: ["embedding", "text", query],
+    queryFn: () => getEmbedding("text", query),
+    staleTime: 60 * 60 * 1000,
   });
-  if (!data || data.length === 0) {
+  const {
+    data,
+    isLoading: isLoadingItems,
+    error: isErrorItems,
+  } = useQuery({
+    queryKey: ["explore-items", query, String(embeddingData?.length || 0)],
+    queryFn: () => getClothingItemsTextSearch(0, 4, embeddingData || []),
+    staleTime: 60 * 60 * 1000,
+  });
+  if (isLoadingEmbedding || isLoadingItems) {
     return <LoadingPage alreadyPrefetched={true} />;
+  }
+  if (isErrorEmbedding || isErrorItems) {
+    return <ErrorPage />;
   }
   return (
     <View className="flex-row px-1 gap-0.5">
-      {data.map((item: ItemSchemaType, index: number) => (
+      {data?.map((item: ItemSchemaType, index: number) => (
         <View key={item.uuid || index} className="flex-1">
           <Image
             source={{ uri: item.image.url }}

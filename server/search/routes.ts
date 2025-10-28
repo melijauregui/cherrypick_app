@@ -302,6 +302,7 @@ SearchApp.openapi(textEmbeddingRoute, async c => {
     embedding: result.embedding,
   };
 
+  logger.info("successResponse!! YES %s", query);
   return c.json(successResponse, 200);
 });
 
