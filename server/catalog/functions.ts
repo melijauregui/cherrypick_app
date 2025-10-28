@@ -1,9 +1,18 @@
-import { CatalogResponseSchemaType, ItemSchema, ItemSchemaType } from "@/schemas/catalog/catalog-schema";
+import {
+  CatalogResponseSchemaType,
+  ItemSchema,
+  ItemSchemaType,
+} from "@/schemas/catalog/catalog-schema";
 import weaviate, { Collection } from "weaviate-client";
 import { config } from "../../config";
 import logger from "../logger";
 import { prisma } from "../db";
 import { ErrorSchemaType } from "@/schemas/standar-response-schema";
+
+const INFERENCE_URL =
+  config.ENVIRONMENT === "production"
+    ? process.env.INFERENCE_URL
+    : `http://127.0.0.1:8000`;
 
 //funcion para obtener items de PostgreSQL
 export async function GetCatalog(
@@ -66,16 +75,13 @@ export async function extractImageFeatures(
   imageUrl: string
 ): Promise<{ error: boolean; details: string; features: number[] }> {
   try {
-    const response = await fetch(
-      "http://127.0.0.1:8000/extract-image-features/",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ image_url: imageUrl }),
-      }
-    );
+    const response = await fetch(`${INFERENCE_URL}/extract-image-features/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ image_url: imageUrl }),
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP error. status: ${response.status}`);
@@ -108,16 +114,13 @@ export async function extractImageFeaturesFromBase64(
   imageBase64: string
 ): Promise<{ error: boolean; details: string; features: number[] }> {
   try {
-    const response = await fetch(
-      "http://127.0.0.1:8000/extract-image-features/",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ image_base64: imageBase64 }),
-      }
-    );
+    const response = await fetch(`${INFERENCE_URL}/extract-image-features/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ image_base64: imageBase64 }),
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP error. status: ${response.status}`);
@@ -153,16 +156,13 @@ export async function extractTextFeatures(
   text: string
 ): Promise<{ error: boolean; details: string; features: number[] }> {
   try {
-    const response = await fetch(
-      "http://127.0.0.1:8000/extract-text-features/",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ text }),
-      }
-    );
+    const response = await fetch(`${INFERENCE_URL}/extract-text-features/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ text }),
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP error. status: ${response.status}`);
@@ -196,7 +196,7 @@ export async function extractFeatures(
   imageUrl: string
 ): Promise<{ error: boolean; details: string; features: FeaturesResult }> {
   try {
-    const response = await fetch("http://127.0.0.1:8000/extract-features/", {
+    const response = await fetch(`${INFERENCE_URL}/extract-features/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -240,16 +240,13 @@ export async function getPreferencesSimilarities(image_url: string): Promise<{
   similarities: PreferencesSimilaritiesResult[];
 }> {
   try {
-    const response = await fetch(
-      "http://127.0.0.1:8000/similarities-preferences/",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ preferences: preferencesRepr, image_url }),
-      }
-    );
+    const response = await fetch(`${INFERENCE_URL}/similarities-preferences/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ preferences: preferencesRepr, image_url }),
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP error. status: ${response.status}`);
@@ -277,7 +274,7 @@ export async function searchText(
   image_urls: string[]
 ): Promise<{ error: boolean; details: string; results: string[] }> {
   try {
-    const response = await fetch("http://127.0.0.1:8000/search-text/", {
+    const response = await fetch(`${INFERENCE_URL}/search-text/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -310,13 +307,13 @@ export async function searchText(
 // Función para verificar si ya existe un elemento con el mismo nombre y brand en Weaviate
 export async function getCollection(): Promise<
   | {
-    error: true;
-    details: string;
-  }
+      error: true;
+      details: string;
+    }
   | {
-    error: false;
-    collection: Collection;
-  }
+      error: false;
+      collection: Collection;
+    }
 > {
   try {
     const client = await weaviate.connectToWeaviateCloud(config.WEAVIATE_URL, {
