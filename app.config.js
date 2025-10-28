@@ -92,6 +92,8 @@ export default ({ config }) => ({
       },
       LOCAL_IP: process.env.LOCAL_IP || "localhost",
       BETTER_AUTH_URL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
+      PROD_BACKEND: process.env.PROD_BACKEND || "",
+      ENVIRONMENT: process.env.ENVIRONMENT || "development",
       eas: {
         projectId: "e0d221a6-6b38-4601-8549-ca222a510406",
       },
