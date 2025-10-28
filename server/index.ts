@@ -1,8 +1,8 @@
 import { serve } from "@hono/node-server";
 import app from "./app";
 import { config } from "../config";
-const PORT = config.PORT ?? 3000;
-const HOSTNAME = config.HOSTNAME ?? "0.0.0.0";
+const PORT = process.env.PORT || config.PORT || 3000; // 👈 toma el puerto de Railway si existe
+const HOSTNAME = "0.0.0.0";
 
 serve({
   fetch: app.fetch,

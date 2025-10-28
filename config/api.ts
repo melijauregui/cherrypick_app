@@ -7,4 +7,6 @@ const PROD_BACKEND = Constants.expoConfig?.extra?.PROD_BACKEND ?? "";
 const ENVIRONMENT = Constants.expoConfig?.extra?.ENVIRONMENT ?? "development";
 
 export const BASE_URL =
-  ENVIRONMENT === "production" ? PROD_BACKEND : `http://${LOCAL_IP}:3000`;
+  ENVIRONMENT === "production"
+    ? `https://${PROD_BACKEND}`
+    : `http://${LOCAL_IP}:3000`;
