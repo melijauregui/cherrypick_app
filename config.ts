@@ -17,8 +17,6 @@ const {
   R2_ACCOUNT_ID,
   R2_ACCESS_KEY_ID,
   R2_SECRET_ACCESS_KEY,
-  PROD_BACKEND,
-  LOCAL_IP,
 } = process.env;
 const REQUIRED_VARS = {
   GOOGLE_CLIENT_ID,
@@ -36,8 +34,6 @@ const REQUIRED_VARS = {
   R2_ACCOUNT_ID,
   R2_ACCESS_KEY_ID,
   R2_SECRET_ACCESS_KEY,
-  PROD_BACKEND,
-  LOCAL_IP,
 };
 
 // Check if any required variable is missing
@@ -69,6 +65,4 @@ export const config = {
   R2_ACCOUNT_ID: R2_ACCOUNT_ID as string,
   R2_ACCESS_KEY_ID: R2_ACCESS_KEY_ID as string,
   R2_SECRET_ACCESS_KEY: R2_SECRET_ACCESS_KEY as string,
-  PROD_BACKEND: PROD_BACKEND as string,
-  LOCAL_IP: LOCAL_IP as string,
 };
