@@ -11,7 +11,7 @@ import { ErrorSchemaType } from "@/schemas/standar-response-schema";
 
 const INFERENCE_URL =
   config.ENVIRONMENT === "production"
-    ? process.env.INFERENCE_URL
+    ? `http://${process.env.INFERENCE_URL}`
     : `http://127.0.0.1:8000`;
 
 //funcion para obtener items de PostgreSQL
