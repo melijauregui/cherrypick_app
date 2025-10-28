@@ -13,9 +13,8 @@ import { BrandSchema, BrandSchemaType } from "@/schemas/brand/brand-schema";
 import z from "zod";
 import InputBoxWithName from "../components/profile/inputBox";
 import safeFetch from "../../utils/safe-fetch";
-import { SuccessSchema } from "@/schemas/standar-response-schema";
 import Toast from "react-native-toast-message";
-import { LOCAL_IP } from "@/config/api";
+import { BASE_URL } from "@/config/api";
 import { usePostItemImage } from "./item-insert";
 import ImageComplete from "../components/ImageComplete";
 import { imageDefault } from "@/lib/constants";
@@ -197,7 +196,7 @@ function useUpdateBrand(
       brandUpdated.url = brand.url;
 
       const { data } = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/brand`,
+        url: `${BASE_URL}/brand`,
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(brandUpdated),

@@ -11,8 +11,9 @@ import {
   SendEmailResetPassword,
 } from "@/server/formUser/functions";
 import { config } from "@/config";
+import { BETTER_AUTH_URL } from "@/config/api";
 
-console.log("BETTER_AUTH_URL", config.BETTER_AUTH_URL);
+// console.log("BETTER_AUTH_URL", config.BETTER_AUTH_URL);
 
 export const auth = betterAuth({
   plugins: [expo()],
@@ -61,9 +62,9 @@ export const auth = betterAuth({
   trustedOrigins: [
     "cherrypick://",
     "https://gibbon-amazing-neatly.ngrok-free.app",
-    config.BETTER_AUTH_URL,
+    BETTER_AUTH_URL,
   ],
-  baseURL: config.BETTER_AUTH_URL,
+  baseURL: BETTER_AUTH_URL,
   user: {
     additionalFields: {
       userType: {

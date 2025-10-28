@@ -11,7 +11,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSession } from "@/lib/auth-client";
 import safeFetch from "../../utils/safe-fetch";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
-import { LOCAL_IP } from "@/config/api";
+import { BASE_URL } from "@/config/api";
 import { IdNameImageSchemaType } from "@/schemas/catalog/catalog-schema";
 
 export default function DeleteItemsPage() {
@@ -105,7 +105,7 @@ function useDelete() {
   const mutation = useMutation({
     mutationFn: async (selected: Set<string>) => {
       const { data } = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/brand/delete-items`,
+        url: `${BASE_URL}/brand/delete-items`,
         method: "POST",
         headers: {
           "Content-Type": "application/json",

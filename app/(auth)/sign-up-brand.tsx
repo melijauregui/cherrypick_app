@@ -10,7 +10,7 @@ import React, { useState } from "react";
 import LogoCircle from "@/app/components/logo/LogoCircle";
 import safeFetch from "@/utils/safe-fetch";
 import { useRouter } from "expo-router";
-import { LOCAL_IP } from "../../config/api";
+import { BASE_URL } from "../../config/api";
 import { useMutation } from "@tanstack/react-query";
 import Toast from "react-native-toast-message";
 
@@ -132,7 +132,7 @@ function useCodeVerification(
       setEmailError(undefined);
       setLoading(true);
       const { data } = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/brand/form`,
+        url: `${BASE_URL}/brand/form`,
         method: "POST",
         headers: {
           "Content-Type": "application/json",

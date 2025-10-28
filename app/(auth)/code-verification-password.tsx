@@ -1,7 +1,7 @@
 import React from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import safeFetch from "@/utils/safe-fetch";
-import { LOCAL_IP } from "@/config/api";
+import { BASE_URL } from "@/config/api";
 import { useMutation } from "@tanstack/react-query";
 import Toast from "react-native-toast-message";
 import { getExpirationCodeResetPassword } from "../../utils/fetch";
@@ -61,7 +61,7 @@ export function useVerifyCode(email: string) {
   const mutation = useMutation({
     mutationFn: async ({ code }: { code: string }) => {
       const { data } = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/code-verification/verify-reset-password`,
+        url: `${BASE_URL}/code-verification/verify-reset-password`,
         method: "POST",
         body: JSON.stringify({ code, email }),
         headers: {

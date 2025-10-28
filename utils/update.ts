@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import safeFetch from "./safe-fetch";
-import { LOCAL_IP } from "@/config/api";
+import { BASE_URL } from "@/config/api";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { Keyboard } from "react-native";
@@ -23,7 +23,7 @@ export function useUpdateClient(email: string) {
       preferences: string[];
     }) => {
       const { data } = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/client`,
+        url: `${BASE_URL}/client`,
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -37,7 +37,7 @@ export function useUpdateClient(email: string) {
       }
       SuccessSchema.parse(data);
     },
-    onSuccess: () => { },
+    onSuccess: () => {},
     onError: error => {
       // TODO PUSH TOAST
       console.log(`could not update user:`, error);
@@ -59,7 +59,7 @@ export function useDeleteItem(itemUuid: string) {
   const mutation = useMutation({
     mutationFn: async () => {
       const response = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/brand/delete-items`,
+        url: `${BASE_URL}/brand/delete-items`,
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -96,7 +96,7 @@ export function useDeleteAccount(logout: () => Promise<void>) {
   const mutation = useMutation({
     mutationFn: async () => {
       const { data } = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/user`,
+        url: `${BASE_URL}/user`,
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

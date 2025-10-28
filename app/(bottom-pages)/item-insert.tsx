@@ -24,7 +24,7 @@ import { imageDefault } from "@/lib/constants";
 import ImagePickerButton from "../components/imagePicker";
 import InputBoxWithName from "../components/profile/inputBox";
 import safeFetch from "../../utils/safe-fetch";
-import { LOCAL_IP } from "@/config/api";
+import { BASE_URL } from "@/config/api";
 import Toast from "react-native-toast-message";
 import { sanitizeFilename } from "../../utils/sanitize-filename";
 import { FormErrors } from "./item-edit";
@@ -79,11 +79,11 @@ export default function InsertItemPage() {
   };
   const isFormValid = Boolean(
     formData.name &&
-    formData.price &&
-    formData.url &&
-    formData.image.url &&
-    formData.description &&
-    formData.price
+      formData.price &&
+      formData.url &&
+      formData.image.url &&
+      formData.description &&
+      formData.price
   );
   return (
     <StandardPageBottomSheet
@@ -260,7 +260,7 @@ function useInsertItem() {
       };
 
       const response = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/brand/insert-items`,
+        url: `${BASE_URL}/brand/insert-items`,
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -320,7 +320,7 @@ export function usePostItemImage() {
       });
 
       const responsePost = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/item/image`,
+        url: `${BASE_URL}/item/image`,
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -369,58 +369,3 @@ export function usePostItemImage() {
 
   return mutation;
 }
-
-// export function usePostItemImage() {
-//   const mutation = useMutation({
-//     mutationFn: async (data: { fileUrl: string; itemUuid: string }) => {
-//       const response = await fetch(data.fileUrl);
-//       const blob = await response.blob();
-
-//       const responsePost = await safeFetch({
-//         url: `http://${LOCAL_IP}:3000/item/${data.itemUuid}/image`,
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({ contentType: blob.type }),
-//       });
-//       const imageUploadUrl = responsePost.data;
-//       const { id: imageId, uploadUrl } =
-//         UploadItemImageResponseSchema.parse(imageUploadUrl);
-
-//       console.log("uploadUrl", uploadUrl);
-//       console.log("imageId", imageId);
-
-//       const res = await fetch(uploadUrl, {
-//         method: "PUT",
-//         headers: {
-//           "Content-Type": blob.type,
-//           "Cache-Control": "no-cache, no-store, must-revalidate",
-//           Pragma: "no-cache",
-//           Expires: "0",
-//         },
-//         body: blob,
-//       });
-//       if (!res.ok) {
-//         const txt = await res
-//           .text()
-//           .catch(e => (e instanceof Error ? e.message : "unknown error"));
-//         throw new Error(
-//           `Upload failed: ${res.status} ${res.statusText} ${txt}`
-//         );
-//       }
-//       console.log("POST SUCCESSFULLY");
-//       return imageId;
-//     },
-//     onError: (responseError, data) => {
-//       if (responseError instanceof Error) {
-//         console.error("ERROR UPLOADING ITEM IMAGE", responseError.message);
-//         Toast.show({
-//           type: "error",
-//           text1: `Error uploading item image`,
-//           visibilityTime: 6000,
-//         });
-//       }
-//     },
-//   });
-
-//   return mutation;
-// }

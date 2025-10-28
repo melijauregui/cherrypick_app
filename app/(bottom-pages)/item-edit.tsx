@@ -13,7 +13,7 @@ import StandardPageBottomSheet, {
 import { useState } from "react";
 import { Keyboard } from "react-native";
 import safeFetch from "../../utils/safe-fetch";
-import { LOCAL_IP } from "@/config/api";
+import { BASE_URL } from "@/config/api";
 import Toast from "react-native-toast-message";
 import {
   InsertItemImageIdSchema,
@@ -61,7 +61,13 @@ export default function EditItemPage() {
 
 export type FormErrors = Partial<Record<keyof UpdateItemSchema, string>>;
 
-function EditItem({ item, brandEmail }: { item: UpdateItemSchema, brandEmail: string }) {
+function EditItem({
+  item,
+  brandEmail,
+}: {
+  item: UpdateItemSchema;
+  brandEmail: string;
+}) {
   const [formData, setFormData] = useState<InsertItemSchema>({
     ...item,
   });
@@ -98,16 +104,16 @@ function EditItem({ item, brandEmail }: { item: UpdateItemSchema, brandEmail: st
 
   const isFormValid = Boolean(
     formData.name &&
-    formData.price &&
-    formData.url &&
-    formData.image.url &&
-    formData.description &&
-    formData.price &&
-    (formData.name !== item.name ||
-      formData.description !== item.description ||
-      formData.price !== item.price ||
-      formData.url !== item.url ||
-      formData.image.url !== item.image.url)
+      formData.price &&
+      formData.url &&
+      formData.image.url &&
+      formData.description &&
+      formData.price &&
+      (formData.name !== item.name ||
+        formData.description !== item.description ||
+        formData.price !== item.price ||
+        formData.url !== item.url ||
+        formData.image.url !== item.image.url)
   );
 
   return (
@@ -164,7 +170,7 @@ function useUpdateItem(itemLastValue: UpdateItemSchema, brandEmail: string) {
       }
 
       const response = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/item/${itemLastValue.uuid}`,
+        url: `${BASE_URL}/item/${itemLastValue.uuid}`,
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(itemUpdated),

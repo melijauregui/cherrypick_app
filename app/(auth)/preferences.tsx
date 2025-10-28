@@ -20,7 +20,7 @@ import { UpdatePreferencesSchema } from "@/schemas/client/client-schema";
 import { SuccessSchema } from "@/schemas/standar-response-schema";
 import safeFetch from "../../utils/safe-fetch";
 import Toast from "react-native-toast-message";
-import { LOCAL_IP } from "@/config/api";
+import { BASE_URL } from "@/config/api";
 
 const Preferences = () => {
   const router = useRouter();
@@ -186,7 +186,7 @@ function useUpdatePreferences() {
       });
 
       const { data } = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/client/preferences`,
+        url: `${BASE_URL}/client/preferences`,
         headers: {
           "Content-Type": "application/json",
         },

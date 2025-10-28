@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import React from "react";
 import { useRouter } from "expo-router";
 import safeFetch from "@/utils/safe-fetch";
-import { LOCAL_IP } from "@/config/api";
+import { BASE_URL } from "@/config/api";
 import { useSession } from "@/lib/auth-client";
 import { useMutation } from "@tanstack/react-query";
 import Toast from "react-native-toast-message";
@@ -61,7 +61,7 @@ export function useVerifyCode() {
   const mutation = useMutation({
     mutationFn: async ({ code }: { code: string }) => {
       const { data } = await safeFetch({
-        url: `http://${LOCAL_IP}:3000/code-verification/verify`,
+        url: `${BASE_URL}/code-verification/verify`,
         method: "POST",
         body: JSON.stringify({ code }),
         headers: {

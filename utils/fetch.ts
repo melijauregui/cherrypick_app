@@ -1,5 +1,5 @@
 import safeFetch from "./safe-fetch";
-import { LOCAL_IP } from "@/config/api";
+import { BASE_URL } from "@/config/api";
 import * as FileSystem from "expo-file-system";
 import {
   CatalogResponseSchema,
@@ -101,7 +101,7 @@ export async function checkIsMyItem(
   const res = await handleApiResponse<{ isMyItem: boolean }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/item/${uuidItem}/is-mine`,
+        url: `${BASE_URL}/item/${uuidItem}/is-mine`,
         method: "GET",
       }),
     IsMyItemSchema,
@@ -122,7 +122,7 @@ export async function getBrandProfile(
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/brand/${brandId}`,
+        url: `${BASE_URL}/brand/${brandId}`,
         method: "GET",
       }),
     BrandSchemaPropertiesResponse,
@@ -146,7 +146,7 @@ export async function getBrandItems(
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/brand/${brandId}/all-items?page=${page}&limit=${limit}`,
+        url: `${BASE_URL}/brand/${brandId}/all-items?page=${page}&limit=${limit}`,
         method: "GET",
       }),
     CatalogResponseSchema,
@@ -162,7 +162,7 @@ export async function getSelfBrandProfile(): Promise<BrandSchemaType | null> {
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/brand`,
+        url: `${BASE_URL}/brand`,
         method: "GET",
       }),
     BrandSchemaResponse,
@@ -183,7 +183,7 @@ export async function getBrandsByIds(
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/brand/some`,
+        url: `${BASE_URL}/brand/some`,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -203,7 +203,7 @@ export async function getSelfClientProfile(): Promise<ClientSchemaType | null> {
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/client`,
+        url: `${BASE_URL}/client`,
         method: "GET",
       }),
     ClientSchemaResponse,
@@ -223,7 +223,7 @@ export async function getSelfBrandItems(
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/brand/all-items?page=${page}&limit=${limit}${search ? `&filter=${search}` : ""}`,
+        url: `${BASE_URL}/brand/all-items?page=${page}&limit=${limit}${search ? `&filter=${search}` : ""}`,
         method: "GET",
       }),
     CatalogResponseSchema,
@@ -238,7 +238,7 @@ export async function getSelfBrandInspoItems(): Promise<QueryIdSchemaType[]> {
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/brand/inspo-items`,
+        url: `${BASE_URL}/brand/inspo-items`,
         method: "GET",
       }),
     UuidItemsSchemaResponse,
@@ -257,7 +257,7 @@ export async function getClothingItemsHome(
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/feed?page=${page}&limit=${limit}`,
+        url: `${BASE_URL}/feed?page=${page}&limit=${limit}`,
         method: "GET",
       }),
     CatalogResponseSchema,
@@ -276,7 +276,7 @@ export const getAllBrands = async (
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/search/all-brands?filter=${search}&page=${page}&limit=${limit}`,
+        url: `${BASE_URL}/search/all-brands?filter=${search}&page=${page}&limit=${limit}`,
         method: "GET",
       }),
     IdNameImageResponseSchema,
@@ -292,7 +292,7 @@ export async function getItem(itemUuid: string): Promise<{
   return handleApiResponse<{ item: ItemSchemaType }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/item/${itemUuid}`,
+        url: `${BASE_URL}/item/${itemUuid}`,
         method: "GET",
       }),
     ItemResponseSchema,
@@ -308,7 +308,7 @@ const toggleLikeFavorite = async (
   const res = await handleApiResponse<SuccessSchemaType>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/item/${itemUuid}/toggle-${action}`,
+        url: `${BASE_URL}/item/${itemUuid}/toggle-${action}`,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -329,7 +329,7 @@ const checkLikeFavorite = async (
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/item/${itemUuid}/check-${action}`,
+        url: `${BASE_URL}/item/${itemUuid}/check-${action}`,
         method: "GET",
       }),
     CheckLikeFavoriteResponseSchema,
@@ -372,7 +372,7 @@ export const getAllLikedItems = async (
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/user/all-liked?page=${page}&limit=${limit}`,
+        url: `${BASE_URL}/user/all-liked?page=${page}&limit=${limit}`,
         method: "GET",
       }),
     CatalogResponseSchema,
@@ -391,7 +391,7 @@ export const getAllFavoritedItems = async (
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/user/all-favorited?page=${page}&limit=${limit}`,
+        url: `${BASE_URL}/user/all-favorited?page=${page}&limit=${limit}`,
         method: "GET",
       }),
     CatalogResponseSchema,
@@ -417,7 +417,7 @@ export const getClothingItemsTextSearch = async (
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/search/text?page=${page}&limit=${limit}`,
+        url: `${BASE_URL}/search/text?page=${page}&limit=${limit}`,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -457,7 +457,7 @@ export const getClothingItemsSimilar = async (
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/search/image/url?page=${page}&limit=${limit}`,
+        url: `${BASE_URL}/search/image/url?page=${page}&limit=${limit}`,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -489,7 +489,7 @@ export async function getClothingItemsSimilarBase64(
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/search/image/base64?page=${page}&limit=${limit}`,
+        url: `${BASE_URL}/search/image/base64?page=${page}&limit=${limit}`,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -519,7 +519,7 @@ export async function getEmbedding(
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/search/embedding/${type}`,
+        url: `${BASE_URL}/search/embedding/${type}`,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -542,7 +542,7 @@ export async function getItemEmbedding(
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/item/${itemUuid}/embedding`,
+        url: `${BASE_URL}/item/${itemUuid}/embedding`,
         method: "GET",
       }),
     EmbbedingResponseSchema,
@@ -559,7 +559,7 @@ export async function getInspirationItems(
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/search/all-inspiration-items?category=${category}`,
+        url: `${BASE_URL}/search/all-inspiration-items?category=${category}`,
         method: "GET",
       }),
     CatalogResponseSchema,
@@ -574,7 +574,7 @@ export async function getExpirationCode(): Promise<Date | null> {
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/code-verification/expiration`,
+        url: `${BASE_URL}/code-verification/expiration`,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -595,7 +595,7 @@ export async function verifyCode(
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/code-verification/verify`,
+        url: `${BASE_URL}/code-verification/verify`,
         method: "POST",
         body: JSON.stringify({ code, email }),
         headers: {
@@ -616,7 +616,7 @@ export async function getExpirationCodeResetPassword(
   }>(
     () =>
       safeFetch({
-        url: `http://${LOCAL_IP}:3000/code-verification/expiration-reset-password`,
+        url: `${BASE_URL}/code-verification/expiration-reset-password`,
         method: "POST",
         body: JSON.stringify({ email: email }),
         headers: {
@@ -635,7 +635,7 @@ export async function verifyMailAvailability(
 ): Promise<VerifyUserExistsResponseSchemaType | ErrorSchemaType> {
   try {
     const { data } = await safeFetch({
-      url: `http://${LOCAL_IP}:3000/user/verify`,
+      url: `${BASE_URL}/user/verify`,
       method: "POST",
       headers: {
         "Content-Type": "application/json",
