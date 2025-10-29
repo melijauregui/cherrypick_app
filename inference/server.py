@@ -37,6 +37,22 @@ PROCESS_START_ISO = datetime.now(timezone.utc).isoformat()
 PID = os.getpid()
 MODEL_INSTANCE_UUID = str(uuid.uuid4())
 
+# Configure CPU threads for PyTorch based on environment (defaults tuned for 8 vCPU)
+try:
+    torch_threads = int(os.getenv("TORCH_NUM_THREADS", os.getenv("OMP_NUM_THREADS", "4")))
+    torch_interop = int(os.getenv("TORCH_INTEROP_THREADS", os.getenv("MKL_NUM_THREADS", "1")))
+    torch.set_num_threads(torch_threads)
+    torch.set_num_interop_threads(torch_interop)
+    print(
+        f"[startup] thread-config env: TORCH_NUM_THREADS={os.getenv('TORCH_NUM_THREADS')} TORCH_INTEROP_THREADS={os.getenv('TORCH_INTEROP_THREADS')} "
+        f"OMP_NUM_THREADS={os.getenv('OMP_NUM_THREADS')} MKL_NUM_THREADS={os.getenv('MKL_NUM_THREADS')}"
+    )
+    print(
+        f"[startup] thread-config effective: torch_num_threads={torch.get_num_threads()} torch_num_interop_threads={torch.get_num_interop_threads()}"
+    )
+except Exception as _e:
+    print(f"[startup] thread-config could not be set: {_e}")
+
 print(f"[startup] pid={PID} device={device} starting load: model={model_name} processor={pretrained_model_name}")
 model = AutoModel.from_pretrained(model_name, trust_remote_code=True).to(device)
 processor = AutoProcessor.from_pretrained(pretrained_model_name, trust_remote_code=True)
@@ -80,8 +96,22 @@ def _gc_info():
 
 mem_mb = _get_memory_info()
 gc_counts, gc_thresh = _gc_info()
-print(f"[startup] pid={PID} model_id={id(model)} model_uuid={MODEL_INSTANCE_UUID} rss_mb={mem_mb} gc_counts={gc_counts} gc_thresh={gc_thresh}")
+print(f"[startup] pid={PID} model_id={id(model)} model_uuid={MODEL_INSTANCE_UUID} rss_mb={mem_mb} gc_counts={gc_counts} gc_thresh={gc_thresh} torch_threads={torch.get_num_threads()} interop_threads={torch.get_num_interop_threads()}")
 print("[startup] Model and processor loaded successfully")
+
+# Warmup (optional): run a tiny text forward once to initialize kernels/caches
+try:
+    _warm_text = "warmup"
+    text_inputs = processor(text=[_warm_text], padding='max_length', return_tensors="pt").to(device)
+    with torch.inference_mode():
+        _ = model.get_text_features(
+            input_ids=text_inputs["input_ids"],
+            attention_mask=text_inputs["attention_mask"],
+            normalize=True,
+        )
+    print("[startup] warmup completed for text pathway")
+except Exception as _e:
+    print(f"[startup] warmup skipped due to: {_e}")
 
 
 @app.post("/extract-image-features/")
@@ -131,7 +161,7 @@ async def extract_text_features(request: dict):
         # tokenization time
         text_inputs = processor(text=[text], padding='max_length', return_tensors="pt").to(device)
         t1 = time.time()
-        with torch.no_grad():
+        with torch.inference_mode():
             X = model.get_text_features(
                 input_ids=text_inputs["input_ids"],
                 attention_mask=text_inputs["attention_mask"],
@@ -250,7 +280,7 @@ async def extract_features(request: dict):
         input_ids = processed["input_ids"]
         attention_mask = processed["attention_mask"]
 
-        with torch.no_grad():
+        with torch.inference_mode():
             image_features = model.get_image_features(
                 pixel_values=pixel_values, normalize=True)
             text_features = model.get_text_features(
@@ -300,7 +330,7 @@ async def similarities_matrix(request: dict):
         input_ids = processed["input_ids"]
         attention_mask = processed["attention_mask"]
 
-        with torch.no_grad():
+        with torch.inference_mode():
             image_features = model.get_image_features(
                 pixel_values=pixel_values, normalize=True)
             text_features = model.get_text_features(
@@ -356,7 +386,7 @@ async def similarities_preferences(request: dict):
         input_ids = processed["input_ids"]
         attention_mask = processed["attention_mask"]
 
-        with torch.no_grad():
+        with torch.inference_mode():
             image_features = model.get_image_features(
                 pixel_values=pixel_values, normalize=True)
             text_features = model.get_text_features(
