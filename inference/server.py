@@ -19,6 +19,11 @@ try:
 except Exception:
     psutil = None
 
+try:
+    import resource  # optional, RSS fallback on Unix
+except Exception:
+    resource = None
+
 
 app = FastAPI()
 #model_name = "Sofia-gb/cherrypick-sigLip11"
@@ -40,9 +45,24 @@ torch.manual_seed(42)
 
 def _get_memory_info():
     rss_mb = None
+    # Try psutil first
     if psutil is not None:
         try:
             rss_mb = psutil.Process(PID).memory_info().rss / (1024 * 1024)
+            return rss_mb
+        except Exception:
+            rss_mb = None
+    # Fallback to resource on Unix
+    if resource is not None:
+        try:
+            usage = resource.getrusage(resource.RUSAGE_SELF)
+            # ru_maxrss is KB on Linux, bytes on macOS. Assume KB if large.
+            ru = usage.ru_maxrss
+            if ru is not None:
+                if ru > 10_000:  # likely KB
+                    rss_mb = ru / 1024
+                else:  # likely bytes
+                    rss_mb = ru / (1024 * 1024)
         except Exception:
             rss_mb = None
     return rss_mb
@@ -107,11 +127,23 @@ async def extract_text_features(request: dict):
         print(f"[req:{req_uuid}] pid={PID} model_id={id(model)} model_uuid={MODEL_INSTANCE_UUID} rss_mb={mem_mb_before} gc_counts={gc_counts_before}")
         print("Obteniendo features de texto")
         text = request.get("text", "")
-        X = extract_feat_text(text)
+        t0 = time.time()
+        # tokenization time
+        text_inputs = processor(text=[text], padding='max_length', return_tensors="pt").to(device)
+        t1 = time.time()
+        with torch.no_grad():
+            X = model.get_text_features(
+                input_ids=text_inputs["input_ids"],
+                attention_mask=text_inputs["attention_mask"],
+                normalize=True,
+            )
+        t2 = time.time()
         processing_time = time.time() - start_time
         mem_mb_after = _get_memory_info()
         gc_counts_after, _ = _gc_info()
-        print(f"[req:{req_uuid}] Tiempo de procesamiento: {processing_time:.4f} segundos rss_mb_before={mem_mb_before} rss_mb_after={mem_mb_after} gc_counts_before={gc_counts_before} gc_counts_after={gc_counts_after}")
+        print(
+            f"[req:{req_uuid}] Tiempo de procesamiento: {processing_time:.4f} segundos tokeniz={t1-t0:.4f}s forward={t2-t1:.4f}s rss_mb_before={mem_mb_before} rss_mb_after={mem_mb_after} gc_counts_before={gc_counts_before} gc_counts_after={gc_counts_after}"
+        )
         return X[0].cpu().tolist()
 
     except Exception as e:
@@ -207,9 +239,10 @@ async def extract_features(request: dict):
             image_url = request.get("image_url", "")
         if "text" in request and request["text"]:
             text = request.get("text", "")
+        t0 = time.time()
         response = requests.get(image_url)
         img = Image.open(BytesIO(response.content)).convert("RGB")
-
+        t1 = time.time()
         processed = processor(
             text=[text], images=[img], padding='max_length', return_tensors="pt").to(device)
 
@@ -222,11 +255,14 @@ async def extract_features(request: dict):
                 pixel_values=pixel_values, normalize=True)
             text_features = model.get_text_features(
                 input_ids=input_ids, attention_mask=attention_mask, normalize=True)
+        t2 = time.time()
 
         processing_time = time.time() - start_time
         mem_mb_after = _get_memory_info()
         gc_counts_after, _ = _gc_info()
-        print(f"[req:{req_uuid}] Tiempo de procesamiento: {processing_time:.4f} segundos rss_mb_before={mem_mb_before} rss_mb_after={mem_mb_after} gc_counts_before={gc_counts_before} gc_counts_after={gc_counts_after}")
+        print(
+            f"[req:{req_uuid}] Tiempo de procesamiento: {processing_time:.4f} segundos net_img={t1-t0:.4f}s forward_both={t2-t1:.4f}s rss_mb_before={mem_mb_before} rss_mb_after={mem_mb_after} gc_counts_before={gc_counts_before} gc_counts_after={gc_counts_after}"
+        )
         return {
             "image_features": image_features[0].cpu().tolist(),
             "text_features": text_features[0].cpu().tolist()
@@ -251,11 +287,12 @@ async def similarities_matrix(request: dict):
         if "text" in request and request["text"]:
             text = request.get("text", "")
         images = []
+        t0 = time.time()
         for url in image_urls:
             response = requests.get(url)
             img = Image.open(BytesIO(response.content)).convert("RGB")
             images.append(img)
-
+        t1 = time.time()
         processed = processor(
             text=[text], images=images, padding='max_length', return_tensors="pt").to(device)
 
@@ -268,6 +305,7 @@ async def similarities_matrix(request: dict):
                 pixel_values=pixel_values, normalize=True)
             text_features = model.get_text_features(
                 input_ids=input_ids, attention_mask=attention_mask, normalize=True)
+        t2 = time.time()
 
         # Matriz de similitud: (n imágenes x 1 texto)
         similarity_scores = (image_features @
@@ -284,7 +322,9 @@ async def similarities_matrix(request: dict):
         processing_time = time.time() - start_time
         mem_mb_after = _get_memory_info()
         gc_counts_after, _ = _gc_info()
-        print(f"[req:{req_uuid}] Tiempo de procesamiento: {processing_time:.4f} segundos rss_mb_before={mem_mb_before} rss_mb_after={mem_mb_after} gc_counts_before={gc_counts_before} gc_counts_after={gc_counts_after}")
+        print(
+            f"[req:{req_uuid}] Tiempo de procesamiento: {processing_time:.4f} segundos net_imgs={t1-t0:.4f}s preprocess={t2-t1:.4f}s rss_mb_before={mem_mb_before} rss_mb_after={mem_mb_after} gc_counts_before={gc_counts_before} gc_counts_after={gc_counts_after}"
+        )
         return sorted_results
 
     except Exception as e:
@@ -305,8 +345,10 @@ async def similarities_preferences(request: dict):
             image_url = request.get("image_url", "")
         if "preferences" in request and request["preferences"]:
             preferences = request.get("preferences", "")
+        t0 = time.time()
         response = requests.get(image_url)
         img = Image.open(BytesIO(response.content)).convert("RGB")
+        t1 = time.time()
         processed = processor(
             text=preferences, images=[img], padding='max_length', return_tensors="pt").to(device)
 
@@ -319,6 +361,7 @@ async def similarities_preferences(request: dict):
                 pixel_values=pixel_values, normalize=True)
             text_features = model.get_text_features(
                 input_ids=input_ids, attention_mask=attention_mask, normalize=True)
+        t2 = time.time()
 
         similarity_scores = (image_features @
                              text_features.T).squeeze(0)
@@ -333,7 +376,9 @@ async def similarities_preferences(request: dict):
         processing_time = time.time() - start_time
         mem_mb_after = _get_memory_info()
         gc_counts_after, _ = _gc_info()
-        print(f"[req:{req_uuid}] Tiempo de procesamiento: {processing_time:.4f} segundos rss_mb_before={mem_mb_before} rss_mb_after={mem_mb_after} gc_counts_before={gc_counts_before} gc_counts_after={gc_counts_after}")
+        print(
+            f"[req:{req_uuid}] Tiempo de procesamiento: {processing_time:.4f} segundos net_img={t1-t0:.4f}s preprocess+forward={t2-t1:.4f}s rss_mb_before={mem_mb_before} rss_mb_after={mem_mb_after} gc_counts_before={gc_counts_before} gc_counts_after={gc_counts_after}"
+        )
         return {"error": False, "details": "Similarities computed successfully", "similarities": result}
 
     except Exception as e:
@@ -357,6 +402,12 @@ async def debug_model_info():
             }
     except Exception:
         torch_mem = {}
+    threads_info = {
+        "torch_num_threads": torch.get_num_threads(),
+        "torch_num_interop_threads": torch.get_num_interop_threads(),
+        "omp_num_threads_env": os.getenv("OMP_NUM_THREADS"),
+        "mkl_num_threads_env": os.getenv("MKL_NUM_THREADS"),
+    }
     return {
         "pid": PID,
         "process_start_iso": PROCESS_START_ISO,
@@ -368,4 +419,5 @@ async def debug_model_info():
         "gc_counts": gc_counts,
         "gc_threshold": gc_thresh,
         "torch_memory": torch_mem,
+        "threads": threads_info,
     }
