@@ -9,6 +9,15 @@ import requests
 from pydantic import BaseModel
 import numpy as np
 import time
+import os
+import gc
+import uuid
+from datetime import datetime, timezone
+
+try:
+    import psutil  # optional, for RSS memory
+except Exception:
+    psutil = None
 
 
 app = FastAPI()
@@ -17,21 +26,52 @@ model_name="Cherrypick-group/sigLip"
 pretrained_model_name = "Marqo/marqo-fashionSigLIP"
 device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 
-# Load model and processor once at startup
-print(f"Loading model {model_name} and processor...")
-model = AutoModel.from_pretrained(
-    model_name, trust_remote_code=True).to(device)
-processor = AutoProcessor.from_pretrained(
-    pretrained_model_name, trust_remote_code=True)
+# Load model and processor once at import/startup
+PROCESS_START_TIME = time.time()
+PROCESS_START_ISO = datetime.now(timezone.utc).isoformat()
+PID = os.getpid()
+MODEL_INSTANCE_UUID = str(uuid.uuid4())
+
+print(f"[startup] pid={PID} device={device} starting load: model={model_name} processor={pretrained_model_name}")
+model = AutoModel.from_pretrained(model_name, trust_remote_code=True).to(device)
+processor = AutoProcessor.from_pretrained(pretrained_model_name, trust_remote_code=True)
 model.eval()
 torch.manual_seed(42)
-print("Model and processor loaded successfully!")
+
+def _get_memory_info():
+    rss_mb = None
+    if psutil is not None:
+        try:
+            rss_mb = psutil.Process(PID).memory_info().rss / (1024 * 1024)
+        except Exception:
+            rss_mb = None
+    return rss_mb
+
+def _gc_info():
+    try:
+        counts = gc.get_count()
+    except Exception:
+        counts = None
+    try:
+        thresh = gc.get_threshold()
+    except Exception:
+        thresh = None
+    return counts, thresh
+
+mem_mb = _get_memory_info()
+gc_counts, gc_thresh = _gc_info()
+print(f"[startup] pid={PID} model_id={id(model)} model_uuid={MODEL_INSTANCE_UUID} rss_mb={mem_mb} gc_counts={gc_counts} gc_thresh={gc_thresh}")
+print("[startup] Model and processor loaded successfully")
 
 
 @app.post("/extract-image-features/")
 async def extract_image_features(request: dict):
     start_time = time.time()
     try:
+        req_uuid = str(uuid.uuid4())
+        mem_mb_before = _get_memory_info()
+        gc_counts_before, _ = _gc_info()
+        print(f"[req:{req_uuid}] pid={PID} model_id={id(model)} model_uuid={MODEL_INSTANCE_UUID} rss_mb={mem_mb_before} gc_counts={gc_counts_before}")
         # Check if we have image_url or image_base64
         if "image_url" in request and request["image_url"]:
             print("Obteniendo features de imagen url")
@@ -46,12 +86,14 @@ async def extract_image_features(request: dict):
 
         print("Features de imagen obtenidos")
         processing_time = time.time() - start_time
-        print(f"Tiempo de procesamiento: {processing_time:.4f} segundos")
+        mem_mb_after = _get_memory_info()
+        gc_counts_after, _ = _gc_info()
+        print(f"[req:{req_uuid}] Tiempo de procesamiento: {processing_time:.4f} segundos rss_mb_before={mem_mb_before} rss_mb_after={mem_mb_after} gc_counts_before={gc_counts_before} gc_counts_after={gc_counts_after}")
         return X[0].cpu().tolist()
 
     except Exception as e:
         processing_time = time.time() - start_time
-        print(f"Error después de {processing_time:.4f} segundos: {str(e)}")
+        print(f"[req:ERROR] pid={PID} model_id={id(model)} model_uuid={MODEL_INSTANCE_UUID} t={processing_time:.4f}s error={str(e)}")
         return {"error": str(e)}
 
 
@@ -59,16 +101,22 @@ async def extract_image_features(request: dict):
 async def extract_text_features(request: dict):
     start_time = time.time()
     try:
+        req_uuid = str(uuid.uuid4())
+        mem_mb_before = _get_memory_info()
+        gc_counts_before, _ = _gc_info()
+        print(f"[req:{req_uuid}] pid={PID} model_id={id(model)} model_uuid={MODEL_INSTANCE_UUID} rss_mb={mem_mb_before} gc_counts={gc_counts_before}")
         print("Obteniendo features de texto")
         text = request.get("text", "")
         X = extract_feat_text(text)
         processing_time = time.time() - start_time
-        print(f"Tiempo de procesamiento: {processing_time:.4f} segundos")
+        mem_mb_after = _get_memory_info()
+        gc_counts_after, _ = _gc_info()
+        print(f"[req:{req_uuid}] Tiempo de procesamiento: {processing_time:.4f} segundos rss_mb_before={mem_mb_before} rss_mb_after={mem_mb_after} gc_counts_before={gc_counts_before} gc_counts_after={gc_counts_after}")
         return X[0].cpu().tolist()
 
     except Exception as e:
         processing_time = time.time() - start_time
-        print(f"Error después de {processing_time:.4f} segundos: {str(e)}")
+        print(f"[req:ERROR] pid={PID} model_id={id(model)} model_uuid={MODEL_INSTANCE_UUID} t={processing_time:.4f}s error={str(e)}")
         return {"error": str(e)}
 
 
@@ -151,6 +199,10 @@ def extract_feat_text(text: str):
 async def extract_features(request: dict):
     start_time = time.time()
     try:
+        req_uuid = str(uuid.uuid4())
+        mem_mb_before = _get_memory_info()
+        gc_counts_before, _ = _gc_info()
+        print(f"[req:{req_uuid}] pid={PID} model_id={id(model)} model_uuid={MODEL_INSTANCE_UUID} rss_mb={mem_mb_before} gc_counts={gc_counts_before}")
         if "image_url" in request and request["image_url"]:
             image_url = request.get("image_url", "")
         if "text" in request and request["text"]:
@@ -172,7 +224,9 @@ async def extract_features(request: dict):
                 input_ids=input_ids, attention_mask=attention_mask, normalize=True)
 
         processing_time = time.time() - start_time
-        print(f"Tiempo de procesamiento: {processing_time:.4f} segundos")
+        mem_mb_after = _get_memory_info()
+        gc_counts_after, _ = _gc_info()
+        print(f"[req:{req_uuid}] Tiempo de procesamiento: {processing_time:.4f} segundos rss_mb_before={mem_mb_before} rss_mb_after={mem_mb_after} gc_counts_before={gc_counts_before} gc_counts_after={gc_counts_after}")
         return {
             "image_features": image_features[0].cpu().tolist(),
             "text_features": text_features[0].cpu().tolist()
@@ -180,7 +234,7 @@ async def extract_features(request: dict):
 
     except Exception as e:
         processing_time = time.time() - start_time
-        print(f"Error después de {processing_time:.4f} segundos: {str(e)}")
+        print(f"[req:ERROR] pid={PID} model_id={id(model)} model_uuid={MODEL_INSTANCE_UUID} t={processing_time:.4f}s error={str(e)}")
         return {"error": str(e)}
 
 
@@ -188,6 +242,10 @@ async def extract_features(request: dict):
 async def similarities_matrix(request: dict):
     start_time = time.time()
     try:
+        req_uuid = str(uuid.uuid4())
+        mem_mb_before = _get_memory_info()
+        gc_counts_before, _ = _gc_info()
+        print(f"[req:{req_uuid}] pid={PID} model_id={id(model)} model_uuid={MODEL_INSTANCE_UUID} rss_mb={mem_mb_before} gc_counts={gc_counts_before}")
         if "image_urls" in request and request["image_urls"]:
             image_urls = request.get("image_urls", [])
         if "text" in request and request["text"]:
@@ -224,12 +282,14 @@ async def similarities_matrix(request: dict):
             sorted_results.append(image_urls[img_idx])
 
         processing_time = time.time() - start_time
-        print(f"Tiempo de procesamiento: {processing_time:.4f} segundos")
+        mem_mb_after = _get_memory_info()
+        gc_counts_after, _ = _gc_info()
+        print(f"[req:{req_uuid}] Tiempo de procesamiento: {processing_time:.4f} segundos rss_mb_before={mem_mb_before} rss_mb_after={mem_mb_after} gc_counts_before={gc_counts_before} gc_counts_after={gc_counts_after}")
         return sorted_results
 
     except Exception as e:
         processing_time = time.time() - start_time
-        print(f"Error después de {processing_time:.4f} segundos: {str(e)}")
+        print(f"[req:ERROR] pid={PID} model_id={id(model)} model_uuid={MODEL_INSTANCE_UUID} t={processing_time:.4f}s error={str(e)}")
         return {"error": str(e)}
 
 
@@ -237,6 +297,10 @@ async def similarities_matrix(request: dict):
 async def similarities_preferences(request: dict):
     start_time = time.time()
     try:
+        req_uuid = str(uuid.uuid4())
+        mem_mb_before = _get_memory_info()
+        gc_counts_before, _ = _gc_info()
+        print(f"[req:{req_uuid}] pid={PID} model_id={id(model)} model_uuid={MODEL_INSTANCE_UUID} rss_mb={mem_mb_before} gc_counts={gc_counts_before}")
         if "image_url" in request and request["image_url"]:
             image_url = request.get("image_url", "")
         if "preferences" in request and request["preferences"]:
@@ -267,10 +331,41 @@ async def similarities_preferences(request: dict):
         ]
 
         processing_time = time.time() - start_time
-        print(f"Tiempo de procesamiento: {processing_time:.4f} segundos")
+        mem_mb_after = _get_memory_info()
+        gc_counts_after, _ = _gc_info()
+        print(f"[req:{req_uuid}] Tiempo de procesamiento: {processing_time:.4f} segundos rss_mb_before={mem_mb_before} rss_mb_after={mem_mb_after} gc_counts_before={gc_counts_before} gc_counts_after={gc_counts_after}")
         return {"error": False, "details": "Similarities computed successfully", "similarities": result}
 
     except Exception as e:
         processing_time = time.time() - start_time
-        print(f"Error después de {processing_time:.4f} segundos: {str(e)}")
+        print(f"[req:ERROR] pid={PID} model_id={id(model)} model_uuid={MODEL_INSTANCE_UUID} t={processing_time:.4f}s error={str(e)}")
         return {"error": True, "details": str(e), "similarities": []}
+
+
+@app.get("/_debug/model-info")
+async def debug_model_info():
+    uptime_s = time.time() - PROCESS_START_TIME
+    mem_mb = _get_memory_info()
+    gc_counts, gc_thresh = _gc_info()
+    device_name = str(device)
+    torch_mem = {}
+    try:
+        if torch.cuda.is_available():
+            torch_mem = {
+                "cuda_allocated_mb": torch.cuda.memory_allocated() / (1024 * 1024),
+                "cuda_reserved_mb": torch.cuda.memory_reserved() / (1024 * 1024),
+            }
+    except Exception:
+        torch_mem = {}
+    return {
+        "pid": PID,
+        "process_start_iso": PROCESS_START_ISO,
+        "uptime_seconds": uptime_s,
+        "device": device_name,
+        "model_id": id(model),
+        "model_uuid": MODEL_INSTANCE_UUID,
+        "rss_mb": mem_mb,
+        "gc_counts": gc_counts,
+        "gc_threshold": gc_thresh,
+        "torch_memory": torch_mem,
+    }
