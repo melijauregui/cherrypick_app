@@ -9,12 +9,12 @@ import logger from "../logger";
 import { prisma } from "../db";
 import { ErrorSchemaType } from "@/schemas/standar-response-schema";
 
-const INFERENCE_URL =
-  config.ENVIRONMENT === "production"
-    ? `https://inference-server-production.up.railway.app`
-    : `http://127.0.0.1:8000`;
+// const INFERENCE_URL =
+//   config.ENVIRONMENT === "production"
+//     ? `https://inference-server-production.up.railway.app`
+//     : `http://127.0.0.1:8000`;
 
-// const INFERENCE_URL = `https://inference-server-production.up.railway.app`;
+const INFERENCE_URL = `https://inference-server-production.up.railway.app`;
 
 //funcion para obtener items de PostgreSQL
 export async function GetCatalog(

@@ -8,6 +8,7 @@ from transformers import AutoModel, AutoProcessor
 import requests
 from pydantic import BaseModel
 import numpy as np
+import time
 
 
 app = FastAPI()
@@ -29,6 +30,7 @@ print("Model and processor loaded successfully!")
 
 @app.post("/extract-image-features/")
 async def extract_image_features(request: dict):
+    start_time = time.time()
     try:
         # Check if we have image_url or image_base64
         if "image_url" in request and request["image_url"]:
@@ -43,22 +45,30 @@ async def extract_image_features(request: dict):
             return {"error": "Either image_url or image_base64 must be provided"}
 
         print("Features de imagen obtenidos")
+        processing_time = time.time() - start_time
+        print(f"Tiempo de procesamiento: {processing_time:.4f} segundos")
         return X[0].cpu().tolist()
 
     except Exception as e:
+        processing_time = time.time() - start_time
+        print(f"Error después de {processing_time:.4f} segundos: {str(e)}")
         return {"error": str(e)}
 
 
 @app.post("/extract-text-features/")
 async def extract_text_features(request: dict):
+    start_time = time.time()
     try:
         print("Obteniendo features de texto")
         text = request.get("text", "")
         X = extract_feat_text(text)
+        processing_time = time.time() - start_time
+        print(f"Tiempo de procesamiento: {processing_time:.4f} segundos")
         return X[0].cpu().tolist()
 
     except Exception as e:
-        print(f"Error extracting text features: {str(e)}")
+        processing_time = time.time() - start_time
+        print(f"Error después de {processing_time:.4f} segundos: {str(e)}")
         return {"error": str(e)}
 
 
@@ -139,6 +149,7 @@ def extract_feat_text(text: str):
 
 @app.post("/extract-features/")
 async def extract_features(request: dict):
+    start_time = time.time()
     try:
         if "image_url" in request and request["image_url"]:
             image_url = request.get("image_url", "")
@@ -160,17 +171,22 @@ async def extract_features(request: dict):
             text_features = model.get_text_features(
                 input_ids=input_ids, attention_mask=attention_mask, normalize=True)
 
+        processing_time = time.time() - start_time
+        print(f"Tiempo de procesamiento: {processing_time:.4f} segundos")
         return {
             "image_features": image_features[0].cpu().tolist(),
             "text_features": text_features[0].cpu().tolist()
         }
 
     except Exception as e:
+        processing_time = time.time() - start_time
+        print(f"Error después de {processing_time:.4f} segundos: {str(e)}")
         return {"error": str(e)}
 
 
 @app.post("/search-text/")
 async def similarities_matrix(request: dict):
+    start_time = time.time()
     try:
         if "image_urls" in request and request["image_urls"]:
             image_urls = request.get("image_urls", [])
@@ -207,14 +223,19 @@ async def similarities_matrix(request: dict):
             # similarity = probabilities[img_idx]
             sorted_results.append(image_urls[img_idx])
 
+        processing_time = time.time() - start_time
+        print(f"Tiempo de procesamiento: {processing_time:.4f} segundos")
         return sorted_results
 
     except Exception as e:
+        processing_time = time.time() - start_time
+        print(f"Error después de {processing_time:.4f} segundos: {str(e)}")
         return {"error": str(e)}
 
 
 @app.post("/similarities-preferences/")
 async def similarities_preferences(request: dict):
+    start_time = time.time()
     try:
         if "image_url" in request and request["image_url"]:
             image_url = request.get("image_url", "")
@@ -245,7 +266,11 @@ async def similarities_preferences(request: dict):
             for pref, prob in zip(preferences, probabilities)
         ]
 
+        processing_time = time.time() - start_time
+        print(f"Tiempo de procesamiento: {processing_time:.4f} segundos")
         return {"error": False, "details": "Similarities computed successfully", "similarities": result}
 
     except Exception as e:
+        processing_time = time.time() - start_time
+        print(f"Error después de {processing_time:.4f} segundos: {str(e)}")
         return {"error": True, "details": str(e), "similarities": []}
