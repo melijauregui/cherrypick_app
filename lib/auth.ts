@@ -56,11 +56,14 @@ export const auth = betterAuth({
     google: {
       clientId: config.GOOGLE_CLIENT_ID,
       clientSecret: config.GOOGLE_CLIENT_SECRET,
+      redirectURI:
+        "https://backend-production-14d9.up.railway.app/api/auth/callback/google",
     },
   },
   trustedOrigins: [
     "cherrypick://",
     "https://gibbon-amazing-neatly.ngrok-free.app",
+    "https://backend-production-14d9.up.railway.app",
     config.BETTER_AUTH_URL,
   ],
   baseURL: config.BETTER_AUTH_URL,
