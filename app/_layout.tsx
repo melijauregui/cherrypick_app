@@ -4,12 +4,15 @@ import { useFonts } from "expo-font";
 import { useEffect } from "react";
 import Toast from "react-native-toast-message";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, LogBox } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
+
+// Silence all RN LogBox warnings in the simulator
+LogBox.ignoreAllLogs(true);
 
 // const queryClient = new QueryClient();
 const RootLayout = () => {

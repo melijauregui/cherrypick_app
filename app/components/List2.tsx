@@ -32,6 +32,7 @@ const ImageGallery = ({
   contentUp,
   roundRobin,
   canRefresh = true,
+  loadingItem,
 }: {
   queryKey: any[];
   getClothingItems: (page: number, limit: number) => Promise<ItemSchemaType[]>;
@@ -41,6 +42,7 @@ const ImageGallery = ({
   contentUp?: React.ReactElement;
   roundRobin?: boolean;
   canRefresh?: boolean;
+  loadingItem?: React.ReactElement;
 }) => {
   const { user } = useSession();
   const lastTriggeredHeightRef = useRef(0);
@@ -114,9 +116,13 @@ const ImageGallery = ({
   const resto =
     (width - (width / columnCount - 6) * columnCount) / (columnCount - 1);
   const content = !data ? (
-    <View className="flex-1 items-center justify-center">
-      <LoadingItem />
-    </View>
+    loadingItem ? (
+      loadingItem
+    ) : (
+      <View className="flex-1 items-center justify-center">
+        <LoadingItem />
+      </View>
+    )
   ) : itemQuantity === 0 ? (
     itemWhenNothingFound?.()
   ) : (

@@ -35,6 +35,7 @@ import {
 import FilterSearchBottomSheet from "../components/explore/filterSearch";
 import { IdNameImageSchemaType } from "@/schemas/catalog/catalog-schema";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { LoadingItem } from "../components/LoadingPage";
 
 const CameraPage = () => {
   const [uri, setUri] = useState<string | null>(null);
@@ -300,7 +301,7 @@ const RenderPicture = ({
   if (!uri) return null;
 
   const minHeight = Math.max(screenHeight - imageHeight, 400);
-  const snapPoints = [minHeight, 400, 600, 800, 1000].filter(
+  const snapPoints = [minHeight, 400, 600, 800, 900].filter(
     point => point >= minHeight
   );
   const insets = useSafeAreaInsets();
@@ -346,51 +347,60 @@ const RenderPicture = ({
           }}
           enablePanDownToClose={false}
         >
-          <BottomSheetScrollView
-            contentContainerStyle={{
-              paddingBottom: insets.bottom + 10,
-            }}
-            showsVerticalScrollIndicator={false}
-          >
-            <View className="flex flex-row justify-center pb-3 px-6">
-              <Text className="text-white text-lg font-psemibold">
-                Items Similares
-              </Text>
+          <View className="flex flex-row justify-center pb-3 px-6">
+            <Text className="text-white text-lg font-psemibold">
+              Items Similares
+            </Text>
+          </View>
+          {isLoadingBase64 ? (
+            <View
+              className="flex-1 items-center justify-center "
+              style={{
+                maxHeight: (snapPoints[snapIndex] ?? snapPoints[0] ?? 0) - 50,
+              }}
+            >
+              <LoadingItem />
             </View>
-            {isLoadingBase64 ? (
-              <View className="flex-1 items-center justify-center">
-                <Text className="text-white">Procesando imagen...</Text>
-              </View>
-            ) : (
-              <List2
-                queryKey={[
-                  "similar-items",
-                  uri,
-                  embedding?.length || 0,
-                  minPrice,
-                  maxPrice,
+          ) : (
+            <List2
+              queryKey={[
+                "similar-items",
+                uri,
+                embedding?.length || 0,
+                minPrice,
+                maxPrice,
+                brandsSelected.size > 0
+                  ? Array.from(brandsSelected.keys())
+                  : undefined,
+              ]}
+              getClothingItems={(page, limit) =>
+                getClothingItemsSimilarBase64(
+                  page,
+                  limit,
+                  embedding || [],
+                  minPrice ? parseFloat(minPrice) : undefined,
+                  maxPrice ? parseFloat(maxPrice) : undefined,
                   brandsSelected.size > 0
                     ? Array.from(brandsSelected.keys())
-                    : undefined,
-                ]}
-                getClothingItems={(page, limit) =>
-                  getClothingItemsSimilarBase64(
-                    page,
-                    limit,
-                    embedding || [],
-                    minPrice ? parseFloat(minPrice) : undefined,
-                    maxPrice ? parseFloat(maxPrice) : undefined,
-                    brandsSelected.size > 0
-                      ? Array.from(brandsSelected.keys())
-                      : undefined
-                  )
-                }
-                limit={6}
-                columnCount={2}
-                canRefresh={false}
-              />
-            )}
-          </BottomSheetScrollView>
+                    : undefined
+                )
+              }
+              limit={6}
+              columnCount={2}
+              canRefresh={false}
+              loadingItem={
+                <View
+                  className="flex-1 items-center justify-center "
+                  style={{
+                    maxHeight:
+                      (snapPoints[snapIndex] ?? snapPoints[0] ?? 0) - 50,
+                  }}
+                >
+                  <LoadingItem />
+                </View>
+              }
+            />
+          )}
         </BottomSheet>
         <FilterSearchBottomSheet
           isModalOpen={isFilterSearchModalOpen}
@@ -405,6 +415,6 @@ const RenderPicture = ({
           initialBrandsSelected={brandsSelected}
         />
       </View>
-    </GestureHandlerRootView >
+    </GestureHandlerRootView>
   );
 };
