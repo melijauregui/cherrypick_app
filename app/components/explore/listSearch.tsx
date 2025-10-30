@@ -25,28 +25,6 @@ export default function ListSearch({
 }) {
   // Función para obtener los items a mostrar
   const getDisplayItems = () => {
-    if (selected.size > 0) {
-      // Filtrar items seleccionados que coinciden con el search
-      const selectedItemsMatchingSearch = Array.from(selected.entries())
-        .filter(([uuid, name]) =>
-          name.toLowerCase().includes(search.toLowerCase())
-        )
-        .map(([uuid, name]) => ({ uuid, name }));
-
-      // Items del fetch que NO están seleccionados
-      const nonSelectedItems = filteredItems.filter(
-        item => !selected.has(item.id)
-      );
-
-      // Ordenar items seleccionados por nombre
-      const sortedSelectedItems = selectedItemsMatchingSearch.sort((a, b) =>
-        a.name.localeCompare(b.name)
-      );
-
-      // Combinar: primero los seleccionados, luego los no seleccionados
-      return [...sortedSelectedItems, ...nonSelectedItems];
-    }
-    // Si no hay items seleccionados, mostrar los items filtrados normalmente
     return filteredItems;
   };
 

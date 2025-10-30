@@ -1,5 +1,6 @@
-import { View, Image, Dimensions, TouchableOpacity } from "react-native";
-import React, { useEffect, useState, useRef } from "react";
+import { View, Dimensions, TouchableOpacity } from "react-native";
+import React from "react";
+import { Image as ExpoImage } from "expo-image";
 import { router } from "expo-router";
 import { ItemSchemaType } from "@/schemas/catalog/catalog-schema";
 
@@ -30,12 +31,14 @@ const ClothingItemComponent = ({
   numColumns,
   renderedHeight,
   renderedWidth,
+  onImageLoaded,
 }: {
   i: number;
   item: ItemSchemaType;
   numColumns: number;
   renderedHeight: number;
   renderedWidth: number;
+  onImageLoaded?: (uuid: string) => void;
 }) => {
   const { image } = item;
   // const [imageDimensions, setImageDimensions] = useState({
@@ -100,10 +103,18 @@ const ClothingItemComponent = ({
     >
       <TouchableOpacity onPress={handlePress} activeOpacity={0.9}>
         {image.url ? (
-          <Image
+          <ExpoImage
             source={{ uri: image.url }}
+            placeholder={
+              // neutral placeholder while real bitmap arrives
+              { blurhash: "L6PZfSi_.AyE_3t7t7R**0o#DgR4" }
+            }
             style={{ width: renderedWidth, height: renderedHeight }}
-            resizeMode="cover"
+            contentFit="cover"
+            cachePolicy="memory-disk"
+            recyclingKey={item.uuid}
+            transition={0}
+            onLoadEnd={() => onImageLoaded?.(item.uuid)}
           />
         ) : null}
       </TouchableOpacity>

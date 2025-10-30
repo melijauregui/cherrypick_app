@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Dimensions,
   Image,
@@ -94,6 +94,42 @@ const ImageGallery = ({
     lastTriggeredHeightRef.current = 0;
   };
 
+  // Gate: wait until first page images finish loading before showing grid
+  const firstPageItems: ItemSchemaType[] = useMemo(
+    () => (data?.pages?.[0] as ItemSchemaType[]) ?? [],
+    [data]
+  );
+  const [firstPageReady, setFirstPageReady] = useState(false);
+  // Prefetch first page images; show grid only when prefetch settles or timeout
+  useEffect(() => {
+    let cancelled = false;
+    setFirstPageReady(false);
+    const urls = firstPageItems
+      .map(i => i.image?.url)
+      .filter((u): u is string => Boolean(u));
+    if (urls.length === 0) {
+      setFirstPageReady(true);
+      return;
+    }
+    const timeout = setTimeout(() => {
+      if (!cancelled) {
+        console.log("firstPageReady on timeout");
+        setFirstPageReady(true);
+      }
+    }, 2000);
+    Promise.allSettled(urls.map(u => Image.prefetch(u))).finally(() => {
+      if (!cancelled) {
+        console.log("firstPageReady on finally");
+        setFirstPageReady(true);
+      }
+      clearTimeout(timeout);
+    });
+    return () => {
+      cancelled = true;
+      clearTimeout(timeout);
+    };
+  }, [firstPageItems, serializedQueryKey]);
+
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
 
@@ -123,6 +159,10 @@ const ImageGallery = ({
         <LoadingItem />
       </View>
     )
+  ) : !firstPageReady ? (
+    <View className="flex-1 items-center justify-center">
+      <LoadingItem />
+    </View>
   ) : itemQuantity === 0 ? (
     itemWhenNothingFound?.()
   ) : (
@@ -138,7 +178,7 @@ const ImageGallery = ({
         {organizedColumns.map((items, columnIndex) => (
           <View key={columnIndex}>
             {items?.map((item, i) => {
-              return item ? (
+              return (
                 <ClothingItemComponent
                   key={item.uuid}
                   i={i * columnCount + columnIndex}
@@ -146,13 +186,6 @@ const ImageGallery = ({
                   numColumns={columnCount}
                   renderedHeight={item.renderedHeight}
                   renderedWidth={item.renderedWidth}
-                />
-              ) : (
-                <ItemPlaceholder
-                  key={i}
-                  width={width / columnCount - 10}
-                  height={280}
-                  marginTop={i < columnCount ? 0 : 18}
                 />
               );
             })}
