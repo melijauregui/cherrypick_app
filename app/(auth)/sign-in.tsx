@@ -1,27 +1,15 @@
 import { ScrollView, Text, View, TouchableOpacity, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import LogoCircle from "@/app/components/logo/LogoCircle";
-import { router, usePathname } from "expo-router";
+import { Redirect, router } from "expo-router";
 import { authClient, useSession } from "@/lib/auth-client";
 
 const SignIn = () => {
-  const { user, status } = useSession();
-  //veo en que ruta esta
-  const pathname = usePathname();
-
-  useEffect(() => {
-    // Only run if user is authenticated and we're on the sign-in page
-    if (user && status === "authenticated" && pathname === "/sign-in") {
-      if (!user.emailVerified) {
-        router.replace("cherrypick:///code-verification-register");
-      }
-      if (user.emailVerified) {
-        console.log("user email verified, redirecting to home");
-        router.replace("cherrypick:///home");
-      }
-    }
-  }, [status, user, pathname]);
+  const { status } = useSession();
+  if (status === "authenticated") {
+    return <Redirect href="cherrypick:///home" />;
+  }
 
   return (
     <SafeAreaView className="bg-brown-strong flex-1 h-full w-full">
