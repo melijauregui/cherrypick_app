@@ -1,5 +1,5 @@
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { z } from "zod";
 import { Ionicons } from "@expo/vector-icons";
@@ -43,7 +43,9 @@ export default function ListSearch<T extends { id: string; name: string }>({
   ) => React.ReactElement;
   children?: React.ReactNode;
 }) {
+  const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
+
   const queryKeyWithSearch: readonly string[] = [
     ...queryKey,
     search,
@@ -66,6 +68,17 @@ export default function ListSearch<T extends { id: string; name: string }>({
     });
   const isStillLoading = isLoading || isPending || isRefetching;
   const queryClient = useQueryClient();
+
+  // Debounce: actualizar search 500ms después de que el usuario deja de escribir
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      //trim y a minusculas
+      setSearch(searchInput.trim().toLowerCase());
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
   const resetInfiniteQueryPagination = () => {
     console.log("resetInfiniteQueryPagination");
     return queryClient.setQueryData(queryKeyWithSearch, (oldData: any) => {
@@ -100,6 +113,7 @@ export default function ListSearch<T extends { id: string; name: string }>({
   };
 
   const displayItems = useMemo(() => getDisplayItems(), [filteredItems]);
+  console.log("displayItems", displayItems);
   const keyExtractor = useCallback((item: T) => item.id, []);
   return (
     <View className="flex flex-col flex-1">
@@ -107,10 +121,9 @@ export default function ListSearch<T extends { id: string; name: string }>({
         className="text-black border border-gray-300 rounded-3xl px-3 py-3 mb-3 text-lg font-pregular"
         placeholder={"Buscar " + placeholder + "..."}
         placeholderTextColor="grey"
-        value={search}
+        value={searchInput}
         onChangeText={text => {
-          setSearch(text);
-          resetInfiniteQueryPagination();
+          setSearchInput(text);
         }}
         keyboardType="default"
         autoCapitalize="none"
@@ -152,7 +165,7 @@ export default function ListSearch<T extends { id: string; name: string }>({
         </View>
       ) : displayItems.length === 0 ? (
         <View className="justify-top mt-16 items-center flex-1">
-          <Text className="text-lg text-white font-pregular opacity-50 text-center mx-10">
+          <Text className="text-lg text-black font-pregular opacity-50 text-center mx-10">
             There are no {placeholder} that match that name.
           </Text>
         </View>
