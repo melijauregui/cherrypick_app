@@ -17,7 +17,7 @@ import {
   getEmbedding,
 } from "@/utils/fetch";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import LoadingPage from "../LoadingPage";
+import LoadingPage, { LoadingItem } from "../LoadingPage";
 import {
   IdNameImageSchemaType,
   ItemSchemaType,
@@ -289,7 +289,9 @@ export const PageExploreQuery = ({
         />
       </View>
       {isLoadingEmbedding || isLoading ? (
-        <LoadingPage alreadyPrefetched={true} />
+        <View className="flex-1 items-center justify-center ">
+          <LoadingItem />
+        </View>
       ) : (
         <List2
           queryKey={[

@@ -21,14 +21,18 @@ export const auth = betterAuth({
   }),
   advanced: {
     generateId: () => randomUUID(),
-    cookies: {
-      state: {
-        attributes: {
-          sameSite: "none",
-          secure: true,
-        },
-      },
-    },
+    ...(config.ENVIRONMENT === "production"
+      ? {
+          cookies: {
+            state: {
+              attributes: {
+                sameSite: "none",
+                secure: true,
+              },
+            },
+          },
+        }
+      : {}),
   },
   emailAndPassword: {
     enabled: true,

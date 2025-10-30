@@ -6,7 +6,6 @@ import {
   NativeSyntheticEvent,
   RefreshControl,
   ScrollView,
-  StyleSheet,
   View,
 } from "react-native";
 import ClothingItemComponent, {
@@ -17,7 +16,7 @@ import {
   useInfiniteQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import LoadingPage from "./LoadingPage";
+import LoadingPage, { LoadingItem } from "./LoadingPage";
 import { prefetchItemDetail } from "../../utils/prefetchs";
 import { useSession } from "@/lib/auth-client";
 import { ItemSchemaType } from "@/schemas/catalog/catalog-schema";
@@ -115,7 +114,9 @@ const ImageGallery = ({
   const resto =
     (width - (width / columnCount - 6) * columnCount) / (columnCount - 1);
   const content = !data ? (
-    <LoadingPage alreadyPrefetched={true} />
+    <View className="flex-1 items-center justify-center">
+      <LoadingItem />
+    </View>
   ) : itemQuantity === 0 ? (
     itemWhenNothingFound?.()
   ) : (
@@ -157,8 +158,10 @@ const ImageGallery = ({
 
   return (
     <ScrollView
+      className="flex-1"
       contentContainerStyle={{
-        paddingTop: 8,
+        // paddingTop: 8,
+        flexGrow: 1,
       }}
       // contentContainerStyle={}
       showsVerticalScrollIndicator={false}

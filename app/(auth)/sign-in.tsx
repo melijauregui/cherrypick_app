@@ -124,7 +124,7 @@ const handlePress = async () => {
       //newUserCallbackURL: "cherrypick:///preferences",
     });
     await authClient.getSession();
-    console.log("result", result);
+    // console.log("result", result);
   } catch (error) {
     console.error("Error in Google sign-in:", error);
   }
