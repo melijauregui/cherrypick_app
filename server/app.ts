@@ -1,4 +1,5 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
+import { swaggerUI } from "@hono/swagger-ui";
 import { auth } from "../lib/auth";
 import FormUserApp from "./formUser/routes";
 import UserApp from "./user/routes";
@@ -17,6 +18,16 @@ export type AppEnv = {
 
 const app = new OpenAPIHono<AppEnv>();
 export default app;
+
+app.doc("/doc", {
+  openapi: "3.0.0",
+  info: {
+    title: "CherryPick API",
+    version: "1.0.0",
+  },
+});
+
+app.get("/ui", swaggerUI({ url: "/doc" }));
 
 app.use("*", async (c, next) => {
   console.log("c.req.path", c.req.method, c.req.path);
