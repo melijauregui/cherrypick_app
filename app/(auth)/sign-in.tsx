@@ -70,7 +70,7 @@ const LogInButton = () => (
 
 const SignUpButton = () => (
   <TouchableOpacity
-    className="flex flex-row bg-beige h-[50px] justify-center items-center rounded-full"
+    className="flex flex-row bg-beige-strong h-[50px] justify-center items-center rounded-full"
     onPress={() => router.push("/sign-up")}
   >
     <Text className="text-black font-psemibold text-[15px]">

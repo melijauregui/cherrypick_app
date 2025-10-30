@@ -36,29 +36,29 @@ const DeleteAccountButton: React.FC<{
   bottomSheetRefLogout,
   visibleModal,
 }) => {
-    const mutateDeleteAccount = useDeleteAccount(logout);
-    return (
-      <>
-        <TouchableOpacity
-          className="flex flex-row bg-beige h-[50px] justify-center items-center rounded-full"
-          onPress={() => setVisibleModal(true)}
-        >
-          <Text className="text-black font-psemibold text-[15px]">
-            Eliminar cuenta
-          </Text>
-        </TouchableOpacity>
-        <CustomModal
-          title="Eliminar cuenta"
-          text={`¿Estás seguro de querer eliminar tu cuenta? Este proceso es irreversible.`}
-          onSubmit={() => {
-            mutateDeleteAccount.mutate();
-            bottomSheetRefLogout.current?.close();
-            setVisibleModal(false);
-          }}
-          onCancel={() => setVisibleModal(false)}
-          visible={visibleModal}
-        />
-      </>
-    );
-  };
+  const mutateDeleteAccount = useDeleteAccount(logout);
+  return (
+    <>
+      <TouchableOpacity
+        className="flex flex-row bg-beige-strong h-[50px] justify-center items-center rounded-full"
+        onPress={() => setVisibleModal(true)}
+      >
+        <Text className="text-black font-psemibold text-[15px]">
+          Eliminar cuenta
+        </Text>
+      </TouchableOpacity>
+      <CustomModal
+        title="Eliminar cuenta"
+        text={`¿Estás seguro de querer eliminar tu cuenta? Este proceso es irreversible.`}
+        onSubmit={() => {
+          mutateDeleteAccount.mutate();
+          bottomSheetRefLogout.current?.close();
+          setVisibleModal(false);
+        }}
+        onCancel={() => setVisibleModal(false)}
+        visible={visibleModal}
+      />
+    </>
+  );
+};
 export { DeleteAccountButton };

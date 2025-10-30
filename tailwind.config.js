@@ -25,7 +25,10 @@ module.exports = {
         brown: {
           strong: "#301c11",
         },
-        beige: "#d8bc9e",
+        beige: {
+          strong: "#d8bc9e",
+          light: "#fff3e7",
+        },
       },
       fontFamily: {
         pthin: ["Poppins-Thin", "sans-serif"],

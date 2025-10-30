@@ -112,7 +112,7 @@ function ItemStyle({
       onPress={() => toggleSelect(item)}
     >
       <View
-        className={`w-7 h-7 rounded border border-gray-300  ${selected.has(item.id) ? "bg-beige opacity-70" : "bg-white"}`}
+        className={`w-7 h-7 rounded border border-gray-300  ${selected.has(item.id) ? "bg-beige-strong opacity-70" : "bg-white"}`}
       ></View>
       <Text className="text-lg text-black font-pregular">{item.name}</Text>
     </TouchableOpacity>

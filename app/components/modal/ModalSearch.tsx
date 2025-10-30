@@ -1,8 +1,10 @@
-import { Modal, View, Text, TouchableOpacity, Image } from "react-native";
+import { Modal, View, Text, TouchableOpacity } from "react-native";
+import { Image as ExpoImage } from "expo-image";
 import { Octicons } from "@expo/vector-icons";
 import { imageDefault } from "@/lib/constants";
 import { StandardBar } from "../standar-page/standarPage";
 import { IdNameImageSchemaType } from "@/schemas/catalog/catalog-schema";
+import React from "react";
 
 export function ModalStandar({
   isModalOpen,
@@ -56,7 +58,7 @@ export function ModalStandar({
   );
 }
 
-export function ItemStylePhotoAndName({
+export const ItemStylePhotoAndName = React.memo(function ItemStylePhotoAndName({
   item,
   toggleSelect,
   isSelected,
@@ -84,13 +86,13 @@ export function ItemStylePhotoAndName({
       <View
         className={`${size === "small" ? "w-14 h-14" : size === "medium" ? "w-20 h-20" : "w-24 h-24"} ${imageRounded ? "rounded-full" : "rounded-lg"} overflow-hidden mr-3`}
       >
-        <Image
-          source={{
-            uri: item.image?.url ?? imageDefault,
-            cache: "force-cache",
-          }}
-          className="w-full h-full"
-          resizeMode="cover"
+        <ExpoImage
+          source={{ uri: item.image?.url ?? imageDefault }}
+          style={{ width: "100%", height: "100%" }}
+          contentFit="cover"
+          cachePolicy="memory-disk"
+          recyclingKey={item.id}
+          transition={0}
         />
       </View>
 
@@ -133,7 +135,7 @@ export function ItemStylePhotoAndName({
       </View>
     </TouchableOpacity>
   );
-}
+});
 
 // export function ColabsModal({
 //   isColabsModalOpen,

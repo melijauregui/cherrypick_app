@@ -67,7 +67,7 @@ const ConfirmationContent = ({
         </TouchableOpacity>
 
         <TouchableOpacity
-          className="flex-1 bg-beige rounded-3xl py-4 px-6"
+          className="flex-1 bg-beige-strong rounded-3xl py-4 px-6"
           onPress={onSubmit}
         >
           <Text className="text-white text-center font-medium text-base">

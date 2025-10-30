@@ -1,5 +1,5 @@
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { z } from "zod";
 import { Ionicons } from "@expo/vector-icons";
@@ -84,32 +84,8 @@ export default function ListSearch<T extends { id: string; name: string }>({
     disable ||
     (typeof maxAllowSelect === "number" && selected.size >= maxAllowSelect);
 
-  // Función para obtener los items a mostrar
-  const getDisplayItems = () => {
-    if (selected.size > 0) {
-      // Filtrar items seleccionados que coinciden con el search
-      const selectedItemsMatchingSearch = Array.from(selected.entries())
-        .filter(([uuid, item]) =>
-          item.name.toLowerCase().includes(search.toLowerCase())
-        )
-        .map(([uuid, item]) => item);
-
-      // Items del fetch que NO están seleccionados
-      const nonSelectedItems = filteredItems.filter(
-        item => !selected.has(item.id)
-      );
-
-      // Ordenar items seleccionados por nombre
-      const sortedSelectedItems = selectedItemsMatchingSearch.sort((a, b) =>
-        a.name.localeCompare(b.name)
-      );
-
-      // Combinar: primero los seleccionados, luego los no seleccionados
-      return [...sortedSelectedItems, ...nonSelectedItems];
-    }
-    // Si no hay items seleccionados, mostrar los items filtrados normalmente
-    return filteredItems;
-  };
+  // Mantener el orden original para evitar reflow al seleccionar
+  const getDisplayItems = () => filteredItems;
 
   const toggleSelect = (item: T) => {
     setSelected(prev => {
@@ -123,7 +99,8 @@ export default function ListSearch<T extends { id: string; name: string }>({
     });
   };
 
-  const displayItems = getDisplayItems();
+  const displayItems = useMemo(() => getDisplayItems(), [filteredItems]);
+  const keyExtractor = useCallback((item: T) => item.id, []);
   return (
     <View className="flex flex-col flex-1">
       <TextInput
@@ -138,6 +115,30 @@ export default function ListSearch<T extends { id: string; name: string }>({
         keyboardType="default"
         autoCapitalize="none"
       />
+      {selected.size > 0 ? (
+        <View className="flex flex-row flex-wrap gap-2 mb-3 px-1">
+          {Array.from(selected.values()).map(selItem => (
+            <View
+              key={selItem.id}
+              className="flex-row items-center bg-neutral-200 rounded-full px-3 py-1"
+            >
+              <Text
+                className="text-black text-sm font-plight mr-2"
+                numberOfLines={1}
+              >
+                {selItem.name}
+              </Text>
+              <TouchableOpacity
+                accessibilityLabel={`Quitar ${selItem.name}`}
+                onPress={() => toggleSelect(selItem)}
+                hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+              >
+                <Ionicons name="close" size={14} color="#000000" />
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+      ) : null}
       {children}
       {isStillLoading ? (
         <View className="justify-top mt-16 items-center flex-1">
@@ -158,9 +159,8 @@ export default function ListSearch<T extends { id: string; name: string }>({
       ) : (
         <View className="flex-1">
           <FlashList
-            key={`${forceKey ?? ""}-${search}`}
-            extraData={forceKey}
             data={displayItems}
+            keyExtractor={keyExtractor}
             renderItem={({ item, index }) =>
               renderItem(
                 item,
@@ -170,6 +170,7 @@ export default function ListSearch<T extends { id: string; name: string }>({
                 disableToggle
               )
             }
+            estimatedItemSize={56}
             onEndReached={() => {
               console.log("onEndReached");
               fetchNextPage();

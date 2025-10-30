@@ -101,8 +101,9 @@ const TabNavigation = ({
 }) => {
   return (
     <TouchableOpacity
-      className={`flex-1 py-4 px-6 ${activeTab === tab ? "border-b-2 border-beige" : ""
-        }`}
+      className={`flex-1 py-4 px-6 ${
+        activeTab === tab ? "border-b-2 border-beige-strong" : ""
+      }`}
       onPress={() => setActiveTab()}
     >
       <View className="flex-row items-center justify-center gap-1">{icon}</View>

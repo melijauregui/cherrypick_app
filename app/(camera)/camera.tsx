@@ -173,7 +173,7 @@ const ControlsRenderPicture = ({
           />
           {(() => {
             return filterCount > 0 ? (
-              <View className="absolute -bottom-1.5 -right-1 bg-beige rounded-full w-5 h-5 flex items-center justify-center">
+              <View className="absolute -bottom-1.5 -right-1 bg-beige-strong rounded-full w-5 h-5 flex items-center justify-center">
                 <Text className="text-white text-[12px] font-bold">
                   {filterCount}
                 </Text>
