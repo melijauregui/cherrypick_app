@@ -33,6 +33,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { prefetchInspirationItems } from "@/utils/prefetchs";
 import { useSession } from "@/lib/auth-client";
 import ErrorPage from "@/app/(auth)/error";
+import { Skeleton } from "moti/skeleton";
 
 export default function PageExplore({
   children,
@@ -492,7 +493,23 @@ const GridImages = ({ query }: { query: string }) => {
     staleTime: 60 * 60 * 1000,
   });
   if (isLoadingEmbedding || isLoadingItems) {
-    return <LoadingPage alreadyPrefetched={true} />;
+    return (
+      <View className="flex-row px-1 gap-0.5">
+        {[0, 1, 2, 3].map(index => (
+          <View
+            key={index}
+            className={`flex-1 w-full h-60 ${index === 0 ? "rounded-l-xl" : index === 3 ? "rounded-r-xl" : ""}`}
+          >
+            <Skeleton
+              colorMode="light"
+              width={"100%"}
+              height={"100%"}
+              radius={12}
+            />
+          </View>
+        ))}
+      </View>
+    );
   }
   if (isErrorEmbedding || isErrorItems) {
     return <ErrorPage />;
@@ -500,10 +517,10 @@ const GridImages = ({ query }: { query: string }) => {
   return (
     <View className="flex-row px-1 gap-0.5">
       {data?.map((item: ItemSchemaType, index: number) => (
-        <View key={item.uuid || index} className="flex-1">
+        <View key={item.uuid || index} className="flex-1 w-full h-60">
           <Image
             source={{ uri: item.image.url }}
-            className={`w-full h-60 ${index === 0 ? "rounded-l-xl" : index === data.length - 1 ? "rounded-r-xl" : ""}`}
+            className={`w-full h-full ${index === 0 ? "rounded-l-xl" : index === data.length - 1 ? "rounded-r-xl" : ""}`}
             resizeMode="cover"
           />
         </View>

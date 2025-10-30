@@ -32,6 +32,7 @@ import { ItemSchemaType } from "@/schemas/catalog/catalog-schema";
 import { BrandSchemaType } from "@/schemas/brand/brand-schema";
 import ImageComplete from "../components/ImageComplete";
 import ErrorPage from "../(auth)/error";
+import { Skeleton } from "moti/skeleton";
 
 export default function ItemDetailPage() {
   const params = useLocalSearchParams();
@@ -110,8 +111,9 @@ const ItemDetail = ({ item }: { item: ItemSchemaType }) => {
           onPress={() => router.back()}
           onPressIn={() => setIsPressed(true)}
           onPressOut={() => setIsPressed(false)}
-          className={`absolute top-12 left-4 w-14 h-14 rounded-2xl bg-black items-center justify-center z-50 ${isPressed ? "opacity-100" : "opacity-80"
-            }`}
+          className={`absolute top-12 left-4 w-14 h-14 rounded-2xl bg-black items-center justify-center z-50 ${
+            isPressed ? "opacity-100" : "opacity-80"
+          }`}
           activeOpacity={1}
         >
           <Entypo name="chevron-thin-left" size={22} color="white" />
@@ -181,24 +183,31 @@ const ItemDetailComponent = ({
 
   return (
     <View className="gap-2">
-      <TouchableOpacity
-        className="flex-row items-center gap-2"
-        onPress={() => {
-          router.push({
-            pathname: "/(brand)/[id]",
-            params: {
-              id: brand?.id || "",
-            },
-          });
-        }}
-        activeOpacity={0.7}
-      >
-        <Image
-          source={{ uri: brand?.logo.url }}
-          className="w-6 h-6 rounded-full"
-        />
-        <Text className="text-white text-xl font-plight">{brand?.name}</Text>
-      </TouchableOpacity>
+      {brand ? (
+        <TouchableOpacity
+          className="flex-row items-center gap-2"
+          onPress={() => {
+            router.push({
+              pathname: "/(brand)/[id]",
+              params: {
+                id: brand?.id || "",
+              },
+            });
+          }}
+          activeOpacity={0.7}
+        >
+          <Image
+            source={{ uri: brand.logo.url }}
+            className="w-6 h-6 rounded-full"
+          />
+          <Text className="text-white text-xl font-plight">{brand.name}</Text>
+        </TouchableOpacity>
+      ) : (
+        <View className="flex-row items-center gap-2">
+          <Skeleton width={24} height={24} radius={999} colorMode="light" />
+          <Skeleton width={120} height={22} radius={6} colorMode="light" />
+        </View>
+      )}
       <Text className="text-white text-3xl font-pmedium">{item.name}</Text>
       <View className="">
         <Text className="text-white text-xl font-pregular">
@@ -240,7 +249,7 @@ const IconComponent = ({
   uuid,
   itemName,
   setVisibleModal,
-  email
+  email,
 }: {
   uuid: string;
   isBrandItem: boolean;
