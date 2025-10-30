@@ -14,13 +14,13 @@ import { getFileUrl } from "../file-uploader";
 // Función para validar items JSON
 async function validateJsonItems(items: CreateItemSchemaType[]): Promise<
   | {
-    error: true;
-    details: string;
-  }
+      error: true;
+      details: string;
+    }
   | {
-    error: false;
-    catalogItems: CreateItemSchemaType[];
-  }
+      error: false;
+      catalogItems: CreateItemSchemaType[];
+    }
 > {
   if (!Array.isArray(items) || items.length === 0) {
     return {
@@ -174,19 +174,22 @@ export async function UpdateCatalog(
       error: false,
     };
     console.log(
-      `Successfully inserted ${weaviateResult.insertedCount} vectors into Weaviate`
+      `Se han insertado ${weaviateResult.insertedCount} vectores en la base de datos`
     );
 
     const totalCountAfter = await countObjects(collection);
     console.log(
-      `Total objects in collection after insertion: ${totalCountAfter}`
+      `Total de objetos en la colección después de la inserción: ${totalCountAfter}`
     );
   } else {
     res = {
       error: true,
-      details: `Error inserting into Weaviate: ${weaviateResult.errors.join(", ")}`,
+      details: `Error al insertar en la base de datos: ${weaviateResult.errors.join(", ")}`,
     };
-    console.error("Weaviate insertion errors:", weaviateResult.errors);
+    console.error(
+      "Errores al insertar en la base de datos:",
+      weaviateResult.errors
+    );
   }
   return res;
 }

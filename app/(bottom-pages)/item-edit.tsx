@@ -199,7 +199,7 @@ function useUpdateItem(itemLastValue: UpdateItemSchema, brandEmail: string) {
       });
       Toast.show({
         type: "success",
-        text1: `The item ${variables.formData.name} has been successfully updated in the catalog!`,
+        text1: `El item ${variables.formData.name} ha sido actualizado correctamente en el catálogo!`,
         visibilityTime: 2000,
       });
     },
@@ -208,13 +208,13 @@ function useUpdateItem(itemLastValue: UpdateItemSchema, brandEmail: string) {
         if (responseError.message.includes("[1] mal formados")) {
           Toast.show({
             type: "error",
-            text1: `The item ${data.formData.name} is not valid.`,
+            text1: `El item ${data.formData.name} no es válido.`,
             visibilityTime: 6000,
           });
         } else {
           Toast.show({
             type: "error",
-            text1: `Error updating item ${data.formData.name}: ${responseError.message}`,
+            text1: `Error al actualizar el item ${data.formData.name}: ${responseError.message}`,
             visibilityTime: 6000,
           });
         }

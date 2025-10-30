@@ -88,7 +88,7 @@ const SendButton = ({
               ${disabled ? "text-gray-700" : "text-black"}
             `}
       >
-        {loading ? "Sending..." : "Send"}
+        {loading ? "Enviando..." : "Enviar"}
       </Text>
     </TouchableOpacity>
   </View>
@@ -147,14 +147,15 @@ function useCodeVerification(
     onSuccess: async () => {
       Toast.show({
         type: "success",
-        text1: "Email sent successfully!\nPlease check your email to continue.",
+        text1:
+          "Email enviado correctamente!\nPor favor, revisa tu email para continuar.",
         visibilityTime: 4000,
       });
       router.replace("/sign-in");
     },
     onError: error => {
       setEmailError(
-        error instanceof Error ? error.message : "Unexpected error"
+        error instanceof Error ? error.message : "Error inesperado"
       );
     },
     onSettled: () => {

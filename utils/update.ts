@@ -109,12 +109,12 @@ export function useDeleteAccount(logout: () => Promise<void>) {
     },
     onSuccess: async () => {
       await authClient.deleteUser();
-      console.log("Account deleted successfully");
+      console.log("Cuenta eliminada correctamente");
       await logout();
     },
     onError: error => {
       // TODO PUSH TOAST
-      console.log(`could not delete user:`, error);
+      console.log(`No se pudo eliminar el usuario:`, error);
     },
   });
 
@@ -140,20 +140,20 @@ export function useResendCode() {
       console.log("SendCode onSuccess triggered");
       Toast.show({
         type: "success",
-        text1: "Code sent successfully",
+        text1: "Código enviado correctamente",
         visibilityTime: 3000,
       });
     },
     onError: error => {
-      console.error("Error resending code:", error);
+      console.error("Error al reenviar el código:", error);
       Toast.show({
         type: "error",
-        text1: "Failed to resend code",
+        text1: "No se pudo reenviar el código",
         visibilityTime: 3000,
       });
     },
     onSettled: () => {
-      console.log("SendCode onSettled triggered");
+      console.log("SendCode onSettled activado");
       //invalidate query
       void queryClient.invalidateQueries({
         queryKey: ["expiration-code"],
@@ -168,7 +168,7 @@ export function useResendCodeResetPassword() {
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: async (email: string) => {
-      console.log("Sending verification email to", email);
+      console.log("Enviando email de restablecimiento de contraseña a", email);
       await authClient.requestPasswordReset({
         email: email,
         redirectTo: "cherrypick:///reset-password",
@@ -177,14 +177,15 @@ export function useResendCodeResetPassword() {
             console.error(error);
             Toast.show({
               type: "error",
-              text1: "Failed to send reset password email",
+              text1:
+                "No se pudo enviar el email de restablecimiento de contraseña",
             });
           },
           onSuccess: () => {
-            console.log("Reset password email sent");
+            console.log("Email de restablecimiento de contraseña enviado");
             Toast.show({
               type: "success",
-              text1: "Reset password email sent!",
+              text1: "Email de restablecimiento de contraseña enviado!",
             });
           },
         },
@@ -192,7 +193,7 @@ export function useResendCodeResetPassword() {
     },
 
     onSettled: () => {
-      console.log("SendCode onSettled triggered");
+      console.log("SendCode onSettled activado");
       //invalidate query
       void queryClient.invalidateQueries({
         queryKey: ["reset-password-code"],

@@ -41,13 +41,19 @@ export const auth = betterAuth({
       const code = GenerateVerificationCode();
       const emailSent = await SendEmailResetPassword(user.email, code);
       if (!emailSent) {
-        throw new Error("Failed to send verification email");
+        throw new Error(
+          "No se pudo enviar el email de restablecimiento de contraseña"
+        );
       }
       const res = await SaveVerificationCodeResetPassword(user.id, code, token);
       if (res.error) {
-        throw new Error("Failed to save verification code reset password");
+        throw new Error(
+          "No se pudo guardar el código de restablecimiento de contraseña"
+        );
       }
-      console.log("Reset password email sent successfully!!!");
+      console.log(
+        "Email de restablecimiento de contraseña enviado correctamente!!!"
+      );
     },
   },
   emailVerification: {

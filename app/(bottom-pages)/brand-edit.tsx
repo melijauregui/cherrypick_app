@@ -32,7 +32,7 @@ export default function EditBrandPage() {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["self-brand-profile"],
+    queryKey: ["self-brand-profile", user?.email],
     queryFn: () => getSelfBrandProfile(),
     staleTime: 5 * 60 * 1000,
   });
@@ -208,21 +208,25 @@ function useUpdateBrand(
     onSuccess: () => {
       Toast.show({
         type: "success",
-        text1: `Brand updated successfully`,
+        text1: `Marca actualizada correctamente`,
         visibilityTime: 4000,
       });
     },
     onError: error => {
       Toast.show({
         type: "error",
-        text1: `could not update user:`,
+        text1: `No se pudo actualizar la marca:`,
         visibilityTime: 4000,
       });
-      console.log(`could not update user:`, error);
+      console.log(`No se pudo actualizar la marca:`, error);
     },
     onSettled: () => {
+      console.log("onSettled");
       void queryClient.invalidateQueries({
-        queryKey: ["self-brand-profile", user?.email],
+        queryKey: ["self-brand-profile", user.email],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: ["brand-profile-item", user.id],
       });
     },
   });

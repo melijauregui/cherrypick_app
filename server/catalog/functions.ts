@@ -99,14 +99,14 @@ export async function extractImageFeatures(
     }
     return {
       error: false,
-      details: "Image features extracted successfully",
+      details: "Las características de la imagen se han extraído correctamente",
       features: result,
     };
   } catch (error) {
-    console.error("Error extracting image features:", error);
+    console.error("Error al extraer las características de la imagen:", error);
     return {
       error: true,
-      details: "Error extracting image features",
+      details: "Error al extraer las características de la imagen",
       features: [],
     };
   }
@@ -140,14 +140,17 @@ export async function extractImageFeaturesFromBase64(
 
     return {
       error: false,
-      details: "Image features extracted successfully",
+      details: "Las características de la imagen se han extraído correctamente",
       features: result,
     };
   } catch (error) {
-    console.error("Error extracting image features from base64:", error);
+    console.error(
+      "Error al extraer las características de la imagen desde base64:",
+      error
+    );
     return {
       error: true,
-      details: "Error extracting image features from base64",
+      details: "Error al extraer las características de la imagen desde base64",
       features: [],
     };
   }
@@ -180,14 +183,14 @@ export async function extractTextFeatures(
     }
     return {
       error: false,
-      details: "Text features extracted successfully",
+      details: "Las características del texto se han extraído correctamente",
       features: result,
     };
   } catch (error) {
-    logger.error("Error extracting text features: %s", error);
+    logger.error("Error al extraer las características del texto: %s", error);
     return {
       error: true,
-      details: "Error extracting text features",
+      details: "Error al extraer las características del texto",
       features: [],
     };
   }
@@ -213,14 +216,14 @@ export async function extractFeatures(
     const result = await response.json();
     return {
       error: false,
-      details: "Features extracted successfully",
+      details: "Las características se han extraído correctamente",
       features: result,
     };
   } catch (error) {
-    logger.error("Error extracting features: %s", error);
+    logger.error("Error al extraer las características: %s", error);
     return {
       error: true,
-      details: "Error extracting features",
+      details: "Error al extraer las características",
       features: { image_features: [], text_features: [] },
     };
   }
@@ -258,14 +261,18 @@ export async function getPreferencesSimilarities(image_url: string): Promise<{
 
     return {
       error: false,
-      details: "preferences similarities extracted successfully",
+      details:
+        "Las similitudes de las preferencias se han extraído correctamente",
       similarities: result.similarities ?? [],
     };
   } catch (error) {
-    logger.error("Error extracting preferences similarities: %s", error);
+    logger.error(
+      "Error al extraer las similitudes de las preferencias: %s",
+      error
+    );
     return {
       error: true,
-      details: "Error extracting preferences similarities",
+      details: "Error al extraer las similitudes de las preferencias",
       similarities: [],
     };
   }
@@ -293,14 +300,14 @@ export async function searchText(
     console.log("searcghText result type:", typeof result);
     return {
       error: false,
-      details: "Text search successfull",
+      details: "La búsqueda de texto se ha realizado correctamente",
       results: result,
     };
   } catch (error) {
-    logger.error("Error during text search: %s", error);
+    logger.error("Error al realizar la búsqueda de texto: %s", error);
     return {
       error: true,
-      details: "Error during text search",
+      details: "Error al realizar la búsqueda de texto",
       results: [],
     };
   }
@@ -324,7 +331,7 @@ export async function getCollection(): Promise<
 
     // Verificar que la conexión esté lista
     if (!client.isReady()) {
-      throw new Error("No se pudo conectar a Weaviate");
+      throw new Error("No se pudo conectar a la base de datos");
     }
 
     let collection: Collection;

@@ -275,7 +275,7 @@ function useInsertItem() {
     onSuccess: (data, variables) => {
       Toast.show({
         type: "success",
-        text1: `The item ${variables.formData.name} has been successfully added to the catalog.`,
+        text1: `El item ${variables.formData.name} ha sido agregado correctamente al catálogo.`,
         visibilityTime: 2000,
       });
     },
@@ -284,7 +284,7 @@ function useInsertItem() {
         console.log("responseError", responseError.message);
         Toast.show({
           type: "error",
-          text1: `Error inserting item ${data.formData.name}`,
+          text1: `Error al agregar el item ${data.formData.name} al catálogo`,
           visibilityTime: 6000,
         });
       }

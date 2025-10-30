@@ -40,7 +40,7 @@ const BrandProfile = ({
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["self-brand-profile"],
+    queryKey: ["self-brand-profile", user.email],
     queryFn: () => getSelfBrandProfile(),
     staleTime: 5 * 60 * 1000,
   });
@@ -103,8 +103,9 @@ const BrandProfilePage = ({ brandId }: { brandId: string }) => {
             onPress={() => router.back()}
             onPressIn={() => setIsPressed(true)}
             onPressOut={() => setIsPressed(false)}
-            className={`absolute top-12 left-4 w-12 h-12 rounded-full bg-neutral-900 items-center justify-center z-50 ${isPressed ? "opacity-100" : "opacity-90"
-              }`}
+            className={`absolute top-12 left-4 w-12 h-12 rounded-full bg-neutral-900 items-center justify-center z-50 ${
+              isPressed ? "opacity-100" : "opacity-90"
+            }`}
             activeOpacity={1}
           >
             <Entypo name="chevron-thin-left" size={22} color="white" />

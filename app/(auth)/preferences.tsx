@@ -201,7 +201,7 @@ function useUpdatePreferences() {
     onSuccess: async () => {
       Toast.show({
         type: "success",
-        text1: "Account created successfully",
+        text1: "Cuenta creada correctamente",
         visibilityTime: 4000,
       });
       router.replace("/home");
@@ -210,8 +210,8 @@ function useUpdatePreferences() {
       console.error("Error creating account:", error);
       Toast.show({
         type: "error",
-        text1: "Error creating account",
-        text2: "Please try again later.",
+        text1: "Error al crear la cuenta",
+        text2: "Por favor, inténtalo de nuevo más tarde.",
         visibilityTime: 4000,
       });
       router.replace("/sign-in");
