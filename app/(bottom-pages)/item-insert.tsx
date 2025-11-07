@@ -259,6 +259,8 @@ function useInsertItem() {
         imageId: imageId,
       };
 
+      console.log("insertItem", insertItem);
+
       const response = await safeFetch({
         url: `${BASE_URL}/brand/insert-items`,
         method: "POST",

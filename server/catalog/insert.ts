@@ -83,21 +83,11 @@ export async function insertCatalogItems(
         );
       }
 
-      console.log(`Inserting item: ${item.name}, UUID: ${item.uuid}`);
+      console.log(`Inserting item: ${item.name}`);
 
-      // 3. Insertar el item en PostgreSQL
-      const dbItem = await prisma.item.upsert({
-        where: { id: item.uuid ?? "" }, // si item.uuid es undefined, se podría generar un error: mejor asegurar UUID
-        update: {
-          name: item.name,
-          description: item.description,
-          price: item.price,
-          url: item.url,
-          brandId: brandId,
-          imageId: item.imageId,
-        },
-        create: {
-          id: item.uuid, // solo si tienes un UUID generado
+      // 3. Insertar el item en PostgreSQL (Prisma genera el UUID automáticamente)
+      const dbItem = await prisma.item.create({
+        data: {
           name: item.name,
           description: item.description,
           price: item.price,

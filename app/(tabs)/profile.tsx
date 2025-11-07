@@ -144,7 +144,7 @@ const ClientProfile = ({
               value={
                 data.user.dateOfBirth
                   ? format(data.user.dateOfBirth, "dd/MM/yyyy")
-                  : "No date of birth yet"
+                  : "No has ingresado aún"
               }
               canEdit={true}
               onPress={openUsernameSheetDate}

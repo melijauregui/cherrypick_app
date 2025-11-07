@@ -4,7 +4,7 @@ import * as SecureStore from "expo-secure-store";
 import { useEffect, useRef, useState } from "react";
 import { inferAdditionalFields } from "better-auth/client/plugins";
 import { auth } from "@/lib/auth";
-import { router } from "expo-router";
+import { router, usePathname } from "expo-router";
 import { BETTER_AUTH_URL } from "@/config/api";
 
 const authClient = createAuthClient({
@@ -91,6 +91,7 @@ export { useSession, signIn, signUp, signOut };
 
 export function OnlyAuthenticated({ children }: { children: React.ReactNode }) {
   const { status, user } = useSession();
+  const pathname = usePathname();
 
   if (status === "loading") return null;
 
@@ -103,7 +104,7 @@ export function OnlyAuthenticated({ children }: { children: React.ReactNode }) {
     router.replace("cherrypick:///sign-in");
     return null;
   }
-  if (!user?.emailVerified) {
+  if (!user?.emailVerified && pathname !== "/code-verification-register") {
     router.replace("cherrypick:///code-verification-register");
     return null;
   }
