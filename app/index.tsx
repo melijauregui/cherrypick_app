@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import AppName from "@/app/components/AppName";
 import LogoSquareBeige from "@/app/components/logo/LogoSquareBeige";
 import "../global.css";
-import { Redirect, usePathname } from "expo-router";
+import { useRouter, usePathname } from "expo-router";
 import { authClient } from "@/lib/auth-client";
 import { useQueryClient } from "@tanstack/react-query";
 import prefetchHome, {
@@ -24,6 +24,7 @@ export default function App() {
   const [timeout, setHasTimedOut] = useState(false);
   const [hasPrefetched, setHasPrefetched] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     const timer = setTimeout(() => setHasTimedOut(true), 2000);
@@ -49,9 +50,23 @@ export default function App() {
     }
   }, [error]);
 
-  if (error) {
-    return <Redirect href="/sign-in" />;
-  }
+  useEffect(() => {
+    if (!loading && timeout) {
+      if (error) {
+        router.replace("/sign-in");
+      } else if (user) {
+        if (!user.emailVerified && pathname !== "/code-verification-register") {
+          // Usuario nuevo - redirigir a sign-in para que el useEffect maneje el redirect a preferences
+          router.replace("/code-verification-register");
+        } else {
+          // Usuario existente - redirigir directamente a home
+          router.replace(`/home?prefetch=${hasPrefetched}`);
+        }
+      } else {
+        router.replace("/sign-in");
+      }
+    }
+  }, [loading, timeout, user, error, hasPrefetched]);
 
   if (loading || !timeout) {
     return (
@@ -65,19 +80,5 @@ export default function App() {
         <StatusBar backgroundColor="#000000" style="light" />
       </SafeAreaView>
     );
-  }
-
-  // Redirect based on authentication status
-  if (user) {
-    if (!user.emailVerified && pathname !== "/code-verification-register") {
-      // Usuario nuevo - redirigir a sign-in para que el useEffect maneje el redirect a preferences
-      return <Redirect href="/code-verification-register" />;
-    } else {
-      // Usuario existente - redirigir directamente a home
-      return <Redirect href={`/home?prefetch=${hasPrefetched}`} />;
-    }
-  } else {
-    console.log("Index: No user found, redirecting to sign-in");
-    return <Redirect href="/sign-in" />;
   }
 }
