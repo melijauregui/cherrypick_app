@@ -108,7 +108,13 @@ const ItemDetail = ({ item }: { item: ItemSchemaType }) => {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View className="flex-1 bg-brown-strong">
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => {
+            if (router.canGoBack()) {
+              router.back();
+            } else {
+              router.push("/home");
+            }
+          }}
           onPressIn={() => setIsPressed(true)}
           onPressOut={() => setIsPressed(false)}
           className={`absolute top-12 left-4 w-14 h-14 rounded-2xl bg-black items-center justify-center z-50 ${
@@ -272,7 +278,7 @@ const IconComponent = ({
 
   const handleShareItem = async () => {
     try {
-      const itemLink = `cherrypick://item/${uuid}`;
+      const itemLink = `cherrypick://item-page?uuid=${uuid}`;
 
       // Copiar al clipboard
       await Clipboard.setStringAsync(itemLink);

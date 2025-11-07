@@ -103,6 +103,10 @@ export function OnlyAuthenticated({ children }: { children: React.ReactNode }) {
     router.replace("cherrypick:///sign-in");
     return null;
   }
+  if (!user?.emailVerified) {
+    router.replace("cherrypick:///code-verification-register");
+    return null;
+  }
 
   return children;
 }

@@ -63,10 +63,7 @@ const SignIn = () => {
       return false;
     }
     if (resVerify.exists) {
-      Toast.show({
-        type: "error",
-        text1: "Email already exists",
-      });
+      setEmailError("Email already exists");
       return false;
     }
 
