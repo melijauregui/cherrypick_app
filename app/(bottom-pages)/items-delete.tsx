@@ -13,12 +13,14 @@ import safeFetch from "../../utils/safe-fetch";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { BASE_URL } from "@/config/api";
 import { IdNameImageSchemaType } from "@/schemas/catalog/catalog-schema";
+import CustomModal from "@/app/components/Modal";
 
 export default function DeleteItemsPage() {
   const [itemsSelected, setItemsSelected] = useState<
     Map<string, IdNameImageSchemaType>
   >(new Map());
   const [forceKey, setForceKey] = useState(0);
+  const [visibleModal, setVisibleModal] = useState(false);
   const onCancel = () => {
     setForceKey(forceKey + 1);
     router.back();
@@ -32,17 +34,20 @@ export default function DeleteItemsPage() {
     queryFn: getSelfBrandInspoItems,
   });
 
+  const handleDeleteConfirm = async () => {
+    try {
+      setDeleting(true);
+      await deleteMutation.mutateAsync(new Set(itemsSelected.keys()));
+    } finally {
+      setDeleting(false);
+      setVisibleModal(false);
+      router.back();
+    }
+  };
+
   return (
     <StandardPageBottomSheet
-      onSave={async () => {
-        try {
-          setDeleting(true);
-          await deleteMutation.mutateAsync(new Set(itemsSelected.keys()));
-        } finally {
-          setDeleting(false);
-          router.back();
-        }
-      }}
+      onSave={() => setVisibleModal(true)}
       onCancel={onCancel}
       onLoading={deleting}
       section="Eliminar items"
@@ -80,7 +85,16 @@ export default function DeleteItemsPage() {
           }}
         />
       </View>
+      <CustomModal
+        title="Eliminar productos"
+        text={`¿Estás seguro de querer eliminar ${itemsSelected.size} ${itemsSelected.size === 1 ? "producto" : "productos"
+          }? Este proceso es irreversible.`}
+        onSubmit={handleDeleteConfirm}
+        onCancel={() => setVisibleModal(false)}
+        visible={visibleModal}
+      />
     </StandardPageBottomSheet>
+
   );
 }
 
@@ -126,7 +140,8 @@ function useDelete() {
 
       Toast.show({
         type: "success",
-        text1: `${data.numberDeleted} productos eliminados correctamente`,
+        text1: `${data.numberDeleted} ${data.numberDeleted === 1 ? "producto" : "productos"
+          } eliminados correctamente`,
       });
     },
     onError: error => {
