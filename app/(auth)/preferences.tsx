@@ -35,11 +35,9 @@ const Preferences = () => {
   return (
     <SignPage>
       <SignPageContent>
-        <SignPageHeader>
-          How would you describe your fashion style?
-        </SignPageHeader>
+        <SignPageHeader>¿Cómo describirías tu estilo de moda?</SignPageHeader>
         <Text className="text-grey-lighter text-[15px] font-pregular pt-3">
-          Pick at least 1 to customize your home feed.
+          Selecciona al menos 1 para personalizar tu feed de inicio.
         </Text>
         <SelectionList
           setSelectedOne={setSelectedOne}

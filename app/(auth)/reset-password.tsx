@@ -35,7 +35,7 @@ export default function ResetPassword() {
     }
 
     if (password !== confirmPassword) {
-      setConfirmPasswordError("Passwords do not match");
+      setConfirmPasswordError("Las contraseñas no coinciden");
       return false;
     }
     return true;
@@ -52,7 +52,7 @@ export default function ResetPassword() {
       console.log("Password reset error", error.message);
       Toast.show({
         type: "error",
-        text1: "An error occurred during password reset",
+        text1: "Ocurrió un error durante el restablecimiento de contraseña",
       });
       router.replace("/sign-in");
       return;
@@ -61,7 +61,7 @@ export default function ResetPassword() {
     console.log("Password reset successful");
     Toast.show({
       type: "success",
-      text1: "Password reset successful!",
+      text1: "¡Restablecimiento de contraseña exitoso!",
     });
     router.replace("/sign-in");
   };
@@ -69,10 +69,10 @@ export default function ResetPassword() {
   return (
     <SignPage>
       <SignPageContent>
-        <SignPageHeader>Insert your new password</SignPageHeader>
+        <SignPageHeader>Ingresa tu nueva contraseña</SignPageHeader>
         <SignPageItems>
           <Input
-            placeholder="New password"
+            placeholder="Nueva contraseña"
             value={password}
             onChange={text => {
               setPasswordError(undefined);
@@ -84,7 +84,7 @@ export default function ResetPassword() {
             onTogglePassword={() => setShowPassword(!showPassword)}
           />
           <Input
-            placeholder="Confirm password"
+            placeholder="Confirmar contraseña"
             value={confirmPassword}
             onChange={text => {
               setConfirmPasswordError(undefined);

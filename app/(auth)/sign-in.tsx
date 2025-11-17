@@ -21,7 +21,7 @@ const SignIn = () => {
           <LogoCircle classname="w-[60] h-[60] mb-1 self-center" />
           <View className="w-full mt-40 ">
             <Text className="text-white text-[25px] font-pbold relative">
-              Instantly match any outfit to real shopping options.
+              Combina cualquier outfit con opciones de compra reales.
             </Text>
             <View className="w-full mt-40 flex flex-col gap-4">
               <GoogleSignInButton />
@@ -51,7 +51,7 @@ const GoogleSignInButton: React.FC<{}> = () => {
         resizeMode="contain"
       />
       <Text className="text-black font-psemibold text-[15px]">
-        Continue with Google
+        Continuar con Google
       </Text>
     </TouchableOpacity>
   );
@@ -63,7 +63,7 @@ const LogInButton = () => (
     onPress={() => router.push("/log-in")}
   >
     <Text className="text-black font-psemibold text-[15px]">
-      Log in with email
+      Iniciar sesión con email
     </Text>
   </TouchableOpacity>
 );
@@ -73,9 +73,7 @@ const SignUpButton = () => (
     className="flex flex-row bg-beige-strong h-[50px] justify-center items-center rounded-full"
     onPress={() => router.push("/sign-up")}
   >
-    <Text className="text-black font-psemibold text-[15px]">
-      Create account
-    </Text>
+    <Text className="text-black font-psemibold text-[15px]">Crear cuenta</Text>
   </TouchableOpacity>
 );
 
@@ -83,7 +81,7 @@ const OrLine = () => (
   <View className="flex flex-row items-center justify-center">
     <View className="w-40 h-px bg-gray-500 opacity-70" />
     <Text className="text-gray-500 text-[13px] font-plight mx-2 opacity-70">
-      or
+      o
     </Text>
     <View className="w-40 h-px bg-gray-500 opacity-70" />
   </View>
@@ -94,8 +92,8 @@ const SignInBrandButton = () => (
     className="flex flex-row justify-center items-center bottom-6"
     onPress={() => router.push("/sign-up-brand")}
   >
-    <Text className="text-white font-pmedium text-[15px]">
-      Are you a brand? Sign up here
+    <Text className="text-beige-strong font-pmedium text-[15px]">
+      ¿Eres una marca? Registrate aquí
     </Text>
   </TouchableOpacity>
 );

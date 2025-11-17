@@ -17,13 +17,14 @@ const ErrorPage = () => {
           <View className="flex-1 justify-center">
             <View className="mb-8">
               <Text className="text-white text-[32px] font-pbold text-center mb-4">
-                Oops!
+                ¡Ups!
               </Text>
               <Text className="text-white text-[18px] font-pmedium text-center mb-2">
-                Something went wrong
+                Algo salió mal
               </Text>
               <Text className="text-gray-300 text-[14px] font-plight text-center mb-8">
-                We're sorry, but an error occurred. Please try again.
+                Lo sentimos, pero ocurrió un error. Por favor, inténtalo de
+                nuevo.
               </Text>
 
               <View className="w-full flex flex-col gap-4">
@@ -32,7 +33,7 @@ const ErrorPage = () => {
                   onPress={() => router.replace("/sign-in")}
                 >
                   <Text className="text-black font-psemibold text-[15px]">
-                    Go back to Sign In
+                    Volver a Iniciar Sesión
                   </Text>
                 </TouchableOpacity>
               </View>

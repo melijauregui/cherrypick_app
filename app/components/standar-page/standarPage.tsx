@@ -52,11 +52,14 @@ export function StandardDescription({
   return (
     <View className="pb-2">
       <View className="flex flex-col justify-center">
-        <Text className="text-neutral-600 text-base font-plight text-center  px-3">
+        <Text
+          className="text-neutral-600 text-base font-plight px-3"
+          style={{ textAlign: "justify" }}>
           {description}
         </Text>
         {descriptionRed && (
-          <Text className="text-red-500 text-base font-plight text-center">
+          <Text className="text-red-500 text-base font-plight px-3"
+            style={{ textAlign: "justify" }}>
             {descriptionRed}
           </Text>
         )}

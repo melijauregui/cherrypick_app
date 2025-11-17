@@ -49,7 +49,7 @@ const SignIn = () => {
     }
 
     if (password !== confirmPassword) {
-      setConfirmPasswordError("Passwords do not match");
+      setConfirmPasswordError("Las contraseñas no coinciden");
       return false;
     }
 
@@ -58,12 +58,13 @@ const SignIn = () => {
       console.error("Error verifying email availability", resVerify.details);
       Toast.show({
         type: "error",
-        text1: "An error occurred while verifying email availability",
+        text1:
+          "Ocurrió un error al verificar la disponibilidad del correo electrónico",
       });
       return false;
     }
     if (resVerify.exists) {
-      setEmailError("Email already exists");
+      setEmailError("El correo electrónico ya existe");
       return false;
     }
 
@@ -76,11 +77,11 @@ const SignIn = () => {
     <SignPage>
       <SignPageContent>
         <SignPageHeader onBackButton={() => router.back()}>
-          Create account
+          Crear cuenta
         </SignPageHeader>
         <SignPageItems>
           <Input
-            placeholder="Name"
+            placeholder="Nombre"
             value={name}
             onChange={text => {
               setNameError(undefined);
@@ -91,7 +92,7 @@ const SignIn = () => {
           />
           <Input
             type="email-address"
-            placeholder="Email"
+            placeholder="Correo electrónico"
             value={email}
             onChange={text => {
               setEmailError(undefined);
@@ -100,7 +101,7 @@ const SignIn = () => {
             error={emailError}
           />
           <Input
-            placeholder="Password"
+            placeholder="Contraseña"
             value={password}
             onChange={text => {
               setPasswordError(undefined);
@@ -112,7 +113,7 @@ const SignIn = () => {
             onTogglePassword={() => setShowPassword(!showPassword)}
           />
           <Input
-            placeholder="Confirm Password"
+            placeholder="Confirmar contraseña"
             value={confirmPassword}
             onChange={text => {
               setConfirmPasswordError(undefined);
@@ -183,7 +184,7 @@ export async function handleSubmitSignUp(
         console.error("Error resending code:", error);
         Toast.show({
           type: "error",
-          text1: "Failed to resend code",
+          text1: "Error al reenviar el código",
           visibilityTime: 3000,
         });
         router.replace("/sign-in");
@@ -192,7 +193,7 @@ export async function handleSubmitSignUp(
         console.log("SendCode onSuccess triggered");
         Toast.show({
           type: "success",
-          text1: "Code sent successfully",
+          text1: "Código enviado exitosamente",
           visibilityTime: 3000,
         });
         router.replace("/code-verification-register");

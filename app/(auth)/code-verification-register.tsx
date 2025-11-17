@@ -78,7 +78,7 @@ export function useVerifyCode() {
       console.error("Error verifying code:", error);
       Toast.show({
         type: "error",
-        text1: "Error verifying code",
+        text1: "Error al verificar el código",
         visibilityTime: 6000,
       });
     },

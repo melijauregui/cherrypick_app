@@ -113,7 +113,6 @@ export default function ListSearch<T extends { id: string; name: string }>({
   };
 
   const displayItems = useMemo(() => getDisplayItems(), [filteredItems]);
-  console.log("displayItems", displayItems);
   const keyExtractor = useCallback((item: T) => item.id, []);
   return (
     <View className="flex flex-col flex-1">

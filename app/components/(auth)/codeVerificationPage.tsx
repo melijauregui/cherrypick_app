@@ -115,7 +115,7 @@ const CodeVerification = ({
     }
     const isCorrect = await onSubmit(code);
     if (!isCorrect) {
-      setCodeError("Code is incorrect");
+      setCodeError("El código es incorrecto");
       return;
     }
   }
@@ -133,11 +133,12 @@ const CodeVerification = ({
             };
           }}
         >
-          We sent you a code
+          Te enviamos un código a tu email
         </SignPageHeader>
         <SignPageItems>
           <Text className="text-gray-400 text-[15px] font-pregular pt-3">
-            Enter it below to verify your email: {email}.
+            Ingrésalo a continuación para verificar tu correo electrónico:{" "}
+            {email}.
           </Text>
           <View className="flex flex-col w-full gap-3">
             <View className="flex flex-col w-full gap-3">
@@ -155,19 +156,19 @@ const CodeVerification = ({
               )}
             </View>
             <Text className="text-gray-400 text-[14px] font-pregular pt-2">
-              Code expires in {Math.floor(secondsLeft / 60)}:
+              El código expira en {Math.floor(secondsLeft / 60)}:
               {Math.floor(secondsLeft % 60)
                 .toString()
                 .padStart(2, "0")}
             </Text>
             {secondsLeft <= 0 && (
               <Text className="text-red-500 pt-1 text-[14px]">
-                The code has expired. Please request a new one.
+                El código ha expirado. Por favor, solicita uno nuevo.
               </Text>
             )}
             <TouchableOpacity onPress={handleResendCode} className="mt-2">
               <Text className="text-white underline text-[14px]">
-                {isLoadingResendCode ? "Resending..." : "Resend Code"}
+                {isLoadingResendCode ? "Reenviando..." : "Reenviar código"}
               </Text>
             </TouchableOpacity>
           </View>

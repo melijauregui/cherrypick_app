@@ -172,7 +172,13 @@ BrandApp.openapi(updateBrandRoute, async c => {
     };
     return c.json(res, 401);
   }
-  logger.info("Updating brand:", description, url, logoId);
+  logger.info(
+    "Updating brand: %s description: %s url: %s logoId: %s",
+    brandId,
+    description,
+    url,
+    logoId
+  );
   res = await UpdateBrand(brandId, description, url, logoId);
   if (res.error) {
     return c.json(res, 404);

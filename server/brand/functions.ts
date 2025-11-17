@@ -48,9 +48,23 @@ export async function UpdateBrand(
   logoId: string
 ): Promise<SuccessSchemaType | ErrorSchemaType> {
   let res: SuccessSchemaType | ErrorSchemaType;
+  const updateData: {
+    description: string;
+    url: string;
+    logoId?: string;
+  } = {
+    description: description,
+    url: url,
+  };
+
+  // Only include logoId if it's not empty
+  if (logoId && logoId.trim().length > 0) {
+    updateData.logoId = logoId;
+  }
+
   await db.brand.update({
     where: { userId: userId },
-    data: { description: description, url: url, logoId: logoId },
+    data: updateData,
   });
   res = {
     error: false,
