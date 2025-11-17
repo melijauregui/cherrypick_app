@@ -34,7 +34,7 @@ const SignUpBrand = () => {
           <View className="flex flex-col w-full">
             <LogoCircle classname="w-[60] h-[60] mb-1 self-center" />
             <Text className="text-white text-[27px] font-pbold pt-6 text-center">
-              Brand Verification
+              Verificación de Marca
             </Text>
             <Text className="text-white text-xl pt-10 pb-8 text-center">
               Ingresá el email de tu marca. Te enviaremos un formulario para que
@@ -42,7 +42,7 @@ const SignUpBrand = () => {
             </Text>
             <Input
               type="email-address"
-              placeholder="Email"
+              placeholder="Correo electrónico"
               value={email}
               onChange={text => {
                 setEmailError(undefined);

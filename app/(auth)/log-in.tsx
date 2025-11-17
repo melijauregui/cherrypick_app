@@ -22,17 +22,17 @@ export default function LogIn() {
     <SignPage>
       <SignPageContent>
         <SignPageHeader onBackButton={() => router.back()}>
-          Log In
+          Iniciar Sesión
         </SignPageHeader>
         <SignPageItems>
           <Input
-            placeholder="Email"
+            placeholder="Correo electrónico"
             value={email}
             onChange={text => setEmail(text)}
             type="email-address"
           />
           <Input
-            placeholder="Password"
+            placeholder="Contraseña"
             value={password}
             onChange={text => setPassword(text)}
             isPassword={true}
@@ -67,7 +67,7 @@ const ForgotPasswordButton = () => (
     onPress={() => router.push("/forgot-password")}
   >
     <Text className="text-beige-strong font-pmedium text-[15px]">
-      Forgot your password?
+      ¿Olvidaste tu contraseña?
     </Text>
   </TouchableOpacity>
 );
@@ -82,7 +82,7 @@ async function handleSubmit(email: string, password: string) {
 
     let message = error.message ?? "Error al iniciar sesión";
     if (error.status === 403) {
-      message = "Please verify your email address";
+      message = "Por favor, verifica tu dirección de correo electrónico";
     }
 
     Toast.show({

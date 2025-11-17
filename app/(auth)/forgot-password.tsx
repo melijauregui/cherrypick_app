@@ -26,7 +26,7 @@ export default function ForgotPassword() {
       email: email,
     });
     if (!result.success) {
-      setEmailError("Email is invalid");
+      setEmailError("El correo electrónico no es válido");
       return false;
     }
 
@@ -35,12 +35,13 @@ export default function ForgotPassword() {
       console.error("Error verifying email availability", resVerify.details);
       Toast.show({
         type: "error",
-        text1: "An error occurred while verifying email availability",
+        text1:
+          "Ocurrió un error al verificar la disponibilidad del correo electrónico",
       });
       return false;
     }
     if (!resVerify.exists) {
-      setEmailError("Email does not exist");
+      setEmailError("El correo electrónico no existe");
       return false;
     }
     return true;
@@ -59,17 +60,18 @@ export default function ForgotPassword() {
       <SignPageContent>
         <SignPageHeader onBackButton={() => router.back()}>
           <Text className="text-white text-[27px] font-pbold text-center mb-4">
-            Reset your password
+            Restablece tu contraseña
           </Text>
         </SignPageHeader>
         <SignPageItems>
           <Text className="text-gray-400 text-[14px] font-plight text-center mb-8 leading-6">
-            Please insert the email address associated with your account.
+            Por favor, ingresa la dirección de correo electrónico asociada con
+            tu cuenta.
           </Text>
 
           <Input
             type="email-address"
-            placeholder="Email"
+            placeholder="Correo electrónico"
             value={email}
             onChange={text => {
               setEmailError(undefined);
