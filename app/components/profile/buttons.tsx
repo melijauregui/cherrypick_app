@@ -7,6 +7,7 @@ const LogOutButton: React.FC<{ logout: () => Promise<void> }> = ({
   logout,
 }) => {
   const handleLogout = async () => {
+    console.log("logout!!!!!!!!", logout);
     await logout();
   };
 

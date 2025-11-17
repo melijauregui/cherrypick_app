@@ -62,6 +62,7 @@ function useSession() {
 
   // Effect to handle force updates
   useEffect(() => {
+    console.log("forceUpdate!!!!!!!!", forceUpdate);
     if (forceUpdate > 0) {
       console.log("Force update triggered, refetching session...");
       session.refetch?.();
@@ -69,6 +70,7 @@ function useSession() {
   }, [forceUpdate, session.refetch]);
 
   useEffect(() => {
+    console.log("session.isPending!!!!!!!!", session.isPending);
     setFirst(false);
   }, [session.isPending]);
 

@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import AppName from "@/app/components/AppName";
 import LogoSquareBeige from "@/app/components/logo/LogoSquareBeige";
 import "../global.css";
-import { useRouter, usePathname } from "expo-router";
+import { useRouter, usePathname, Redirect } from "expo-router";
 import { authClient } from "@/lib/auth-client";
 import { useQueryClient } from "@tanstack/react-query";
 import prefetchHome, {
@@ -26,49 +26,7 @@ export default function App() {
   const pathname = usePathname();
   const router = useRouter();
 
-  useEffect(() => {
-    const timer = setTimeout(() => setHasTimedOut(true), 2000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    if (user && user.emailVerified && !hasPrefetched) {
-      const prefetchTimer = setTimeout(() => {
-        prefetchHome(queryClient, user.email);
-        setHasPrefetched(true);
-      }, 100);
-      return () => clearTimeout(prefetchTimer);
-    }
-  }, [user, queryClient, hasPrefetched]);
-
-  useEffect(() => {
-    if (error) {
-      Toast.show({
-        text1: "Error al iniciar sesión",
-        type: "error",
-      });
-    }
-  }, [error]);
-
-  useEffect(() => {
-    if (!loading && timeout) {
-      if (error) {
-        router.replace("/sign-in");
-      } else if (user) {
-        if (!user.emailVerified && pathname !== "/code-verification-register") {
-          // Usuario nuevo - redirigir a sign-in para que el useEffect maneje el redirect a preferences
-          router.replace("/code-verification-register");
-        } else {
-          // Usuario existente - redirigir directamente a home
-          router.replace(`/home?prefetch=${hasPrefetched}`);
-        }
-      } else {
-        router.replace("/sign-in");
-      }
-    }
-  }, [loading, timeout, user, error, hasPrefetched]);
-
-  if (loading || !timeout) {
+  if (isPending) {
     return (
       <SafeAreaView className="flex-1 h-full bg-brown-strong">
         <ScrollView className="my-1 ">
@@ -80,5 +38,20 @@ export default function App() {
         <StatusBar backgroundColor="#000000" style="light" />
       </SafeAreaView>
     );
+  }
+
+  if (error) {
+    console.log("Error al iniciar sesión", error);
+    return <Redirect href="/sign-in" />;
+  }
+  if (user) {
+    if (!user.emailVerified) {
+      //&& pathname !== "/code-verification-register"
+      return <Redirect href="/code-verification-register" />;
+    }
+    return router.replace(`/home?prefetch=${hasPrefetched}`);
+  } else {
+    console.log("User not authenticated, redirecting to sign-in 1");
+    return <Redirect href="/sign-in" />;
   }
 }
