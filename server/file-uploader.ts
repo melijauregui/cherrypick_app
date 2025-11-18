@@ -7,6 +7,7 @@ import { config } from "../config";
 import { getSignedUrl as getSignedUrlPresigner } from "@aws-sdk/s3-request-presigner";
 import { z } from "zod";
 import { createHash } from "node:crypto";
+import sizeOf from "image-size";
 import { prisma } from "./db";
 import { NotFoundError } from "./errorHandler";
 
@@ -167,4 +168,114 @@ export async function getFilesFromR2(bucket: string, prefix?: string) {
   ).Contents;
 
   return files ?? [];
+}
+
+/**
+ * Get image dimensions from a File object
+ * @param file - File object from multipart form data
+ * @returns Object with width and height, or undefined if not an image or error
+ */
+async function getImageDimensions(
+  file: File
+): Promise<{ width: number; height: number } | undefined> {
+  if (!file.type.startsWith("image/")) {
+    return undefined;
+  }
+
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const dimensions = sizeOf(buffer);
+    
+    if (dimensions.width && dimensions.height) {
+      return {
+        width: dimensions.width,
+        height: dimensions.height,
+      };
+    }
+  } catch (error) {
+    // If we can't read dimensions, return undefined
+    console.error("Error reading image dimensions:", error);
+  }
+  
+  return undefined;
+}
+
+/**
+ * Upload a file directly to R2 from a File object (from multipart/form-data)
+ * @param file - File object from multipart form data
+ * @param bucket - R2 bucket name
+ * @param fileName - Name for the file (without extension)
+ * @param width - Optional image width (will be auto-detected if not provided)
+ * @param height - Optional image height (will be auto-detected if not provided)
+ * @returns The created file record from database
+ */
+export async function uploadFromFile(
+  file: File,
+  bucket: string,
+  fileName: string,
+  width?: number,
+  height?: number
+) {
+  // Convert File to buffer
+  const arrayBuffer = await file.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+  const contentType = file.type;
+
+  // Auto-detect dimensions if not provided
+  if (!width || !height) {
+    const dimensions = await getImageDimensions(file);
+    if (dimensions) {
+      width = dimensions.width;
+      height = dimensions.height;
+    }
+  }
+
+  // Get file extension from contentType
+  const fileExtension = contentType.split("/")[1] ?? "";
+  if (fileExtension === "") {
+    throw new Error("File extension is empty");
+  }
+
+  // Generate filename using the same logic as getFilename
+  const input = {
+    bucket,
+    name: fileName,
+    contentType,
+    fileExtension,
+    replace: false,
+    hash: false,
+    width,
+    height,
+    metadata: {},
+  };
+
+  const filename = await getFilename(input);
+  const url = `https://${bucket}.cherrypick.com.ar/${filename}`;
+
+  // Create file record in database
+  const newFile = await prisma.files.create({
+    data: {
+      name: filename,
+      bucket: bucket,
+      contentType: contentType,
+      uploadUrl: url, // Use the final URL as uploadUrl since we already uploaded
+      url: url,
+      width: width,
+      height: height,
+      metadata: {},
+    },
+  });
+
+  // Upload directly to R2
+  await S3.send(
+    new PutObjectCommand({
+      Bucket: bucket,
+      Key: filename,
+      Body: buffer,
+      ContentType: contentType,
+    })
+  );
+
+  return newFile;
 }

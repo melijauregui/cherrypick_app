@@ -172,3 +172,48 @@ export const UploadItemImageResponseSchema = z.object({
 export type UploadItemImageResponseSchemaType = z.infer<
   typeof UploadItemImageResponseSchema
 >;
+
+// Schema for items without image (used in multipart/form-data where images come separately)
+export const ItemWithoutImageSchema = MinimumPropertiesItemSchema.extend({
+  uuid: z.string().uuid({ message: "UUID is required" }).optional(),
+});
+
+// Schema for multipart/form-data where items come as JSON string
+export const InsertBatchItemsMultipartSchema = z.object({
+  brandId: z.string().uuid({ message: "UUID is required" }),
+  items: z
+    .string()
+    .min(1, "items is required")
+    .transform((val, ctx) => {
+      try {
+        const parsed = JSON.parse(val);
+        return parsed;
+      } catch {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "items must be valid JSON",
+        });
+        return z.NEVER;
+      }
+    })
+    .pipe(
+      z.array(ItemWithoutImageSchema).min(1, "Debe tener al menos un item")
+    ),
+});
+
+// Schema for inserting item with multipart/form-data image (after parsing and adding images)
+export const InsertBatchItems = z.object({
+  brandId: z.string().uuid({ message: "UUID is required" }),
+  items: z
+    .array(
+      ItemWithoutImageSchema.extend({
+        image: z
+          .instanceof(File, { message: "Image file is required" })
+          .refine(file => file.type.startsWith("image/"), {
+            message: "El archivo debe ser una imagen",
+          }),
+      })
+    )
+    .min(1, "Debe tener al menos un item"),
+});
+export type InsertBatchItemsType = z.infer<typeof InsertBatchItems>;
