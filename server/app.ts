@@ -41,6 +41,7 @@ app.use("*", async (c, next) => {
       c.req.path === "/brand/insert-items2" || //TODO NO DEBERIA ESTAR SOLO PARA ENDPOINTS
       c.req.path.startsWith("/code-verification") ||
       c.req.path.startsWith("/search/") || // Temporarily allow search endpoints for testing
+      c.req.path.startsWith("/brand/insert-items-complete") ||
       (c.req.path === "/client" && c.req.method === "POST")
     ) {
       return next();

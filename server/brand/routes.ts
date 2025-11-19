@@ -1,4 +1,5 @@
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
+import { z } from "zod";
 import { Context } from "hono";
 import { errorHandler } from "../errorHandler";
 import { AppEnv } from "../app";
@@ -24,6 +25,7 @@ import {
   UpdateBrand,
   GetBrandInspoItems,
   GetBrandsByIds,
+  InsertItems,
 } from "./functions";
 import { QueryIdSchema } from "@/schemas/standar-query-schema";
 import logger from "../logger";
@@ -40,11 +42,20 @@ import {
   DeleteItemsResponseSchemaType,
   PaginationFilterSchema,
   UuidItemsSchemaResponse,
+  InsertBatchItems,
+  ItemWithoutImageSchema,
+  InsertBatchItemsMultipartSchema,
 } from "@/schemas/catalog/catalog-schema";
-import { GetCatalog } from "../catalog/functions";
+import {
+  GetCatalog,
+  extractFeatures,
+  getCollection,
+} from "../catalog/functions";
 import { UpdateCatalog } from "../catalog/insert";
 import { DeleteFromCatalog } from "../catalog/delete";
 import { QueryEmailSchema } from "@/schemas/standar-query-schema";
+import { uploadFromFile } from "../file-uploader";
+import { prisma } from "../db";
 
 const BrandApp = new OpenAPIHono<AppEnv>({
   defaultHook: (result, c) => {
@@ -665,6 +676,120 @@ BrandApp.openapi(updateCatalogRoute2, async c => {
   if (res.error) {
     return c.json(res, 500);
   }
+  return c.json(res, 200);
+});
+
+// endpoint que inserta un item en el catálogo con imagen en multipart/form-data
+const insertItemWithImageMultipartRoute = createRoute({
+  method: "post",
+  path: "/insert-items-complete",
+  request: {
+    body: {
+      content: {
+        "multipart/form-data": {
+          // Schema que valida items como JSON string y las imágenes por separado
+          schema: InsertBatchItemsMultipartSchema.passthrough(), // Permite campos adicionales como image_0, image_1, etc.
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: SuccessSchema,
+        },
+      },
+      description: "Item insertado exitosamente con imagen",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "No tienes permisos para insertar items",
+    },
+    400: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Error en los datos proporcionados",
+    },
+    500: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Error interno del servidor",
+    },
+  },
+});
+
+BrandApp.openapi(insertItemWithImageMultipartRoute, async c => {
+  let res: SuccessSchemaType | ErrorSchemaType;
+
+  // const user = c.get("user");
+  // const brandId = user?.id;
+  // if (!brandId) {
+  //   res = {
+  //     error: true,
+  //     details: "No tienes permisos para insertar items",
+  //   };
+  //   return c.json(res, 401);
+  // }
+
+  // Validar FormData con el schema (valida brandId e items como JSON string)
+  const validatedData = await c.req.valid("form");
+  const { brandId, items: itemsWithoutImages } = validatedData;
+
+  // Parsear FormData para obtener las imágenes
+  const formData = await c.req.formData();
+
+  // Validar que existan todas las imágenes requeridas
+  const missingImages: number[] = [];
+  for (let index = 0; index < itemsWithoutImages.length; index++) {
+    const imageFile = formData.get(`image_${index}`);
+    if (!imageFile || !(imageFile instanceof File)) {
+      missingImages.push(index);
+    }
+  }
+
+  if (missingImages.length > 0) {
+    res = {
+      error: true,
+      details: `Missing images for items at indices: ${missingImages.join(", ")}`,
+    };
+    return c.json(res, 400);
+  }
+
+  // Agregar las imágenes a cada item
+  const items = itemsWithoutImages.map((item: any, index: number) => {
+    const imageFile = formData.get(`image_${index}`) as File;
+    return {
+      ...item,
+      image: imageFile,
+    };
+  });
+
+  // Validar con Zod usando el schema InsertBatchItems (con imágenes)
+  const validationResult = InsertBatchItems.safeParse({ brandId, items });
+  if (!validationResult.success) {
+    res = {
+      error: true,
+      details: `Validation error: ${validationResult.error.message}`,
+    };
+    return c.json(res, 400);
+  }
+
+  res = await InsertItems(validationResult.data.items, brandId);
+
+  res = {
+    error: false,
+  };
   return c.json(res, 200);
 });
 
