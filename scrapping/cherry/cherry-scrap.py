@@ -17,14 +17,14 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 
 BASE_URL = "https://www.shopcherry.com.ar"
-LISTING_URL = f"{BASE_URL}/mujer/pantalones/"
+LISTING_URL = f"{BASE_URL}/mujer/tops/?mpage=4"
 HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
         "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
     )
 }
-OUTPUT_PATH = Path(__file__).parent / "cherry-pantalones-sample.json"
+OUTPUT_PATH = Path(__file__).parent / "cherry-tops-sample.json"
 
 
 def fetch_soup(url: str) -> BeautifulSoup:
