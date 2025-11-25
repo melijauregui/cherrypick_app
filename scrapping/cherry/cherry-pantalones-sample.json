@@ -72,27 +72,11 @@
     "url": "https://www.shopcherry.com.ar/productos/denim-austin/"
   },
   {
-    "uuid": "10ccc009-18af-4aae-a970-4eebf472727d",
-    "name": "Denim Street",
-    "description": "Jean tiro bajo, calce BAGGY, rígido con detalle de costuras. La modelo usa talle 38 y sus medidas son 66 cm cintura 95 cm cadera. Tabla de talles: considerar...",
-    "price": "59490.00",
-    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/061/998/products/img_8674-e82892abe150d8f4b517577754323247-640-0.webp",
-    "url": "https://www.shopcherry.com.ar/productos/denim-street/"
-  },
-  {
     "uuid": "c77489a0-80e1-48c8-9a4f-05478fb6eae4",
     "name": "Denim Collin",
     "description": "Jean tiro bajo gris con roturas. Calce wide leg. La modelo usa talle 34 y sus medidas son 64 cm cintura 90 cm cadera. Tabla de talles: considerar la medida d...",
     "price": "42890.00",
     "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/061/998/products/img_2037-a65ef87f7ccf0b877117443304186549-640-0.webp",
     "url": "https://www.shopcherry.com.ar/productos/denim-collin/"
-  },
-  {
-    "uuid": "aded09b2-4c0e-4627-930b-62dc3fce6cb8",
-    "name": "Baggy Oliver",
-    "description": "Jean tiro medio bajo, oversized. Calce Baggy.  La modelo usa talle 34 y sus medidas son 64 cm cintura 90 cm cadera. Tabla de talles: considerar la medida de ...",
-    "price": "43190.00",
-    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/061/998/products/tezza-3065-9123c22398fe522fcb17443265188084-640-0.webp",
-    "url": "https://www.shopcherry.com.ar/productos/baggy-oliver/"
   }
 ]
