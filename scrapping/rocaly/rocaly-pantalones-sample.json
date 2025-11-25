@@ -16,28 +16,12 @@
     "url": "https://www.rocaly.com.ar/productos/denim-cross-k91ar/"
   },
   {
-    "uuid": "9c22bb21-c0bb-4c2a-b242-5448bfa1dff2",
-    "name": "PANT URBAN",
-    "description": "Pantalón cargo en color habano-chocolate, con costuras a contratono en color ocre claro. Es tiro medio, y tiene bolsillos laterales con solapas. MEGA cancher...",
-    "price": "82000.00",
-    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_9010-8d0b68e0a5c123da6c17620582864102-640-0.webp",
-    "url": "https://www.rocaly.com.ar/productos/pant-urban-k6viz/"
-  },
-  {
     "uuid": "b431380b-fcd5-4612-b660-e89d5e7df5b4",
     "name": "PANT SAND",
     "description": "Pantalón de gabardina semi elastizado. en color arena. Tiro medio, recto. Tiene botòn delantero en el mismo tono y lazo para atar en la cintura, bolsillos la...",
     "price": "69000.00",
     "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_0737-e65a6e54e195ece6da17620557526772-640-0.webp",
     "url": "https://www.rocaly.com.ar/productos/pant-sand-d37tn/"
-  },
-  {
-    "uuid": "1f97f5a9-1f72-40e9-9df4-62a7977a5874",
-    "name": "PANT BALLOON T.M",
-    "description": "Pantalón de algodón liviano, super fresco y con mucha caída, en color gris melange/visòn. Tiene cintura elástica, bolsillos laterales y detalle de solapa con...",
-    "price": "69000.00",
-    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_8549-cfd341548d9f8e7c7117611761034741-640-0.webp",
-    "url": "https://www.rocaly.com.ar/productos/pant-balloon-t-m-goi59/"
   },
   {
     "uuid": "0851b8c7-0ad7-49f2-aeab-dea24ba97f49",
@@ -88,76 +72,12 @@
     "url": "https://www.rocaly.com.ar/productos/denim-coast/"
   },
   {
-    "uuid": "f333eda4-17af-4600-bea0-5c53a4fffbb8",
-    "name": "PANT ECO DUST",
-    "description": "Pantalón recto de cuerina tiro medio-bajo con dos bolsillos delanteros y dos bolsillos traseros. Cintura con presillas y boton zamak personalizado Top White ...",
-    "price": "98000.00",
-    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_0009-7300b7eb64e831b1af17546055451297-640-0.webp",
-    "url": "https://www.rocaly.com.ar/productos/pant-eco-dust/"
-  },
-  {
-    "uuid": "b5361233-26cf-4a02-90a3-46e09c4a53c8",
-    "name": "DENIM FLARE - SIN CAMBIO T. 34",
-    "description": "Pant de jean en color deep blue clásico, con un corte semi oxford (no es tan ajustado en los muslos pero tiene ese efecto acampanado que estiliza muchísimo)....",
-    "price": "64000.00",
-    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_0843-65f045db26d7453a4217546048401721-640-0.webp",
-    "url": "https://www.rocaly.com.ar/productos/denim-flare-sin-cambio-t-34-rcrwf/"
-  },
-  {
-    "uuid": "f6d340d6-b265-4db3-9bdc-48b23335f0bf",
-    "name": "DENIM SLICE BLACK",
-    "description": "Pant de jean tiro bajo en color negro gastado, con detalles de costura cerrada en la botamanga. Tiene botones con solapas en parte posterior, con botoncitos ...",
-    "price": "89000.00",
-    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_2939-d83d44d8d1e58f706017557202940556-640-0.webp",
-    "url": "https://www.rocaly.com.ar/productos/denim-slice-black/"
-  },
-  {
-    "uuid": "5d1f3ba6-4345-4910-9b7b-e801200c3fca",
-    "name": "DENIM RIDDLE T.38 Y 40 - SIN CAMBIO",
-    "description": "Pantalón denim corte straight, tiro medio, color azul lavado con localizado leve y bigotes laser. Tiene pequeños detalles de roturas que lo hacen suuper orig...",
-    "price": "57850.00",
-    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_9693-e51b48e4f8287b0eb517546103347566-640-0.webp",
-    "url": "https://www.rocaly.com.ar/productos/denim-riddle1/"
-  },
-  {
-    "uuid": "d4f58588-9b03-43a7-9483-9b31ce857e34",
-    "name": "DENIM DURBAN",
-    "description": "Pant de jean corte wide leg, tiro medio. Es un jean celeste lavado, con localizado en parte de adelante y atrás. Cancherisimo. Viene por talles del 34 al 42 ...",
-    "price": "89000.00",
-    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_9658-7275bcbfe40c4d402d17546104704754-640-0.webp",
-    "url": "https://www.rocaly.com.ar/productos/denim-durban/"
-  },
-  {
-    "uuid": "b68867a3-1b0c-44c0-99e8-f9805f07ec7c",
-    "name": "DENIM LEXY",
-    "description": "Pant de jean en color celeste gastado, con localizados en parte delantera. El corte está entre un recto la terminación de la botamanga un poco más cerrada co...",
-    "price": "74000.00",
-    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_0659-9cac33fd7f87cede9f17546101232119-640-0.webp",
-    "url": "https://www.rocaly.com.ar/productos/denim-lexy/"
-  },
-  {
     "uuid": "2e8180e6-b462-4fc8-b975-35b4e24e49df",
     "name": "DENIM STRAIGHT ACID",
     "description": "Pant de jean en color celeste óxido, con dejes de colores cálidos que le dan ese efecto. Súper canchero. Tiro medio, corte recto, con costuras a tono. Viene ...",
     "price": "89000.00",
     "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_2546-c4463f1d2488df9c5c17508915944619-640-0.webp",
     "url": "https://www.rocaly.com.ar/productos/denim-straight-acid-z4rmb/"
-  },
-  {
-    "uuid": "cbfe5d67-1265-4722-b312-69da55d407a0",
-    "name": "PANTALON SASTRERO BLACK t.36 - SIN CAMBIO",
-    "description": "Pantalon sastrero con un calce hermoso, con  cierre y boton. No transparenta. Viene por talles del 36 al 42  TALLE CINTURA CADERA LARGO TIRO 36 37 cm 47 cm 1...",
-    "price": "57000.00",
-    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_2952-2478d880c75478436717508917210771-640-0.webp",
-    "url": "https://www.rocaly.com.ar/productos/pantalon-sastrero-black1/"
-  },
-  {
-    "uuid": "bda69b7a-ed0b-4950-bd8f-0943c77b4acc",
-    "name": "PANT RAVEN ECO",
-    "description": "Este pantalón de eco es TODO lo que está bien. Tiro medio/bajo. Con detalles de remaches metálicos en bolsillos. La calidad es 10/10, al igual que el calce. ...",
-    "price": "98000.00",
-    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_9142-be84326d62aef41a2617490787386404-640-0.webp",
-    "url": "https://www.rocaly.com.ar/productos/pant-raven-eco/"
   },
   {
     "uuid": "2c0ad923-a5f8-49a9-839d-e52a3fe05215",

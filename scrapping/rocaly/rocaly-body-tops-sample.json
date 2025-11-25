@@ -456,30 +456,6 @@
     "url": "https://www.rocaly.com.ar/productos/top-ravena-white/"
   },
   {
-    "uuid": "b7a39e03-916e-4fd0-945c-7a806aff11a9",
-    "name": "TOP RAVENA BLACK",
-    "description": "Top de microfibra liviana en tela doble calidad premium, sin mangas, escote en “v”. Tiene lazos para atar detrás del cuello y frunces a los costados que le d...",
-    "price": "29900.00",
-    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_5568-69a9a0924e7720658d17600124309932-640-0.webp",
-    "url": "https://www.rocaly.com.ar/productos/top-ravena-black/"
-  },
-  {
-    "uuid": "ae43ebbe-1417-4033-a970-c6188d2919c1",
-    "name": "BODY GINGER SS",
-    "description": "Body de microfibra con escote cerrado y espalda descubierta con muucha onda. Tiene cordones cruzados en la espalda unidos con argollitas metalizadas. Tiene b...",
-    "price": "27000.00",
-    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_5590-33d877f34a444a0a5317600122354222-640-0.webp",
-    "url": "https://www.rocaly.com.ar/productos/body-ginger-ss/"
-  },
-  {
-    "uuid": "802de830-63c8-4e9c-8167-4600cc1128f1",
-    "name": "TOP MORGAN BLACK",
-    "description": "Top de microfibra con detalle metálico dorado en el frente que une las tiras formando un escote gota. Cuello cerrado y con tiras para atar detrás del cuello....",
-    "price": "20900.00",
-    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_5615-61279f3cfa9a19f22f17600121756944-640-0.webp",
-    "url": "https://www.rocaly.com.ar/productos/top-morgan-black/"
-  },
-  {
     "uuid": "cd204189-5229-4e7f-898b-9e5e3b36635f",
     "name": "TOP CANDE COTTON CHOCO",
     "description": "Top 100% algodón, tela con cuerpo y cómoda. Con tiras para atar en el cuello. Básico infaltablee. Es al cuerpo, pero la tela es elastizada y cede. Encontras ...",
@@ -502,14 +478,6 @@
     "price": "20900.00",
     "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_4566-beaa8701070b707bf917594936756285-640-0.webp",
     "url": "https://www.rocaly.com.ar/productos/top-cande-cotton-pink/"
-  },
-  {
-    "uuid": "dee5083a-0b5d-42bc-a1ed-dc0390e79b1d",
-    "name": "TOP CANDE COTTON WHITE",
-    "description": "Top 100% algodón, tela con cuerpo y cómoda. Con tiras para atar en el cuello. Básico infaltablee. Es al cuerpo, pero la tela es elastizada y cede. Encontras ...",
-    "price": "20900.00",
-    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_4616-36930764d651147e5f17594940111957-640-0.webp",
-    "url": "https://www.rocaly.com.ar/productos/top-cande-cotton-white/"
   },
   {
     "uuid": "666e43cf-9a30-49c2-80ed-20ffb5627b4d",
@@ -712,14 +680,6 @@
     "url": "https://www.rocaly.com.ar/productos/top-blusa-blossom-black-sin-cambio-fsovg/"
   },
   {
-    "uuid": "cb9906fc-bf79-4fac-b977-71f0d4a5636e",
-    "name": "TOP BLUSA BLOSSOM BORDEAU- SIN CAMBIO",
-    "description": "Top blusa de microtul mangas largas con escote en V, forrería en busto. El microtul tiene costuras externas como detalles que le dan una textura y un entrama...",
-    "price": "17880.00",
-    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_3488-9eb9fe79bb3329c2e317546030250902-640-0.webp",
-    "url": "https://www.rocaly.com.ar/productos/top-blusa-blossom-bordeau-sin-cambio-jutn1/"
-  },
-  {
     "uuid": "1d2f10ac-4cec-4747-a891-6ce19aa48270",
     "name": "TOP SERENA BLACK- SIN CAMBIO",
     "description": "Top blusa de microtull con mangas largas. Tiene escote V y un lazo para atar en parte delantera. La parte inferior termina en picos, y sus terminaciones en p...",
@@ -744,22 +704,6 @@
     "url": "https://www.rocaly.com.ar/productos/top-zoe-slim-fit1/"
   },
   {
-    "uuid": "b793361a-be5d-4721-8cdc-45a3944f6cfd",
-    "name": "TOP GALA BLACK- SIN CAMBIO",
-    "description": "Top de microfibra elastizada premium con un montón de detalles que vas a amar: cuello bote a un lado para usar con un hombro descubierto, toble tela en busto...",
-    "price": "22000.00",
-    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_7733-3e1967ec250a4258b017527866643873-640-0.webp",
-    "url": "https://www.rocaly.com.ar/productos/top-gala-black-sin-cambio-fob4g/"
-  },
-  {
-    "uuid": "d51dfdad-d4c1-4eed-87af-56f720f93bc7",
-    "name": "TOP GALA GREY- SIN CAMBIO",
-    "description": "Top de microfibra elastizada premium con un montón de detalles que vas a amar: toble tela en busto, cuello bote a un lado para usar con un hombro descubierto...",
-    "price": "22000.00",
-    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_7742-2343c90e4c694a993717527867185696-640-0.webp",
-    "url": "https://www.rocaly.com.ar/productos/top-gala-grey-sin-cambio-j52py/"
-  },
-  {
     "uuid": "37d2826e-60f9-432b-8176-1ad69d661806",
     "name": "TOP BAMBULA CHOCO- SIN CAMBIO",
     "description": "Top mangas largas de bambula, con una textura que es todo. Tiene frunces a los lados, dándole una moldería con muchos más detalles. La tela cede, se adapta ...",
@@ -782,14 +726,6 @@
     "price": "14900.00",
     "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_7249-7b65c85e2d5d6d740917521885120496-640-0.webp",
     "url": "https://www.rocaly.com.ar/productos/top-bambula-black-sin-cambio-7sjyb/"
-  },
-  {
-    "uuid": "57918134-bb60-44cb-a9b8-b50dbf24b0bd",
-    "name": "TOP JULES BLACK - SIN CAMBIO",
-    "description": "Top de microtul mangas largas con escote en V, forrería en busto, y mangas con vuelitos. El microtul tiene costuras externas como detalles que le dan una tex...",
-    "price": "20300.00",
-    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_7025-81b4575188e6fce17e17521888325848-640-0.webp",
-    "url": "https://www.rocaly.com.ar/productos/top-jules-black-sin-cambio-lm5kg/"
   },
   {
     "uuid": "a53c0ac3-4142-4370-b665-0176d756216f",
@@ -840,28 +776,12 @@
     "url": "https://www.rocaly.com.ar/productos/top-angie-white-sin-cambio-ime8z/"
   },
   {
-    "uuid": "2ac4498d-93d7-4330-8779-c457aaaf5d4c",
-    "name": "TOP AMELIA WHITE",
-    "description": "Top de encaje mangas largas con escote en V, forrería en busto, y mangas con vuelitos. El encaje es hermosoo, súper delicado. Se adapta al cuerpo pero es ela...",
-    "price": "29000.00",
-    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_1566-8f499925d13951fe0717557206590265-640-0.webp",
-    "url": "https://www.rocaly.com.ar/productos/top-amelia-white/"
-  },
-  {
     "uuid": "5ea82f98-6cd7-40ff-90c8-ecdf89365a41",
     "name": "BODY V MICROTUL- SIN CAMBIO",
     "description": "Body de microtul, al cuerpo y muy elastizado. Tiene mangas 3/4 y escote en V pronunciado. El body se prende en la parte inferior con botones snaps &lt;3 Vien...",
     "price": "22000.00",
     "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_8977-8f31f63e5e989c0bdd17442376385583-640-0.webp",
     "url": "https://www.rocaly.com.ar/productos/body-v-microtul-sin-cambio/"
-  },
-  {
-    "uuid": "d668b3fd-4284-498e-b85f-2de162ed013d",
-    "name": "TOP NICKY WHITE",
-    "description": "Top de microfibra premiun con tiras para atar en le cuello, canchero y comodo. Viene por talles S a L",
-    "price": "22900.00",
-    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_5035-952ac129edb90fe43117425104153068-640-0.webp",
-    "url": "https://www.rocaly.com.ar/productos/top-nicky-white1/"
   },
   {
     "uuid": "6fa64727-43c9-472b-bae1-722fdbc6afa7",

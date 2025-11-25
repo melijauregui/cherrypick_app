@@ -18,7 +18,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 BASE_URL = "https://www.rocaly.com.ar"
 # LISTING_URL = f"{BASE_URL}/pants/?mpage=2"
-LISTING_URL = f"{BASE_URL}/body-tops/?mpage=10"
+LISTING_URL = f"{BASE_URL}/remeras/?mpage=6"
 HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
@@ -26,7 +26,7 @@ HEADERS = {
     )
 }
 # OUTPUT_PATH = Path(__file__).parent / "rocaly-pantalones-sample.json"
-OUTPUT_PATH = Path(__file__).parent / "rocaly-body-tops-sample.json"
+OUTPUT_PATH = Path(__file__).parent / "rocaly-remeras-sample.json"
 
 
 def fetch_soup(url: str) -> BeautifulSoup:

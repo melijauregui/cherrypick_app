@@ -1,0 +1,482 @@
+[
+  {
+    "uuid": "fd2896bc-5b9d-433a-839a-36cde24519dd",
+    "name": "MUSCULOSA COTTON CREAM",
+    "description": "Musculosa de algodón con mucho cuerpo, tiene un largo ideal. Tiene bordes con costura doble en el escote y hombros. El escote es cerrado estilo americano. Se...",
+    "price": "25900.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_4221-330dd4d43ed0db0e4017636788189747-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/musculosa-cotton-cream-kox1m/"
+  },
+  {
+    "uuid": "310e62e1-54b3-44e0-9852-74fd195e2d83",
+    "name": "MUSCULOSA COTTON BLACK",
+    "description": "Musculosa de algodón con mucho cuerpo, tiene un largo ideal. Tiene bordes con costura doble en el escote y hombros. El escote es cerrado estilo americano. Se...",
+    "price": "25900.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_4298-0343c5646e52d49dd317636787663857-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/musculosa-cotton-black-7mbfg/"
+  },
+  {
+    "uuid": "1f9f03d8-a87e-4252-87c7-ff829bf26a67",
+    "name": "CHOMBA KNIT CREAM",
+    "description": "Chomba tejida con puntos en lineas horizontales que le dan una textura hermosa. Es larguita, elastizada y muy gruesita. Se prende con botones en parte delant...",
+    "price": "55000.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_3303-d05c938f32613f36a417631645868800-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/chomba-knit-cream-ycth9/"
+  },
+  {
+    "uuid": "a06f7c75-b6d0-4f64-a161-aa0f0b7bc0f7",
+    "name": "MUSCU BASIC TANK BLUE",
+    "description": "Musculosa de algodón ribb premium super elastizado, tiene un largo ideal. Tiene bordes anchos en ribb en el escote y hombros. El escote es cerrado estilo ame...",
+    "price": "32000.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_3141-bf35ac87c20d83aca117631645576518-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/muscu-basic-tank-blue-cpxxg/"
+  },
+  {
+    "uuid": "4cf1e5e5-1159-4151-885c-ad9a0032e22c",
+    "name": "MUSCU BASIC TANK TIZA",
+    "description": "Musculosa de algodón ribb premium super elastizado, tiene un largo ideal. Tiene bordes anchos en ribb en el escote y hombros. El escote es cerrado estilo ame...",
+    "price": "32000.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_3074-7b9b506b7f6b03c98417631645287572-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/muscu-basic-tank-tiza-3gzub/"
+  },
+  {
+    "uuid": "ba30001c-e0ea-439b-af1c-f6a6b841fc44",
+    "name": "MUSCU BASIC TANK WHITE",
+    "description": "Musculosa de algodón ribb premium super elastizado, tiene un largo ideal. Tiene bordes anchos en ribb en el escote y hombros. El escote es cerrado estilo ame...",
+    "price": "32000.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_3039-dff543c41f7eeee3db17631644955047-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/muscu-basic-tank-white-uhky1/"
+  },
+  {
+    "uuid": "b3268278-cff9-4b16-b7eb-9b7e3b95f97b",
+    "name": "MUSCU BASIC TANK CHOCO",
+    "description": "Musculosa de algodón ribb premium super elastizado, tiene un largo ideal. Tiene bordes anchos en ribb en el escote y hombros. El escote es cerrado estilo ame...",
+    "price": "32000.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_3159-7e4e1c97348f7c1fd917631644579713-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/muscu-basic-tank-choco-fomlq/"
+  },
+  {
+    "uuid": "5da1a859-c055-4a9f-928a-a077ad35c18e",
+    "name": "MUSCU ROSY BAMBULA",
+    "description": "Musculosa de bambula con escote en V y terminaciones de puntilla en el escote. Súper classy y con detalles en tendencia esta temporada. La tela es elastizada...",
+    "price": "19800.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_3343-77c02e1a3ec00c5ffd17631643026321-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/muscu-rosy-bambula-mmf0m/"
+  },
+  {
+    "uuid": "1cd4fab2-7980-498e-a034-b550790bfc68",
+    "name": "T-SHIRT STRIPES WHITE",
+    "description": "Remera mangas cortas de algodón, con base blanc y rayas horizontales en deep blue, de corte oversize y boxy (cuadrada). El cuello hace contraste en color osc...",
+    "price": "39800.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_3393-1254f0df216d66912d17631642727621-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/t-shirt-stripes-white-4gt17/"
+  },
+  {
+    "uuid": "9bd95af5-01c1-4c79-83dd-5ff9ff17f151",
+    "name": "T-SHIRT STRIPES BLUE",
+    "description": "Remera mangas cortas de algodón, con base deep blue y rayas horizontales en deep blanco, de corte oversize y boxy (cuadrada). El cuello hace contraste en col...",
+    "price": "39800.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_3416-d29a44fb0b5bd0089e17631642435131-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/t-shirt-stripes-blue-ykbr9/"
+  },
+  {
+    "uuid": "b6d24e45-8967-4406-bf6e-e2d4a5f94eec",
+    "name": "CHOMBA COTTON CHOCO",
+    "description": "Chomba mangas cortas con cuello tipo polo y botones en parte delantera desde la altura del busto.  Tiene corte recto, clásico atemporal, con un toque vintage...",
+    "price": "27500.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_2243-6a307923d55c0c96d617623752856419-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/chomba-cotton-choco-wr6pc/"
+  },
+  {
+    "uuid": "71c3621f-80e9-433a-83db-24ac26139d16",
+    "name": "T-SHIRT GLENN ASIMETRICA BLACK",
+    "description": "Remera de algodón premium, rigido y con mucho cuerpo. Tiene escote bote, con un hombro bajo. Es super basic pero la moldería es original, la combinación PERF...",
+    "price": "30900.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_9830-7524f3f244866cd34517620579940764-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/t-shirt-glenn-asimetrica-black-aiyrp/"
+  },
+  {
+    "uuid": "fab355b3-6612-4103-8d88-9d2072640909",
+    "name": "BASIC ANNE ESCOTE PINK",
+    "description": "Musculosa basica de algodon morley premium, con escote cuadrado en ribb. Son al cuerpo, la tela es elastizada y cede. un básico que tenes que tener. Encontra...",
+    "price": "34000.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_0949-d2f54279af5936cfcf17620576339272-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/basic-anne-escote-pink-xxti6/"
+  },
+  {
+    "uuid": "5ca992f5-d437-4ff6-81b7-f3a2936be7e0",
+    "name": "BASIC ANNE ESCOTE YELLOW",
+    "description": "Musculosa basica de algodon morley premium, con escote cuadrado en ribb. Son al cuerpo, la tela es elastizada y cede. un básico que tenes que tener. Encontra...",
+    "price": "34000.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_0985-8abff3e1a9c5168a2f17620575715040-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/basic-anne-escote-yellow-lctp1/"
+  },
+  {
+    "uuid": "ebc74197-b839-4ed2-9b3f-1779f792a1aa",
+    "name": "BASIC ANNE ESCOTE WHITE",
+    "description": "Musculosa basica de algodon morley premium, con escote cuadrado en ribb. Son al cuerpo, la tela es elastizada y cede. un básico que tenes que tener. Encontra...",
+    "price": "34000.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_0097-fe359643b39877aab717620569837484-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/basic-anne-escote-white-55yg0/"
+  },
+  {
+    "uuid": "6aa017b1-3fa2-4c39-8a25-ec68c4e96a89",
+    "name": "BASIC ANNE ESCOTE BLACK",
+    "description": "Musculosa basica de algodon morley premium, con escote cuadrado en ribb. Son al cuerpo, la tela es elastizada y cede. un básico que tenes que tener. Encontra...",
+    "price": "34000.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_6529-483bac3a98a5b86a9217618383739102-640-0.jpeg",
+    "url": "https://www.rocaly.com.ar/productos/basic-anne-escote-black-uka0a/"
+  },
+  {
+    "uuid": "1a7a27ff-e629-46ed-8849-f3ec0576c154",
+    "name": "BLUSA DAPHNE",
+    "description": "Blusa de algodón liviano translúcido con caída super fluida. Tiene volados frontales, escote en V y lazos finos para atar al frente. La moldería es suelta, i...",
+    "price": "42000.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_0554-9be7845472f3d7c05217620567007426-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/blusa-daphne-srkui/"
+  },
+  {
+    "uuid": "c57237bd-7f58-445f-99b2-a8d151c726ab",
+    "name": "REMERA CLARE BOTE WHITE",
+    "description": "Remera de algodón elastizado con escote bote y frunces en el bajo busto. La parte del busto queda un poco más suelta y a la cintura queda ajustada al cuerpo....",
+    "price": "25200.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_9872-e78276592dd90ec41617620562468916-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/remera-clare-bote-white-y7nqw/"
+  },
+  {
+    "uuid": "2cf2e850-72c2-4210-9594-99272b33fc82",
+    "name": "REMERA CLARE BOTE BLACK",
+    "description": "Remera de algodón elastizado con escote bote y frunces en el bajo busto. La parte del busto queda un poco más suelta y a la cintura queda ajustada al cuerpo....",
+    "price": "25200.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_9929-5187808545e48239e517620560719608-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/remera-clare-bote-black-s67lt/"
+  },
+  {
+    "uuid": "e683b22d-0192-447b-96a1-70a36fa6c70b",
+    "name": "REMERA CORSETERA WHITE",
+    "description": "Remera de algodón suelta y basic, pero con un detalle: es la remera más original que viste. Tiene broches corseteros a los costados que se prenden en parte d...",
+    "price": "29500.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_1135-a2b2245432d7594f1217620547488614-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/remera-corsetera-white-n9esq/"
+  },
+  {
+    "uuid": "979f0c69-f6c5-490d-b70d-45dc85d818c1",
+    "name": "REMERA HEART SKY",
+    "description": "Remera mangas cortas de algodón elastizado, super fresca y soft. Básica, con un detalle de corazón &lt;3 pequeño bordado a la altura del pecho. Es elastizada...",
+    "price": "19500.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_0848-d3a47d19c9ebe94c0b17620545846523-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/remera-heart-sky-kd0vs/"
+  },
+  {
+    "uuid": "e54eb0f4-8e3b-4e3d-bd42-8744470a1c13",
+    "name": "REMERA HEART WHITE",
+    "description": "Remera mangas cortas de algodón elastizado, super fresca y soft. Básica, con un detalle de corazón &lt;3 pequeño bordado a la altura del pecho. Es elastizada...",
+    "price": "19500.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_0803-682edda782bc1709e517620544445141-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/remera-heart-white-0peq3/"
+  },
+  {
+    "uuid": "2f9b7faa-1972-4012-abf5-b9232b386894",
+    "name": "REMERA MARGARET SKY",
+    "description": "Remera de algodón elastizado con mangas cortas y estampa delantera bordada de margarita &lt;3 girly, cómoda y básica. Es al cuerpo, pero la tela es elastizad...",
+    "price": "17900.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_0415-becb4228d8d2a0b49917620543420718-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/remera-margaret-sky-jnvqa/"
+  },
+  {
+    "uuid": "d1984d83-beb9-4ae9-9fa4-9f09d1a42320",
+    "name": "MUSCU DUA BLACK&WHITE",
+    "description": "Musculosa de algodón ribb elastizada, suave y fresca en color negro. Tiene escote en V y se ata con tiritas detrás del cuello. Tiene costuras en color blanco...",
+    "price": "20900.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_0917-e16e702842effc5f0017620538909449-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/muscu-dua-blackwhite-cmifx/"
+  },
+  {
+    "uuid": "ab776a67-12d3-42ca-8177-cda5a3c4e7af",
+    "name": "MUSCU DUA CHOCO&BLACK",
+    "description": "Musculosa de algodón ribb elastizada, suave y fresca en color choco dark. Tiene escote en V y se ata con tiritas detrás del cuello. Tiene costuras en color n...",
+    "price": "20900.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_0732-2349c640d057b3517917620538203386-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/muscu-dua-chocoblack-4755r/"
+  },
+  {
+    "uuid": "b2b03be5-2786-4eaa-957f-3ed10059ec46",
+    "name": "BLUSA JENNA BEIGE",
+    "description": "Blusa de crep satinado super suelta y fresca. Tiene escote en V y tiras finas a tono, y terminaciones de puntilla en el escote. Viene por talles S/M Y M/L. E...",
+    "price": "42000.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_0286-05857a58d97b70084317620536276912-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/blusa-jenna-beige-foilx/"
+  },
+  {
+    "uuid": "ea0b20f5-7e18-4639-bb18-930e179bcf61",
+    "name": "REMERA JE T'AIME WHITE",
+    "description": "Remera de algodón elastizado con mangas cortas y estampa vinìlica delantera &lt;3 girly, cómoda y básica. Es al cuerpo, pero la tela cede. Encontras las medi...",
+    "price": "19500.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_8369-62982b2109a524932917611765234340-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/remera-je-taime-white1/"
+  },
+  {
+    "uuid": "5c6dad43-9d35-4ed9-9a01-b827c60e8e11",
+    "name": "CHOMBA CORSETERA CHOCO",
+    "description": "Top chomba de algodón satinado, con escote en V amplio y cuello con solapas. Tiene cierres frontales corseteros, que estilizan y quedan super girly &lt;3. Es...",
+    "price": "24000.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_8674-5eefa01ef40fb066d417611763235451-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/chomba-corsetera-choco/"
+  },
+  {
+    "uuid": "b8d277f4-2464-4a43-8f21-688bb2bc3201",
+    "name": "BLUSA AURA WHITE",
+    "description": "Blusa de algodón liviano translúcido con caída super fluida. Tiene volados frontales, escote en V y un lazo fino para atar al frente. La moldería es suelta, ...",
+    "price": "49000.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_6851-99a2977339a45d814117606554686083-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/blusa-aura-white/"
+  },
+  {
+    "uuid": "6c584a89-d88d-4194-aba5-2467a31dd488",
+    "name": "REMERA BOTONES V SKY",
+    "description": "Remera de algodón elastizado con escote en V y detalle de tres botones al frente. Es al cuerpo, con mangas cortas, súper fresco y girly. La tela es elastizad...",
+    "price": "19500.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_7709-a56f11d59e5da1513b17606548529007-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/remera-botones-v-sky/"
+  },
+  {
+    "uuid": "c806f07a-cc3a-459d-8bed-ed4ffaa3ec7f",
+    "name": "REMERA BOTONES V CHOCO",
+    "description": "Remera de algodón elastizado con escote en V y detalle de tres botones al frente. Es al cuerpo, con mangas cortas, súper fresco y girly. La tela es elastizad...",
+    "price": "19500.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_7695-c3a244bc798afe9c0917606547653582-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/remera-botones-v-choco/"
+  },
+  {
+    "uuid": "74c28e30-dec5-41d7-a490-0aaf35d7be89",
+    "name": "REMERA BOTONES V BLACK",
+    "description": "Remera de algodón elastizado con escote en V y detalle de tres botones al frente. Es al cuerpo, con mangas cortas, súper fresco y girly. La tela es elastizad...",
+    "price": "19500.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_7794-c7eed8cc971484fa4d17606546757354-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/remera-botones-v-black/"
+  },
+  {
+    "uuid": "aece5b4a-0fbb-4902-aae3-24aa28ccbb31",
+    "name": "MUSCU RIBB TIRAS",
+    "description": "Musculosa de algodón ribb en color blanco con lineas finas horizontales. Escote redondo, breteles finos y terminaciones en puntilla al tono que le dan un det...",
+    "price": "18500.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_7267-98843428550ba9738c17606542811582-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/muscu-ribb-tiras/"
+  },
+  {
+    "uuid": "b2c2c9fd-449e-4897-b215-f8fdbc5bb4c0",
+    "name": "MUSCU COCONUT PINK",
+    "description": "Musculosa básica de microfibra elastizada con doble tela en busto, de corte boxy y al cuerpo. con escote cuadrado. Un básico que vas a amar &lt;3 Encontras l...",
+    "price": "19500.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_7662-5f28eed878e7ed0e8817606542241391-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/muscu-coconut-pink/"
+  },
+  {
+    "uuid": "6e5dbf8e-739b-47e8-8924-3c330de992d7",
+    "name": "CAMISA VERONA WHITE",
+    "description": "Camisa en tela liviana con escote en V y lazos para atar en parte delantera. Tiene detalles de volados en el cuello y bordes, y pequeñas franjas caladas supe...",
+    "price": "54900.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_3942-ed69c6452a3c7570b017594954349332-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/camisa-verona-white/"
+  },
+  {
+    "uuid": "17355faf-de25-4b53-bd80-4c8576a2e458",
+    "name": "CAMISA VERONA BLACK",
+    "description": "Camisa en tela liviana con escote en V y lazos para atar en parte delantera. Tiene detalles de volados en el cuello y bordes, y pequeñas franjas caladas supe...",
+    "price": "54900.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_4130-88d7f91fafb275c30f17594952186498-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/camisa-verona-black/"
+  },
+  {
+    "uuid": "0962705e-11a3-4054-b08e-9521c3b90270",
+    "name": "MUSCU SPAIN BLUE",
+    "description": "Musculosa de morley elastizado con escote redonde y bordes con costuras en blanco, haciendo contraste. Tiene una estampa bordada \"SPAIN\" en parte delantera. ...",
+    "price": "18500.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_3854-de1844cc2e2826a88117594935797693-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/muscu-spain-blue/"
+  },
+  {
+    "uuid": "0dd1da91-bf6a-4d30-915d-5845e3101f46",
+    "name": "REMERA MARGARET CHOCO",
+    "description": "Remera de algodón elastizado con mangas cortas y estampa delantera bordada de margarita &lt;3 girly, cómoda y básica. Es al cuerpo, pero la tela es elastizad...",
+    "price": "17900.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_4401-e31bd7d8f1c0e9368d17594923517344-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/remera-margaret-choco/"
+  },
+  {
+    "uuid": "5249071c-00fa-4205-8b62-fd3d6066affc",
+    "name": "MUSCU TACHAS GREEN",
+    "description": "Musculosa de mornley elastizado con efecto lavado/gastado. Tiene detalles de tachas plateadas en el escote y breteles. Comoda y cool, es al cuerpo, pero la t...",
+    "price": "28900.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_4420-2f1dd05d182e4914f817594906460427-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/muscu-tachas-green/"
+  },
+  {
+    "uuid": "119972bf-a6e0-45fa-9cbc-17b6deffe0bd",
+    "name": "MUSCU TACHAS VISON",
+    "description": "Musculosa de mornley elastizado con efecto lavado/gastado. Tiene detalles de tachas plateadas en el escote y breteles. Comoda y cool, es al cuerpo, pero la t...",
+    "price": "27000.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_4466-84b366be02e537d58c17594899065813-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/muscu-tachas-vison/"
+  },
+  {
+    "uuid": "007bc0c6-74ca-4881-b6e3-afc07143daf6",
+    "name": "REMERA NY BOOKS WHITE",
+    "description": "Remera mangas cortas de algodón elastizado, super suave. Tiene estampa delantera con tipografía vintage. Tiene cuello redondo y una terminaciòn sutil de punt...",
+    "price": "21900.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_0773-d02c5a2e134316464817582850388478-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/remera-ny-books-white/"
+  },
+  {
+    "uuid": "6ff7066a-3e36-4e79-85fd-c5878fd39425",
+    "name": "REMERA NY BOOKS CREAM",
+    "description": "Remera mangas cortas de algodón elastizado, super suave. Tiene estampa delantera con tipografía vintage. Tiene cuello redondo y una terminaciòn sutil de punt...",
+    "price": "21900.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_0787-3e3cf91bd8f9ec0f6717582851018545-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/remera-ny-books-cream/"
+  },
+  {
+    "uuid": "adf55a55-5f8e-4715-87ab-5898c3254ea2",
+    "name": "REMERA NY BOOKS SKY",
+    "description": "Remera mangas cortas de algodón elastizado, super suave. Tiene estampa delantera con tipografía vintage. Tiene cuello redondo y una terminaciòn sutil de punt...",
+    "price": "21900.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_0795-8929f6f3ea25ad81bb17582851410784-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/remera-ny-books-sky/"
+  },
+  {
+    "uuid": "9f26333d-0d29-41f3-872a-642433b13c93",
+    "name": "REMERA NY BOOKS BLUE",
+    "description": "Remera mangas cortas de algodón elastizado, super suave. Tiene estampa delantera con tipografía vintage. Tiene cuello redondo y una terminaciòn sutil de punt...",
+    "price": "21900.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_0746-5180859be2df4eaef517582853983202-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/remera-ny-books-blue/"
+  },
+  {
+    "uuid": "92b63cf4-3580-467d-a05c-fe30d76b80b7",
+    "name": "CHOMBA COTTON PINK",
+    "description": "Chomba mangas cortas con cuello tipo polo y botones en parte delantera desde la altura del busto.  Tiene corte recto, clásico atemporal, con un toque vintage...",
+    "price": "27500.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_1785-38669fe0664c4c950017582860024013-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/chomba-cotton-pink/"
+  },
+  {
+    "uuid": "a3b59c07-db44-43d2-bfac-595a1251d1a0",
+    "name": "REMERA VINTAGE OVER SKY&CHOCO",
+    "description": "Remera mangas cortas de algodón, con rayas horizontales en colores celeste y chocolate, de corte oversize y boxy (cuadrada). Clasica y super atemporal, tiene...",
+    "price": "34000.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_6472-9decee5ac55adc6e4f17566444414416-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/remera-vintage-over-skychoco/"
+  },
+  {
+    "uuid": "da1b85b9-b011-4fad-8cc3-c736f5806afb",
+    "name": "MUSCU NIZA OCEAN",
+    "description": "Musculosa de algodón con breteles anchos y escote cuadrado, en color azul marino. Tiene ribetes en escote y sisas en color tiza, que generan contraste. Un bá...",
+    "price": "29800.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_6184-03c79cd442b8e25de417566453258804-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/muscu-niza-ocean/"
+  },
+  {
+    "uuid": "2ad4658b-188b-4de4-bce6-79e723794d0f",
+    "name": "CHOMBA COTTON",
+    "description": "Chomba mangas cortas con cuello tipo polo y botones en parte delantera desde la altura del busto.  Tiene corte recto, clásico atemporal, con un toque vintage...",
+    "price": "27500.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_6048-15dbf3b4d8edc10d2917566455822965-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/chomba-cotton/"
+  },
+  {
+    "uuid": "5a86ba40-90f4-45f6-9824-73347d784c90",
+    "name": "MUSCULOSA COCONUT YELLOW",
+    "description": "Musculosa básica de microfibra elastizada con doble tela en busto, de corte boxy y al cuerpo. con escote cuadrado. Un básico que vas a amar &lt;3 Encontras l...",
+    "price": "19500.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_5896-9ff92017f84aefcbb217566457869436-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/musculosa-coconut-yellow/"
+  },
+  {
+    "uuid": "3fbd82fe-0fc9-46b1-acdb-93e346bb720f",
+    "name": "MUSCULOSA COCONUT BLACK",
+    "description": "Musculosa básica de microfibra elastizada con doble tela en busto, de corte boxy y al cuerpo. con escote cuadrado. Un básico que vas a amar &lt;3 Encontras l...",
+    "price": "19500.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_5988-d77b2affc37795380617566458278684-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/musculosa-coconut-black/"
+  },
+  {
+    "uuid": "077f6022-7257-4de6-996f-1ba15aa0e6a6",
+    "name": "REMERA LEATHER BROWN - SIN CAMBIO",
+    "description": "Remera de algodón fresca y liviana con escote en V, en color marròn. La tela tiene un jaspeado engomado negro que le da mucha textura y originalidad. Es una ...",
+    "price": "34900.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_4572-e70068c783934469d317558142704575-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/remera-leather-brown-sin-cambio-ofq2e/"
+  },
+  {
+    "uuid": "6ee69c90-2bc1-4a04-b5ce-ca772c3f1366",
+    "name": "REMERA LEATHER BLACK- SIN CAMBIO",
+    "description": "Remera de algodón fresca y liviana con escote en V, en color negro. La tela tiene un jaspeado engomado que le da mucha textura y originalidad. Es una prenda ...",
+    "price": "40900.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_4588-3e490b29032560a60117558143472436-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/remera-leather-black-sin-cambio-s92dh/"
+  },
+  {
+    "uuid": "167245df-e49c-4fe9-a66f-c9f33b10610c",
+    "name": "TOP ASIMETRICO BLACK T.L",
+    "description": "Top asimétrico de bengalina. Con cuello bote, al cuerpo y súper elastizado. Tiene frunces a un costado. Basico y hermosoo, viene por talles del S al L. Encon...",
+    "price": "29000.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_0680-5e52002cf2365947da17546057361567-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/top-asimetrico-black1/"
+  },
+  {
+    "uuid": "c027bd54-5783-4ea0-822b-ee14d3ed8119",
+    "name": "MUSCULOSA COCONUT WHITE",
+    "description": "Musculosa básica de microfibra elastizada con doble tela en busto, de corte boxy y al cuerpo. con escote cuadrado. Un básico que vas a amar &lt;3 Encontras l...",
+    "price": "19500.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_3329-cd42872efce8f0582817557200029893-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/musculosa-coconut-white/"
+  },
+  {
+    "uuid": "89c20df5-a42f-42c0-ac42-864bf060b165",
+    "name": "TOP RABBLE BLACK T.XS Y S",
+    "description": "Top de mangas largas con cierre delantero a la altura del escote, de tela punto roma (simil algodón con lycra),con mucho cuerpo y firme. Tiene deditos en las...",
+    "price": "46000.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_2487-0fffb56c681f52353217508909160478-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/top-rabble-black-t-xs-y-s-2dmm0/"
+  },
+  {
+    "uuid": "9cc72640-eee0-47cd-9994-5d0f616d6449",
+    "name": "TOP RABBLE GREY",
+    "description": "Top de mangas largas con cierre delantero a la altura del escote, de tela punto roma (simil algodón con lycra),con mucho cuerpo y firme. Tiene deditos en las...",
+    "price": "46000.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_2775-52d3dbca0095e2b58417508909729561-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/top-rabble-grey-rkpq2/"
+  },
+  {
+    "uuid": "d2db6808-5a85-4efe-b25d-9211b3376978",
+    "name": "CAMISETA AIME BASIC. ARENA",
+    "description": "Camiseta de morley básica con cuello a la base. Infaltable. Se adapta a un talle M/L. Disponible en colores negro, bordeau, arena y blanco  LARGO SISA CEDE H...",
+    "price": "27000.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_3167-a6a5ec435e208f3eda17508911622644-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/camiseta-aime-basic-arena-126ad/"
+  },
+  {
+    "uuid": "72c05031-8355-4469-acc5-02a7ffd02edf",
+    "name": "MEDIA POLERA AIME",
+    "description": "Media polera de morley, básica y elastizada. Se adapta a un talle M/L. Dispomible en colores arena y blanco  LARGO SISA CEDE HASTA (ancho) HOMBROS MANGA 53 c...",
+    "price": "27000.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_3216-d8c688a75aab8cf6be17508913027429-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/media-polera-aime-e30vn/"
+  },
+  {
+    "uuid": "424fbb67-829e-404a-8e20-746884cac700",
+    "name": "MEDIA POLERA ANNE T.S - SIN CAMBIO",
+    "description": "De morley algodon premium, al cuerpo y larguita, elastizada, cuello media polera. El calce es todoo! TALLE LARGO SISA CEDE HASTA (ancho) HOMBROS MANGA S 56 c...",
+    "price": "26170.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_4854-f1bc9a589c1adc029f17469642215068-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/media-polera-anne-t-s-sin-cambio-z6aes/"
+  },
+  {
+    "uuid": "ca268137-aed0-44fa-85ff-989c9bc7ed15",
+    "name": "BASIC ANNE AMERICANA- NEGRA S M L",
+    "description": "Musculosa basica de algodon morley premium, escote AMERICANO en ribb.  Son AL CUERPO, largo debajo del ombligo.",
+    "price": "27900.00",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/001/133/889/products/img_5791-e4dcc58c7cc2e2852617322323410040-640-0.webp",
+    "url": "https://www.rocaly.com.ar/productos/basic-anne-americana-negra-s-m-l/"
+  }
+]
