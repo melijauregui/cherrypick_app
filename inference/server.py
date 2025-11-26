@@ -1,4 +1,5 @@
 from rembg import remove
+import re
 from io import BytesIO
 from fastapi import FastAPI
 from fastapi import FastAPI, File, UploadFile
@@ -13,6 +14,13 @@ import os
 import gc
 import uuid
 from datetime import datetime, timezone
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+nltk.download("stopwords")
+# para dividir texto en palabras y oraciones. Reconoce: puntos, abreviaciones, signos, etc
+nltk.download("punkt")
+nltk.download("punkt_tab")
 
 try:
     import psutil  # optional, for RSS memory
@@ -26,10 +34,11 @@ except Exception:
 
 
 app = FastAPI()
-#model_name = "Sofia-gb/cherrypick-sigLip11"
-model_name="Cherrypick-group/sigLip"
+# model_name = "Sofia-gb/cherrypick-sigLip11"
+model_name = "Cherrypick-group/sigLip"
 pretrained_model_name = "Marqo/marqo-fashionSigLIP"
 device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+MAX_LEN = 64
 
 # Load model and processor once at import/startup
 PROCESS_START_TIME = time.time()
@@ -39,8 +48,10 @@ MODEL_INSTANCE_UUID = str(uuid.uuid4())
 
 # Configure CPU threads for PyTorch based on environment (defaults tuned for 8 vCPU)
 try:
-    torch_threads = int(os.getenv("TORCH_NUM_THREADS", os.getenv("OMP_NUM_THREADS", "4")))
-    torch_interop = int(os.getenv("TORCH_INTEROP_THREADS", os.getenv("MKL_NUM_THREADS", "1")))
+    torch_threads = int(os.getenv("TORCH_NUM_THREADS",
+                        os.getenv("OMP_NUM_THREADS", "4")))
+    torch_interop = int(os.getenv("TORCH_INTEROP_THREADS",
+                        os.getenv("MKL_NUM_THREADS", "1")))
     torch.set_num_threads(torch_threads)
     torch.set_num_interop_threads(torch_interop)
     print(
@@ -53,11 +64,15 @@ try:
 except Exception as _e:
     print(f"[startup] thread-config could not be set: {_e}")
 
-print(f"[startup] pid={PID} device={device} starting load: model={model_name} processor={pretrained_model_name}")
-model = AutoModel.from_pretrained(model_name, trust_remote_code=True).to(device)
-processor = AutoProcessor.from_pretrained(pretrained_model_name, trust_remote_code=True)
+print(
+    f"[startup] pid={PID} device={device} starting load: model={model_name} processor={pretrained_model_name}")
+model = AutoModel.from_pretrained(
+    model_name, trust_remote_code=True).to(device)
+processor = AutoProcessor.from_pretrained(
+    pretrained_model_name, trust_remote_code=True)
 model.eval()
 torch.manual_seed(42)
+
 
 def _get_memory_info():
     rss_mb = None
@@ -83,6 +98,7 @@ def _get_memory_info():
             rss_mb = None
     return rss_mb
 
+
 def _gc_info():
     try:
         counts = gc.get_count()
@@ -94,6 +110,7 @@ def _gc_info():
         thresh = None
     return counts, thresh
 
+
 mem_mb = _get_memory_info()
 gc_counts, gc_thresh = _gc_info()
 print(f"[startup] pid={PID} model_id={id(model)} model_uuid={MODEL_INSTANCE_UUID} rss_mb={mem_mb} gc_counts={gc_counts} gc_thresh={gc_thresh} torch_threads={torch.get_num_threads()} interop_threads={torch.get_num_interop_threads()}")
@@ -102,7 +119,8 @@ print("[startup] Model and processor loaded successfully")
 # Warmup (optional): run a tiny text forward once to initialize kernels/caches
 try:
     _warm_text = "warmup"
-    text_inputs = processor(text=[_warm_text], padding='max_length', return_tensors="pt").to(device)
+    text_inputs = processor(
+        text=[_warm_text], padding='max_length', return_tensors="pt").to(device)
     with torch.inference_mode():
         _ = model.get_text_features(
             input_ids=text_inputs["input_ids"],
@@ -143,7 +161,8 @@ async def extract_image_features(request: dict):
 
     except Exception as e:
         processing_time = time.time() - start_time
-        print(f"[req:ERROR] pid={PID} model_id={id(model)} model_uuid={MODEL_INSTANCE_UUID} t={processing_time:.4f}s error={str(e)}")
+        print(
+            f"[req:ERROR] pid={PID} model_id={id(model)} model_uuid={MODEL_INSTANCE_UUID} t={processing_time:.4f}s error={str(e)}")
         return {"error": str(e)}
 
 
@@ -157,9 +176,11 @@ async def extract_text_features(request: dict):
         print(f"[req:{req_uuid}] pid={PID} model_id={id(model)} model_uuid={MODEL_INSTANCE_UUID} rss_mb={mem_mb_before} gc_counts={gc_counts_before}")
         print("Obteniendo features de texto")
         text = request.get("text", "")
+        # text = __remove_stopwords(text)
         t0 = time.time()
         # tokenization time
-        text_inputs = processor(text=[text], padding='max_length', return_tensors="pt").to(device)
+        text_inputs = processor(
+            text=[text], padding='max_length', return_tensors="pt").to(device)
         t1 = time.time()
         with torch.inference_mode():
             X = model.get_text_features(
@@ -178,7 +199,8 @@ async def extract_text_features(request: dict):
 
     except Exception as e:
         processing_time = time.time() - start_time
-        print(f"[req:ERROR] pid={PID} model_id={id(model)} model_uuid={MODEL_INSTANCE_UUID} t={processing_time:.4f}s error={str(e)}")
+        print(
+            f"[req:ERROR] pid={PID} model_id={id(model)} model_uuid={MODEL_INSTANCE_UUID} t={processing_time:.4f}s error={str(e)}")
         return {"error": str(e)}
 
 
@@ -269,12 +291,14 @@ async def extract_features(request: dict):
             image_url = request.get("image_url", "")
         if "text" in request and request["text"]:
             text = request.get("text", "")
+            # text = __remove_stopwords(text)
+        print("Obteniendo features de imagen y texto: ", text, image_url)
         t0 = time.time()
         response = requests.get(image_url)
         img = Image.open(BytesIO(response.content)).convert("RGB")
         t1 = time.time()
         processed = processor(
-            text=[text], images=[img], padding='max_length', return_tensors="pt").to(device)
+            text=[text], images=[img], padding='max_length', max_length=MAX_LEN, truncation=True, return_tensors="pt").to(device)
 
         pixel_values = processed["pixel_values"]
         input_ids = processed["input_ids"]
@@ -300,7 +324,8 @@ async def extract_features(request: dict):
 
     except Exception as e:
         processing_time = time.time() - start_time
-        print(f"[req:ERROR] pid={PID} model_id={id(model)} model_uuid={MODEL_INSTANCE_UUID} t={processing_time:.4f}s error={str(e)}")
+        print(
+            f"[req:ERROR] pid={PID} model_id={id(model)} model_uuid={MODEL_INSTANCE_UUID} t={processing_time:.4f}s error={str(e)}")
         return {"error": str(e)}
 
 
@@ -359,7 +384,8 @@ async def similarities_matrix(request: dict):
 
     except Exception as e:
         processing_time = time.time() - start_time
-        print(f"[req:ERROR] pid={PID} model_id={id(model)} model_uuid={MODEL_INSTANCE_UUID} t={processing_time:.4f}s error={str(e)}")
+        print(
+            f"[req:ERROR] pid={PID} model_id={id(model)} model_uuid={MODEL_INSTANCE_UUID} t={processing_time:.4f}s error={str(e)}")
         return {"error": str(e)}
 
 
@@ -413,7 +439,8 @@ async def similarities_preferences(request: dict):
 
     except Exception as e:
         processing_time = time.time() - start_time
-        print(f"[req:ERROR] pid={PID} model_id={id(model)} model_uuid={MODEL_INSTANCE_UUID} t={processing_time:.4f}s error={str(e)}")
+        print(
+            f"[req:ERROR] pid={PID} model_id={id(model)} model_uuid={MODEL_INSTANCE_UUID} t={processing_time:.4f}s error={str(e)}")
         return {"error": True, "details": str(e), "similarities": []}
 
 
@@ -451,3 +478,13 @@ async def debug_model_info():
         "torch_memory": torch_mem,
         "threads": threads_info,
     }
+
+
+def __remove_stopwords(text):
+    stop_words = set(stopwords.words("spanish"))
+    tokens = word_tokenize(text.lower())
+
+    filtered = [word for word in tokens if word.isalnum()
+                and word not in stop_words]
+
+    return " ".join(filtered)

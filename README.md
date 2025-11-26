@@ -2,7 +2,7 @@
 - front:  npm run ios/android  
 - server: npm run start:backend
 - database: (cd inference && source .venv/bin/activate) uvicorn server:app --reload 
-- seed: db:seed-complete
+- seed: npm run db:seed-complete
 
 source venv/bin/activate
 deactivate

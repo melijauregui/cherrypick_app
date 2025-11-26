@@ -1,6 +1,6 @@
 const fs = require("fs/promises");
 const path = require("path");
-const { FormData, File } = require("undici");
+const { FormData, File, Agent } = require("undici");
 const { PrismaClient } = require("../server/generated/prisma");
 
 const LOCAL_IP = "localhost";
@@ -9,30 +9,30 @@ const API_HOST = process.env.BRAND_API_HOST ?? `http://${LOCAL_IP}:3000`;
 const prisma = new PrismaClient();
 
 const BRAND_CONFIGS = [
-  // {
-  //   brandEmail: "girlsclub@gmail.com",
-  //   filePaths: ["db-seed/pinterest/girls-club/catalog-items-girls-club.json"],
-  // },
-  // {
-  //   brandEmail: "socialclub@gmail.com",
-  //   filePaths: ["db-seed/pinterest/social-club/catalog-items-social-club.json"],
-  // },
+  {
+    brandEmail: "girlsclub@gmail.com",
+    filePaths: ["db-seed/pinterest/girls-club/catalog-items-girls-club.json"],
+  },
+  {
+    brandEmail: "socialclub@gmail.com",
+    filePaths: ["db-seed/pinterest/social-club/catalog-items-social-club.json"],
+  },
   {
     brandEmail: "cherrypick.brand.example@gmail.com",
     filePaths: ["db-seed/scrapping/cherry/cherry-pantalones-sample.json"],
   },
-  // {
-  //   brandEmail: "charostoreok@gmail.com",
-  //   filePaths: ["db-seed/scrapping/charo/charo-pantalones-sample.json"],
-  // },
-  // {
-  //   brandEmail: "rocaly@gmail.com",
-  //   filePaths: [
-  //     "db-seed/scrapping/rocaly/rocaly-remeras-sample.json",
-  //     "db-seed/scrapping/rocaly/rocaly-pantalones-sample.json",
-  //     "db-seed/scrapping/rocaly/rocaly-body-tops-sample.json",
-  //   ],
-  // },
+  {
+    brandEmail: "charostoreok@gmail.com",
+    filePaths: ["db-seed/scrapping/charo/charo-pantalones-sample.json"],
+  },
+  {
+    brandEmail: "rocaly@gmail.com",
+    filePaths: [
+      "db-seed/scrapping/rocaly/rocaly-remeras-sample.json",
+      "db-seed/scrapping/rocaly/rocaly-pantalones-sample.json",
+      "db-seed/scrapping/rocaly/rocaly-body-tops-sample.json",
+    ],
+  },
 ];
 
 function normalizePrice(price) {
@@ -116,6 +116,10 @@ async function uploadCatalog({ brandEmail, filePath }) {
   const response = await fetch(`${API_HOST}/brand/insert-items-complete`, {
     method: "POST",
     body: formData,
+    dispatcher: new Agent({
+      headersTimeout: 600000,
+      bodyTimeout: 1200000,
+    })
   });
 
   let payload;
