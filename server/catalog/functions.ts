@@ -214,6 +214,23 @@ export async function extractFeatures(
     }
 
     const result = await response.json();
+    
+    // Validar que el resultado tenga la estructura esperada
+    if (
+      !result ||
+      !Array.isArray(result.image_features) ||
+      !Array.isArray(result.text_features) ||
+      result.image_features.length === 0 ||
+      result.text_features.length === 0
+    ) {
+      logger.error("Invalid features structure from inference service: %s", JSON.stringify(result));
+      return {
+        error: true,
+        details: "El servicio de inferencia retornó una estructura inválida",
+        features: { image_features: [], text_features: [] },
+      };
+    }
+    
     return {
       error: false,
       details: "Las características se han extraído correctamente",

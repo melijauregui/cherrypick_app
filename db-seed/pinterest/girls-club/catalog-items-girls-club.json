@@ -1,0 +1,202 @@
+[
+  {
+    "uuid": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Jean celeste 1",
+    "description": "Jean liso recto. Color celeste.",
+    "price": "29.99",
+    "imageUrl": "./images/jean_celeste_1.jpg",
+    "url": "https://ar.pinterest.com/pin/80501912085455960/"
+  },
+  {
+    "uuid": "6ba7b811-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Jean azul 1",
+    "description": "Jean liso recto. Color azul.",
+    "price": "49.99",
+    "imageUrl": "./images/jean_azul_1.jpg",
+    "url": "https://ar.pinterest.com/pin/10344274146431872/"
+  },
+  {
+    "uuid": "6ba7b812-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Jean celeste 2",
+    "description": "Jean liso recto. Color celeste.",
+    "price": "39.99",
+    "imageUrl": "./images/jean_celeste_2.jpg",
+    "url": "https://ar.pinterest.com/pin/906560600028845732/"
+  },
+  {
+    "uuid": "6ba7b813-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Jean celeste vintage",
+    "description": "Jean liso recto con dobladillo. Color azul o celeste vintage.",
+    "price": "79.99",
+    "imageUrl": "./images/jean_celeste_vintage.jpg",
+    "url": "https://ar.pinterest.com/pin/49750770878377093/"
+  },
+  {
+    "uuid": "6ba7b814-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Jean flared",
+    "description": "Jean liso acampanado o flared. Color celeste. Tiro alto.",
+    "price": "49.99",
+    "imageUrl": "./images/jean_flared.jpg",
+    "url": "https://ar.pinterest.com/pin/475481673180604864/"
+  },
+  {
+    "uuid": "6ba7b815-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Jean negro",
+    "description": "Jean liso recto. Color negro. Tiro bajo.",
+    "price": "49.99",
+    "imageUrl": "./images/jean_negro.jpg",
+    "url": "https://ar.pinterest.com/pin/6333255723414092/"
+  },
+  {
+    "uuid": "6ba7b816-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Jean roto celeste",
+    "description": "Jean recto con roturas desmechadas simétricas. Color celeste.",
+    "price": "49.99",
+    "imageUrl": "./images/jean_roto_celeste.jpg",
+    "url": "https://ar.pinterest.com/pin/140806228541778/"
+  },
+  {
+    "uuid": "6ba7b817-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Jean azul vintage",
+    "description": "Jean liso wide leg o palazzo. Color azul vintage.",
+    "price": "49.99",
+    "imageUrl": "./images/jean_azul_vintage.jpg",
+    "url": "https://ar.pinterest.com/pin/270708627597606133/"
+  },
+  {
+    "uuid": "6ba7b818-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Jean roto una pierna",
+    "description": "Jean recto con rotura en una pierna. Color celeste. Tiro alto.",
+    "price": "49.99",
+    "imageUrl": "./images/jean_roto_una_pierna.jpg",
+    "url": "https://ar.pinterest.com/pin/597782550554822752/"
+  },
+  {
+    "uuid": "6ba7b819-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Jean mom azul",
+    "description": "Jean liso mom o recto. Color azul.",
+    "price": "19.99",
+    "imageUrl": "./images/jean_mom_azul.jpg",
+    "url": "https://ar.pinterest.com/pin/69876231726786229/"
+  },
+  {
+    "uuid": "6ba7b820-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Jean cierre",
+    "description": "Jean liso recto o wide leg con cierre torcido. Color azul.",
+    "price": "19.99",
+    "imageUrl": "./images/jean_cierre.jpg",
+    "url": "https://ar.pinterest.com/pin/195484440073043855/"
+  },
+  {
+    "uuid": "6ba7b821-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Jean palazzo",
+    "description": "Jean liso palazzo. Color azul.",
+    "price": "19.99",
+    "imageUrl": "./images/jean_palazzo.jpg",
+    "url": "https://ar.pinterest.com/pin/49610033390820882/"
+  },
+  {
+    "uuid": "6ba7b822-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Jean vintage remangado",
+    "description": "Jean liso recto o wide leg con dobladillo. Color azul vintage o negro.",
+    "price": "19.99",
+    "imageUrl": "./images/jean_vintage_remangado.jpg",
+    "url": "https://ar.pinterest.com/pin/70437489706563/"
+  },
+  {
+    "uuid": "6ba7b823-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Jean gris vintage",
+    "description": "Jean liso recto. Color gris oscuro vintage o negro.",
+    "price": "19.99",
+    "imageUrl": "./images/jean_gris_vintage.jpg",
+    "url": "https://ar.pinterest.com/pin/41165784089945499/"
+  },
+  {
+    "uuid": "6ba7b824-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Jean gris claro",
+    "description": "Jean liso recto. Color gris claro.",
+    "price": "19.99",
+    "imageUrl": "./images/jean_gris_claro.jpg",
+    "url": "https://ar.pinterest.com/pin/13721973860716908/"
+  },
+  {
+    "uuid": "6ba7b825-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Jean cierre mom",
+    "description": "Jean liso mom o recto con cierre cruzado. Color azul.",
+    "price": "19.99",
+    "imageUrl": "./images/jean_cierre_mom.jpg",
+    "url": "https://ar.pinterest.com/pin/1053138694130282090/"
+  },
+  {
+    "uuid": "6ba7b826-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Jean celeste mom",
+    "description": "Jean liso mom o recto. Color celeste. Tiro alto.",
+    "price": "19.99",
+    "imageUrl": "./images/jean_celeste_mom.jpg",
+    "url": "https://ar.pinterest.com/pin/281475045455497409/"
+  },
+  {
+    "uuid": "6ba7b827-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Jean celeste vintage 2",
+    "description": "Jean liso recto y vintage. Color celeste.",
+    "price": "19.99",
+    "imageUrl": "./images/jean_celeste_vintage_2.jpg",
+    "url": "https://ar.pinterest.com/pin/7388786884390779/"
+  },
+  {
+    "uuid": "6ba7b828-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Jean cinturon rosado",
+    "description": " Jean liso recto. Color celeste con cinturón rosado.",
+    "price": "19.99",
+    "imageUrl": "./images/jean_cinturon_rosado.jpg",
+    "url": "https://ar.pinterest.com/pin/282037995423977700/"
+  },
+  {
+    "uuid": "6ba7b829-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Jean wide leg",
+    "description": "Jean liso wide leg. Color celeste.",
+    "price": "9.99",
+    "imageUrl": "./images/jean_wide_leg.jpg",
+    "url": "https://ar.pinterest.com/pin/57139489016966417/"
+  },
+  {
+    "uuid": "6ba7b830-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Jean wide leg azul con roturas",
+    "description": "Jean wide leg con roturas desmechadas. Color azul. Tiro alto.",
+    "price": "19.99",
+    "imageUrl": "./images/jean_wide_leg_azul_con_roturas.jpg",
+    "url": "https://ar.pinterest.com/pin/604186106298968485/"
+  },
+  {
+    "uuid": "6ba7b831-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Jean azul con roturas",
+    "description": "Jean skinny con roturas en ambas piernas. Color azul.",
+    "price": "19.99",
+    "imageUrl": "./images/jean_azul_con_roturas.jpg",
+    "url": "https://ar.pinterest.com/pin/3166662230413761/"
+  },
+  {
+    "uuid": "6ba7b832-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Jean negro con roturas",
+    "description": "Jean skinny con roturas en ambas piernas. Color negro.",
+    "price": "19.99",
+    "imageUrl": "./images/jean_negro_con_roturas.jpg",
+    "url": "https://ar.pinterest.com/pin/3166662224558583/"
+  },
+  {
+    "uuid": "6ba7b833-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Cinto country",
+    "description": "Cinturon color rosa viejo con circulos y tachas texano",
+    "price": "3.99",
+    "imageUrl": "./images/cinto_country.jpg",
+    "url": "https://ar.pinterest.com/pin/4601060432427917824/"
+  },
+  {
+    "uuid": "6ba7b834-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Pollera Tess",
+    "description": "Pollera blanca con volados y estampada media pierna",
+    "price": "20.99",
+    "imageUrl": "./images/pollera_tess.jpg",
+    "url": "https://ar.pinterest.com/pin/4601060432427917824/"
+  }
+]

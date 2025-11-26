@@ -165,13 +165,24 @@ export async function InsertItems(
         uploadedFile.url
       );
 
+      if (featuresResult.error) {
+        throw new Error(
+          `No se pudieron extraer características de la imagen o el texto: ${featuresResult.details || "Unknown error"}`
+        );
+      }
+
       if (
-        featuresResult.error ||
+        !featuresResult.features ||
+        !Array.isArray(featuresResult.features.image_features) ||
+        !Array.isArray(featuresResult.features.text_features) ||
         featuresResult.features.image_features.length === 0 ||
         featuresResult.features.text_features.length === 0
       ) {
+        logger.error(
+          `Invalid features structure for item ${name}: features=${JSON.stringify(featuresResult.features)}`
+        );
         throw new Error(
-          "No se pudieron extraer características de la imagen o el texto"
+          `Estructura de características inválida: image_features=${featuresResult.features?.image_features?.length || 0}, text_features=${featuresResult.features?.text_features?.length || 0}`
         );
       }
 

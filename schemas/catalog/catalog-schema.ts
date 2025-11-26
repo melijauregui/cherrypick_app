@@ -14,7 +14,7 @@ export const MinimumPropertiesItemSchema = z.object({
   description: z
     .string()
     .min(1, { message: "Description is required" })
-    .max(200, { message: "Description must be less than 200 characters" }),
+    .max(700, { message: "Description must be less than 700 characters" }),
   price: z.preprocess(
     val => {
       if (typeof val === "string") {

@@ -1,0 +1,106 @@
+[
+  {
+    "uuid": "f10afa2b-942d-4ca7-a858-39fcb2767a4b",
+    "name": "PANT BORA",
+    "description": "Pantalón over de tela liviana tipo lino, con caída y super fresco, con una textura sutil. Tiro medio-alto y pierna recta. Tiene cintura con elástico en la pa...",
+    "price": "59000.00",
+    "imageUrl": "images/pant_bora.webp",
+    "url": "https://www.rocaly.com.ar/productos/pant-bora-jnyyz/"
+  },
+  {
+    "uuid": "e47118e8-6239-4ac3-9d75-03fc6a39240a",
+    "name": "DENIM CROSS",
+    "description": "Pantalón de jean recto, tiro medio. En color celeste gastado con bigotes en parte delantera, costuras a contratono en tono ocre. Tiene un detalle super cool:...",
+    "price": "82000.00",
+    "imageUrl": "images/denim_cross.webp",
+    "url": "https://www.rocaly.com.ar/productos/denim-cross-k91ar/"
+  },
+  {
+    "uuid": "b431380b-fcd5-4612-b660-e89d5e7df5b4",
+    "name": "PANT SAND",
+    "description": "Pantalón de gabardina semi elastizado. en color arena. Tiro medio, recto. Tiene botòn delantero en el mismo tono y lazo para atar en la cintura, bolsillos la...",
+    "price": "69000.00",
+    "imageUrl": "images/pant_sand.webp",
+    "url": "https://www.rocaly.com.ar/productos/pant-sand-d37tn/"
+  },
+  {
+    "uuid": "0851b8c7-0ad7-49f2-aeab-dea24ba97f49",
+    "name": "PANT ATENAS T.M",
+    "description": "Pantalón amplio de tela plisada tipo bambula en color visón, con cintura elástoca y lazo ajustable. Tiene un calce relajado y suelto, con bolsilos laterales....",
+    "price": "72000.00",
+    "imageUrl": "images/pant_atenas_t.m.webp",
+    "url": "https://www.rocaly.com.ar/productos/pant-atenas-t-m-yhd23/"
+  },
+  {
+    "uuid": "1baa079c-38c1-4bfe-bf42-1214cab5a0ae",
+    "name": "DENIM BARREL",
+    "description": "Pantalón de jean en color natural, corte wide leg, tiro medio. Tiene bolsillos delanteros y traseros, costuras a tono y presillas pasacintos. Es fresco, un m...",
+    "price": "69900.00",
+    "imageUrl": "images/denim_barrel.webp",
+    "url": "https://www.rocaly.com.ar/productos/denim-barrel/"
+  },
+  {
+    "uuid": "dfe6fc0c-8f80-425b-989d-6405947a67ab",
+    "name": "PANT SUMMER DENIM",
+    "description": "Denim baggy en azul claro, con localizados y bigotes desgastados en parte delantera, lona liviana, la botamanga termina un poco mas angosta, quedando levemen...",
+    "price": "72000.00",
+    "imageUrl": "images/pant_summer_denim.webp",
+    "url": "https://www.rocaly.com.ar/productos/pant-summer-denim/"
+  },
+  {
+    "uuid": "4563a9ae-5d0a-4eb1-a1b5-f7d6356e93e3",
+    "name": "DENIM ARENA - T. 42-",
+    "description": "Pantalón de jean corte wide leg, de color arena con leves gastados localizados en parte delantera. Es tiro medio/ normal, versátil. cómodo y para usar todos ...",
+    "price": "72000.00",
+    "imageUrl": "images/denim_arena_-_t._42-.webp",
+    "url": "https://www.rocaly.com.ar/productos/denim-arena-t-42-4edv5/"
+  },
+  {
+    "uuid": "1acacab1-8ef9-476e-acf0-236faca5449c",
+    "name": "PANT SUMMER T.42 OVER",
+    "description": "Denim baggy blanco, lona liviana, la botamanga termina un poco mas angosta, quedando levemente ajustado en puños. Tiene un lazo interno para atar en la cintu...",
+    "price": "72000.00",
+    "imageUrl": "images/pant_summer_t.42_over.webp",
+    "url": "https://www.rocaly.com.ar/productos/pant-summer-t-42-over-ajeog/"
+  },
+  {
+    "uuid": "b7ce8170-3bcf-4c3b-b4f8-5e4defb022ad",
+    "name": "DENIM COAST",
+    "description": "Pantalón de jean corte wide leg, de color celeste clásico con leves gastados localizados en parte delantera. Es tiro medio/ normal, versátil. cómodo y para u...",
+    "price": "74900.00",
+    "imageUrl": "images/denim_coast.webp",
+    "url": "https://www.rocaly.com.ar/productos/denim-coast/"
+  },
+  {
+    "uuid": "2e8180e6-b462-4fc8-b975-35b4e24e49df",
+    "name": "DENIM STRAIGHT ACID",
+    "description": "Pant de jean en color celeste óxido, con dejes de colores cálidos que le dan ese efecto. Súper canchero. Tiro medio, corte recto, con costuras a tono. Viene ...",
+    "price": "89000.00",
+    "imageUrl": "images/denim_straight_acid.webp",
+    "url": "https://www.rocaly.com.ar/productos/denim-straight-acid-z4rmb/"
+  },
+  {
+    "uuid": "2c0ad923-a5f8-49a9-839d-e52a3fe05215",
+    "name": "DENIM BAGGY OXID -T.36 y 38 SIN CAMBIO",
+    "description": "Denim corte baggy en color azul óxido, localizado más claro en parte delantera y trasera. Súper ancho y canchero. Viene por talles del 36 al 46  TALLE CINTUR...",
+    "price": "59900.00",
+    "imageUrl": "images/denim_baggy_oxid_-t.36_y_38_sin_cambio.webp",
+    "url": "https://www.rocaly.com.ar/productos/denim-baggy-oxid-t-36-y-38-sin-cambio-3s2qu/"
+  },
+  {
+    "uuid": "05188a3d-6cdd-4629-91cc-c1ad4e8baf0d",
+    "name": "DENIM BLACK LOW",
+    "description": "Pant negro gastado , corte recto suelto, tiro MEDIO/ BAJO. Confeccion justa, es hermoso  Y FACHA!  en la foto usamos talle 38. Las medidas son las siguientes...",
+    "price": "62000.00",
+    "imageUrl": "images/denim_black_low.webp",
+    "url": "https://www.rocaly.com.ar/productos/denim-black-low2/"
+  },
+  {
+    "uuid": "6c66cfa5-e155-4218-bdff-6fd2d0b74222",
+    "name": "DENIM VINTAGE MID WAIST T.42 - SIN CAMBIO",
+    "description": "Jean celeste con costuras a contratono en color ocre. Tiro medio/bajo, es un 10/10 en cancherooo. Infaltable. Viene por talles del 36 al 44  TALLE CINTURA CA...",
+    "price": "37950.00",
+    "imageUrl": "images/denim_vintage_mid_waist_t.42_-_sin_cambio.webp",
+    "url": "https://www.rocaly.com.ar/productos/denim-vintage-mid-waist-t-42-sin-cambio-40hil/"
+  }
+]
