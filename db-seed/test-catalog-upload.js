@@ -119,7 +119,7 @@ async function uploadCatalog({ brandEmail, filePath }) {
     dispatcher: new Agent({
       headersTimeout: 600000,
       bodyTimeout: 1200000,
-    })
+    }),
   });
 
   let payload;
