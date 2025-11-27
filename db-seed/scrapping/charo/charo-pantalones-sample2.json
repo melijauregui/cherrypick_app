@@ -1,0 +1,338 @@
+[
+  {
+    "uuid": "41e34b38-f7f4-43e0-a58f-b14f976908b9",
+    "name": "Jean California",
+    "description": "Jean wide leg combinado tiro alto. La modelo esta usando talle 36 y lo esta combinando con la Camisa Hellen y la Blusa Adore Me. Medidas Talle 36 Talle 38 Talle 40 Talle 42 Talle 44 Talle 46 Circunferencia de cintura 70cm 74cm 78cm 82cm 86cm 90cm Circunferencia de cadera 104cm 106cm 112cm 116cm 120cm 124cm Largo 103cm 104cm 106cm 107cm 108cm 108cm",
+    "price": "89990.00",
+    "imageUrl": "images/jean_california.webp",
+    "url": "https://www.charostoreok.com/productos/jean-california/"
+  },
+  {
+    "uuid": "cd4f803a-71ba-4c01-8638-417b46dcf84b",
+    "name": "Jean Clara",
+    "description": "Jean wide leg con detaalle en la cintura La modelo esta usando talle 36 y lo esta combinando con la Camisa Hellen y la Blusa Adore Me. Medidas Talle 36 Talle 38 Talle 40 Talle 42 Talle 44 Talle 46 Circunferencia de cintura 70cm 74cm 78cm 82cm 86cm 90cm Circunferencia de cadera 104cm 106cm 112cm 116cm 120cm 124cm Largo 103cm 104cm 106cm 107cm 108cm 108cm",
+    "price": "89990.00",
+    "imageUrl": "images/jean_clara.webp",
+    "url": "https://www.charostoreok.com/productos/jean-clara/"
+  },
+  {
+    "uuid": "d71d2245-41e3-42fa-8b3f-d6f64496a499",
+    "name": "Jean Monaco Black",
+    "description": "Jean tiro bajo elastizado , con cierre y boton. La modelo esta usando talle 38 y lo esta combinando con El Top Connie . Medidas Talle 36 Talle 38 Talle 40 Talle 42 Talle 44 Talle 46 Talle 48 Circunferencia de cintura 70cm 74cm 78cm 82cm 86cm 90cm 94cm Circunferencia de cadera 82cm 86cm 90cm 94cm 98cm 102cm 106cm Largo 107cm 108cm 109cm 110cm 111cm 112cm 113cm",
+    "price": "69990.00",
+    "imageUrl": "images/jean_monaco_black.webp",
+    "url": "https://www.charostoreok.com/productos/jean-monaco-black/"
+  },
+  {
+    "uuid": "2eab141f-11ed-4210-b808-af432b432e1f",
+    "name": "Pant balloon Fridha",
+    "description": "Pant balloon de bambula con elastico en la cintura y puño. La modelo lo esta combinando con la Camisa Adan. Medidas Circunferencia de cintura de 60cm a 100cm Circunferencia de cadera 100cm Largo 99cm",
+    "price": "79990.00",
+    "imageUrl": "images/pant_balloon_fridha.webp",
+    "url": "https://www.charostoreok.com/productos/pant-balloon-fridha-al5aa/"
+  },
+  {
+    "uuid": "97ea6aee-ad59-4bc7-90c6-b670162ffaf6",
+    "name": "Jean Balloon Glass",
+    "description": "Jean baggy ballon tiro alto, contiene aplicaciones de strass tanto en la parte delantera como trasera. Posee pinzas a la altura de la rodilla y ruedo. La modelo esta usando talle 36 y lo esta combinando con la Blusa Atenas. Medidas Talle 36 Talle 38 Talle 40 Tale 42 Talle 44 Talle 46 Circunferencia de cintura 70cm 74cm 78cm 82cm 86cm 90cm Circunferencia de cadera 104cm 108cm 112cm 116cm 120cm 124cm Largo 103cm 104cm 105cm 106cm 107cm 108cm",
+    "price": "139990.00",
+    "imageUrl": "images/jean_balloon_glass.webp",
+    "url": "https://www.charostoreok.com/productos/jean-balloon-glass/"
+  },
+  {
+    "uuid": "468cb448-2a70-44b6-85f4-2cf4cb200e7b",
+    "name": "Jean Oxford Vitta",
+    "description": "Jean oxford tiro medio semi elastizado,la modelo esta usando talle 36 y lo esta combinando con el Top Pekin. Medidas Talle 36 Talle 38 Talle 40 Talle 42 Talle 44 circunferencia de cintura hasta 60cm hasta 64cm hasta 69cm hasta 73cm hasta 76cm circunferencia de cadera hasta 88cm hasta 90cm hasta 93cm hasta 95cm hasta 98cm Largo 100cm 100cm 101cm 104cm 104cm",
+    "price": "79990.00",
+    "imageUrl": "images/jean_oxford_vitta.webp",
+    "url": "https://www.charostoreok.com/productos/jean-oxford-vitta/"
+  },
+  {
+    "uuid": "7b0dbd14-1845-4396-8be1-2e06ff3c9a7f",
+    "name": "Jean Wide Augus",
+    "description": "Jean Wide tiro bajo, la modelo lo esta combinando con el Corset Eleonor y esta usando talle 36. JeanWide Leg tiro medio, la modelo esta usando talle 36 y lo esta combinando con la Blusa Sophie. Medidas Talle 34 Talle 36 Talle 38 Talle 40 Talle 42 Talle 44 Circunferencia de cintura 68cm 72cm 76cm 80cm 84cm 89cm Circunferencia de cadera 94cm 96cm 98cm 100cm 104cm 108cm Largo 103cm 104cm 106cm 106cm 108cm 109cm",
+    "price": "69990.00",
+    "imageUrl": "images/jean_wide_augus.webp",
+    "url": "https://www.charostoreok.com/productos/jean-wide-augus/"
+  },
+  {
+    "uuid": "b0686d77-a61d-4118-bb4c-142a29fcdc49",
+    "name": "Jean Genova",
+    "description": "J ean straight tiro alto, la modelo esta usando talle 36 y lo esta combinando con la Blusa Kurm. Medidas Talle 34 Talle 36 Talle 38 Talle 40 Talle 42 Talle 44 Circunferencia de cintura 58cm 62cm 66cm 68cm 70cm 74cm Circunferencia de cadera 88cm 92cm 96cm 102cm 104cm 108cm Largo 104cm 105cm 105cm 105cm 105cm 106cm",
+    "price": "72990.00",
+    "imageUrl": "images/jean_genova.webp",
+    "url": "https://www.charostoreok.com/productos/jean-genova/"
+  },
+  {
+    "uuid": "7887fc7f-7e21-4dbd-8d7a-318c8a82a24b",
+    "name": "Jean Nerin",
+    "description": "Jean  color latte  tiro medio , la modelo esta usando talle 36 y lo esta combinando con el Top Carrie y el Sweater Amalfi. Medidas Talle 34 Talle 36 Talle 38 Talle 40 Talle 42 Talle 44 Circunferencia de cintura 74cm 78cm 80cm 84cm 86cm 90cm Circunferencia de cadera 93cm 96cm 98cm 102cm 104cm 106cm Largo 102cm 102cm 104cm 105cm 109cm 109cm",
+    "price": "79990.00",
+    "imageUrl": "images/jean_nerin.webp",
+    "url": "https://www.charostoreok.com/productos/jean-nerin1/"
+  },
+  {
+    "uuid": "89a5baa7-33bc-43e2-b40c-35f928a0314f",
+    "name": "Jean Glam Black",
+    "description": "Jean straight full tiro alto con aplicacion de strass en la parte frontal del mismo , la modelo esta usando talle 36 y lo esta combinando con la Blusa Bella. Medidas Talle 36 Talle 38 Talle 40 Talle 42 Talle 44 Circunferencia de cintura 74cm 78cm 82cm 86cm 90cm Circunferencia de cadera 100cm 104cm 108cm 112cm 116cm Largo 104cm 105cm 106cm 107cm 108cm",
+    "price": "89990.00",
+    "imageUrl": "images/jean_glam_black.webp",
+    "url": "https://www.charostoreok.com/productos/jean-glam-black/?openNotificationDialog=true"
+  },
+  {
+    "uuid": "dedac9c4-bc74-4ac8-8de5-904e567d3044",
+    "name": "Jean Wide Nerea",
+    "description": "Jean mega wide tiro medio, la modelo esta usando talle 36 y lo esta combinando con el Top Dots Medidas Talle 34 Talle 36 Talle 38 Talle 40 Circunferencia de cintura 66cm 72cm 79cm 83cm Circunferencia de cadera 95cm 98cm 103cm 106cm Largo 97cm 101cm 101cm 102cm",
+    "price": "89990.00",
+    "imageUrl": "images/jean_wide_nerea.webp",
+    "url": "https://www.charostoreok.com/productos/jean-wide-nerea/"
+  },
+  {
+    "uuid": "244f82fc-4c71-4721-8efe-561c45ae682a",
+    "name": "Jean Wide Stone",
+    "description": "Jean wide leg tiro medio , la modelo esta usando talle 38  y lo esta combinando con el Top Aragon . Medidas Talle 34 Talle 36 Talle 38 Talle 40 Talle 42 Circunferencia de cintura 70cm 74cm 78cm 80cm 83cm Circunferencia de cadera 98cm 101cm 104cm 106cm 110cm Largo 102cm 102cm 103cm 104cm 104cm",
+    "price": "89990.00",
+    "imageUrl": "images/jean_wide_stone.webp",
+    "url": "https://www.charostoreok.com/productos/jean-wide-stone/"
+  },
+  {
+    "uuid": "cbe9ec9d-7dfe-4af6-8ce3-80ac12a96e4a",
+    "name": "Jean Wide Dark",
+    "description": "Jean extra wide tiro alto. La modelo esta usando talle 36 Medidas Talle 36 Talle 38 Talle 40 Talle 42 Talle 44 Talle 46 Talle 48 Circunferencia de cintura 72cm 76cm 80cm 84cm 88cm 92cm 96cm Circunferencia de cadera 102cm 106cm 110cm 114cm 118cm 122cm 124cm Largo 109cm 110cm 111cm 112cm 113cm 114cm 115cm",
+    "price": "79990.00",
+    "imageUrl": "images/jean_wide_dark.webp",
+    "url": "https://www.charostoreok.com/productos/jean-wide-dark/?openNotificationDialog=true"
+  },
+  {
+    "uuid": "d63bd95c-c8eb-42fc-89f4-4883178e9d0e",
+    "name": "Jean Marruecos",
+    "description": "Jean tiro bajo con doble cintura. Ideal para combinar con el Cardigan Charlotte y la Campera Calvin, creando conjuntos versátiles y a la moda. La modelo está usando talle 36. Medidas Talle 34 Talle 36 Talle 38 Talle 40 Talle 42 Talle 44 circunferencia de cintura 72cm 74cm 80cm 84cm 88cm 90cm circunferencia de cadera 94cm 96cm 100cm 102cm 110cm 112cm largo 99cm 100cm 100cm 103cm 103cm 103cm",
+    "price": "65990.00",
+    "imageUrl": "images/jean_marruecos.webp",
+    "url": "https://www.charostoreok.com/productos/jean-marruecos/"
+  },
+  {
+    "uuid": "bb68d028-5bc7-43e8-8526-5060db28d1ba",
+    "name": "Jean Baggy Zelda",
+    "description": "Este jean baggy, con un detalle de recortes únicos, es perfecto para un look urbano y moderno. La modelo está usando talle 36 y lo esta combinando con la Campera Troya Medidas Talle 34 Talle 36 Talle 38 Talle 40 Talle 42 circunferencia de cintura 74cm 76cm 78cm 80cm 85cm circnferencia de cadera 94cm 96cm 100cm 103cm 110cm largo 96cm 97cm 98cm 98cm 99cm",
+    "price": "75990.00",
+    "imageUrl": "images/jean_baggy_zelda.jpg",
+    "url": "https://www.charostoreok.com/productos/jean-baggy-zeland1/"
+  },
+  {
+    "uuid": "e2342e01-062e-42d8-a5c1-db9437af55cd",
+    "name": "Pant Asia",
+    "description": "Descubrí el Pant Asia, el pantalón engomado tiro alto que realza tu figura y se adapta perfectamente a tu día a día. Confeccionado en material engomado de excelente calidad, este pantalón combina estilo y practicidad. Incorpora cierre y botón para un calce seguro y moderno, ideal para usar tanto en ocasiones informales como en salidas nocturnas. La modelo está usando talle 34, y lo combina con diferentes looks para mostrar su versatilidad. El tiro alto estiliza la silueta y brinda una comodidad única durante toda la jornada. Su acabado engomado le otorga un toque sofisticado que realza cualquier conjunto. Medidas Talle 34 Talle 36 Talle 38 Talle 40 Talle 42 Talle 44 circunferencia de cintura 58cm 61cm 64cm 69cm 74cm circunferencia de cadera 82cm 85cm 90cm 94cm 96cm largo 102cm 102cm 104cm 104c m 104cm",
+    "price": "55990.00",
+    "imageUrl": "images/pant_asia.webp",
+    "url": "https://www.charostoreok.com/productos/pant-asia/"
+  },
+  {
+    "uuid": "6a9d185b-7932-4986-a631-e8eb2d61b51f",
+    "name": "Jean Oxford Heny",
+    "description": "Descubre denim oxford henry , una prenda esencial para tu guardarropa. Este jean tiro alto combina estilo y comodidad con su diseño moderno. La terminación desflecada** en el bajo añade un toque desenfadado, perfecto para cualquier ocasión. Este jean es ideal para quienes buscan una prenda versátil que se adapte a diferentes estilos. Combínalo con tus tops favoritos y transforma tu look de casual a chic en un instante. Su corte amplio ofrece libertad de movimiento y un ajuste favorecedor para todas las siluetas. La modelo esta usando talle 36 Medidas Talle 36 Talle 38 Talle 40 Talle 42 circunferencia de sisa 70cm 72cm 74cm 76cm circunferencia de cadera 112cm 114cm 115cm 116cm largo 104cm 105cm 106cm 107cm",
+    "price": "79990.00",
+    "imageUrl": "images/jean_oxford_heny.webp",
+    "url": "https://www.charostoreok.com/productos/jean-oxford-heny/?openNotificationDialog=true"
+  },
+  {
+    "uuid": "a5e4f204-d4f5-4823-96bd-81b360eab50f",
+    "name": "Jean Olivia",
+    "description": "Jean tiro medio con detalle de recortes. La modelo esta usando talle 36 Medidas Talle 36 Talle 38 Talle 40 Talle 42 circunferencia de cintura 68cm 74cm 80cm 84cm circunferencia de cadera 88cm 92cm 101cm 105cm largo 100cm 101cm 101cm 104cm",
+    "price": "65990.00",
+    "imageUrl": "images/jean_olivia.jpg",
+    "url": "https://www.charostoreok.com/productos/jean-olivia1/?openNotificationDialog=true"
+  },
+  {
+    "uuid": "802d6b4c-41c6-4045-b216-4b7e8683b1ba",
+    "name": "Pant Euge",
+    "description": "Panto oxford engomado tiro alto con detalle en los laterales, tiene cierre y bolsillo. La modelo esta usando talle S y lo esta combinando con el Top Euge . Medidas Talle S Talle M Talle L circunferencia de cintura 68cm 72cm 78cm circunferencia de cadera 86cm 90cm 95cm largo 103cm 103cm 105m",
+    "price": "45990.00",
+    "imageUrl": "images/pant_euge.webp",
+    "url": "https://www.charostoreok.com/productos/pant-euge/"
+  },
+  {
+    "uuid": "bff35ba5-ac49-44a2-8021-2928fb5478f8",
+    "name": "Jean Wide Cecil",
+    "description": "Jean rigido wide leg tiro bajo. La modelo esta usando talle 36 Medidas Talle 34 Talle 36 Talle 38 Talle 40 Talle 42 Circunferencia de cintura 70cm 74cm 82cm 84cm 88cm circunferencia de cadera 96cm 98cm 102cm 104cm 106cm largo 102cm 102cm 103cm 105cm 106cm",
+    "price": "79990.00",
+    "imageUrl": "images/jean_wide_cecil.webp",
+    "url": "https://www.charostoreok.com/productos/jean-wide-cecil/"
+  },
+  {
+    "uuid": "42cd1162-a888-4eaa-a22f-4a87adcfeb65",
+    "name": "Jean Straight Justine",
+    "description": "Jean straight tiro alto. La modelo esta usando talle 36. Y lo esta combinando con el Remera Renata Medidas Talle 36 Talle 38 Tale 40 Talle 42 Talle 44 Talle 46 Circunferencia de cintura 62cm 68cm 72cm 76cm 80cm 84cm Circunferencia de cadera 88cm 90cm 93cm 96cm 100cm 103cm Largo 112cm 112cm 113cm 113cm 114cm 114cm",
+    "price": "75990.00",
+    "imageUrl": "images/jean_straight_justine.webp",
+    "url": "https://www.charostoreok.com/productos/jean-straight-justine/"
+  },
+  {
+    "uuid": "e148d52e-773b-46cb-8b76-f3f4ccb5393b",
+    "name": "Jean Wide Tassia",
+    "description": "Jean wide tiro bajo con boton doble.  La modelo esta usando talle 36 Medidas Talle 34 Talle 36 Talle 38 Talle 40 Talle 42 Talle 44 circunferencia de cintura 66cm 70cm 74cm 78cm 82cm 86cm circunferencia de cadera 90cm 94cm 98cm 102cm 106cm 110cm",
+    "price": "69990.00",
+    "imageUrl": "images/jean_wide_tassia.webp",
+    "url": "https://www.charostoreok.com/productos/jean-wide-tassia/"
+  },
+  {
+    "uuid": "fc3f10fb-261e-473a-9390-6e14efa2280c",
+    "name": "Jean Wide Boxy",
+    "description": "Jean wide tiro bajo con boton doble.  La modelo esta usando talle 36 Medidas Talle 34 Talle 36 Talle 38 Talle 40 Talle 42 Talle 44 circunferencia de cintura 66cm 70cm 74cm 78cm 82cm 86cm circunferencia de cadera 90cm 94cm 98cm 102cm 106cm 110cm",
+    "price": "69990.00",
+    "imageUrl": "images/jean_wide_boxy.webp",
+    "url": "https://www.charostoreok.com/productos/jean-wide-boxy/"
+  },
+  {
+    "uuid": "46819976-10f9-4eda-8a6b-c62df86c340d",
+    "name": "Jean Dana",
+    "description": "Jean Dana – Wide Leg, Tiro Bajo Descubrí el Jean Dana, la prenda ideal para sumar un toque moderno y relajado a tu guardarropa. Este jean wide leg de tiro bajo destaca por su silueta amplia y cómoda, perfecta para quienes buscan estilo y libertad de movimiento. La modelo está usando talle 36. Características principales - Jean wide leg tiro bajo - Confección de calidad para máxima comodidad - Ideal para combinar con camisas, sweaters o tops - Disponible en talles 36 a 44 Medidas Talle 36 Talle 38 Talle 40 Talle 42 Talle 44 circunferencia de cintura 74cm 76cm 80cm 84cm 88cm circunferencia de cadera 98cm 101cm 104cm 108cm 110cm largo 98cm 100cm 102cm 102cm 104cm",
+    "price": "65990.00",
+    "imageUrl": "images/jean_dana.webp",
+    "url": "https://www.charostoreok.com/productos/jean-dana/?openNotificationDialog=true"
+  },
+  {
+    "uuid": "f8ee8291-6651-492c-b6a8-a9826b1db723",
+    "name": "Jean Wide Roxy",
+    "description": "Jean Wide Roxy Descubrí el Jean Wide Roxy, la prenda esencial para tu guardarropa esta temporada. Este jean de corte wide leg rígido, con tiro medio y alforzas delanteras, ofrece un diseño moderno y favorecedor que estiliza tu figura y aporta un toque sofisticado a tus looks diarios. La modelo está usando talle 36. Características principales Corte wide leg rígido: tendencia y comodidad en una sola prenda. Tiro medio: ideal para combinar con todo tipo de tops. Alforzas delanteras: detalles que realzan y estilizan la silueta. Confeccionado en denim de alta calidad, resistente y duradero. Medidas Talle 36 Talle 38 Talle 40 Talle 42 Talle 42 circunferencia de cintura 72cm 74cm 76cm 82cm 84cm circunferencia de cadera 96cm 100cm 102cm 106cm 110cm largo 100cm 100cm 101cm 100cm 101cm",
+    "price": "65990.00",
+    "imageUrl": "images/jean_wide_roxy.webp",
+    "url": "https://www.charostoreok.com/productos/jean-wide-roxy/"
+  },
+  {
+    "uuid": "1eed713a-2405-4aca-a6de-a9ad510d610f",
+    "name": "Jean Wide Leg Lola",
+    "description": "Jean Wide Leg Emma: Estilo y Comodidad en un Solo Jean Descubrí el Jean Wide Leg Emma, un pantalón de tiro alto diseñado para realzar tu figura y brindarte comodidad durante todo el día. Este modelo se destaca por su corte wide leg y un delicado detalle de tiras en los laterales. La modelo esta usando talle 36 Medidas Talle 34 Talle 36 Talle 38 Talle 40 Talle 42 Talle 44 circunferencia de cintura 66cm 70cm 72cm 76cm 80cm 82cm circunferencia de cadera 96cm 102cm 106cm 108cm 110cm 112cm largo 96cm 96cm 97cm 98cm 98cm 99cm",
+    "price": "79990.00",
+    "imageUrl": "images/jean_wide_leg_lola.webp",
+    "url": "https://www.charostoreok.com/productos/jean-wide-leg-lola/"
+  },
+  {
+    "uuid": "1bb4c51b-f3eb-476f-beb9-1d632253f8ce",
+    "name": "Jean Morrison",
+    "description": "Jean wide , la modelo esta usando talle 36 Medidas Talle 36 Talle 38 Talle 40 Talle 42 Talle 44 circunferencia de cintura 68cm 72cm 76cm 80cm 84cm circunferencia de cadera 92cm 96cm 100cm 104cm 108cm largo 110cm 111cm 112cm 113cm 114cm",
+    "price": "77990.00",
+    "imageUrl": "images/jean_morrison.webp",
+    "url": "https://www.charostoreok.com/productos/jean-morrison/?openNotificationDialog=true"
+  },
+  {
+    "uuid": "400f3e58-7674-4402-a954-2178f3c0e3ab",
+    "name": "Jean Wide Foster",
+    "description": "Jean wide con boton y cierre. La modelo esta usando talle 36 Medidas Talle 34 Talle 36 Talle 38 Talle 40 Talle 42 circunferencia de cintura 70cm 72cm 74cm 76cm 78cm circunferencia de cadera 104cm 106cm 108cm 110cm 112cm ºlargo 100cm 103cm 105m 108cm 111cm",
+    "price": "69990.00",
+    "imageUrl": "images/jean_wide_foster.webp",
+    "url": "https://www.charostoreok.com/productos/jean-wide-foster/"
+  },
+  {
+    "uuid": "e8bfd6b5-3f00-4dd8-b2b7-5e38468b4682",
+    "name": "Jean Loto",
+    "description": "Jean tiro bajo gris con roturas wide leg. La modelo usa talle 34 Tabla de talles: considerar la medida de la cadera al elegir el talle ya que son modelos tiro bajo. Talle 34 36 38 40 42 Circunferencia cintura 70cm 72cm 78cm 80cm 85 cm Circunferencia cadera 88-90cm 92-95cm 96-100cm 100-105cm 105-110 cm Largo 107cm 108cm 109cm 109cm 110 cm Tiro 30cm 31cm 32cm 34cm 36 cm",
+    "price": "65990.00",
+    "imageUrl": "images/jean_loto.webp",
+    "url": "https://www.charostoreok.com/productos/jean-loto/"
+  },
+  {
+    "uuid": "af6b5f67-d51d-44db-aeff-e49e622b25ce",
+    "name": "Jean Ziara",
+    "description": "Denim wide. leg . La modelo esta usando talle 36 . Talle 36 38 40 42 44 Circunferencia cintura 74cm 78cm 86cm 88cm 92cm Circunferencia cadera 116cm 120cm 124cm 128cm 130cm Largo 104cm 105cm 105cm 107cm 107cm",
+    "price": "75990.00",
+    "imageUrl": "images/jean_ziara.webp",
+    "url": "https://www.charostoreok.com/productos/jean-ziara/"
+  },
+  {
+    "uuid": "2257d93f-624f-493f-89ea-0d1c0db9532d",
+    "name": "Jean Picton",
+    "description": "Jean tiro medio , la modelo esta usando talle 38 Medidas Talle 34 Talle 36 Talle 38 Talle 40 Talle 42cm Talle 44cm Circunferencia de cinrtura 74cm 78cm 82cm 86cm 90cm 94cm circunferencia de cadera 108cm 112cm 116cm 120cm 122cm 128cm Largo 104cm 104cm 105cm 105cm 105cm 105cm",
+    "price": "69990.00",
+    "imageUrl": "images/jean_picton.webp",
+    "url": "https://www.charostoreok.com/productos/jean-picton/"
+  },
+  {
+    "uuid": "cfa287de-bc5c-4346-a867-c4d767872726",
+    "name": "Jean Alexander",
+    "description": "Jean tiro alto wide. La modelo esta usando talle 36 Medidas Talle 34 Talle 36 Talle 38 Talle 40 Talle 42 Talle 44 circunferencia de cintura 72cm 76cm 78cm 82cm 86cm 90cm circunferencia de cadera 104cm 110cm 118cm 120cm 122cm 124cm largo 102cm 102cm 104cm 104cm 104cm 104cm",
+    "price": "69990.00",
+    "imageUrl": "images/jean_alexander.webp",
+    "url": "https://www.charostoreok.com/productos/jean-alexander/?openNotificationDialog=true"
+  },
+  {
+    "uuid": "6fb84051-b1ee-4baf-b66d-2bfe80f1dacf",
+    "name": "Jean Eva",
+    "description": "Jean tiro alto wide leg. La modelo esta usando talle 38 Medidas Talle 36 Talle 38 Talle 40 Talle 42 Talle 44 Tale 46 circunferencia de cintura 72cm 76cm 79cm 82cm 86cm 92cm circunferencia de cadera 92cm 94cm 102cm 106cm 108cm 112cm Largo 110cm 112cm 112cm 112cm 115cm 119cm",
+    "price": "75990.00",
+    "imageUrl": "images/jean_eva.webp",
+    "url": "https://www.charostoreok.com/productos/jean-eva/"
+  },
+  {
+    "uuid": "107f1ab3-74d4-425c-bb42-f1190e5d466c",
+    "name": "Jean Wide Frank",
+    "description": "Jean Wide tiro alto, la modelo esta usando talle 38 y lo esta combinando con la Polera Aleli Medidas Talle 36 Talle 38 Talle 40 Talle 42 Talle 44 Talle 46 Talle 48 circunferencia de cintura 68cm 72cm 80cm 82cm 86cm 88cm 90cm circunferencia de cadera 92cm 96cm 102cm 102cm 104cm 108cm 110cm largo 113cm 115cm 116cm 118cm 118cm 119cm 120cm",
+    "price": "75990.00",
+    "imageUrl": "images/jean_wide_frank.webp",
+    "url": "https://www.charostoreok.com/productos/jean-wide-frank/"
+  },
+  {
+    "uuid": "9c5f4ead-318a-4917-95a7-655250803e1d",
+    "name": "Jogger Karma",
+    "description": "Jogger rustico de acetato con elastico en la cintura. La modelo lo esta combinando con el Buzo Karma y esta usando talle M en ambas prendas Medidas Talle S Talle M Talle L circunferencia de cintura 56cm 60cm 64cm circunferencia de cadera 114cm 118cm 126cm largo 100cm 101cm 102cm",
+    "price": "39990.00",
+    "imageUrl": "images/jogger_karma.webp",
+    "url": "https://www.charostoreok.com/productos/jogger-karma/"
+  },
+  {
+    "uuid": "3693b5c7-71bc-4d2e-b30a-8cd95e9659a9",
+    "name": "Jogger Queen",
+    "description": "Jogger con elastico en la cintura, bolsillos y tiras regulables. La modelo lo esta combinando con la Campera Queen , el jogger en Vison difiere en color con la Campera Queen Medidas Talle 1 Talle 2 circunferencia de cintura hasta 80cm hasta 86cm circunferencia de cadera hasta 106cm hasta 120cm largo 100cm 102cm",
+    "price": "57990.00",
+    "imageUrl": "images/jogger_queen.webp",
+    "url": "https://www.charostoreok.com/productos/jogger-queen/?openNotificationDialog=true"
+  },
+  {
+    "uuid": "858170a8-095d-420e-bc34-77f397e9c8b7",
+    "name": "Jogger Kid",
+    "description": "Jogger rustico con elastico en la cintura, bolsillos y tiras ajustables. La modelo esta usando talle M Medidas Talle S Talle M Talle L Talle L circunferencia de cintura de 47cm hasta 90cm de 60cm a 100cm de 70cm a 110cm de 75cm a 115cm circunferencia de cadera 90cm 100cm 110cm 115cm largo 107cm 107cm 109cm 110cm",
+    "price": "65990.00",
+    "imageUrl": "images/jogger_kid.jpg",
+    "url": "https://www.charostoreok.com/productos/jogger-kid1/"
+  },
+  {
+    "uuid": "424bab71-2b84-4247-b17d-d9422ce9d1ab",
+    "name": "Pantalon Angeline",
+    "description": "Pant wide de bambula con elastico en la cintura. La modelo lo esta combinando con la Blusa Angeline Medidas circunferencia de cintura 64cm circunferencia de cadera 136cm largo 105cm",
+    "price": "65990.00",
+    "imageUrl": "images/pantalon_angeline.webp",
+    "url": "https://www.charostoreok.com/productos/pantalon-angeline/"
+  },
+  {
+    "uuid": "e9d1d97c-8888-426a-b74b-503856611501",
+    "name": "Jean Barcelona",
+    "description": "Jean rigido tiro medio , la modelo esta usando talle 36 y lo esta combinando con el Sweater California Medidas Talle 36 Talle 38 Talle 40 Talle 42 Talle 44 circunferencia de cintura 72cm 74cm 76cm 80cm 82cm circunferencia de cadera 95cm 98cm 100cm 108cm 110cm largo 95cm 98cm 98cm 98cm 99cm",
+    "price": "69990.00",
+    "imageUrl": "images/jean_barcelona.webp",
+    "url": "https://www.charostoreok.com/productos/jean-barcelona/"
+  },
+  {
+    "uuid": "ee5f2091-1a09-466e-b87b-177f63757e6b",
+    "name": "Pant Praga",
+    "description": "Pant tiro medio con cierre. La modelo esta usando talle 36 Medidas Talle 36 Talle 38 Talle 40 Talle 42 Talle 44 circunferencia de cintura 72cm 74cm 78cm 82cm 88cm circunferencia de cadera 102cm 106cm 108cm 110cm 120cm largo 112cm 112cm 114cm 115cm 116cm",
+    "price": "75990.00",
+    "imageUrl": "images/pant_praga.webp",
+    "url": "https://www.charostoreok.com/productos/pant-praga/?openNotificationDialog=true"
+  },
+  {
+    "uuid": "59c63fc9-82c5-4634-83cf-3454488028c6",
+    "name": "Jean Snow",
+    "description": "Jean wide tiro medio, La modelo lo esta combinando con el Saquito Aria y esta usando talle 36. Medidas Talle 34 Talle 36 Talle 38 Talle 40 Talle 42 Talle 44 circunferencia de cintura 68cm 72cm 74cm 78cm 82cm 86cm circunferencia de cadera 100cm 106cm 110cm 114cm 116cm 118cm largo 107cm 109cm 109cm 110cm 111cm 111cm",
+    "price": "69990.00",
+    "imageUrl": "images/jean_snow.webp",
+    "url": "https://www.charostoreok.com/productos/jean-snow/?openNotificationDialog=true"
+  },
+  {
+    "uuid": "491f9026-5071-40ac-93c7-f0bff5310b9a",
+    "name": "Jogger Chester",
+    "description": "jogger con elastico en la cintura.  La modelo esta combinando con la Camper Chester y esta usando talle 1 Medidas Talle 1 Talle 2 Talle 3 circunferencia de cintura 78cm 80cm 82cm circunferencia de cadera 106cm 108cm 110cm largo 107cm 108cm 109c,",
+    "price": "65990.00",
+    "imageUrl": "images/jogger_chester.webp",
+    "url": "https://www.charostoreok.com/productos/jogger-chester/?openNotificationDialog=true"
+  }
+]

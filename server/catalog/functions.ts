@@ -9,12 +9,10 @@ import logger from "../logger";
 import { prisma } from "../db";
 import { ErrorSchemaType } from "@/schemas/standar-response-schema";
 
-// const INFERENCE_URL =
-//   config.ENVIRONMENT === "production"
-//     ? `https://inference-server-production.up.railway.app`
-//     : `http://127.0.0.1:8000`;
-
-const INFERENCE_URL = `https://inference-server-production.up.railway.app`;
+const INFERENCE_URL =
+  config.ENVIRONMENT === "production"
+    ? `https://inference-server-production.up.railway.app`
+    : `http://127.0.0.1:8000`;
 
 //funcion para obtener items de PostgreSQL
 export async function GetCatalog(
@@ -214,6 +212,23 @@ export async function extractFeatures(
     }
 
     const result = await response.json();
+
+    // Validar que el resultado tenga la estructura esperada
+    if (
+      !result ||
+      !Array.isArray(result.image_features) ||
+      !Array.isArray(result.text_features) ||
+      result.image_features.length === 0 ||
+      result.text_features.length === 0
+    ) {
+      logger.error("Invalid features structure from inference service: %s", JSON.stringify(result));
+      return {
+        error: true,
+        details: "El servicio de inferencia retornó una estructura inválida",
+        features: { image_features: [], text_features: [] },
+      };
+    }
+
     return {
       error: false,
       details: "Las características se han extraído correctamente",
@@ -316,13 +331,13 @@ export async function searchText(
 // Función para verificar si ya existe un elemento con el mismo nombre y brand en Weaviate
 export async function getCollection(): Promise<
   | {
-      error: true;
-      details: string;
-    }
+    error: true;
+    details: string;
+  }
   | {
-      error: false;
-      collection: Collection;
-    }
+    error: false;
+    collection: Collection;
+  }
 > {
   try {
     const client = await weaviate.connectToWeaviateCloud(config.WEAVIATE_URL, {

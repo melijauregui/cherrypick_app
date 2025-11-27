@@ -1,8 +1,11 @@
 # Run 
 - front:  npm run ios/android  
-- server: npx ts-node -r tsconfig-paths/register server/index.ts
+- server: npm run start:backend
 - database: (cd inference && source .venv/bin/activate) uvicorn server:app --reload 
-- ejecutar script: node test-endpoints/test-catalog-upload.js
+- seed: npm run db:seed-complete
+
+source venv/bin/activate
+deactivate
 
 en ios dentro de Info.plist:
 <key>NSCameraUsageDescription</key>

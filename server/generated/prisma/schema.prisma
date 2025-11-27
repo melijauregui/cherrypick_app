@@ -101,7 +101,7 @@ model InspoItems {
 model Item {
   id          String @id @default(uuid()) @db.Uuid
   name        String @db.VarChar(50)
-  description String @db.VarChar(512)
+  description String @db.VarChar(700)
   price       Float  @db.Real
   url         String @db.VarChar(255)
   brandId     String @db.Uuid
