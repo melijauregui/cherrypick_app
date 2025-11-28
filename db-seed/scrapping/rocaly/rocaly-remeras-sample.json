@@ -1,67 +1,11 @@
 [
   {
-    "uuid": "fd2896bc-5b9d-433a-839a-36cde24519dd",
-    "name": "MUSCULOSA COTTON CREAM",
-    "description": "Musculosa de algodón con mucho cuerpo, tiene un largo ideal. Tiene bordes con costura doble en el escote y hombros. El escote es cerrado estilo americano. Se...",
-    "price": "25900.00",
-    "imageUrl": "images/musculosa_cotton_cream.webp",
-    "url": "https://www.rocaly.com.ar/productos/musculosa-cotton-cream-kox1m/"
-  },
-  {
-    "uuid": "310e62e1-54b3-44e0-9852-74fd195e2d83",
-    "name": "MUSCULOSA COTTON BLACK",
-    "description": "Musculosa de algodón con mucho cuerpo, tiene un largo ideal. Tiene bordes con costura doble en el escote y hombros. El escote es cerrado estilo americano. Se...",
-    "price": "25900.00",
-    "imageUrl": "images/musculosa_cotton_black.webp",
-    "url": "https://www.rocaly.com.ar/productos/musculosa-cotton-black-7mbfg/"
-  },
-  {
     "uuid": "1f9f03d8-a87e-4252-87c7-ff829bf26a67",
     "name": "CHOMBA KNIT CREAM",
     "description": "Chomba tejida con puntos en lineas horizontales que le dan una textura hermosa. Es larguita, elastizada y muy gruesita. Se prende con botones en parte delant...",
     "price": "55000.00",
     "imageUrl": "images/chomba_knit_cream.webp",
     "url": "https://www.rocaly.com.ar/productos/chomba-knit-cream-ycth9/"
-  },
-  {
-    "uuid": "a06f7c75-b6d0-4f64-a161-aa0f0b7bc0f7",
-    "name": "MUSCU BASIC TANK BLUE",
-    "description": "Musculosa de algodón ribb premium super elastizado, tiene un largo ideal. Tiene bordes anchos en ribb en el escote y hombros. El escote es cerrado estilo ame...",
-    "price": "32000.00",
-    "imageUrl": "images/muscu_basic_tank_blue.webp",
-    "url": "https://www.rocaly.com.ar/productos/muscu-basic-tank-blue-cpxxg/"
-  },
-  {
-    "uuid": "4cf1e5e5-1159-4151-885c-ad9a0032e22c",
-    "name": "MUSCU BASIC TANK TIZA",
-    "description": "Musculosa de algodón ribb premium super elastizado, tiene un largo ideal. Tiene bordes anchos en ribb en el escote y hombros. El escote es cerrado estilo ame...",
-    "price": "32000.00",
-    "imageUrl": "images/muscu_basic_tank_tiza.webp",
-    "url": "https://www.rocaly.com.ar/productos/muscu-basic-tank-tiza-3gzub/"
-  },
-  {
-    "uuid": "ba30001c-e0ea-439b-af1c-f6a6b841fc44",
-    "name": "MUSCU BASIC TANK WHITE",
-    "description": "Musculosa de algodón ribb premium super elastizado, tiene un largo ideal. Tiene bordes anchos en ribb en el escote y hombros. El escote es cerrado estilo ame...",
-    "price": "32000.00",
-    "imageUrl": "images/muscu_basic_tank_white.webp",
-    "url": "https://www.rocaly.com.ar/productos/muscu-basic-tank-white-uhky1/"
-  },
-  {
-    "uuid": "b3268278-cff9-4b16-b7eb-9b7e3b95f97b",
-    "name": "MUSCU BASIC TANK CHOCO",
-    "description": "Musculosa de algodón ribb premium super elastizado, tiene un largo ideal. Tiene bordes anchos en ribb en el escote y hombros. El escote es cerrado estilo ame...",
-    "price": "32000.00",
-    "imageUrl": "images/muscu_basic_tank_choco.webp",
-    "url": "https://www.rocaly.com.ar/productos/muscu-basic-tank-choco-fomlq/"
-  },
-  {
-    "uuid": "5da1a859-c055-4a9f-928a-a077ad35c18e",
-    "name": "MUSCU ROSY BAMBULA",
-    "description": "Musculosa de bambula con escote en V y terminaciones de puntilla en el escote. Súper classy y con detalles en tendencia esta temporada. La tela es elastizada...",
-    "price": "19800.00",
-    "imageUrl": "images/muscu_rosy_bambula.webp",
-    "url": "https://www.rocaly.com.ar/productos/muscu-rosy-bambula-mmf0m/"
   },
   {
     "uuid": "1cd4fab2-7980-498e-a034-b550790bfc68",
@@ -198,14 +142,6 @@
     "price": "20900.00",
     "imageUrl": "images/muscu_dua_choco&black.webp",
     "url": "https://www.rocaly.com.ar/productos/muscu-dua-chocoblack-4755r/"
-  },
-  {
-    "uuid": "b2b03be5-2786-4eaa-957f-3ed10059ec46",
-    "name": "BLUSA JENNA BEIGE",
-    "description": "Blusa de crep satinado super suelta y fresca. Tiene escote en V y tiras finas a tono, y terminaciones de puntilla en el escote. Viene por talles S/M Y M/L. E...",
-    "price": "42000.00",
-    "imageUrl": "images/blusa_jenna_beige.webp",
-    "url": "https://www.rocaly.com.ar/productos/blusa-jenna-beige-foilx/"
   },
   {
     "uuid": "ea0b20f5-7e18-4639-bb18-930e179bcf61",
@@ -384,14 +320,6 @@
     "url": "https://www.rocaly.com.ar/productos/chomba-cotton/"
   },
   {
-    "uuid": "5a86ba40-90f4-45f6-9824-73347d784c90",
-    "name": "MUSCULOSA COCONUT YELLOW",
-    "description": "Musculosa básica de microfibra elastizada con doble tela en busto, de corte boxy y al cuerpo. con escote cuadrado. Un básico que vas a amar &lt;3 Encontras l...",
-    "price": "19500.00",
-    "imageUrl": "images/musculosa_coconut_yellow.webp",
-    "url": "https://www.rocaly.com.ar/productos/musculosa-coconut-yellow/"
-  },
-  {
     "uuid": "3fbd82fe-0fc9-46b1-acdb-93e346bb720f",
     "name": "MUSCULOSA COCONUT BLACK",
     "description": "Musculosa básica de microfibra elastizada con doble tela en busto, de corte boxy y al cuerpo. con escote cuadrado. Un básico que vas a amar &lt;3 Encontras l...",
@@ -414,14 +342,6 @@
     "price": "40900.00",
     "imageUrl": "images/remera_leather_black-_sin_cambio.webp",
     "url": "https://www.rocaly.com.ar/productos/remera-leather-black-sin-cambio-s92dh/"
-  },
-  {
-    "uuid": "167245df-e49c-4fe9-a66f-c9f33b10610c",
-    "name": "TOP ASIMETRICO BLACK T.L",
-    "description": "Top asimétrico de bengalina. Con cuello bote, al cuerpo y súper elastizado. Tiene frunces a un costado. Basico y hermosoo, viene por talles del S al L. Encon...",
-    "price": "29000.00",
-    "imageUrl": "images/top_asimetrico_black_t.l.webp",
-    "url": "https://www.rocaly.com.ar/productos/top-asimetrico-black1/"
   },
   {
     "uuid": "c027bd54-5783-4ea0-822b-ee14d3ed8119",

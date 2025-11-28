@@ -16,6 +16,7 @@
     "db:seed-inspiration": "npx tsx db-seed/seed-inspiration.ts",
     "db:seed-items": "node db-seed/test-catalog-upload.js",
     "db:cleanup": "npx tsx db-seed/cleanup-database.ts",
+    "db:delete-items": "npx tsx db-seed/delete-items.ts",
     "db:seed-complete": "npm run db:cleanup && npm run db:seed-brands && npm run db:seed-items && npm run db:seed-inspiration"
   },
   "jest": {
