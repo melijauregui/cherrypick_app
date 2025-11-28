@@ -18,7 +18,9 @@ const BRAND_CONFIGS = [
   },
   {
     brandEmail: "socialclub@gmail.com",
-    filePaths: ["db-seed/pinterest/social-club/catalog-items-social-club.json"],
+    filePaths: ["db-seed/pinterest/social-club/catalog-items-social-club.json",
+      "db-seed/pinterest/social-club/catalog-items-social-club2.json"
+    ],
   },
   {
     brandEmail: "cherrypick.brand.example@gmail.com",
