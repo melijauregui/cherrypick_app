@@ -11,7 +11,10 @@ const prisma = new PrismaClient();
 const BRAND_CONFIGS = [
   {
     brandEmail: "girlsclub@gmail.com",
-    filePaths: ["db-seed/pinterest/girls-club/catalog-items-girls-club.json"],
+    filePaths: [
+      "db-seed/pinterest/girls-club/catalog-items-girls-club.json",
+      "db-seed/pinterest/girls-club/catalog-items-girls-club2.json"
+    ],
   },
   {
     brandEmail: "socialclub@gmail.com",
