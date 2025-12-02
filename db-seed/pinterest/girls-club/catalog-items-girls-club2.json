@@ -1,0 +1,242 @@
+[
+  {
+    "uuid": "ca9b7eb4-111e-41cf-87bb-a17ceed0e3e8",
+    "name": "Jean Aurora celeste",
+    "description": "Jean liso recto. Color celeste. Tiro bajo.",
+    "price": "29.99",
+    "imageUrl": "./images/jean_recto_celeste_1.jpg",
+    "url": "https://ar.pinterest.com/pin/22869910604328205/"
+  },
+  {
+    "uuid": "8dcb049d-d0fb-4523-a2ff-61e5627a6aba",
+    "name": "Jean Luna celeste",
+    "description": "Jean liso recto. Color celeste. Tiro bajo.",
+    "price": "39.99",
+    "imageUrl": "./images/jean_recto_celeste_2.jpg",
+    "url": "https://ar.pinterest.com/pin/626844841924466438/"
+  },
+  {
+    "uuid": "f1817010-5a41-4526-95f6-8769c423fc42",
+    "name": "Jean recto celeste claro",
+    "description": "Jean liso recto. Color celeste claro. Tiro medio.",
+    "price": "29.99",
+    "imageUrl": "./images/jean_recto_celeste_3.jpg",
+    "url": "https://ar.pinterest.com/pin/70439181666701860/"
+  },
+  {
+    "uuid": "c64082df-e219-4f2e-a87e-cac1b54421f9",
+    "name": "Jean Aurora azul",
+    "description": "Jean liso recto. Color azul. Tiro alto",
+    "price": "39.99",
+    "imageUrl": "./images/jean_recto_azul_2.jpg",
+    "url": "https://ar.pinterest.com/pin/422281211543730/"
+  },
+  {
+    "uuid": "a3201d89-bb77-4922-9c17-7c64a7477987",
+    "name": "Jean Luna azul",
+    "description": "Jean liso recto. Color azul. Tiro alto",
+    "price": "39.99",
+    "imageUrl": "./images/jean_recto_azul_3.jpg",
+    "url": "https://ar.pinterest.com/pin/6614730696940786/"
+  },
+  {
+    "uuid": "2fee57b8-18a3-4186-aaa5-5254671c1caf",
+    "name": "Jean azul Vega",
+    "description": "Jean liso recto. Color azul. Tiro medio.",
+    "price": "39.99",
+    "imageUrl": "./images/jean_recto_azul_4.jpg",
+    "url": "https://ar.pinterest.com/pin/250512798022380325/"
+  },
+  {
+    "uuid": "ebcb18d2-0823-4108-abc1-43ed9a055c0c",
+    "name": "Jean Alma gris",
+    "description": "Jean liso recto. Color gris. Tiro bajo",
+    "price": "29.99",
+    "imageUrl": "./images/jean_recto_gris_2.jpg",
+    "url": "https://ar.pinterest.com/pin/13721973860716905/"
+  },
+  {
+    "uuid": "d8c7280b-13d2-4f25-8469-56452e775475",
+    "name": "Jean Luna gris",
+    "description": "Jean liso recto. Color gris claro. Tiro alto.",
+    "price": "39.99",
+    "imageUrl": "./images/jean_recto_gris_3.jpg",
+    "url": "https://ar.pinterest.com/pin/692569248988602739/"
+  },
+  {
+    "uuid": "be67e13d-d4f3-4853-964a-dc4559ea13ca",
+    "name": "Jean Iris acampanado",
+    "description": "Jean liso acampanado o flared. Color celeste o azul claro. Tiro alto.",
+    "price": "39.99",
+    "imageUrl": "./images/jean_flared_2.jpg",
+    "url": "https://ar.pinterest.com/pin/74027987620994727/"
+  },
+  {
+    "uuid": "424948a7-0874-40cc-b527-d797e52b2bcd",
+    "name": "Jean Nala acampanado - azul",
+    "description": "Jean liso acampanado o flared. Color azul. Tiro alto.",
+    "price": "29.99",
+    "imageUrl": "./images/jean_flared_3.jpg",
+    "url": "https://ar.pinterest.com/pin/229613280996282298/"
+  },
+  {
+    "uuid": "7299a83e-53ed-4612-867f-1a465984ab56",
+    "name": "Jean Nala acampanado - celeste",
+    "description": "Jean liso acampanado o flared. Color celeste claro. Tiro alto.",
+    "price": "29.99",
+    "imageUrl": "./images/jean_flared_4.jpg",
+    "url": "https://ar.pinterest.com/pin/229613280996282300/"
+  },
+  {
+    "uuid": "94e58aca-a55b-4a81-8057-389efbe957b9",
+    "name": "Jean Aurora negro",
+    "description": "Jean liso recto. Color negro. Tiro bajo.",
+    "price": "29.99",
+    "imageUrl": "./images/jean_recto_negro_2.jpg",
+    "url": "https://ar.pinterest.com/pin/186688347050885928/"
+  },
+  {
+    "uuid": "9e488eff-3f5c-4c7e-a3a6-04e7ea9a8adc",
+    "name": "Jean Luna negro",
+    "description": "Jean liso recto. Color negro. Tiro alto",
+    "price": "29.99",
+    "imageUrl": "./images/jean_recto_negro_3.jpg",
+    "url": "https://ar.pinterest.com/pin/887420301585344219/"
+  },
+  {
+    "uuid": "4beb151c-ec95-428b-9a65-452503a96d77",
+    "name": "Jean Lyra celeste",
+    "description": "Jean recto con roturas desmechadas. Color celeste claro. Tiro alto",
+    "price": "19.99",
+    "imageUrl": "./images/jean_roto_celeste_3.jpg",
+    "url": "https://ar.pinterest.com/pin/6403624462882402/"
+  },
+  {
+    "uuid": "8fc634f3-8f25-4dfc-abac-caf39dfeae8f",
+    "name": "Jean Mora celeste",
+    "description": "Jean recto con roturas desmechadas blancas. Color celeste claro. Tiro alto",
+    "price": "29.99",
+    "imageUrl": "./images/jean_roto_celeste_4.jpg",
+    "url": "https://ar.pinterest.com/pin/20547742045236077/"
+  },
+  {
+    "uuid": "649ca1f3-7355-4141-bb7a-68c881e23623",
+    "name": "Jean Gaia celeste",
+    "description": "Jean recto con varias roturas desmechadas. Color celeste. Tiro alto",
+    "price": "25.99",
+    "imageUrl": "./images/jean_roto_celeste_5.jpg",
+    "url": "https://ar.pinterest.com/pin/664843963749790792/"
+  },
+  {
+    "uuid": "e91add2c-6634-491f-83b4-0fab0064f555",
+    "name": "Jean Alba azul",
+    "description": "Jean liso wide leg o palazzo. Color azul claro.",
+    "price": "69.99",
+    "imageUrl": "./images/jean_azul_wide_2.jpg",
+    "url": "https://ar.pinterest.com/pin/225391156347258957/"
+  },
+  {
+    "uuid": "07930f93-224a-4a6e-bc98-b72d556f2aaf",
+    "name": "Jean Vega azul",
+    "description": "Jean liso wide leg o palazzo. Color azul. Tiro alto",
+    "price": "79.99",
+    "imageUrl": "./images/jean_azul_wide_3.jpg",
+    "url": "https://ar.pinterest.com/pin/801148221254987688/"
+  },
+  {
+    "uuid": "9443c89e-7cf1-48a2-9426-f99460ae826a",
+    "name": "Jean Cora azul",
+    "description": "Jean liso wide leg o palazzo. Color azul. Tiro alto",
+    "price": "89.99",
+    "imageUrl": "./images/jean_azul_wide_palazzo_4.jpg",
+    "url": "https://ar.pinterest.com/pin/92112754875093426/"
+  },
+  {
+    "uuid": "525c0859-2135-40a9-9288-93422591dd18",
+    "name": "Jean Dalia celeste",
+    "description": "Jean liso mom. Color celeste. Tiro alto.",
+    "price": "19.99",
+    "imageUrl": "./images/jean_celeste_mom_2.jpg",
+    "url": "https://ar.pinterest.com/pin/72902087707982012/"
+  },
+  {
+    "uuid": "2fb06930-0378-422b-a1cd-a6166ad0c43f",
+    "name": "Jean Dialia celeste oscuro",
+    "description": "Jean liso mom. Color azul claro o celeste oscuro. Tiro alto.",
+    "price": "29.99",
+    "imageUrl": "./images/jean_celeste_mom_3.jpg",
+    "url": "https://ar.pinterest.com/pin/1053138694130282090/"
+  },
+  {
+    "uuid": "6e6ba50d-07da-46cc-bfc4-e13f44183111",
+    "name": "Jean Cora azul claro",
+    "description": "Jean liso palazzo o wide leg. Color azul claro o celeste ocuro. Tiro alto.",
+    "price": "19.99",
+    "imageUrl": "./images/jean_azul_wide_palazzo_5.jpg",
+    "url": "https://ar.pinterest.com/pin/40884309113948604/"
+  },
+  {
+    "uuid": "017c9ba1-cf21-42fc-9f07-0d7126b8fed0",
+    "name": "Jean Cora celeste",
+    "description": "Jean liso palazzo o wide leg. Color celeste. Tiro alto.",
+    "price": "19.99",
+    "imageUrl": "./images/jean_azul_wide_palazzo_6.jpg",
+    "url": "https://ar.pinterest.com/pin/573646071305115593/"
+  },
+  {
+    "uuid": "6e39216c-de28-480c-9e5e-d90999c07a85",
+    "name": "Jean Siena azul",
+    "description": "Jean wide leg con roturas desmechadas grandes. Color azul. Tiro alto.",
+    "price": "39.99",
+    "imageUrl": "./images/jean_roto_azul_2.jpg",
+    "url": "https://ar.pinterest.com/pin/258886678575122556/"
+  },
+  {
+    "uuid": "a0f3c360-2df0-411f-8b0a-e72bc0d7011e",
+    "name": "Jean Vera azul",
+    "description": "Jean wide leg con roturas chicas. Color azul. Tiro alto.",
+    "price": "39.99",
+    "imageUrl": "./images/jean_roto_azul_3.jpg",
+    "url": "https://ar.pinterest.com/pin/15551561208799399/"
+  },
+  {
+    "uuid": "7b49c9c1-5f48-4f6c-8511-72f282e1b088",
+    "name": "Jean Fiora azul",
+    "description": "Jean skinny con roturas. Color azul.",
+    "price": "19.99",
+    "imageUrl": "./images/jean_roto_skinny_1.jpg",
+    "url": "https://ar.pinterest.com/pin/22447698133716375/"
+  },
+  {
+    "uuid": "2cdb2557-f516-4c5b-96bb-06f38dc0fcd7",
+    "name": "Jean Selene azul",
+    "description": "Jean skinny con roturas. Color azul.",
+    "price": "19.99",
+    "imageUrl": "./images/jean_roto_skinny_2.jpg",
+    "url": "https://ar.pinterest.com/pin/311874342963784626/"
+  },
+  {
+    "uuid": "f36b1244-0e80-486c-978f-87fc70e94419",
+    "name": "Jean Maia azul",
+    "description": "Jean skinny con multiples roturas. Color azul.",
+    "price": "19.99",
+    "imageUrl": "./images/jean_roto_skinny_3.jpg",
+    "url": "https://ar.pinterest.com/pin/30610472459355078/"
+  },
+  {
+    "uuid": "c183aa23-b882-42c4-922c-627c213a427d",
+    "name": "Jean Maia negro",
+    "description": "Jean skinny con roturas. Color negro. Tiro alto.",
+    "price": "19.99",
+    "imageUrl": "./images/jean_roto_skinny_4.jpg",
+    "url": "https://ar.pinterest.com/pin/43136108926986293/"
+  },
+  {
+    "uuid": "904ab98f-a2f5-4630-85b8-a258cc1211fe",
+    "name": "Jean Selene negro",
+    "description": "Jean skinny con roturas. Color negro. Tiro medio.",
+    "price": "19.99",
+    "imageUrl": "./images/jean_roto_skinny_5.jpg",
+    "url": "https://ar.pinterest.com/pin/31384528647522096/"
+  }
+]

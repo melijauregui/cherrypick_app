@@ -8,20 +8,20 @@
     "url": "https://ar.pinterest.com/pin/80501912085455960/"
   },
   {
-    "uuid": "6ba7b811-9dad-11d1-80b4-00c04fd430c8",
-    "name": "Jean azul 1",
-    "description": "Jean liso recto. Color azul.",
-    "price": "49.99",
-    "imageUrl": "./images/jean_azul_1.jpg",
-    "url": "https://ar.pinterest.com/pin/10344274146431872/"
-  },
-  {
     "uuid": "6ba7b812-9dad-11d1-80b4-00c04fd430c8",
     "name": "Jean celeste 2",
     "description": "Jean liso recto. Color celeste.",
     "price": "39.99",
     "imageUrl": "./images/jean_celeste_2.jpg",
     "url": "https://ar.pinterest.com/pin/906560600028845732/"
+  },
+  {
+    "uuid": "6ba7b811-9dad-11d1-80b4-00c04fd430c8",
+    "name": "Jean azul 1",
+    "description": "Jean liso recto. Color azul.",
+    "price": "49.99",
+    "imageUrl": "./images/jean_azul_1.jpg",
+    "url": "https://ar.pinterest.com/pin/10344274146431872/"
   },
   {
     "uuid": "6ba7b813-9dad-11d1-80b4-00c04fd430c8",
@@ -142,14 +142,6 @@
     "price": "19.99",
     "imageUrl": "./images/jean_celeste_vintage_2.jpg",
     "url": "https://ar.pinterest.com/pin/7388786884390779/"
-  },
-  {
-    "uuid": "6ba7b828-9dad-11d1-80b4-00c04fd430c8",
-    "name": "Jean cinturon rosado",
-    "description": " Jean liso recto. Color celeste con cinturón rosado.",
-    "price": "19.99",
-    "imageUrl": "./images/jean_cinturon_rosado.jpg",
-    "url": "https://ar.pinterest.com/pin/282037995423977700/"
   },
   {
     "uuid": "6ba7b829-9dad-11d1-80b4-00c04fd430c8",
