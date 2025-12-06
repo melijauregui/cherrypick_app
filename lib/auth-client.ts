@@ -30,6 +30,8 @@ function useSession() {
   const authorized = session.data?.user.id;
   const [forceUpdate, setForceUpdate] = useState(0);
 
+  console.log("useSession!!!!!!!!");
+
   // Custom refetch that also gets fresh session data when needed
   const customRefetch = async () => {
     // First do the normal refetch
@@ -90,26 +92,44 @@ function useSession() {
 }
 
 export { useSession, signIn, signUp, signOut };
-
 export function OnlyAuthenticated({ children }: { children: React.ReactNode }) {
   const { status, user } = useSession();
   const pathname = usePathname();
+  const [hasRedirected, setHasRedirected] = useState(false);
+
+  useEffect(() => {
+    if (status === "error") {
+      router.replace("cherrypick:///error");
+    }
+    if (status === "unauthenticated" && !hasRedirected) {
+      console.log("User not authenticated, redirecting to sign-in");
+      setHasRedirected(true);
+      router.replace("cherrypick:///sign-in");
+    }
+    if (
+      user &&
+      !user?.emailVerified &&
+      pathname !== "/code-verification-register"
+    ) {
+      router.replace("cherrypick:///code-verification-register");
+    }
+    // Reset flag when user becomes authenticated again
+    if (status === "authenticated") {
+      setHasRedirected(false);
+    }
+  }, [status, hasRedirected]);
 
   if (status === "loading") return null;
 
-  if (status === "error") {
-    router.replace("cherrypick:///error");
-    return null;
-  }
+  // if (status === "error") {
+  //   router.replace("melodia:///error");
+  //   return null;
+  // }
 
-  if (status === "unauthenticated") {
-    router.replace("cherrypick:///sign-in");
-    return null;
-  }
-  if (!user?.emailVerified && pathname !== "/code-verification-register") {
-    router.replace("cherrypick:///code-verification-register");
-    return null;
-  }
+  // if (status === "unauthenticated") {
+  //   router.replace("melodia:///sign-in");
+  //   return null;
+  // }
 
   return children;
 }
