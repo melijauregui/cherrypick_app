@@ -1,0 +1,26 @@
+[
+  {
+    "uuid": "a94a5c3d-63ae-4bf9-b10c-72286ad24f9a",
+    "name": "Pantalón Bel crema",
+    "description": "Pantalón old money o minimalista color crema.",
+    "price": "39.99",
+    "imageUrl": "./images/oldmoney-minimalista-pantalon1.jpg",
+    "url": "https://ar.pinterest.com/pin/702069029439957229/"
+  },
+  {
+    "uuid": "73800826-a0e6-4294-b2a5-7db14734081b",
+    "name": "Pantalón Bel marrón",
+    "description": "Pantalón old money o minimalista color marrón.",
+    "price": "39.99",
+    "imageUrl": "./images/oldmoney-minimalista-pantalon2.jpg",
+    "url": "https://ar.pinterest.com/pin/1407443628842108/"
+  },
+  {
+    "uuid": "082bed04-09f2-4505-be6e-2ecef86510a8",
+    "name": "Pantalón Bel negro",
+    "description": "Pantalón old money o minimalista color negro.",
+    "price": "39.99",
+    "imageUrl": "./images/oldmoney-minimalista-pantalon3.jpg",
+    "url": "https://ar.pinterest.com/pin/1102748658742798614/"
+  }
+]

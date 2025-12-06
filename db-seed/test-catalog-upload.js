@@ -12,11 +12,12 @@ const BRAND_CONFIGS = [
   {
     brandEmail: "girlsclub@gmail.com",
     filePaths: [
-      "db-seed/pinterest/girls-club/catalog-items-girls-club.json",
-      "db-seed/pinterest/girls-club/catalog-items-girls-club2.json"
+      //"db-seed/pinterest/girls-club/catalog-items-girls-club.json",
+      //"db-seed/pinterest/girls-club/catalog-items-girls-club2.json",
+      "db-seed/pinterest/girls-club/catalog-items-girls-club3.json"
     ],
   },
-  {
+  /* {
     brandEmail: "socialclub@gmail.com",
     filePaths: ["db-seed/pinterest/social-club/catalog-items-social-club.json",
       "db-seed/pinterest/social-club/catalog-items-social-club2.json"
@@ -37,7 +38,7 @@ const BRAND_CONFIGS = [
       "db-seed/scrapping/rocaly/rocaly-pantalones-sample.json",
       "db-seed/scrapping/rocaly/rocaly-body-tops-sample.json",
     ],
-  },
+  }, */
 ];
 
 function normalizePrice(price) {
