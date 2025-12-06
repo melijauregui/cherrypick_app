@@ -20,18 +20,20 @@ export const auth = betterAuth({
     connectionString: config.DATABASE_URL,
   }),
   advanced: {
-    generateId: () => randomUUID(),
+    database: {
+      generateId: () => randomUUID()
+    },
     ...(config.ENVIRONMENT === "production"
       ? {
-          cookies: {
-            state: {
-              attributes: {
-                sameSite: "none",
-                secure: true,
-              },
+        cookies: {
+          state: {
+            attributes: {
+              sameSite: "none",
+              secure: true,
             },
           },
-        }
+        },
+      }
       : {}),
   },
   emailAndPassword: {
