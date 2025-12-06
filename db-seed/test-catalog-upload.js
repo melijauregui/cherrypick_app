@@ -13,13 +13,14 @@ const BRAND_CONFIGS = [
     brandEmail: "girlsclub@gmail.com",
     filePaths: [
       "db-seed/pinterest/girls-club/catalog-items-girls-club.json",
-      "db-seed/pinterest/girls-club/catalog-items-girls-club2.json"
+      "db-seed/pinterest/girls-club/catalog-items-girls-club2.json",
     ],
   },
   {
     brandEmail: "socialclub@gmail.com",
-    filePaths: ["db-seed/pinterest/social-club/catalog-items-social-club.json",
-      "db-seed/pinterest/social-club/catalog-items-social-club2.json"
+    filePaths: [
+      "db-seed/pinterest/social-club/catalog-items-social-club.json",
+      "db-seed/pinterest/social-club/catalog-items-social-club2.json",
     ],
   },
   {
@@ -47,7 +48,7 @@ function normalizePrice(price) {
   if (typeof price === "string") {
     return price.replace(",", ".").trim();
   }
-  throw new Error(`Invalid price value: ${price}`);
+  throw new Error(`Valor de precio inválido: ${price}`);
 }
 
 function getMimeType(fileName) {

@@ -80,11 +80,12 @@ async function handleSubmit(email: string, password: string) {
   if (error) {
     console.error(error);
 
-    let message = error.message ?? "Error al iniciar sesión";
-    if (error.status === 403) {
-      message = "Por favor, verifica tu dirección de correo electrónico";
+    let message: string;
+    if (error.status === 401 || error.status === 400 || error.status === 403) {
+      message = "Correo o contraseña incorrectos";
+    } else {
+      message = "Error al iniciar sesión";
     }
-
     Toast.show({
       type: "error",
       text1: message,

@@ -10,6 +10,7 @@ const SignIn = () => {
   if (status === "authenticated") {
     return <Redirect href="cherrypick:///home" />;
   }
+  console.log("status is not authenticated, rendering sign-in!! SIGN");
 
   return (
     <SafeAreaView className="bg-brown-strong flex-1 h-full w-full">

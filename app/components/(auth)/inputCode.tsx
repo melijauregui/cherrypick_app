@@ -49,7 +49,7 @@ const CodeInput: React.FC<CodeInputProps> = ({
       for (let i = 0; i < chars.length; i++) {
         const char = chars[i];
         if (char === undefined || !/^\d$/.test(char)) {
-          setCodeError("Invalid paste code");
+          setCodeError("Código de paste inválido");
           return;
         }
       }

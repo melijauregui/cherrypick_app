@@ -52,15 +52,15 @@ export type ClientSchemaResponseType = z.infer<typeof ClientSchemaResponse>;
 const ClientFormSchemaSignUp = z.object({
   name: z
     .string({
-      required_error: "Name must ve valid",
+      required_error: "El nombre debe ser válido",
     })
-    .min(1, { message: "Name is required" })
-    .max(50, { message: "Name must be less than 50 characters" }),
+    .min(1, { message: "El nombre es requerido" })
+    .max(50, { message: "El nombre debe tener menos de 50 caracteres" }),
   email: z
     .string({
-      required_error: "Email is required",
+      required_error: "El correo electrónico es requerido",
     })
-    .email({ message: "Invalid email address" }),
+    .email({ message: "El correo electrónico no es válido" }),
   ...PasswordSchema.shape,
 });
 export { ClientFormSchemaSignUp };
@@ -74,4 +74,4 @@ export type UserData = {
   updatedAt: Date;
   image?: string | null | undefined;
   userType: string;
-}
+};

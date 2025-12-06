@@ -60,3 +60,4 @@ server/generated/prisma/edge.js
 server/generated/prisma/index.js
 
 .venv/
+inference/__pycache__/server.cpython-312.pyc
