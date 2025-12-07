@@ -70,5 +70,37 @@
     "price": "19.99",
     "imageUrl": "./images/cargo_6.jpg",
     "url": "https://ar.pinterest.com/pin/622763454761403532/"
+  },
+  {
+    "uuid": "2fb06930-0378-422b-a1cd-a6166ad0c43f",
+    "name": "Jean Dalia azul",
+    "description": "Jean liso mom. Color azul. Tiro alto.",
+    "price": "29.99",
+    "imageUrl": "./images/mom_1.jpg",
+    "url": "https://ar.pinterest.com/pin/704461566706946325/"
+  },
+  {
+    "uuid": "0b0e987a-a15d-4574-aa0c-3224ebc5edab",
+    "name": "Jean Rae azul",
+    "description": "Jean liso mom. Color azul. Tiro alto.",
+    "price": "29.99",
+    "imageUrl": "./images/mom_2.jpg",
+    "url": "https://ar.pinterest.com/pin/156500155801671322/"
+  },
+  {
+    "uuid": "d1455375-2289-4fa0-aef8-3b7cda2bd799",
+    "name": "Jean Rae celeste",
+    "description": "Jean liso mom. Color celeste. Tiro alto.",
+    "price": "29.99",
+    "imageUrl": "./images/mom_3.jpg",
+    "url": "https://ar.pinterest.com/pin/25192079155745503/"
+  },
+  {
+    "uuid": "46582a50-2abb-4108-8b67-00197a7b2136",
+    "name": "Jean Tay azul",
+    "description": "Jean mom o recto con roturas simétricas. Color azul. Tiro medio.",
+    "price": "29.99",
+    "imageUrl": "./images/mom_4.jpg",
+    "url": "https://ar.pinterest.com/pin/12666442689517391/"
   }
 ]
