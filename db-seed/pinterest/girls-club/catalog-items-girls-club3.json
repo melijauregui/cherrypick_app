@@ -22,5 +22,53 @@
     "price": "39.99",
     "imageUrl": "./images/oldmoney-minimalista-pantalon3.jpg",
     "url": "https://ar.pinterest.com/pin/1102748658742798614/"
+  },
+  {
+    "uuid": "60b8b9b4-0c3a-4318-aa1f-c584d9dad022",
+    "name": "Jean Carly Cargo",
+    "description": "Jean liso cargo y wide leg. Color azul. Tiro alto de 38 cm. Entrepierna de 84 cm. 100 % algodón.",
+    "price": "29.99",
+    "imageUrl": "./images/cargo_1.jpg",
+    "url": "https://ar.pinterest.com/pin/33143747255644939/"
+  },
+  {
+    "uuid": "3dc001e2-6f59-4ac9-86e9-cac946b3159f",
+    "name": "Jean Jess Celeste",
+    "description": "Jean liso cargo y wide leg o recto. Tiro alto. Color celeste.",
+    "price": "29.99",
+    "imageUrl": "./images/cargo_2.jpg",
+    "url": "https://ar.pinterest.com/pin/365917538496561833/"
+  },
+  {
+    "uuid": "86b78bdb-79fe-4602-ac7e-ea6719aea4b3",
+    "name": "Jean Jess Negro",
+    "description": "Jean liso cargo y wide leg o recto. Tiro alto. Color negro.",
+    "price": "29.99",
+    "imageUrl": "./images/cargo_3.jpg",
+    "url": "https://ar.pinterest.com/pin/144678206775394816/"
+  },
+  {
+    "uuid": "df2a2b99-fd95-4c4b-8269-d4e0a1d147c8",
+    "name": "Jean Bella Celeste",
+    "description": "Jean cargo y recto con roturas. Tiro alto. Color celeste. Dos bolsillos.",
+    "price": "19.99",
+    "imageUrl": "./images/cargo_4.jpg",
+    "url": "https://ar.pinterest.com/pin/739997782561685841/"
+  },
+  {
+    "uuid": "cdf9ff8a-62dd-42ea-99be-9b71035781a9",
+    "name": "Jean Alix Cargo",
+    "description": "Jean cargo y wide leg con roturas. Tiro medio. Color celeste gastado. Cuatro bolsillos",
+    "price": "19.99",
+    "imageUrl": "./images/cargo_5.jpg",
+    "url": "https://ar.pinterest.com/pin/868068896928108471/"
+  },
+  {
+    "uuid": "dd8566b5-2387-4adc-86fc-3dc134fbfb80",
+    "name": "Jean Betty Cargo",
+    "description": "Jean cargo y wide leg con roturas. Tiro alto. Color azul. Cuatro bolsillos",
+    "price": "19.99",
+    "imageUrl": "./images/cargo_6.jpg",
+    "url": "https://ar.pinterest.com/pin/622763454761403532/"
   }
 ]
