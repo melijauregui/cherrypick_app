@@ -160,14 +160,6 @@
     "url": "https://ar.pinterest.com/pin/72902087707982012/"
   },
   {
-    "uuid": "2fb06930-0378-422b-a1cd-a6166ad0c43f",
-    "name": "Jean Dialia celeste oscuro",
-    "description": "Jean liso mom. Color azul claro o celeste oscuro. Tiro alto.",
-    "price": "29.99",
-    "imageUrl": "./images/jean_celeste_mom_3.jpg",
-    "url": "https://ar.pinterest.com/pin/1053138694130282090/"
-  },
-  {
     "uuid": "6e6ba50d-07da-46cc-bfc4-e13f44183111",
     "name": "Jean Cora azul claro",
     "description": "Jean liso palazzo o wide leg. Color azul claro o celeste ocuro. Tiro alto.",
@@ -182,14 +174,6 @@
     "price": "19.99",
     "imageUrl": "./images/jean_azul_wide_palazzo_6.jpg",
     "url": "https://ar.pinterest.com/pin/573646071305115593/"
-  },
-  {
-    "uuid": "6e39216c-de28-480c-9e5e-d90999c07a85",
-    "name": "Jean Siena azul",
-    "description": "Jean wide leg con roturas desmechadas grandes. Color azul. Tiro alto.",
-    "price": "39.99",
-    "imageUrl": "./images/jean_roto_azul_2.jpg",
-    "url": "https://ar.pinterest.com/pin/258886678575122556/"
   },
   {
     "uuid": "a0f3c360-2df0-411f-8b0a-e72bc0d7011e",

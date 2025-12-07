@@ -90,10 +90,17 @@ async function compareAndClean(fileAUrl: string, fileBUrl: string) {
 }
 
 async function main() {
-    await compareAndClean(
+    /* await compareAndClean(
         "db-seed/scrapping/rocaly/rocaly-body-tops-sample.json",
         "db-seed/scrapping/rocaly/rocaly-remeras-sample.json",
-    );
+    ); */
+
+    const badUUIDs = [
+        "6e39216c-de28-480c-9e5e-d90999c07a85",
+        "6ba7b830-9dad-11d1-80b4-00c04fd430c8"
+    ];
+    await deleteWeaviateItemsByUUIDs(badUUIDs);
+    await deletePrismaItemsByUUIDs(badUUIDs);
 }
 
 main()
