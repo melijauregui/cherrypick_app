@@ -3,7 +3,7 @@
     "uuid": "85043e5f-6fb9-44eb-9d63-9aad04afb89a",
     "name": "Top verde",
     "description": "Top verde claro ajustable con cordón en el frente.",
-    "price": "19.99",
+    "price": "32000",
     "imageUrl": "./images/remera_verde_2.jpg",
     "url": "https://ar.pinterest.com/pin/3448137207242144/"
   },
@@ -11,7 +11,7 @@
     "uuid": "b74c0efd-35e0-411f-9b45-291b4ae3c04d",
     "name": "Musculosa verde",
     "description": "Musculosa verde con botones.",
-    "price": "19.99",
+    "price": "32000",
     "imageUrl": "./images/remera_verde_3.jpg",
     "url": "https://ar.pinterest.com/pin/110056784636457487/"
   },
@@ -19,7 +19,7 @@
     "uuid": "7476d089-86f9-4eef-9dd8-32f09586c700",
     "name": "Remera Cider marrón",
     "description": "Remera marrón manga larga con frunce y encaje en el escote.",
-    "price": "29.99",
+    "price": "42000",
     "imageUrl": "./images/remera_marron_2.jpg",
     "url": "https://ar.pinterest.com/pin/73183562690124316/"
   },
@@ -27,7 +27,7 @@
     "uuid": "ee59cba9-f07a-4330-9f3d-256d54b2f457",
     "name": "Remera Krit marrón",
     "description": "Remera marrón manga larga con textura a rayas.",
-    "price": "29.99",
+    "price": "42000",
     "imageUrl": "./images/remera_marron_3.jpg",
     "url": "https://ar.pinterest.com/pin/593278950952182081/"
   },
@@ -35,7 +35,7 @@
     "uuid": "63fa4cd0-f223-4ab4-bba4-41dbebbd5303",
     "name": "Top Paloma",
     "description": "Top asimétrico de un solo hombro en color crema y con un ligero drapeado en el lateral.",
-    "price": "15.99",
+    "price": "28000",
     "imageUrl": "./images/remera_una_manga_2.jpg",
     "url": "https://ar.pinterest.com/pin/644999977924825029/"
   },
@@ -43,7 +43,7 @@
     "uuid": "f68535cf-3d53-4622-86ec-49bbb2b7bebe",
     "name": "Top Olvera gris",
     "description": "Top gris con tirantes y diseño a rayas.",
-    "price": "15.99",
+    "price": "28000",
     "imageUrl": "./images/top_gris.jpg",
     "url": "https://ar.pinterest.com/pin/16958936096368464/"
   },
@@ -51,7 +51,7 @@
     "uuid": "6c60c8ba-0bfa-4d92-ba33-8cd4e731dffb",
     "name": "Top Ellie largo",
     "description": "Top marrón liso con tirantes.",
-    "price": "15.99",
+    "price": "28000",
     "imageUrl": "./images/top_marron_3.jpg",
     "url": "https://ar.pinterest.com/pin/56928382800931941/"
   },
@@ -59,7 +59,7 @@
     "uuid": "138edb03-6ddd-44e5-808c-80da1d325186",
     "name": "Top Ellie corto",
     "description": "Top marrón liso con tirantes.",
-    "price": "14.99",
+    "price": "26000",
     "imageUrl": "./images/top_marron_4.jpg",
     "url": "https://ar.pinterest.com/pin/371124825565327355/"
   },
@@ -67,7 +67,7 @@
     "uuid": "7bbe497d-b642-4c96-8c8c-e98e529ecfb9",
     "name": "Top Rosa Satín",
     "description": "Top acampanado en satín con ligero drapeado. Modelo con tirantes spaghetti escote en V pronunciado y costura debajo del busto. Cierre oculto de zíper en un lateral.",
-    "price": "24.99",
+    "price": "38000",
     "imageUrl": "./images/top_rosa_satin.jpg",
     "url": "https://ar.pinterest.com/pin/511651207686339746/"
   },
@@ -75,7 +75,7 @@
     "uuid": "b6c764af-9f6c-45b2-9729-7fb544269089",
     "name": "Top halter negro",
     "description": "Top halter negro con escote profundo en V para salir.",
-    "price": "10.99",
+    "price": "20000",
     "imageUrl": "./images/top_negro_2.jpg",
     "url": "https://ar.pinterest.com/pin/122652789845737058/"
   },
@@ -83,7 +83,7 @@
     "uuid": "54618544-1821-4314-97be-24bec1fbfca3",
     "name": "Pantalón Zay gris claro",
     "description": "Pantalón sastrero gris claro de pierna recta, en estilo old money y minimalista.",
-    "price": "29.99",
+    "price": "42000",
     "imageUrl": "./images/pantalón_sastrero_gris_2.jpg",
     "url": "https://ar.pinterest.com/pin/25332816646648908/"
   },
@@ -91,7 +91,7 @@
     "uuid": "81b1c86f-7444-4aa0-a356-fb7ffeb19ede",
     "name": "Pantalón Zay gris oscuro",
     "description": "Pantalón sastrero gris oscuro de pierna recta, en estilo old money y minimalista.",
-    "price": "29.99",
+    "price": "42000",
     "imageUrl": "./images/pantalón_sastrero_gris_3.jpg",
     "url": "https://ar.pinterest.com/pin/10907224093251321/"
   }

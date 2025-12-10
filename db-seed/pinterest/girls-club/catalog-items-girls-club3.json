@@ -3,7 +3,7 @@
     "uuid": "a94a5c3d-63ae-4bf9-b10c-72286ad24f9a",
     "name": "Pantalón Bel crema",
     "description": "Pantalón old money o minimalista color crema.",
-    "price": "39.99",
+    "price": "110000",
     "imageUrl": "./images/oldmoney-minimalista-pantalon1.jpg",
     "url": "https://ar.pinterest.com/pin/702069029439957229/"
   },
@@ -11,7 +11,7 @@
     "uuid": "73800826-a0e6-4294-b2a5-7db14734081b",
     "name": "Pantalón Bel marrón",
     "description": "Pantalón old money o minimalista color marrón.",
-    "price": "39.99",
+    "price": "90000",
     "imageUrl": "./images/oldmoney-minimalista-pantalon2.jpg",
     "url": "https://ar.pinterest.com/pin/1407443628842108/"
   },
@@ -19,7 +19,7 @@
     "uuid": "082bed04-09f2-4505-be6e-2ecef86510a8",
     "name": "Pantalón Bel negro",
     "description": "Pantalón old money o minimalista color negro.",
-    "price": "39.99",
+    "price": "85000",
     "imageUrl": "./images/oldmoney-minimalista-pantalon3.jpg",
     "url": "https://ar.pinterest.com/pin/1102748658742798614/"
   },
@@ -27,7 +27,7 @@
     "uuid": "60b8b9b4-0c3a-4318-aa1f-c584d9dad022",
     "name": "Jean Carly Cargo",
     "description": "Jean liso cargo y wide leg. Color azul. Tiro alto de 38 cm. Entrepierna de 84 cm. 100 % algodón.",
-    "price": "29.99",
+    "price": "75000",
     "imageUrl": "./images/cargo_1.jpg",
     "url": "https://ar.pinterest.com/pin/33143747255644939/"
   },
@@ -35,7 +35,7 @@
     "uuid": "3dc001e2-6f59-4ac9-86e9-cac946b3159f",
     "name": "Jean Jess Celeste",
     "description": "Jean liso cargo y wide leg o recto. Tiro alto. Color celeste.",
-    "price": "29.99",
+    "price": "75000",
     "imageUrl": "./images/cargo_2.jpg",
     "url": "https://ar.pinterest.com/pin/365917538496561833/"
   },
@@ -43,7 +43,7 @@
     "uuid": "86b78bdb-79fe-4602-ac7e-ea6719aea4b3",
     "name": "Jean Jess Negro",
     "description": "Jean liso cargo y wide leg o recto. Tiro alto. Color negro.",
-    "price": "29.99",
+    "price": "75000",
     "imageUrl": "./images/cargo_3.jpg",
     "url": "https://ar.pinterest.com/pin/144678206775394816/"
   },
@@ -51,7 +51,7 @@
     "uuid": "df2a2b99-fd95-4c4b-8269-d4e0a1d147c8",
     "name": "Jean Bella Celeste",
     "description": "Jean cargo y recto con roturas. Tiro alto. Color celeste. Dos bolsillos.",
-    "price": "19.99",
+    "price": "60000",
     "imageUrl": "./images/cargo_4.jpg",
     "url": "https://ar.pinterest.com/pin/739997782561685841/"
   },
@@ -59,7 +59,7 @@
     "uuid": "cdf9ff8a-62dd-42ea-99be-9b71035781a9",
     "name": "Jean Alix Cargo",
     "description": "Jean cargo y wide leg con roturas. Tiro medio. Color celeste gastado. Cuatro bolsillos",
-    "price": "19.99",
+    "price": "60000",
     "imageUrl": "./images/cargo_5.jpg",
     "url": "https://ar.pinterest.com/pin/868068896928108471/"
   },
@@ -67,7 +67,7 @@
     "uuid": "dd8566b5-2387-4adc-86fc-3dc134fbfb80",
     "name": "Jean Betty Cargo",
     "description": "Jean cargo y wide leg con roturas. Tiro alto. Color azul. Cuatro bolsillos",
-    "price": "19.99",
+    "price": "60000",
     "imageUrl": "./images/cargo_6.jpg",
     "url": "https://ar.pinterest.com/pin/622763454761403532/"
   },
@@ -75,7 +75,7 @@
     "uuid": "2fb06930-0378-422b-a1cd-a6166ad0c43f",
     "name": "Jean Dalia azul",
     "description": "Jean liso mom. Color azul. Tiro alto.",
-    "price": "29.99",
+    "price": "75000",
     "imageUrl": "./images/mom_1.jpg",
     "url": "https://ar.pinterest.com/pin/704461566706946325/"
   },
@@ -83,7 +83,7 @@
     "uuid": "0b0e987a-a15d-4574-aa0c-3224ebc5edab",
     "name": "Jean Rae azul",
     "description": "Jean liso mom. Color azul. Tiro alto.",
-    "price": "29.99",
+    "price": "75000",
     "imageUrl": "./images/mom_2.jpg",
     "url": "https://ar.pinterest.com/pin/156500155801671322/"
   },
@@ -91,7 +91,7 @@
     "uuid": "d1455375-2289-4fa0-aef8-3b7cda2bd799",
     "name": "Jean Rae celeste",
     "description": "Jean liso mom. Color celeste. Tiro alto.",
-    "price": "29.99",
+    "price": "75000",
     "imageUrl": "./images/mom_3.jpg",
     "url": "https://ar.pinterest.com/pin/25192079155745503/"
   },
@@ -99,7 +99,7 @@
     "uuid": "46582a50-2abb-4108-8b67-00197a7b2136",
     "name": "Jean Tay azul",
     "description": "Jean mom o recto con roturas simétricas. Color azul. Tiro medio.",
-    "price": "29.99",
+    "price": "75000",
     "imageUrl": "./images/mom_4.jpg",
     "url": "https://ar.pinterest.com/pin/12666442689517391/"
   }

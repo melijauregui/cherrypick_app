@@ -31,7 +31,9 @@ def read_no_add_items(no_add_path: str, tag: str) -> list[str]:
             # Si la línea termina con ":", es una etiqueta
             if line.endswith(":"):
                 current_tag = line[:-1].strip().lower()
+                print(current_tag)
                 reading_items = current_tag == tag.lower()
+                print(reading_items)
             elif reading_items:
                 # Si estamos leyendo items de la etiqueta correcta, agregar el nombre
                 items_to_remove.append(line)

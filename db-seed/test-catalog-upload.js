@@ -14,7 +14,7 @@ const BRAND_CONFIGS = [
     filePaths: [
       "db-seed/pinterest/girls-club/catalog-items-girls-club.json",
       "db-seed/pinterest/girls-club/catalog-items-girls-club2.json",
-      "db-seed/pinterest/girls-club/catalog-items-girls-club3.json"
+      "db-seed/pinterest/girls-club/catalog-items-girls-club3.json",
     ],
   },
   {

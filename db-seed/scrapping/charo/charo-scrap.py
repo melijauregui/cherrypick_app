@@ -1,4 +1,5 @@
 import json
+import re
 import time
 from pathlib import Path
 from typing import List, Dict
@@ -24,7 +25,7 @@ HEADERS = {
         "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
     )
 }
-OUTPUT_PATH = Path(__file__).parent / "charo-tops-sample.json"
+OUTPUT_PATH = Path(__file__).parent / "charo-pantalones-sample.json"
 
 
 def fetch_soup(url: str) -> BeautifulSoup:
@@ -132,24 +133,45 @@ def extract_listing() -> List[Dict[str, str]]:
         driver.quit()
 
 
+def remove_measurements(text: str) -> str:
+    """Remove measurement sections from description text"""
+    if not text:
+        return text
+    
+    # Find the index where measurements start
+    # Look for "Medidas", "Tabla de talles", or patterns that indicate measurements
+    patterns_to_find = [
+        r'\bMedidas\b',
+        r'\bTabla de talles\b',
+        # Pattern: "Talle" followed by numbers, then measurement keywords like "Circunferencia", "Largo", "cm"
+        r'\s+Talle\s+\d+.*?(?:Circunferencia|Largo|cm|Tiro)',
+    ]
+    
+    min_index = len(text)
+    for pattern in patterns_to_find:
+        match = re.search(pattern, text, flags=re.IGNORECASE)
+        if match:
+            min_index = min(min_index, match.start())
+    
+    # If we found a measurement section, truncate the text
+    if min_index < len(text):
+        text = text[:min_index].strip()
+    
+    # Clean up trailing spaces and punctuation
+    text = text.rstrip(' .')
+    return text
+
+
 def extract_description(detail_soup: BeautifulSoup) -> str:
     desc = detail_soup.select_one("#product-description .product-description")
     if desc:
         text = desc.get_text(separator=" ", strip=True)
         if text:
-            # Eliminar la parte de "Medidas..." y todo lo que viene después
-            medidas_index = text.find("Medidas")
-            if medidas_index != -1:
-                text = text[:medidas_index].strip()
-            return text
+            return remove_measurements(text)
     og_desc = detail_soup.find("meta", attrs={"property": "og:description"})
     if og_desc and og_desc.get("content"):
         content = og_desc["content"].strip()
-        # Eliminar la parte de "Medidas..." y todo lo que viene después
-        medidas_index = content.find("Medidas")
-        if medidas_index != -1:
-            content = content[:medidas_index].strip()
-        return content
+        return remove_measurements(content)
     return ""
 
 

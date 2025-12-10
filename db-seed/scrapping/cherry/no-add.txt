@@ -1,4 +1,4 @@
-- pantalones:
+pantalones:
 Long Short Star
 denim street
 oliver

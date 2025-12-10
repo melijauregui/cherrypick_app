@@ -1,238 +1,286 @@
 [
   {
-    "uuid": "73a9b174-d233-4f6a-b66c-fdfc49fd7405",
+    "uuid": "107df668-d738-4732-be47-7bdd36d6b3ea",
+    "name": "Pant Ballon Cody",
+    "description": "Pant con elastico en la cintura, tiras regulables y elastico en puño. La modelo lo esta combiando con la Musculosa Loa",
+    "price": "55990.00",
+    "imageUrl": "images/pant_ballon_cody.jpg",
+    "url": "https://www.charostoreok.com/productos/pant-ballon-cody-g0fo5/"
+  },
+  {
+    "uuid": "0cc8f334-7a20-4257-91a3-1a522bc99210",
+    "name": "Pant Ludmila",
+    "description": "Pant con elastico en la cintura y tiras",
+    "price": "49990.00",
+    "imageUrl": "images/pant_ludmila.webp",
+    "url": "https://www.charostoreok.com/productos/pant-ludmila-9kl5c/"
+  },
+  {
+    "uuid": "ddc3a973-b6e7-4e09-84e4-76d1fbfe9dc0",
+    "name": "Pantalon Tejido Ron",
+    "description": "Pantalon tejido tiro alto con elastico en la cintura. la modelo lo esta combinando con el Top Ron y esta usando talle L",
+    "price": "49990.00",
+    "imageUrl": "images/pantalon_tejido_ron.webp",
+    "url": "https://www.charostoreok.com/productos/pantalon-tejido-ron-ebrvx/"
+  },
+  {
+    "uuid": "36752931-f86d-402c-b596-a69aeb8c490a",
     "name": "Jean California",
-    "description": "Jean wide leg combinado tiro alto. La modelo esta usando talle 36 y lo esta combinando con la Camisa Hellen y la Blusa Adore Me.",
+    "description": "Jean wide leg combinado tiro alto. La modelo esta usando",
     "price": "89990.00",
     "imageUrl": "images/jean_california.webp",
     "url": "https://www.charostoreok.com/productos/jean-california/"
   },
   {
-    "uuid": "2f44bd93-aa29-4309-a2c4-bb635143188c",
+    "uuid": "fc7931de-8d56-4814-9b1f-b556824d90e6",
     "name": "Pant balloon Fridha",
-    "description": "Pant balloon de bambula con elastico en la cintura y puño. La modelo lo esta combinando con la Camisa Adan.",
+    "description": "Pant balloon de bambula con elastico en la cintura y puño. La modelo lo esta combinando con la Camisa Adan",
     "price": "79990.00",
     "imageUrl": "images/pant_balloon_fridha.webp",
     "url": "https://www.charostoreok.com/productos/pant-balloon-fridha-al5aa/"
   },
   {
-    "uuid": "a58e63aa-b9e9-492c-8614-e101e33c6cad",
+    "uuid": "4d2058ea-a895-40df-a0e6-c585a74de989",
+    "name": "Pant Aurora",
+    "description": "Pantalon Balloon confeccionado en gasa de algodon, tiene elastico en la cintura y tira regulable para ajustar puño. La modelo lo esta combinando con el Top Aurora",
+    "price": "79990.00",
+    "imageUrl": "images/pant_aurora.webp",
+    "url": "https://www.charostoreok.com/productos/pant-aurora-fbm45/"
+  },
+  {
+    "uuid": "77557fb3-9b88-4768-a7c1-ef8621650660",
     "name": "Jean Balloon Glass",
-    "description": "Jean baggy ballon tiro alto, contiene aplicaciones de strass tanto en la parte delantera como trasera. Posee pinzas a la altura de la rodilla y ruedo. La modelo esta usando talle 36 y lo esta combinando con la Blusa Atenas.",
+    "description": "Jean baggy ballon tiro alto, contiene aplicaciones de strass tanto en la parte delantera como trasera. Posee pinzas a la altura de la rodilla y ruedo. La modelo esta usando",
     "price": "139990.00",
     "imageUrl": "images/jean_balloon_glass.webp",
     "url": "https://www.charostoreok.com/productos/jean-balloon-glass/"
   },
   {
-    "uuid": "6b53b431-fdf4-41db-90e8-48835bb6f645",
+    "uuid": "c70c07d0-90b2-4a65-a4b2-58d28f1f15aa",
+    "name": "Pant Britney",
+    "description": "Pant ballon confeccionado en poplin , cadera ancha , elastico en la cintura y elastico en puño. La modelo lo combinando con la Musculosa Calabria by CH y la Blusa Atenas,",
+    "price": "59990.00",
+    "imageUrl": "images/pant_britney.webp",
+    "url": "https://www.charostoreok.com/productos/pant-britney-8tk0z/"
+  },
+  {
+    "uuid": "c314cf01-494e-4fe7-a6c7-e3832b41444e",
     "name": "Jean Oxford Vitta",
-    "description": "Jean oxford tiro medio semi elastizado,la modelo esta usando talle 36 y lo esta combinando con el Top Pekin.",
+    "description": "Jean oxford tiro medio semi elastizado,la modelo esta usando",
     "price": "79990.00",
     "imageUrl": "images/jean_oxford_vitta.webp",
     "url": "https://www.charostoreok.com/productos/jean-oxford-vitta/"
   },
   {
-    "uuid": "1a006bf7-499f-44da-bf43-0e611698fcee",
+    "uuid": "bae5f80f-cc6b-40fc-93a7-cea0226c47fe",
     "name": "Jean Wide Augus",
-    "description": "Jean Wide tiro bajo, la modelo lo esta combinando con el Corset Eleonor y esta usando talle 36. JeanWide Leg tiro medio, la modelo esta usando talle 36 y lo esta combinando con la Blusa Sophie.",
+    "description": "Jean Wide tiro bajo, la modelo lo esta combinando con el Corset Eleonor y esta usando",
     "price": "69990.00",
     "imageUrl": "images/jean_wide_augus.webp",
     "url": "https://www.charostoreok.com/productos/jean-wide-augus/"
   },
   {
-    "uuid": "9707546e-a951-4f99-84f3-228569de7691",
+    "uuid": "935a69e4-9fbe-4dde-a5ad-eea5a22db744",
     "name": "Jean Genova",
-    "description": "J ean straight tiro alto, la modelo esta usando talle 36 y lo esta combinando con la Blusa Kurm.",
+    "description": "J ean straight tiro alto, la modelo esta usando",
     "price": "72990.00",
     "imageUrl": "images/jean_genova.webp",
     "url": "https://www.charostoreok.com/productos/jean-genova/"
   },
   {
-    "uuid": "99e0a56c-97e0-4f0d-8cab-feb0d7ac6e99",
+    "uuid": "a9f8f87b-e898-4704-a9fe-bdc3b5532c13",
     "name": "Jean Nerin",
-    "description": "Jean  color latte  tiro medio , la modelo esta usando talle 36 y lo esta combinando con el Top Carrie y el Sweater Amalfi.",
+    "description": "Jean  color latte  tiro medio , la modelo esta usando",
     "price": "79990.00",
     "imageUrl": "images/jean_nerin.webp",
     "url": "https://www.charostoreok.com/productos/jean-nerin1/"
   },
   {
-    "uuid": "d64064ff-98cd-4400-a780-869b690dae5f",
+    "uuid": "41f35bf7-0c6f-4cda-bf4b-3877c86e515e",
     "name": "Jean Wide Nerea",
-    "description": "Jean mega wide tiro medio, la modelo esta usando talle 36 y lo esta combinando con el Top Dots",
+    "description": "Jean mega wide tiro medio, la modelo esta usando",
     "price": "89990.00",
     "imageUrl": "images/jean_wide_nerea.webp",
     "url": "https://www.charostoreok.com/productos/jean-wide-nerea/"
   },
   {
-    "uuid": "a1cc2582-a784-4bf7-a6c4-fb700f4a1c3a",
+    "uuid": "2939fb19-4b63-4d56-82bc-e5b822e1c6b9",
     "name": "Jean Wide Stone",
-    "description": "Jean wide leg tiro medio , la modelo esta usando talle 38  y lo esta combinando con el Top Aragon .",
+    "description": "Jean wide leg tiro medio , la modelo esta usando",
     "price": "89990.00",
     "imageUrl": "images/jean_wide_stone.webp",
     "url": "https://www.charostoreok.com/productos/jean-wide-stone/"
   },
   {
-    "uuid": "1c9c88fa-2d95-4a8c-baab-53ab028918b2",
+    "uuid": "5194d7dc-b983-4299-b21b-462dd93ae289",
     "name": "Jean Wide Dark",
-    "description": "Jean extra wide tiro alto. La modelo esta usando talle 36",
+    "description": "Jean extra wide tiro alto. La modelo esta usando",
     "price": "79990.00",
     "imageUrl": "images/jean_wide_dark.webp",
     "url": "https://www.charostoreok.com/productos/jean-wide-dark/?openNotificationDialog=true"
   },
   {
-    "uuid": "84e13c42-37b8-42bf-a30b-ca2b03561c7b",
+    "uuid": "4dfa6fa7-aa2c-4eee-9ada-0c2100181085",
     "name": "Jean Marruecos",
-    "description": "Jean tiro bajo con doble cintura. Ideal para combinar con el Cardigan Charlotte y la Campera Calvin, creando conjuntos versátiles y a la moda. La modelo está usando talle 36.",
+    "description": "Jean tiro bajo con doble cintura. Ideal para combinar con el Cardigan Charlotte y la Campera Calvin, creando conjuntos versátiles y a la moda. La modelo está usando",
     "price": "65990.00",
     "imageUrl": "images/jean_marruecos.webp",
     "url": "https://www.charostoreok.com/productos/jean-marruecos/"
   },
   {
-    "uuid": "3af47061-ceaa-49f3-bd5b-91de2a426569",
+    "uuid": "a9ab71ee-f28d-47cd-8b21-5d212749c7e9",
     "name": "Jean Baggy Zelda",
-    "description": "Este jean baggy, con un detalle de recortes únicos, es perfecto para un look urbano y moderno. La modelo está usando talle 36 y lo esta combinando con la Campera Troya",
+    "description": "Este jean baggy, con un detalle de recortes únicos, es perfecto para un look urbano y moderno. La modelo está usando",
     "price": "75990.00",
     "imageUrl": "images/jean_baggy_zelda.jpg",
     "url": "https://www.charostoreok.com/productos/jean-baggy-zeland1/"
   },
   {
-    "uuid": "fccf9e0d-03a2-4a24-972c-7bc3c2b6c8e0",
-    "name": "Jean Oxford Heny",
-    "description": "Descubre denim oxford henry , una prenda esencial para tu guardarropa. Este jean tiro alto combina estilo y comodidad con su diseño moderno. La terminación desflecada** en el bajo añade un toque desenfadado, perfecto para cualquier ocasión. Este jean es ideal para quienes buscan una prenda versátil que se adapte a diferentes estilos. Combínalo con tus tops favoritos y transforma tu look de casual a chic en un instante. Su corte amplio ofrece libertad de movimiento y un ajuste favorecedor para todas las siluetas. La modelo esta usando talle 36",
-    "price": "79990.00",
-    "imageUrl": "images/jean_oxford_heny.webp",
-    "url": "https://www.charostoreok.com/productos/jean-oxford-heny/?openNotificationDialog=true"
+    "uuid": "97456d68-a069-425f-a5c5-f84efc253d3a",
+    "name": "Pant Asia",
+    "description": "Descubrí el Pant Asia, el pantalón engomado tiro alto que realza tu figura y se adapta perfectamente a tu día a día. Confeccionado en material engomado de excelente calidad, este pantalón combina estilo y practicidad. Incorpora cierre y botón para un calce seguro y moderno, ideal para usar tanto en ocasiones informales como en salidas nocturnas. La modelo está usando",
+    "price": "55990.00",
+    "imageUrl": "images/pant_asia.webp",
+    "url": "https://www.charostoreok.com/productos/pant-asia/"
   },
   {
-    "uuid": "aa31d06c-ca67-483c-9aec-1a60ed36421e",
+    "uuid": "cbd8e109-9c5e-4817-99c7-e00f0a64901c",
+    "name": "Jean Oxford Heny",
+    "description": "Descubre denim oxford henry , una prenda esencial para tu guardarropa. Este jean tiro alto combina estilo y comodidad con su diseño moderno. La terminación desflecada** en el bajo añade un toque desenfadado, perfecto para cualquier ocasión. Este jean es ideal para quienes buscan una prenda versátil que se adapte a diferentes estilos. Combínalo con tus tops favoritos y transforma tu look de casual a chic en un instante. Su corte amplio ofrece libertad de movimiento y un ajuste favorecedor para todas las siluetas. La modelo esta usando",
+    "price": "79990.00",
+    "imageUrl": "images/jean_oxford_heny.webp",
+    "url": "https://www.charostoreok.com/productos/jean-oxford-heny/"
+  },
+  {
+    "uuid": "e72a7103-a933-4e0f-8f23-7f539a1bcf1f",
     "name": "Jean Olivia",
-    "description": "Jean tiro medio con detalle de recortes. La modelo esta usando talle 36",
+    "description": "Jean tiro medio con detalle de recortes. La modelo esta usando",
     "price": "65990.00",
     "imageUrl": "images/jean_olivia.jpg",
     "url": "https://www.charostoreok.com/productos/jean-olivia1/?openNotificationDialog=true"
   },
   {
-    "uuid": "cb1a883b-15dd-4d53-aae7-70795f329ae7",
+    "uuid": "ac62beda-f231-4086-9564-2f059988ecbd",
     "name": "Pant Euge",
-    "description": "Panto oxford engomado tiro alto con detalle en los laterales, tiene cierre y bolsillo. La modelo esta usando talle S y lo esta combinando con el Top Euge .",
+    "description": "Panto oxford engomado tiro alto con detalle en los laterales, tiene cierre y bolsillo. La modelo esta usando talle S y lo esta combinando con el Top Euge",
     "price": "45990.00",
     "imageUrl": "images/pant_euge.webp",
     "url": "https://www.charostoreok.com/productos/pant-euge/"
   },
   {
-    "uuid": "2842b9d8-5e8d-4a64-8951-dbdd7405786e",
+    "uuid": "986a4547-aff1-46ed-9ade-dcf53a2de95c",
     "name": "Jean Wide Cecil",
-    "description": "Jean rigido wide leg tiro bajo. La modelo esta usando talle 36",
+    "description": "Jean rigido wide leg tiro bajo. La modelo esta usando",
     "price": "79990.00",
     "imageUrl": "images/jean_wide_cecil.webp",
     "url": "https://www.charostoreok.com/productos/jean-wide-cecil/"
   },
   {
-    "uuid": "5ee1a36c-edc8-4720-b48b-a5adea061544",
+    "uuid": "b496b487-b248-466c-9248-52c13bc51c25",
     "name": "Jean Straight Justine",
-    "description": "Jean straight tiro alto. La modelo esta usando talle 36. Y lo esta combinando con el Remera Renata",
+    "description": "Jean straight tiro alto. La modelo esta usando",
     "price": "75990.00",
     "imageUrl": "images/jean_straight_justine.webp",
     "url": "https://www.charostoreok.com/productos/jean-straight-justine/"
   },
   {
-    "uuid": "0a93b9ca-66dd-4314-82d8-345bfe043110",
+    "uuid": "36067b8c-3041-4c46-be63-a1c26a15458e",
     "name": "Jean Wide Tassia",
-    "description": "Jean wide tiro bajo con boton doble.  La modelo esta usando talle 36",
+    "description": "Jean wide tiro bajo con boton doble.  La modelo esta usando",
     "price": "69990.00",
     "imageUrl": "images/jean_wide_tassia.webp",
     "url": "https://www.charostoreok.com/productos/jean-wide-tassia/"
   },
   {
-    "uuid": "0df85858-a56d-4c64-b575-46449e613d53",
+    "uuid": "2d4d05b3-03a7-43a1-9b1c-48541c8db5af",
     "name": "Jean Wide Boxy",
-    "description": "Jean wide tiro bajo con boton doble.  La modelo esta usando talle 36",
+    "description": "Jean wide tiro bajo con boton doble.  La modelo esta usando",
     "price": "69990.00",
     "imageUrl": "images/jean_wide_boxy.webp",
-    "url": "https://www.charostoreok.com/productos/jean-wide-boxy/"
+    "url": "https://www.charostoreok.com/productos/jean-wide-boxy/?openNotificationDialog=true"
   },
   {
-    "uuid": "fe4f5d7a-5fa3-4eec-a7ad-053d03a7cac4",
+    "uuid": "2e27fca8-31a7-4900-b24b-b21e853181b7",
     "name": "Jean Dana",
-    "description": "Jean Dana – Wide Leg, Tiro Bajo Descubrí el Jean Dana, la prenda ideal para sumar un toque moderno y relajado a tu guardarropa. Este jean wide leg de tiro bajo destaca por su silueta amplia y cómoda, perfecta para quienes buscan estilo y libertad de movimiento. La modelo está usando talle 36. Características principales - Jean wide leg tiro bajo - Confección de calidad para máxima comodidad - Ideal para combinar con camisas, sweaters o tops - Disponible en talles 36 a 44",
+    "description": "Jean Dana – Wide Leg, Tiro Bajo Descubrí el Jean Dana, la prenda ideal para sumar un toque moderno y relajado a tu guardarropa. Este jean wide leg de tiro bajo destaca por su silueta amplia y cómoda, perfecta para quienes buscan estilo y libertad de movimiento. La modelo está usando",
     "price": "65990.00",
     "imageUrl": "images/jean_dana.webp",
     "url": "https://www.charostoreok.com/productos/jean-dana/?openNotificationDialog=true"
   },
   {
-    "uuid": "c7d3b57f-db61-43d4-90a0-1d87c9be034e",
+    "uuid": "3435295c-0060-4846-8121-75374e2cd8a5",
     "name": "Jean Wide Roxy",
-    "description": "Jean Wide Roxy Descubrí el Jean Wide Roxy, la prenda esencial para tu guardarropa esta temporada. Este jean de corte wide leg rígido, con tiro medio y alforzas delanteras, ofrece un diseño moderno y favorecedor que estiliza tu figura y aporta un toque sofisticado a tus looks diarios. La modelo está usando talle 36. Características principales Corte wide leg rígido: tendencia y comodidad en una sola prenda. Tiro medio: ideal para combinar con todo tipo de tops. Alforzas delanteras: detalles que realzan y estilizan la silueta. Confeccionado en denim de alta calidad, resistente y duradero.",
+    "description": "Jean Wide Roxy Descubrí el Jean Wide Roxy, la prenda esencial para tu guardarropa esta temporada. Este jean de corte wide leg rígido, con tiro medio y alforzas delanteras, ofrece un diseño moderno y favorecedor que estiliza tu figura y aporta un toque sofisticado a tus looks diarios. La modelo está usando",
     "price": "65990.00",
     "imageUrl": "images/jean_wide_roxy.webp",
     "url": "https://www.charostoreok.com/productos/jean-wide-roxy/"
   },
   {
-    "uuid": "7a011130-4b80-4672-be31-ac1c9bcc9cff",
+    "uuid": "d083f781-6d1a-4d33-ae65-9a1fbe54be86",
     "name": "Jean Wide Leg Lola",
-    "description": "Jean Wide Leg Emma: Estilo y Comodidad en un Solo Jean Descubrí el Jean Wide Leg Emma, un pantalón de tiro alto diseñado para realzar tu figura y brindarte comodidad durante todo el día. Este modelo se destaca por su corte wide leg y un delicado detalle de tiras en los laterales. La modelo esta usando talle 36",
+    "description": "Jean Wide Leg Emma: Estilo y Comodidad en un Solo Jean Descubrí el Jean Wide Leg Emma, un pantalón de tiro alto diseñado para realzar tu figura y brindarte comodidad durante todo el día. Este modelo se destaca por su corte wide leg y un delicado detalle de tiras en los laterales. La modelo esta usando",
     "price": "79990.00",
     "imageUrl": "images/jean_wide_leg_lola.webp",
     "url": "https://www.charostoreok.com/productos/jean-wide-leg-lola/"
   },
   {
-    "uuid": "5d7cc84c-8377-4c95-9cdf-1ce9407c100f",
+    "uuid": "3b5a7c1f-f033-494a-a8a8-d033d7af6c7d",
     "name": "Jean Morrison",
-    "description": "Jean wide , la modelo esta usando talle 36",
+    "description": "Jean wide , la modelo esta usando",
     "price": "77990.00",
     "imageUrl": "images/jean_morrison.webp",
     "url": "https://www.charostoreok.com/productos/jean-morrison/?openNotificationDialog=true"
   },
   {
-    "uuid": "b61de6f0-a321-4298-bfa9-565fcc6dd2c9",
+    "uuid": "2c1d5fc3-6f71-4e2c-bc68-633f2fd8da09",
     "name": "Jean Wide Foster",
-    "description": "Jean wide con boton y cierre. La modelo esta usando talle 36",
+    "description": "Jean wide con boton y cierre. La modelo esta usando",
     "price": "69990.00",
     "imageUrl": "images/jean_wide_foster.webp",
     "url": "https://www.charostoreok.com/productos/jean-wide-foster/"
   },
   {
-    "uuid": "aa671574-18bb-407f-a184-c02134d15ac7",
+    "uuid": "f4e75dd1-4f70-43b9-a3d6-773ac5a3e82e",
     "name": "Jean Loto",
-    "description": "Jean tiro bajo gris con roturas wide leg. La modelo usa talle 34 Tabla de talles: considerar la medida de la cadera al elegir el talle ya que son modelos tiro bajo. Talle 34 36 38 40 42 Circunferencia cintura 70cm 72cm 78cm 80cm 85 cm Circunferencia cadera 88-90cm 92-95cm 96-100cm 100-105cm 105-110 cm Largo 107cm 108cm 109cm 109cm 110 cm Tiro 30cm 31cm 32cm 34cm 36 cm",
+    "description": "Jean tiro bajo gris con roturas wide leg. La modelo usa",
     "price": "65990.00",
     "imageUrl": "images/jean_loto.webp",
     "url": "https://www.charostoreok.com/productos/jean-loto/"
   },
   {
-    "uuid": "f0df82bd-5f31-4237-a317-d91ae22011d9",
+    "uuid": "dd42963e-6d2d-4588-b9bd-f0d8969d819f",
     "name": "Jean Picton",
-    "description": "Jean tiro medio , la modelo esta usando talle 38",
+    "description": "Jean tiro medio , la modelo esta usando",
     "price": "69990.00",
     "imageUrl": "images/jean_picton.webp",
     "url": "https://www.charostoreok.com/productos/jean-picton/"
   },
   {
-    "uuid": "d24f66e8-7851-49e3-a87e-db727bee12c6",
+    "uuid": "45555f6c-aaea-46a4-8e0c-78f885a30c02",
     "name": "Jean Alexander",
-    "description": "Jean tiro alto wide. La modelo esta usando talle 36",
+    "description": "Jean tiro alto wide. La modelo esta usando",
     "price": "69990.00",
     "imageUrl": "images/jean_alexander.webp",
-    "url": "https://www.charostoreok.com/productos/jean-alexander/?openNotificationDialog=true"
+    "url": "https://www.charostoreok.com/productos/jean-alexander/"
   },
   {
-    "uuid": "a3d4e115-f5e8-4e1c-8511-27cf5b02fb1d",
+    "uuid": "70917b4d-22f6-4dcb-8c55-5b8c6a896d5d",
     "name": "Jean Eva",
-    "description": "Jean tiro alto wide leg. La modelo esta usando talle 38",
+    "description": "Jean tiro alto wide leg. La modelo esta usando",
     "price": "75990.00",
     "imageUrl": "images/jean_eva.webp",
-    "url": "https://www.charostoreok.com/productos/jean-eva/"
+    "url": "https://www.charostoreok.com/productos/jean-eva/?openNotificationDialog=true"
   },
   {
-    "uuid": "fa3f5cca-13aa-4d70-88e0-13cd1afe3b57",
+    "uuid": "00fc4b7d-02ce-418a-9600-0168e65e8f94",
     "name": "Jean Wide Frank",
-    "description": "Jean Wide tiro alto, la modelo esta usando talle 38 y lo esta combinando con la Polera Aleli",
+    "description": "Jean Wide tiro alto, la modelo esta usando",
     "price": "75990.00",
     "imageUrl": "images/jean_wide_frank.webp",
-    "url": "https://www.charostoreok.com/productos/jean-wide-frank/"
+    "url": "https://www.charostoreok.com/productos/jean-wide-frank/?openNotificationDialog=true"
   },
   {
-    "uuid": "91d7dadd-f224-44d6-98f6-872c7b75f193",
+    "uuid": "381e0fcb-8d86-43e7-8db0-bf069c18444a",
     "name": "Jogger Karma",
     "description": "Jogger rustico de acetato con elastico en la cintura. La modelo lo esta combinando con el Buzo Karma y esta usando talle M en ambas prendas",
     "price": "39990.00",
@@ -240,7 +288,7 @@
     "url": "https://www.charostoreok.com/productos/jogger-karma/"
   },
   {
-    "uuid": "bfad7e98-0f1c-43b2-bef8-34204ec78bbb",
+    "uuid": "44dd1c12-4e8a-47c3-b74d-e5ae72c57877",
     "name": "Jogger Queen",
     "description": "Jogger con elastico en la cintura, bolsillos y tiras regulables. La modelo lo esta combinando con la Campera Queen , el jogger en Vison difiere en color con la Campera Queen",
     "price": "57990.00",
@@ -248,7 +296,7 @@
     "url": "https://www.charostoreok.com/productos/jogger-queen/?openNotificationDialog=true"
   },
   {
-    "uuid": "d83a0b29-c533-4933-8592-4f2b7ff5b747",
+    "uuid": "b1e7f4d5-566b-4e45-8a5d-dba31f9cc0f8",
     "name": "Jogger Kid",
     "description": "Jogger rustico con elastico en la cintura, bolsillos y tiras ajustables. La modelo esta usando talle M",
     "price": "65990.00",
@@ -256,7 +304,7 @@
     "url": "https://www.charostoreok.com/productos/jogger-kid1/"
   },
   {
-    "uuid": "8f8b6a44-8bef-4507-825a-cb05e88e55b3",
+    "uuid": "ce3baa32-4c1f-44fe-9aa3-a1b46243e84a",
     "name": "Pantalon Angeline",
     "description": "Pant wide de bambula con elastico en la cintura. La modelo lo esta combinando con la Blusa Angeline",
     "price": "65990.00",
@@ -264,33 +312,33 @@
     "url": "https://www.charostoreok.com/productos/pantalon-angeline/"
   },
   {
-    "uuid": "17861cff-3710-4bc0-b762-cda1616aa698",
+    "uuid": "edaf3468-57b2-4428-ac02-9ed4951c697d",
     "name": "Jean Barcelona",
-    "description": "Jean rigido tiro medio , la modelo esta usando talle 36 y lo esta combinando con el Sweater California",
+    "description": "Jean rigido tiro medio , la modelo esta usando",
     "price": "69990.00",
     "imageUrl": "images/jean_barcelona.webp",
     "url": "https://www.charostoreok.com/productos/jean-barcelona/"
   },
   {
-    "uuid": "e4396d82-4621-4c86-854d-32cd8f6f9388",
+    "uuid": "8ff8e82f-2967-4fc7-b9ae-58baa485cfdf",
     "name": "Pant Praga",
-    "description": "Pant tiro medio con cierre. La modelo esta usando talle 36",
+    "description": "Pant tiro medio con cierre. La modelo esta usando",
     "price": "75990.00",
     "imageUrl": "images/pant_praga.webp",
     "url": "https://www.charostoreok.com/productos/pant-praga/?openNotificationDialog=true"
   },
   {
-    "uuid": "71af33e1-a791-4504-9892-6a23a29d9627",
+    "uuid": "aa3480c6-5dba-42a0-89ad-408d32fc0bf2",
     "name": "Jean Snow",
-    "description": "Jean wide tiro medio, La modelo lo esta combinando con el Saquito Aria y esta usando talle 36.",
+    "description": "Jean wide tiro medio, La modelo lo esta combinando con el Saquito Aria y esta usando",
     "price": "69990.00",
     "imageUrl": "images/jean_snow.webp",
-    "url": "https://www.charostoreok.com/productos/jean-snow/?openNotificationDialog=true"
+    "url": "https://www.charostoreok.com/productos/jean-snow/"
   },
   {
-    "uuid": "01845976-ef19-4d27-a06e-f25f55e7b217",
+    "uuid": "5eb4ccd1-67c8-4c87-a887-711c045122d3",
     "name": "Jogger Chester",
-    "description": "jogger con elastico en la cintura.  La modelo esta combinando con la Camper Chester y esta usando talle 1",
+    "description": "jogger con elastico en la cintura.  La modelo esta combinando con la Camper Chester y esta usando",
     "price": "65990.00",
     "imageUrl": "images/jogger_chester.webp",
     "url": "https://www.charostoreok.com/productos/jogger-chester/?openNotificationDialog=true"

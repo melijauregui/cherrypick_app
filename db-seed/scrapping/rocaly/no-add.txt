@@ -1,4 +1,4 @@
-- pants:
+pants:
 urban
 balloon
 eco dust
@@ -10,7 +10,7 @@ lexy
 sastrero black
 raven eco
 
-- tops:
+tops:
 ginger
 ravena black 
 morgan black
@@ -21,8 +21,9 @@ JULES BLACK
 AMELIA WHITE
 NICKY WHITE
 CHOMBA CORSETERA CHOCO
+TOP RAVENA MOCCA
 
-- remeras:
+remeras:
 escote mocca
 over yellow
 t'aime choco
