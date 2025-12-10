@@ -47,11 +47,15 @@ const ImageGallery = ({
   const { user } = useSession();
   const lastTriggeredHeightRef = useRef(0);
   const queryClient = useQueryClient();
+  // List2 always requires authentication
+  const isEnabled = !!user;
+
   const { data, fetchNextPage, refetch } = useInfiniteGetItems(
     queryKey,
     pageParam => getClothingItems(pageParam, limit),
     item =>
-      prefetchItemDetail(queryClient, item, user?.email ?? "", item.brandId)
+      prefetchItemDetail(queryClient, item, user?.email ?? "", item.brandId),
+    isEnabled
   );
 
   const serializedQueryKey = JSON.stringify(queryKey);
@@ -240,7 +244,8 @@ const getImageSize = (
 function useInfiniteGetItems(
   queryKey: any[],
   getClothingItems: (pageParam: number) => Promise<ItemSchemaType[]>,
-  prefetchItemDetail: (item: ItemSchemaType) => Promise<void>
+  prefetchItemDetail: (item: ItemSchemaType) => Promise<void>,
+  enabled: boolean = true
 ): { data: any; fetchNextPage: any; refetch: any } {
   return useInfiniteQuery({
     queryKey: queryKey,
@@ -256,6 +261,7 @@ function useInfiniteGetItems(
       });
       return items;
     },
+    enabled: enabled,
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) => {
       if (lastPage.length === 0) {

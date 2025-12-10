@@ -40,6 +40,7 @@ export default function ItemDetailPage() {
   const itemData = useQuery({
     queryKey: ["item-detail", itemUuid],
     queryFn: () => getItem(itemUuid),
+    enabled: !!itemUuid, // Item can be viewed without auth, but we need a valid UUID
     staleTime: 5 * 60 * 1000,
   });
 
@@ -54,7 +55,7 @@ export default function ItemDetailPage() {
     return <LoadingPage />;
   }
 
-  if (error) {
+  if (error || !item) {
     return <ErrorPage />;
   }
 
@@ -63,7 +64,8 @@ export default function ItemDetailPage() {
 
 const ItemDetail = ({ item }: { item: ItemSchemaType }) => {
   const { user } = useSession();
-  const itemEmbeddingData = useFetchItemEmbedding(item.uuid);
+  // Hooks must be called unconditionally, but they're protected by 'enabled' flag
+  const itemEmbeddingData = useFetchItemEmbedding(item?.uuid || "");
   const brand = useFetchBrandProfileItem(item?.brandId || "");
   const deleteItem = useDeleteItem(item?.uuid || "");
 

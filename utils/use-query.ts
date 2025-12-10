@@ -56,12 +56,14 @@ export function useFetchClientProfile(user: UserInfo): {
 export function useFetchBrandProfileItem(brandId: string): {
   brand: BrandSchemaType;
 } | null {
+  const { user } = useSession();
   const { data, isLoading, error } = useQuery({
     queryKey: ["brand-profile-item", brandId],
     queryFn: () => {
       // console.log("fetching brand profile item", brandId);
       return getBrandProfile(brandId);
     },
+    enabled: !!user && !!brandId,
     staleTime: 5 * 60 * 1000,
   });
 
@@ -77,9 +79,11 @@ export function useFetchBrandProfileItem(brandId: string): {
 export function useFetchItemEmbedding(itemUuid: string): {
   embedding: number[];
 } | null {
+  const { user } = useSession();
   const { data, isLoading, error } = useQuery({
     queryKey: ["item-embedding", itemUuid],
     queryFn: () => getItemEmbedding(itemUuid),
+    enabled: !!user && !!itemUuid,
     staleTime: 5 * 60 * 1000,
   });
 
