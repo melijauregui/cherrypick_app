@@ -88,20 +88,41 @@ function useSession() {
 }
 
 export { useSession, signIn, signUp, signOut };
+
+// Variable compartida a nivel de módulo para evitar múltiples redirects
+let isRedirectingToSignIn = false;
+
 export function OnlyAuthenticated({ children }: { children: React.ReactNode }) {
   const { status, user } = useSession();
   const pathname = usePathname();
-  const [hasRedirected, setHasRedirected] = useState(false);
 
   useEffect(() => {
     if (status === "error") {
       router.replace("cherrypick:///error");
+      return;
     }
-    if (status === "unauthenticated" && !hasRedirected) {
-      console.log("User not authenticated, redirecting to sign-in");
-      setHasRedirected(true);
-      router.replace("cherrypick:///sign-in");
+
+    // Reset flag cuando llegamos a sign-in para permitir futuros redirects
+    if (pathname === "/sign-in") {
+      isRedirectingToSignIn = false;
     }
+
+    if (status === "unauthenticated") {
+      // Solo redirigir si no estamos ya redirigiendo y no estamos ya en sign-in
+      if (!isRedirectingToSignIn && pathname !== "/sign-in") {
+        console.log("pathname", pathname);
+        console.log("User not authenticated, redirecting to sign-in");
+        isRedirectingToSignIn = true;
+        router.replace("cherrypick:///sign-in");
+      }
+      return;
+    }
+
+    // Reset flag when user becomes authenticated again
+    if (status === "authenticated") {
+      isRedirectingToSignIn = false;
+    }
+
     if (
       user &&
       !user?.emailVerified &&
@@ -114,11 +135,7 @@ export function OnlyAuthenticated({ children }: { children: React.ReactNode }) {
         pathname: "/code-verification-register",
       });
     }
-    // Reset flag when user becomes authenticated again
-    if (status === "authenticated") {
-      setHasRedirected(false);
-    }
-  }, [status, hasRedirected]);
+  }, [status, pathname, user]);
 
   if (status === "loading") return null;
 

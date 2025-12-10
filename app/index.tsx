@@ -1,7 +1,7 @@
 import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AppName from "@/app/components/AppName";
 import LogoSquareBeige from "@/app/components/logo/LogoSquareBeige";
 import "../global.css";
@@ -19,6 +19,13 @@ export default function App() {
   const [hasPrefetched, setHasPrefetched] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+
+  // Handle navigation to home when user is authenticated and verified
+  useEffect(() => {
+    if (user && user.emailVerified && !isPending) {
+      router.replace(`/home?prefetch=${hasPrefetched}`);
+    }
+  }, [isPending]);
 
   if (isPending) {
     return (
@@ -43,7 +50,8 @@ export default function App() {
       //&& pathname !== "/code-verification-register"
       return <Redirect href="/code-verification-register" />;
     }
-    return router.replace(`/home?prefetch=${hasPrefetched}`);
+    // Navigation is handled in useEffect, return null while navigating
+    return null;
   } else {
     console.log("User not authenticated, redirecting to sign-in 1");
     return <Redirect href="/sign-in" />;
