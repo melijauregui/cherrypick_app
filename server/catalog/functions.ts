@@ -221,7 +221,10 @@ export async function extractFeatures(
       result.image_features.length === 0 ||
       result.text_features.length === 0
     ) {
-      logger.error("Invalid features structure from inference service: %s", JSON.stringify(result));
+      logger.error(
+        "Invalid features structure from inference service: %s",
+        JSON.stringify(result)
+      );
       return {
         error: true,
         details: "El servicio de inferencia retornó una estructura inválida",
@@ -331,13 +334,13 @@ export async function searchText(
 // Función para verificar si ya existe un elemento con el mismo nombre y brand en Weaviate
 export async function getCollection(): Promise<
   | {
-    error: true;
-    details: string;
-  }
+      error: true;
+      details: string;
+    }
   | {
-    error: false;
-    collection: Collection;
-  }
+      error: false;
+      collection: Collection;
+    }
 > {
   try {
     const client = await weaviate.connectToWeaviateCloud(config.WEAVIATE_URL, {

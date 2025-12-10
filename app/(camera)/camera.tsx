@@ -388,6 +388,7 @@ const RenderPicture = ({
               limit={6}
               columnCount={2}
               canRefresh={false}
+              itemWhenNothingFound={renderEmptyState}
               loadingItem={
                 <View
                   className="flex-1 items-center justify-center "
@@ -418,3 +419,11 @@ const RenderPicture = ({
     </GestureHandlerRootView>
   );
 };
+
+const renderEmptyState = () => (
+  <View className="flex-1 justify-center items-center px-8 ">
+    <Text className="text-gray-500 text-center text-lg">
+      No hay items similares que coincidan con la búsqueda
+    </Text>
+  </View>
+);

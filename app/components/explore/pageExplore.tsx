@@ -129,12 +129,12 @@ export function PageExploreStandard({ query }: { query: string }) {
             })
           }
         />
-        <FashionIdeasSection query={"Minimalist"} />
-        <FashionIdeasSection query={"Coquette"} />
-        <FashionIdeasSection query={"Streetwear"} />
-        <FashionIdeasSection query={"Sporty"} />
-        <FashionIdeasSection query={"Old money"} />
         <FashionIdeasSection query={"Boho-chic"} />
+        <FashionIdeasSection query={"Coquette"} />
+        <FashionIdeasSection query={"Sporty"} />
+        <FashionIdeasSection query={"Streetwear"} />
+        <FashionIdeasSection query={"Old money"} />
+        <FashionIdeasSection query={"Minimalist"} />
       </ScrollView>
 
       <FilterSearchBottomSheet
@@ -452,7 +452,11 @@ const FashionIdeasSection = ({ query }: { query: string }) => {
   };
 
   return (
-    <View className="mb-6">
+    <TouchableOpacity
+      onPress={handleNavigateToSearch}
+      activeOpacity={1}
+      className="mb-6"
+    >
       <View className="flex-row items-center justify-between px-4 mb-4">
         <View>
           <Text className="text-white text-sm font-pregular opacity-80">
@@ -460,16 +464,15 @@ const FashionIdeasSection = ({ query }: { query: string }) => {
           </Text>
           <Text className="text-white text-xl font-pbold">{query}</Text>
         </View>
-        <TouchableOpacity
-          onPress={handleNavigateToSearch}
-          className="rounded-full p-2"
-        >
-          <Ionicons name="chevron-forward" size={24} color="#ffffff" />
+        <TouchableOpacity onPress={handleNavigateToSearch}>
+          <View className="rounded-full p-2">
+            <Ionicons name="chevron-forward" size={24} color="#ffffff" />
+          </View>
         </TouchableOpacity>
       </View>
 
       <GridImages query={query} />
-    </View>
+    </TouchableOpacity>
   );
 };
 

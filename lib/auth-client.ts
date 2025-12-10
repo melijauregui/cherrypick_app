@@ -30,8 +30,6 @@ function useSession() {
   const authorized = session.data?.user.id;
   const [forceUpdate, setForceUpdate] = useState(0);
 
-  console.log("useSession!!!!!!!!");
-
   // Custom refetch that also gets fresh session data when needed
   const customRefetch = async () => {
     // First do the normal refetch
@@ -64,7 +62,6 @@ function useSession() {
 
   // Effect to handle force updates
   useEffect(() => {
-    console.log("forceUpdate!!!!!!!!", forceUpdate);
     if (forceUpdate > 0) {
       console.log("Force update triggered, refetching session...");
       session.refetch?.();
@@ -72,7 +69,6 @@ function useSession() {
   }, [forceUpdate, session.refetch]);
 
   useEffect(() => {
-    console.log("session.isPending!!!!!!!!", session.isPending);
     setFirst(false);
   }, [session.isPending]);
 
@@ -111,7 +107,12 @@ export function OnlyAuthenticated({ children }: { children: React.ReactNode }) {
       !user?.emailVerified &&
       pathname !== "/code-verification-register"
     ) {
-      router.replace("cherrypick:///code-verification-register");
+      console.log(
+        "User not verified, redirecting to code verification register"
+      );
+      router.push({
+        pathname: "/code-verification-register",
+      });
     }
     // Reset flag when user becomes authenticated again
     if (status === "authenticated") {

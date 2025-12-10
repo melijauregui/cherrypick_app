@@ -48,6 +48,9 @@ const CodeVerification = ({
     refetchInterval: false, // Disable automatic refetching
     retry: true,
   });
+  console.log("expirationTime", expirationTime);
+  console.log("isLoadingExpirationTime", isLoadingExpirationTime);
+  console.log("error", error);
 
   const [secondsLeft, setSecondsLeft] = useState<number>(
     Math.max(
@@ -91,6 +94,12 @@ const CodeVerification = ({
   if (error || !expirationTime) {
     return <Redirect href="/error" />;
   }
+  const logout = async () => {
+    // Cancelar todas las peticiones activas y limpiar la caché de React Query antes de hacer logout
+    await queryClient.cancelQueries();
+    await queryClient.clear();
+    await signOut();
+  };
 
   async function handleResendCode() {
     setIsLoadingResendCode(true);
@@ -123,14 +132,9 @@ const CodeVerification = ({
     <SignPage>
       <SignPageContent>
         <SignPageHeader
-          onBackButton={() => {
+          onBackButton={async () => {
+            await logout();
             router.replace("cherrypick:///sign-in");
-            async () => {
-              // Cancelar todas las peticiones activas y limpiar la caché de React Query antes de hacer logout
-              await queryClient.cancelQueries();
-              await queryClient.clear();
-              signOut();
-            };
           }}
         >
           Te enviamos un código a tu email
@@ -155,13 +159,14 @@ const CodeVerification = ({
                 <Text className="text-red-500 pt-0.5">{codeError}</Text>
               )}
             </View>
-            <Text className="text-gray-400 text-[14px] font-pregular pt-2">
-              El código expira en {Math.floor(secondsLeft / 60)}:
-              {Math.floor(secondsLeft % 60)
-                .toString()
-                .padStart(2, "0")}
-            </Text>
-            {secondsLeft <= 0 && (
+            {secondsLeft > 0 ? (
+              <Text className="text-gray-400 text-[14px] font-pregular pt-2">
+                El código expira en {Math.floor(secondsLeft / 60)}:
+                {Math.floor(secondsLeft % 60)
+                  .toString()
+                  .padStart(2, "0")}
+              </Text>
+            ) : (
               <Text className="text-red-500 pt-1 text-[14px]">
                 El código ha expirado. Por favor, solicita uno nuevo.
               </Text>

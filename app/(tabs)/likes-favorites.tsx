@@ -61,27 +61,36 @@ const LikesFavoritesPage = () => {
       </View>
 
       {/* Content */}
-      {activeTab === "likes" ? (
-        <List2
-          key={`likes-${user?.email}`}
-          queryKey={["all-liked-items", user?.email]}
-          getClothingItems={getAllLikedItems}
-          limit={18}
-          columnCount={numColumns}
-          itemWhenNothingFound={renderEmptyState}
-          roundRobin={true}
-        />
-      ) : (
-        <List2
-          key={`favorites-${user?.email}`}
-          queryKey={["all-favorited-items", user?.email]}
-          getClothingItems={getAllFavoritedItems}
-          limit={18}
-          columnCount={numColumns}
-          itemWhenNothingFound={renderEmptyState}
-          roundRobin={true}
-        />
-      )}
+      <View className="flex-1">
+        <View
+          style={{ display: activeTab === "likes" ? "flex" : "none" }}
+          className="flex-1"
+        >
+          <List2
+            key={`likes-${user?.email}`}
+            queryKey={["all-liked-items", user?.email]}
+            getClothingItems={getAllLikedItems}
+            limit={18}
+            columnCount={numColumns}
+            itemWhenNothingFound={renderEmptyState}
+            roundRobin={true}
+          />
+        </View>
+        <View
+          style={{ display: activeTab === "favorites" ? "flex" : "none" }}
+          className="flex-1"
+        >
+          <List2
+            key={`favorites-${user?.email}`}
+            queryKey={["all-favorited-items", user?.email]}
+            getClothingItems={getAllFavoritedItems}
+            limit={18}
+            columnCount={numColumns}
+            itemWhenNothingFound={renderEmptyState}
+            roundRobin={true}
+          />
+        </View>
+      </View>
     </SafeAreaView>
   );
 };

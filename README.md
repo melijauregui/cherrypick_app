@@ -93,3 +93,9 @@ Join our community of developers creating universal apps.
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
 
+
+
+cd /Users/melinajauregui/Documents/cherrypick && rm -rf ios/Pods ios/Podfile.lock ios/build
+cd /Users/melinajauregui/Documents/cherrypick && rm -rf ~/Library/Developer/Xcode/DerivedData/*
+cd /Users/melinajauregui/Documents/cherrypick && npx expo prebuild --clean
+cd /Users/melinajauregui/Documents/cherrypick/ios && LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 pod install

@@ -1,19 +1,13 @@
 import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import AppName from "@/app/components/AppName";
 import LogoSquareBeige from "@/app/components/logo/LogoSquareBeige";
 import "../global.css";
 import { useRouter, usePathname, Redirect } from "expo-router";
 import { authClient } from "@/lib/auth-client";
 import { useQueryClient } from "@tanstack/react-query";
-import prefetchHome, {
-  prefetchExplorePage,
-  prefetchLikeAndFavoritePage,
-  prefetchProfile,
-} from "@/utils/prefetchs";
-import Toast from "react-native-toast-message";
 
 export default function App() {
   //verificar si hay un usuario autenticado

@@ -34,8 +34,6 @@ const Profile = () => {
     await queryClient.cancelQueries();
     await queryClient.clear();
     await signOut();
-    // Navegar directamente a sign-in para evitar problemas de cache
-    // router.replace("/sign-in");
   };
 
   if (!user) {
