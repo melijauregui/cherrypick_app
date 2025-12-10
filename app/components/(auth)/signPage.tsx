@@ -28,9 +28,11 @@ export default function SignPage({ children }: { children?: React.ReactNode }) {
 export function SignPageHeader({
   children,
   onBackButton,
+  centerTitle = false,
 }: {
   children: React.ReactNode;
   onBackButton?: () => void;
+  centerTitle?: boolean;
 }) {
   return (
     <View>
@@ -50,7 +52,11 @@ export function SignPageHeader({
         <View style={{ width: 24 }} />
       </View>
 
-      <Text className="text-white text-[27px] font-pbold pt-6">{children}</Text>
+      <Text
+        className={`text-white text-[27px] font-pbold pt-6 ${centerTitle ? "text-center" : ""}`}
+      >
+        {children}
+      </Text>
     </View>
   );
 }

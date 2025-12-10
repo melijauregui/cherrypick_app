@@ -9,29 +9,29 @@ const API_HOST = process.env.BRAND_API_HOST ?? `http://${LOCAL_IP}:3000`;
 const prisma = new PrismaClient();
 
 const BRAND_CONFIGS = [
-  {
-    brandEmail: "girlsclub@gmail.com",
-    filePaths: [
-      "db-seed/pinterest/girls-club/catalog-items-girls-club.json",
-      "db-seed/pinterest/girls-club/catalog-items-girls-club2.json",
-      "db-seed/pinterest/girls-club/catalog-items-girls-club3.json",
-    ],
-  },
-  {
-    brandEmail: "socialclub@gmail.com",
-    filePaths: [
-      "db-seed/pinterest/social-club/catalog-items-social-club.json",
-      "db-seed/pinterest/social-club/catalog-items-social-club2.json",
-    ],
-  },
-  {
-    brandEmail: "cherrypick.brand.example@gmail.com",
-    filePaths: ["db-seed/scrapping/cherry/cherry-pantalones-sample.json"],
-  },
-  {
-    brandEmail: "charostoreok@gmail.com",
-    filePaths: ["db-seed/scrapping/charo/charo-pantalones-sample.json"],
-  },
+  // {
+  //   brandEmail: "girlsclub@gmail.com",
+  //   filePaths: [
+  //     "db-seed/pinterest/girls-club/catalog-items-girls-club.json",
+  //     "db-seed/pinterest/girls-club/catalog-items-girls-club2.json",
+  //     "db-seed/pinterest/girls-club/catalog-items-girls-club3.json",
+  //   ],
+  // },
+  // {
+  //   brandEmail: "socialclub@gmail.com",
+  //   filePaths: [
+  //     "db-seed/pinterest/social-club/catalog-items-social-club.json",
+  //     "db-seed/pinterest/social-club/catalog-items-social-club2.json",
+  //   ],
+  // },
+  // {
+  //   brandEmail: "cherrypick.brand.example@gmail.com",
+  //   filePaths: ["db-seed/scrapping/cherry/cherry-pantalones-sample.json"],
+  // },
+  // {
+  //   brandEmail: "charostoreok@gmail.com",
+  //   filePaths: ["db-seed/scrapping/charo/charo-pantalones-sample.json"],
+  // },
   {
     brandEmail: "rocaly@gmail.com",
     filePaths: [

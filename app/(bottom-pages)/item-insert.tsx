@@ -155,6 +155,8 @@ export function ItemsBottomSheetDetails({
                   imageUrl={formData.image.url ?? imageDefault}
                   imageUrlUpdatedAt={undefined}
                   maxHeight={600}
+                  imageWidth={formData.image.width}
+                  imageHeight={formData.image.height}
                 />
                 <View className="flex justify-center items-center">
                   <ImagePickerButton

@@ -13,6 +13,12 @@ import { useRouter } from "expo-router";
 import { BASE_URL } from "../../config/api";
 import { useMutation } from "@tanstack/react-query";
 import Toast from "react-native-toast-message";
+import SignPage, {
+  SignPageContent,
+  SignPageFooter,
+  SignPageHeader,
+} from "../components/(auth)/signPage";
+import { router } from "expo-router";
 
 const SignUpBrand = () => {
   const [email, setEmail] = useState<string>("");
@@ -25,40 +31,34 @@ const SignUpBrand = () => {
   }
 
   return (
-    <SafeAreaView className="bg-brown-strong flex-1 h-full w-full">
-      <ScrollView
-        className="flex-1 w-full h-full"
-        contentContainerStyle={{ flexGrow: 1 }}
-      >
-        <View className="flex flex-grow flex-col w-full justify-between px-14 pt-3">
-          <View className="flex flex-col w-full">
-            <LogoCircle classname="w-[60] h-[60] mb-1 self-center" />
-            <Text className="text-white text-[27px] font-pbold pt-6 text-center">
-              Verificación de Marca
-            </Text>
-            <Text className="text-white text-xl pt-10 pb-8 text-center">
-              Ingresá el email de tu marca. Te enviaremos un formulario para que
-              puedas verificar tu identidad tanto jurídica como física.
-            </Text>
-            <Input
-              type="email-address"
-              placeholder="Correo electrónico"
-              value={email}
-              onChange={text => {
-                setEmailError(undefined);
-                setEmail(text);
-              }}
-              error={emailError}
-            />
-          </View>
-          <SendButton
-            onPress={handleSend}
-            disabled={!email || loading}
-            loading={loading}
-          />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    <SignPage>
+      <SignPageContent>
+        <SignPageHeader onBackButton={() => router.back()} centerTitle={true}>
+          Verificación de Marca
+        </SignPageHeader>
+        <Text className="text-white text-xl pt-10 pb-8 text-center">
+          Ingresá el email de tu marca. Te enviaremos un formulario para que
+          puedas verificar tu identidad tanto jurídica como física.
+        </Text>
+        <Input
+          type="email-address"
+          placeholder="Correo electrónico"
+          value={email}
+          onChange={text => {
+            setEmailError(undefined);
+            setEmail(text);
+          }}
+          error={emailError}
+        />
+      </SignPageContent>
+      <SignPageFooter>
+        <SendButton
+          onPress={handleSend}
+          disabled={!email || loading}
+          loading={loading}
+        />
+      </SignPageFooter>
+    </SignPage>
   );
 };
 
