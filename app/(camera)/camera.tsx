@@ -326,15 +326,6 @@ const RenderPicture = ({
   let snapPoints = [minHeight, 400, 600, 800, 900].filter(
     point => point >= minHeight
   );
-  /* if (Platform.OS === "android") {
-    snapPoints = [minHeight, minHeight + 200, minHeight + 400, minHeight + 600, minHeight + 700]
-  } */
-
-  const BottomSheetContent =
-    Platform.OS === "android"
-      ? BottomSheetScrollView
-      : View;
-
 
   useEffect(() => {
     const fetchImageBase64 = async () => {
@@ -378,69 +369,61 @@ const RenderPicture = ({
           }}
           enablePanDownToClose={false}
         >
-          <BottomSheetContent
-            {...{
-              contentContainerStyle: {
-                paddingBottom: insets.bottom + 24,
-              },
-            }}
-          >
-            <View className="flex flex-row justify-center pb-3 px-6">
-              <Text className="text-white text-lg font-psemibold">
-                Items Similares
-              </Text>
+          <View className="flex flex-row justify-center pb-3 px-6">
+            <Text className="text-white text-lg font-psemibold">
+              Items Similares
+            </Text>
+          </View>
+          {isLoadingBase64 ? (
+            <View
+              className="flex-1 items-center justify-center "
+              style={{
+                maxHeight: (snapPoints[snapIndex] ?? snapPoints[0] ?? 0) - 50,
+              }}
+            >
+              <LoadingItem />
             </View>
-            {isLoadingBase64 ? (
-              <View
-                className="flex-1 items-center justify-center "
-                style={{
-                  maxHeight: (snapPoints[snapIndex] ?? snapPoints[0] ?? 0) - 50,
-                }}
-              >
-                <LoadingItem />
-              </View>
-            ) : (
-              <List2
-                queryKey={[
-                  "similar-items",
-                  uri,
-                  embedding?.length || 0,
-                  minPrice,
-                  maxPrice,
+          ) : (
+            <List2
+              queryKey={[
+                "similar-items",
+                uri,
+                embedding?.length || 0,
+                minPrice,
+                maxPrice,
+                brandsSelected.size > 0
+                  ? Array.from(brandsSelected.keys())
+                  : undefined,
+              ]}
+              getClothingItems={(page, limit) =>
+                getClothingItemsSimilarBase64(
+                  page,
+                  limit,
+                  embedding || [],
+                  minPrice ? parseFloat(minPrice) : undefined,
+                  maxPrice ? parseFloat(maxPrice) : undefined,
                   brandsSelected.size > 0
                     ? Array.from(brandsSelected.keys())
-                    : undefined,
-                ]}
-                getClothingItems={(page, limit) =>
-                  getClothingItemsSimilarBase64(
-                    page,
-                    limit,
-                    embedding || [],
-                    minPrice ? parseFloat(minPrice) : undefined,
-                    maxPrice ? parseFloat(maxPrice) : undefined,
-                    brandsSelected.size > 0
-                      ? Array.from(brandsSelected.keys())
-                      : undefined
-                  )
-                }
-                limit={6}
-                columnCount={2}
-                canRefresh={false}
-                itemWhenNothingFound={renderEmptyState}
-                loadingItem={
-                  <View
-                    className="flex-1 items-center justify-center "
-                    style={{
-                      maxHeight:
-                        (snapPoints[snapIndex] ?? snapPoints[0] ?? 0) - 50,
-                    }}
-                  >
-                    <LoadingItem />
-                  </View>
-                }
-              />
-            )}
-          </BottomSheetContent>
+                    : undefined
+                )
+              }
+              limit={6}
+              columnCount={2}
+              canRefresh={false}
+              itemWhenNothingFound={renderEmptyState}
+              loadingItem={
+                <View
+                  className="flex-1 items-center justify-center "
+                  style={{
+                    maxHeight:
+                      (snapPoints[snapIndex] ?? snapPoints[0] ?? 0) - 50,
+                  }}
+                >
+                  <LoadingItem />
+                </View>
+              }
+            />
+          )}
         </BottomSheet>
         <View style={{ flex: 1 }}>
           <FilterSearchBottomSheet
