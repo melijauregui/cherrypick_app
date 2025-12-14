@@ -10,6 +10,7 @@ import {
 import StandardPageBottomSheet, {
   StandardDescription,
 } from "../components/standar-page/standarPage";
+import { GuidelinesModal } from "../components/standar-page/GuidelinesModal";
 import { useState } from "react";
 import { Keyboard } from "react-native";
 import safeFetch from "../../utils/safe-fetch";
@@ -73,6 +74,8 @@ function EditItem({
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGuidelinesModalVisible, setIsGuidelinesModalVisible] =
+    useState(false);
 
   const mutation = useUpdateItem(item, brandEmail);
 
@@ -127,7 +130,14 @@ function EditItem({
       onLoading={isSubmitting}
       section="Editar item"
     >
-      <StandardDescription description="Edita la descripción del item para maximizar las ventas. En lo posible, una foto de alta calidad que muestre únicamente el producto en un fondo limpio. Esto mejorará significativamente la visibilidad y precisión de búsqueda de tu item." />
+      <StandardDescription
+        description="Edita la descripción del item para maximizar las ventas. En lo posible, una foto de alta calidad que muestre únicamente el producto en un fondo limpio. Esto mejorará significativamente la visibilidad y precisión de búsqueda de tu item."
+        onSeeMore={() => setIsGuidelinesModalVisible(true)}
+      />
+      <GuidelinesModal
+        visible={isGuidelinesModalVisible}
+        onClose={() => setIsGuidelinesModalVisible(false)}
+      />
       <ItemsBottomSheetDetails
         setFormData={setFormData}
         setErrors={setErrors}

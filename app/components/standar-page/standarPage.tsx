@@ -45,21 +45,36 @@ export default function StandardPageBottomSheet({
 export function StandardDescription({
   description,
   descriptionRed,
+  onSeeMore,
 }: {
   description: string;
   descriptionRed?: string;
+  onSeeMore?: () => void;
 }) {
   return (
     <View className="pb-2">
       <View className="flex flex-col justify-center">
         <Text
           className="text-neutral-600 text-base font-plight px-3"
-          style={{ textAlign: "justify" }}>
+          style={{ textAlign: "justify" }}
+        >
           {description}
+          {onSeeMore && (
+            <Text
+              className="text-neutral-600 text-base font-pmedium"
+              onPress={onSeeMore}
+              suppressHighlighting={true}
+            >
+              {" "}
+              Ver más
+            </Text>
+          )}
         </Text>
         {descriptionRed && (
-          <Text className="text-red-500 text-base font-plight px-3"
-            style={{ textAlign: "justify" }}>
+          <Text
+            className="text-red-500 text-base font-plight px-3"
+            style={{ textAlign: "justify" }}
+          >
             {descriptionRed}
           </Text>
         )}

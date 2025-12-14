@@ -8,6 +8,7 @@ import {
 import StandardPageBottomSheet, {
   StandardDescription,
 } from "../components/standar-page/standarPage";
+import { GuidelinesModal } from "../components/standar-page/GuidelinesModal";
 import { useState } from "react";
 import {
   Image,
@@ -51,6 +52,8 @@ export default function InsertItemPage() {
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGuidelinesModalVisible, setIsGuidelinesModalVisible] =
+    useState(false);
 
   const mutation = useInsertItem();
 
@@ -93,7 +96,14 @@ export default function InsertItemPage() {
       section="Insertar nuevo item"
       disableSave={!isFormValid}
     >
-      <StandardDescription description="Crea una descripción detallada y atractiva para maximizar las ventas. En lo posible, una foto de alta calidad que muestre únicamente el producto en un fondo limpio. Esto mejorará significativamente la visibilidad y precisión de búsqueda de tu item." />
+      <StandardDescription
+        description="Crea una descripción detallada y atractiva para maximizar las ventas. En lo posible, una foto de alta calidad que muestre únicamente el producto en un fondo limpio. Esto mejorará significativamente la visibilidad y precisión de búsqueda de tu item."
+        onSeeMore={() => setIsGuidelinesModalVisible(true)}
+      />
+      <GuidelinesModal
+        visible={isGuidelinesModalVisible}
+        onClose={() => setIsGuidelinesModalVisible(false)}
+      />
       <ItemsBottomSheetDetails
         setFormData={setFormData}
         setErrors={setErrors}
@@ -182,7 +192,7 @@ export function ItemsBottomSheetDetails({
               </View>
               <View className="flex flex-col gap-4 px-4">
                 <InputBoxWithName
-                  name="Product Name"
+                  name="Nombre del item"
                   value={formData.name}
                   setValue={text => handleFieldChange("name", text)}
                   error={errors.name}
@@ -195,7 +205,7 @@ export function ItemsBottomSheetDetails({
                 />
 
                 <InputBoxWithName
-                  name="Description"
+                  name="Descripción del item"
                   value={formData.description}
                   error={errors.description}
                   setValue={text => handleFieldChange("description", text)}
@@ -208,7 +218,7 @@ export function ItemsBottomSheetDetails({
                 />
 
                 <InputBoxWithName
-                  name="Product URL"
+                  name="URL del item"
                   value={formData.url}
                   setValue={text => handleFieldChange("url", text)}
                   error={errors.url}
@@ -220,7 +230,7 @@ export function ItemsBottomSheetDetails({
                 />
 
                 <InputBoxWithName
-                  name="Price"
+                  name="Precio del item"
                   value={formData.price.toString()}
                   setValue={text => handleFieldChange("price", text)}
                   error={errors.price}
