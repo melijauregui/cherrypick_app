@@ -135,7 +135,7 @@ export function OnlyAuthenticated({ children }: { children: React.ReactNode }) {
         pathname: "/code-verification-register",
       });
     }
-  }, [status, pathname, user]);
+  }, [status, user]);
 
   if (status === "loading") return null;
 

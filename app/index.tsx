@@ -23,6 +23,7 @@ export default function App() {
   // Handle navigation to home when user is authenticated and verified
   useEffect(() => {
     if (user && user.emailVerified && !isPending) {
+      console.log("User is authenticated and verified, redirecting to home");
       router.replace(`/home?prefetch=${hasPrefetched}`);
     }
   }, [isPending]);
