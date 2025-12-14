@@ -330,6 +330,12 @@ const RenderPicture = ({
     snapPoints = [minHeight, minHeight + 200, minHeight + 400, minHeight + 600, minHeight + 700]
   } */
 
+  const BottomSheetContent =
+    Platform.OS === "android"
+      ? BottomSheetScrollView
+      : View;
+
+
   useEffect(() => {
     const fetchImageBase64 = async () => {
       setIsLoadingBase64(true);
@@ -372,9 +378,11 @@ const RenderPicture = ({
           }}
           enablePanDownToClose={false}
         >
-          <BottomSheetScrollView
-            contentContainerStyle={{
-              paddingBottom: insets.bottom + 24,
+          <BottomSheetContent
+            {...{
+              contentContainerStyle: {
+                paddingBottom: insets.bottom + 24,
+              },
             }}
           >
             <View className="flex flex-row justify-center pb-3 px-6">
@@ -432,7 +440,7 @@ const RenderPicture = ({
                 }
               />
             )}
-          </BottomSheetScrollView>
+          </BottomSheetContent>
         </BottomSheet>
         <View style={{ flex: 1 }}>
           <FilterSearchBottomSheet
