@@ -422,24 +422,28 @@ const RenderPicture = ({
             />
           )}
         </BottomSheet>
-        <FilterSearchBottomSheet
-          isModalOpen={isFilterSearchModalOpen}
-          setIsModalOpen={setIsFilterSearchModalOpen}
-          onSubmit={(minPrice, maxPrice, brandsSelected) => {
-            setMinPrice(minPrice);
-            setMaxPrice(maxPrice);
-            setBrandsSelected(brandsSelected);
-          }}
-          initialMinPrice={minPrice}
-          initialMaxPrice={maxPrice}
-          initialBrandsSelected={brandsSelected}
-        />
-        <ImageSearchGuidelinesModal
-          visible={isImageSearchGuidelinesModalVisible}
-          onClose={() => setIsImageSearchGuidelinesModalVisible(false)}
-        />
+        <View style={{ flex: 1 }}>
+          <FilterSearchBottomSheet
+            isModalOpen={isFilterSearchModalOpen}
+            setIsModalOpen={setIsFilterSearchModalOpen}
+            onSubmit={(minPrice, maxPrice, brandsSelected) => {
+              setMinPrice(minPrice);
+              setMaxPrice(maxPrice);
+              setBrandsSelected(brandsSelected);
+            }}
+            initialMinPrice={minPrice}
+            initialMaxPrice={maxPrice}
+            initialBrandsSelected={brandsSelected}
+          />
+        </View>
+        <View style={{ flex: 1 }}>
+          <ImageSearchGuidelinesModal
+            visible={isImageSearchGuidelinesModalVisible}
+            onClose={() => setIsImageSearchGuidelinesModalVisible(false)}
+          />
+        </View>
       </View>
-    </GestureHandlerRootView>
+    </GestureHandlerRootView >
   );
 };
 
