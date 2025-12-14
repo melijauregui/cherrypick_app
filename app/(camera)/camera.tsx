@@ -38,6 +38,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LoadingItem } from "../components/LoadingPage";
 import IoniconsIcon from "@expo/vector-icons/Ionicons";
 import { ImageSearchGuidelinesModal } from "./ImageSearchGuidelinesModal";
+import { Platform } from "react-native";
 
 const CameraPage = () => {
   const [uri, setUri] = useState<string | null>(null);
@@ -317,12 +318,17 @@ const RenderPicture = ({
   ] = useState(false);
 
   if (!uri) return null;
+  const insets = useSafeAreaInsets();
 
-  const minHeight = Math.max(screenHeight - imageHeight, 400);
-  const snapPoints = [minHeight, 400, 600, 800, 900].filter(
+  const max = 400
+  const minHeight = Math.max(screenHeight - imageHeight, max) + (Platform.OS === "android" ? insets.bottom + insets.top : 0);
+
+  let snapPoints = [minHeight, 400, 600, 800, 900].filter(
     point => point >= minHeight
   );
-  const insets = useSafeAreaInsets();
+  /* if (Platform.OS === "android") {
+    snapPoints = [minHeight, minHeight + 200, minHeight + 400, minHeight + 600, minHeight + 700]
+  } */
 
   useEffect(() => {
     const fetchImageBase64 = async () => {
@@ -366,61 +372,67 @@ const RenderPicture = ({
           }}
           enablePanDownToClose={false}
         >
-          <View className="flex flex-row justify-center pb-3 px-6">
-            <Text className="text-white text-lg font-psemibold">
-              Items Similares
-            </Text>
-          </View>
-          {isLoadingBase64 ? (
-            <View
-              className="flex-1 items-center justify-center "
-              style={{
-                maxHeight: (snapPoints[snapIndex] ?? snapPoints[0] ?? 0) - 50,
-              }}
-            >
-              <LoadingItem />
+          <BottomSheetScrollView
+            contentContainerStyle={{
+              paddingBottom: insets.bottom + 24,
+            }}
+          >
+            <View className="flex flex-row justify-center pb-3 px-6">
+              <Text className="text-white text-lg font-psemibold">
+                Items Similares
+              </Text>
             </View>
-          ) : (
-            <List2
-              queryKey={[
-                "similar-items",
-                uri,
-                embedding?.length || 0,
-                minPrice,
-                maxPrice,
-                brandsSelected.size > 0
-                  ? Array.from(brandsSelected.keys())
-                  : undefined,
-              ]}
-              getClothingItems={(page, limit) =>
-                getClothingItemsSimilarBase64(
-                  page,
-                  limit,
-                  embedding || [],
-                  minPrice ? parseFloat(minPrice) : undefined,
-                  maxPrice ? parseFloat(maxPrice) : undefined,
+            {isLoadingBase64 ? (
+              <View
+                className="flex-1 items-center justify-center "
+                style={{
+                  maxHeight: (snapPoints[snapIndex] ?? snapPoints[0] ?? 0) - 50,
+                }}
+              >
+                <LoadingItem />
+              </View>
+            ) : (
+              <List2
+                queryKey={[
+                  "similar-items",
+                  uri,
+                  embedding?.length || 0,
+                  minPrice,
+                  maxPrice,
                   brandsSelected.size > 0
                     ? Array.from(brandsSelected.keys())
-                    : undefined
-                )
-              }
-              limit={6}
-              columnCount={2}
-              canRefresh={false}
-              itemWhenNothingFound={renderEmptyState}
-              loadingItem={
-                <View
-                  className="flex-1 items-center justify-center "
-                  style={{
-                    maxHeight:
-                      (snapPoints[snapIndex] ?? snapPoints[0] ?? 0) - 50,
-                  }}
-                >
-                  <LoadingItem />
-                </View>
-              }
-            />
-          )}
+                    : undefined,
+                ]}
+                getClothingItems={(page, limit) =>
+                  getClothingItemsSimilarBase64(
+                    page,
+                    limit,
+                    embedding || [],
+                    minPrice ? parseFloat(minPrice) : undefined,
+                    maxPrice ? parseFloat(maxPrice) : undefined,
+                    brandsSelected.size > 0
+                      ? Array.from(brandsSelected.keys())
+                      : undefined
+                  )
+                }
+                limit={6}
+                columnCount={2}
+                canRefresh={false}
+                itemWhenNothingFound={renderEmptyState}
+                loadingItem={
+                  <View
+                    className="flex-1 items-center justify-center "
+                    style={{
+                      maxHeight:
+                        (snapPoints[snapIndex] ?? snapPoints[0] ?? 0) - 50,
+                    }}
+                  >
+                    <LoadingItem />
+                  </View>
+                }
+              />
+            )}
+          </BottomSheetScrollView>
         </BottomSheet>
         <View style={{ flex: 1 }}>
           <FilterSearchBottomSheet
