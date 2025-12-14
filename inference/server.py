@@ -120,7 +120,7 @@ print("[startup] Model and processor loaded successfully")
 try:
     _warm_text = "warmup"
     text_inputs = processor(
-        text=[_warm_text], padding='max_length', return_tensors="pt").to(device)
+        text=[_warm_text], padding='max_length', return_tensors="pt",  max_length=MAX_LEN, truncation=True).to(device)
     with torch.inference_mode():
         _ = model.get_text_features(
             input_ids=text_inputs["input_ids"],
@@ -180,7 +180,7 @@ async def extract_text_features(request: dict):
         t0 = time.time()
         # tokenization time
         text_inputs = processor(
-            text=[text], padding='max_length', return_tensors="pt").to(device)
+            text=[text], padding='max_length', return_tensors="pt", max_length=MAX_LEN, truncation=True).to(device)
         t1 = time.time()
         with torch.inference_mode():
             X = model.get_text_features(

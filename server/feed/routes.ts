@@ -122,7 +122,7 @@ FeedApp.openapi(getPersonalizedFeedRoute, async c => {
     if (res.error) {
       res = {
         error: true,
-        details: "Error querying Weaviate",
+        details: "Error querying Weaviate " + (res.details ? res.details : ""),
       };
       return c.json(res, 500);
     }
