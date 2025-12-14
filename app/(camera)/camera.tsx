@@ -36,6 +36,8 @@ import FilterSearchBottomSheet from "../components/explore/filterSearch";
 import { IdNameImageSchemaType } from "@/schemas/catalog/catalog-schema";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LoadingItem } from "../components/LoadingPage";
+import IoniconsIcon from "@expo/vector-icons/Ionicons";
+import { ImageSearchGuidelinesModal } from "./ImageSearchGuidelinesModal";
 
 const CameraPage = () => {
   const [uri, setUri] = useState<string | null>(null);
@@ -139,10 +141,12 @@ const ControlsCamera = ({
 const ControlsRenderPicture = ({
   setUri,
   onPressTune,
+  onPressInfo,
   filterCount,
 }: {
   setUri: (uri: string | null) => void;
   onPressTune: () => void;
+  onPressInfo?: () => void;
   filterCount: number;
 }) => {
   const router = useRouter();
@@ -180,6 +184,16 @@ const ControlsRenderPicture = ({
               </View>
             ) : null;
           })()}
+        </Pressable>
+        <Pressable
+          className="bg-black items-center justify-center w-12 h-12 rounded-2xl opacity-80"
+          onPress={onPressInfo || (() => null)}
+        >
+          <IoniconsIcon
+            name="information-circle-outline"
+            size={23}
+            color="#ffffff"
+          />
         </Pressable>
       </View>
     </View>
@@ -297,6 +311,10 @@ const RenderPicture = ({
   const [brandsSelected, setBrandsSelected] = useState<
     Map<string, IdNameImageSchemaType>
   >(new Map<string, IdNameImageSchemaType>());
+  const [
+    isImageSearchGuidelinesModalVisible,
+    setIsImageSearchGuidelinesModalVisible,
+  ] = useState(false);
 
   if (!uri) return null;
 
@@ -328,6 +346,7 @@ const RenderPicture = ({
         <ControlsRenderPicture
           setUri={setUri}
           onPressTune={() => setIsFilterSearchModalOpen(true)}
+          onPressInfo={() => setIsImageSearchGuidelinesModalVisible(true)}
           filterCount={
             (minPrice ? 1 : 0) + (maxPrice ? 1 : 0) + brandsSelected.size
           }
@@ -414,6 +433,10 @@ const RenderPicture = ({
           initialMinPrice={minPrice}
           initialMaxPrice={maxPrice}
           initialBrandsSelected={brandsSelected}
+        />
+        <ImageSearchGuidelinesModal
+          visible={isImageSearchGuidelinesModalVisible}
+          onClose={() => setIsImageSearchGuidelinesModalVisible(false)}
         />
       </View>
     </GestureHandlerRootView>

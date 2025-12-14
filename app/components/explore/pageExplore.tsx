@@ -34,6 +34,8 @@ import { prefetchInspirationItems } from "@/utils/prefetchs";
 import { useSession } from "@/lib/auth-client";
 import ErrorPage from "@/app/(auth)/error";
 import { Skeleton } from "moti/skeleton";
+import IoniconsIcon from "@expo/vector-icons/Ionicons";
+import { SearchGuidelinesModal } from "./SearchGuidelinesModal";
 
 export default function PageExplore({
   children,
@@ -56,6 +58,8 @@ export function PageExploreStandard({ query }: { query: string }) {
   const [minPrice, setMinPrice] = useState<string | undefined>(undefined);
   const [maxPrice, setMaxPrice] = useState<string | undefined>(undefined);
   const [isFilterSearchModalOpen, setIsFilterSearchModalOpen] = useState(false);
+  const [isSearchGuidelinesModalVisible, setIsSearchGuidelinesModalVisible] =
+    useState(false);
   const [brandsSelected, setBrandsSelected] = useState<
     Map<string, IdNameImageSchemaType>
   >(new Map<string, IdNameImageSchemaType>());
@@ -107,6 +111,7 @@ export function PageExploreStandard({ query }: { query: string }) {
           maxPrice={maxPrice}
           brandsSelected={brandsSelected}
           onPressFilter={() => setIsFilterSearchModalOpen(true)}
+          onPressInfo={() => setIsSearchGuidelinesModalVisible(true)}
         />
       </View>
       <ScrollView
@@ -148,6 +153,10 @@ export function PageExploreStandard({ query }: { query: string }) {
         initialMinPrice={minPrice}
         initialMaxPrice={maxPrice}
         initialBrandsSelected={brandsSelected}
+      />
+      <SearchGuidelinesModal
+        visible={isSearchGuidelinesModalVisible}
+        onClose={() => setIsSearchGuidelinesModalVisible(false)}
       />
     </>
   );
@@ -383,6 +392,7 @@ function SearchInput({
   searchText,
   handleSearch,
   onPressFilter,
+  onPressInfo,
   minPrice,
   maxPrice,
   brandsSelected,
@@ -392,6 +402,7 @@ function SearchInput({
   searchText: string;
   handleSearch: () => void;
   onPressFilter: () => void;
+  onPressInfo?: () => void;
   minPrice: string | undefined;
   maxPrice: string | undefined;
   brandsSelected: Map<string, IdNameImageSchemaType>;
@@ -413,6 +424,13 @@ function SearchInput({
         returnKeyType="search"
       />
       <View className="flex-row items-center gap-2">
+        <TouchableOpacity onPress={onPressInfo || (() => null)}>
+          <IoniconsIcon
+            name="information-circle-outline"
+            size={23}
+            color="#ffffff"
+          />
+        </TouchableOpacity>
         <TouchableOpacity onPress={onPressFilter} className="relative">
           <MaterialCommunityIcons
             name="tune-vertical-variant"
