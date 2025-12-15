@@ -385,6 +385,7 @@ const RenderPicture = ({
             </View>
           ) : (
             <List2
+              useBottomSheetScroll={Platform.OS === "android" ? true : false}
               queryKey={[
                 "similar-items",
                 uri,

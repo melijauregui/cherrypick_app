@@ -7,7 +7,10 @@ import {
   RefreshControl,
   ScrollView,
   View,
+  Platform,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import ClothingItemComponent, {
   ItemPlaceholder,
 } from "./ClothingItemComponent";
@@ -33,6 +36,7 @@ const ImageGallery = ({
   roundRobin,
   canRefresh = true,
   loadingItem,
+  useBottomSheetScroll = false,
 }: {
   queryKey: any[];
   getClothingItems: (page: number, limit: number) => Promise<ItemSchemaType[]>;
@@ -43,8 +47,10 @@ const ImageGallery = ({
   roundRobin?: boolean;
   canRefresh?: boolean;
   loadingItem?: React.ReactElement;
+  useBottomSheetScroll?: boolean;
 }) => {
   const { user } = useSession();
+  const insets = useSafeAreaInsets();
   const lastTriggeredHeightRef = useRef(0);
   const queryClient = useQueryClient();
   // List2 always requires authentication
@@ -172,9 +178,8 @@ const ImageGallery = ({
   ) : (
     <>
       <View
-        className={`flex-row ${
-          itemQuantity < columnCount ? `justify-start ` : "justify-between"
-        }`}
+        className={`flex-row ${itemQuantity < columnCount ? `justify-start ` : "justify-between"
+          }`}
         style={{
           gap: itemQuantity < columnCount ? resto : 0,
         }}
@@ -199,31 +204,39 @@ const ImageGallery = ({
     </>
   );
 
+  const ScrollComponent: any = useBottomSheetScroll ? BottomSheetScrollView : ScrollView;
+
+  const commonScrollProps: any = {
+    contentContainerStyle: {
+      // paddingTop: 8,
+      flexGrow: 1,
+      paddingBottom:
+        Platform.OS === "android" ? (insets.bottom ? insets.bottom + 16 : 24) : 0,
+    },
+    showsVerticalScrollIndicator: false,
+    onScroll: handleScroll,
+    scrollEventThrottle: 16,
+    refreshControl: canRefresh ? (
+      <RefreshControl
+        refreshing={false}
+        onRefresh={onRefresh}
+        tintColor="#ffffff"
+        colors={["#ffffff"]}
+      />
+    ) : undefined,
+  };
+
+  if (useBottomSheetScroll) {
+    // Android
+    commonScrollProps.nestedScrollEnabled = true;
+    commonScrollProps.keyboardShouldPersistTaps = "handled";
+  }
+
   return (
-    <ScrollView
-      className="flex-1"
-      contentContainerStyle={{
-        // paddingTop: 8,
-        flexGrow: 1,
-      }}
-      // contentContainerStyle={}
-      showsVerticalScrollIndicator={false}
-      onScroll={handleScroll}
-      scrollEventThrottle={16}
-      refreshControl={
-        canRefresh ? (
-          <RefreshControl
-            refreshing={false}
-            onRefresh={onRefresh}
-            tintColor="#ffffff"
-            colors={["#ffffff"]}
-          />
-        ) : undefined
-      }
-    >
+    <ScrollComponent className="flex-1" {...commonScrollProps}>
       {contentUp}
       {content}
-    </ScrollView>
+    </ScrollComponent>
   );
 };
 
