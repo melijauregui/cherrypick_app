@@ -4,6 +4,8 @@
 - inference: (cd inference && source .venv/bin/activate) uvicorn server:app --reload 
 - seed: npm run db:seed-complete
 
+
+
 source venv/bin/activate
 deactivate
 
