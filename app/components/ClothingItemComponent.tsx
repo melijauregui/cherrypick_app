@@ -111,9 +111,10 @@ const ClothingItemComponent = ({
             }
             style={{ width: renderedWidth, height: renderedHeight }}
             contentFit="cover"
-            cachePolicy="memory-disk"
+            cachePolicy="none"
             recyclingKey={item.uuid}
             transition={0}
+            // allowDownscaling={false}
             onLoadEnd={() => onImageLoaded?.(item.uuid)}
           />
         ) : null}

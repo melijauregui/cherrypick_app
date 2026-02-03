@@ -8,7 +8,7 @@ export const MinimumPropertiesBrandSchema = z.object({
     .max(200, { message: "Description must be less than 200 characters" })
     .describe("Descripción de la marca"),
   url: z
-    .string({ required_error: "URL de la marca es requerida" })
+    .string({ error: "URL de la marca es requerida" })
     .url({ message: "URL de la marca debe ser una URL válida" })
     .describe("URL de la marca"),
 });
@@ -27,7 +27,7 @@ export const BrandSchema = MinimumPropertiesBrandSchema.extend({
   logo: z
     .object({
       url: z
-        .string({ required_error: "URL del logo de la marca es requerida" })
+        .string({ error: "URL del logo de la marca es requerida" })
         .url({ message: "URL del logo de la marca debe ser una URL válida" }),
       updatedAt: z.string(),
       width: z.number().optional(),

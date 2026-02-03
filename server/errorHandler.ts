@@ -22,8 +22,8 @@ export function errorHandler(err: Error, c: Context) {
       error: true,
       status: 400,
       details: "Validation error",
-      info: err.errors
-        .map(e =>
+      info: err.issues
+        .map((e) =>
           e.path.length > 0 ? `${e.path.join(".")}: ${e.message}` : e.message
         )
         .join(", "),

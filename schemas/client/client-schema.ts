@@ -5,8 +5,7 @@ import { PasswordSchema } from "../formUser-schema";
 export const UpdatePreferencesSchema = z.object({
   preferences: z
     .array(z.string().min(1), {
-      required_error: "Preferences are required",
-      invalid_type_error: "Preferences must be an array of strings",
+      error: "Preferences are required",
     })
     .min(1, {
       message: "At least one preference is required",
@@ -16,8 +15,7 @@ export const UpdatePreferencesSchema = z.object({
 export const UpdateClientSchema = z.object({
   name: z
     .string({
-      required_error: "Name is required",
-      invalid_type_error: "Name must be a string",
+      error: "Name is required",
     })
     .min(1, { message: "Name is required" })
     .max(50, { message: "Name must be less than 50 characters" }),
@@ -31,8 +29,7 @@ export const UpdateClientSchema = z.object({
     })
     .nullable(),
   preferences: z.array(z.string().min(1), {
-    required_error: "Preferences are required",
-    invalid_type_error: "Preferences must be an array of strings",
+    error: "Preferences are required",
   }),
 });
 
@@ -52,13 +49,13 @@ export type ClientSchemaResponseType = z.infer<typeof ClientSchemaResponse>;
 const ClientFormSchemaSignUp = z.object({
   name: z
     .string({
-      required_error: "El nombre debe ser válido",
+      error: "El nombre debe ser válido",
     })
     .min(1, { message: "El nombre es requerido" })
     .max(50, { message: "El nombre debe tener menos de 50 caracteres" }),
   email: z
     .string({
-      required_error: "El correo electrónico es requerido",
+      error: "El correo electrónico es requerido",
     })
     .email({ message: "El correo electrónico no es válido" }),
   ...PasswordSchema.shape,

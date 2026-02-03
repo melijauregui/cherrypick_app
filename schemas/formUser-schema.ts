@@ -34,7 +34,7 @@ export type VerifyCodeResponseSchemaTypeResetPassword = z.infer<
 const FormSchemaCodeVerification = z.object({
   code: z
     .string({
-      required_error: "Code must ve string",
+      error: "Code must ve string",
     })
     .length(6, { message: "Code must have 6 digits" }),
 });

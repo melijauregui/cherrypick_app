@@ -26,8 +26,7 @@ export const MinimumPropertiesItemSchema = z.object({
     },
     z
       .number({
-        required_error: "Price must be a positive number",
-        invalid_type_error: "Price must be a positive number",
+        error: "Price must be a positive number",
       })
       .positive({ message: "Price must be a positive number" })
   ),
