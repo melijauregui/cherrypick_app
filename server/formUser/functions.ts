@@ -13,6 +13,13 @@ import { auth } from "@/lib/auth";
 import { Resend } from "resend";
 import { config } from "@/config";
 
+
+import { render } from "@react-email/render";
+import { EmailBrand, EmailResetPassword, EmailVerification } from "./emails/email";
+import React from "react";
+
+
+
 const resend = new Resend(config.RESEND_API_KEY);
 
 export async function SaveVerificationCode(
@@ -129,19 +136,15 @@ export async function sendEmail({
   return { success: true };
 }
 
-export async function SendEmail(email: string, code: string): Promise<boolean> {
+export async function SendEmail(email: string, code: string, userName: string | null): Promise<boolean> {
   try {
     console.log("Enviando correo a:", email);
+    const html = await render(React.createElement(EmailVerification, code, userName));
     const result = await sendEmail({
       to: [email],
       subject: "Verificá tu dirección de correo electrónico",
       text: `¡Gracias por registrarte en CherryPick!\n\nPara completar la creación de tu cuenta, por favor ingresá el siguiente código de verificación en nuestra app:\n\n${code}\n\n¡Gracias!\nEl equipo de CherryPick.`,
-      html: `
-            <p>¡Gracias por registrarte en <strong>CherryPick</strong>!</p>
-            <p>Para completar la creación de tu cuenta, por favor ingresá el siguiente código de verificación en nuestra app:</p>
-            <p><strong>${code}</strong></p>
-            <p>¡Gracias!<br/>Equipo <strong>CherryPick</strong></p>
-          `,
+      html: html,
     });
     return result.success;
   } catch (error) {
@@ -152,20 +155,17 @@ export async function SendEmail(email: string, code: string): Promise<boolean> {
 
 export async function SendEmailResetPassword(
   email: string,
-  code: string
+  code: string,
+  userName: string | null
 ): Promise<boolean> {
   try {
     console.log("Enviando correo a:", email);
+    const html = await render(React.createElement(EmailResetPassword, code, userName));
     const result = await sendEmail({
       to: [email],
       subject: "Resetear contraseña",
       text: `¡Gracias por registrarte en CherryPick!\n\nPara resetear tu contraseña, por favor ingresá el siguiente código de verificación en nuestra app:\n\n${code}\n\n¡Gracias!\nEl equipo de CherryPick.`,
-      html: `
-            <p>¡Gracias por registrarte en <strong>CherryPick</strong>!</p>
-            <p>Para resetear tu contraseña, por favor ingresá el siguiente código de verificación en nuestra app:</p>
-            <p><strong>${code}</strong></p>
-            <p>¡Gracias!<br/>Equipo <strong>CherryPick</strong></p>
-          `,
+      html: html,
     });
     return result.success;
   } catch (error) {
@@ -294,20 +294,14 @@ async function VerifyVerificationCode(
 export async function SendEmailBrand(
   email: string
 ): Promise<SuccessSchemaType | ErrorSchemaType> {
+ const html = await render(React.createElement(EmailBrand));
   try {
     console.log("Enviando correo a:", email);
     const result = await sendEmail({
       to: [email],
       subject: "Verificación de marca en CherryPick",
       text: `¡Gracias por tu interés en registrar tu marca en CherryPick!\n\nPara avanzar con la verificación, por favor completá el siguiente formulario: https://forms.gle/13WA248W6chvGCm7A\n\nEl equipo de CherryPick revisará tu documentación y validará que la marca esté registrada a nombre de la sociedad informada. Nos contactaremos contigo en caso de requerir información adicional o para coordinar la verificación facial.\n\n¡Gracias!\nEl equipo de CherryPick`,
-      html: `
-          <p>¡Gracias por tu interés en registrar tu marca en <strong>CherryPick</strong>!</p>
-          <p>Para avanzar con la verificación, por favor completá el siguiente formulario:<br/>
-          <a href="https://forms.gle/13WA248W6chvGCm7A" target="_blank">https://forms.gle/13WA248W6chvGCm7A</a></p>
-          <p>El equipo de CherryPick revisará tu documentación y validará que la marca esté registrada a nombre de la sociedad informada.<br/>
-          Nos contactaremos contigo en caso de requerir información adicional o para coordinar la verificación facial.</p>
-          <p>¡Gracias!<br/>Equipo <strong>CherryPick</strong></p>
-        `,
+      html: html,
     });
 
     if (!result.success) {
@@ -361,3 +355,6 @@ async function GetExpirationCode(
     expirationTime: new Date(registerInProgress.verificationCodeExpiration),
   };
 }
+
+
+

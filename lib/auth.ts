@@ -2,7 +2,7 @@ import { betterAuth } from "better-auth";
 import { Pool } from "pg";
 import { expo } from "@better-auth/expo";
 import { randomUUID } from "crypto";
-import { CreateClient } from "@/server/client/functions";
+import { CreateClient, GetClient } from "@/server/client/functions";
 import {
   GenerateVerificationCode,
   SaveVerificationCode,
@@ -11,6 +11,7 @@ import {
   SendEmailResetPassword,
 } from "@/server/formUser/functions";
 import { config } from "@/config";
+import { GetUserName } from "@/server/user/functions";
 
 // console.log("BETTER_AUTH_URL", config.BETTER_AUTH_URL);
 
@@ -41,7 +42,9 @@ export const auth = betterAuth({
     sendResetPassword: async ({ user, url, token }, request) => {
       console.log("YEEES Sending reset password email to", user.email);
       const code = GenerateVerificationCode();
-      const emailSent = await SendEmailResetPassword(user.email, code);
+      //get name of user
+      const userName = await GetUserName(user.id);
+      const emailSent = await SendEmailResetPassword(user.email, code, userName);
       if (!emailSent) {
         throw new Error(
           "No se pudo enviar el email de restablecimiento de contraseña"
@@ -62,7 +65,8 @@ export const auth = betterAuth({
     autoSignInAfterVerification: true,
     async sendVerificationEmail({ user, url, token }, request) {
       const code = GenerateVerificationCode();
-      const emailSent = await SendEmail(user.email, code);
+      const userName = await GetUserName(user.id);
+      const emailSent = await SendEmail(user.email, code, userName);
       if (!emailSent) {
         throw new Error("Failed to send verification email");
       }

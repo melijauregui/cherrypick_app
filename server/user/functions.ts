@@ -51,3 +51,28 @@ export async function GetUserIdByEmail(email: string): Promise<string | null> {
   }
   return user.id;
 }
+
+export async function GetUserName(userId: string): Promise<string | null> {
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    select: {
+      userType: true,
+    },
+  });
+  if (!user) {
+    throw new NotFoundError("User not found", userId, "User not found");
+  }
+
+  const entity =
+    user.userType === "client"
+      ? await db.client.findUnique({ where: { userId: userId } })
+      : user.userType === "brand"
+      ? await db.brand.findUnique({ where: { userId: userId } })
+      : null;
+
+  if (!entity) {
+    throw new NotFoundError("Entity not found", userId, "Entity not found");
+  }
+
+  return entity.name;
+}
