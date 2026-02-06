@@ -1,5 +1,5 @@
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { z } from "zod";
 import { Ionicons } from "@expo/vector-icons";
@@ -97,8 +97,32 @@ export default function ListSearch<T extends { id: string; name: string }>({
     disable ||
     (typeof maxAllowSelect === "number" && selected.size >= maxAllowSelect);
 
-  // Mantener el orden original para evitar reflow al seleccionar
-  const getDisplayItems = () => filteredItems;
+  // Orden de ids la primera vez que se ven; así el orden no cambia al seleccionar/filtrar
+  const orderRef = useRef<string[]>([]);
+  const prevQueryKeyRef = useRef<string>("");
+
+  const displayItems = useMemo(() => {
+    const queryKeySerialized = JSON.stringify(queryKeyWithSearch);
+    if (prevQueryKeyRef.current !== queryKeySerialized) {
+      prevQueryKeyRef.current = queryKeySerialized;
+      orderRef.current = [];
+    }
+    const items = filteredItems;
+    const order = orderRef.current;
+    const orderSet = new Set(order);
+    for (const item of items) {
+      if (!orderSet.has(item.id)) {
+        order.push(item.id);
+        orderSet.add(item.id);
+      }
+    }
+    const orderIndex = new Map(order.map((id, i) => [id, i]));
+    return [...items].sort((a, b) => {
+      const ia = orderIndex.get(a.id) ?? Infinity;
+      const ib = orderIndex.get(b.id) ?? Infinity;
+      return ia - ib;
+    });
+  }, [filteredItems, queryKeyWithSearch]);
 
   const toggleSelect = (item: T) => {
     setSelected(prev => {
@@ -111,8 +135,6 @@ export default function ListSearch<T extends { id: string; name: string }>({
       return newMap;
     });
   };
-
-  const displayItems = useMemo(() => getDisplayItems(), [filteredItems]);
   const keyExtractor = useCallback((item: T) => item.id, []);
   return (
     <View className="flex flex-col flex-1">

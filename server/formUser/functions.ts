@@ -139,7 +139,7 @@ export async function sendEmail({
 export async function SendEmail(email: string, code: string, userName: string | null): Promise<boolean> {
   try {
     console.log("Enviando correo a:", email);
-    const html = await render(React.createElement(EmailVerification, code, userName));
+    const html = await render(React.createElement(EmailVerification, { code, userName }));
     const result = await sendEmail({
       to: [email],
       subject: "Verificá tu dirección de correo electrónico",
@@ -160,7 +160,7 @@ export async function SendEmailResetPassword(
 ): Promise<boolean> {
   try {
     console.log("Enviando correo a:", email);
-    const html = await render(React.createElement(EmailResetPassword, code, userName));
+    const html = await render(React.createElement(EmailResetPassword, { code, userName }));
     const result = await sendEmail({
       to: [email],
       subject: "Resetear contraseña",

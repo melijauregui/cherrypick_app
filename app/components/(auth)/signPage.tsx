@@ -96,7 +96,7 @@ export function NextButton({
               text-[15px] font-psemibold text-black 
             `}
       >
-        {isLoading ? "Loading..." : "Next"}
+        {isLoading ? "Cargando..." : "Siguiente"}
       </Text>
     </TouchableOpacity>
   );

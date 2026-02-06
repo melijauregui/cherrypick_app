@@ -1,12 +1,16 @@
+import { Asset } from "expo-asset";
 import {
   CameraType,
   CameraView,
   FlashMode,
   useCameraPermissions,
 } from "expo-camera";
+import { useVideoPlayer, VideoView } from "expo-video";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Button,
+  Image,
   Pressable,
   Text,
   View,
@@ -49,7 +53,7 @@ const CameraPage = () => {
       <GestureHandlerRootView style={{ flex: 1, backgroundColor: "black" }}>
         <View className="flex-1 bg-black w-full">
           {uri ? (
-            <RenderPicture uri={uri} setUri={setUri} />
+            <RenderPicture key={uri} uri={uri} setUri={setUri} />
           ) : (
             <RenderCamera setImage={setUri} />
           )}
@@ -61,6 +65,25 @@ const CameraPage = () => {
 
 export default CameraPage;
 
+const DEFUALT_IMAGE = require("@/assets/images/defaultCamera.png");
+const DEFAULT_VIDEO = require("@/assets/videos/defaultCamera.mp4");
+
+const DefaultCameraVideo = () => {
+  const player = useVideoPlayer(DEFAULT_VIDEO, p => {
+    p.loop = true;
+    p.muted = true;
+    p.play();
+  });
+  return (
+    <VideoView
+      player={player}
+      style={{ position: "absolute", width: "100%", height: "100%" }}
+      contentFit="cover"
+      nativeControls={false}
+    />
+  );
+};
+
 const RenderCamera = ({
   setImage,
 }: {
@@ -69,10 +92,17 @@ const RenderCamera = ({
   const refCamera = useRef<CameraView>(null);
   const [facing, setFacing] = useState<CameraType>("back");
   const [flash, setFlash] = useState<FlashMode>("off");
+  const [isCameraReady, setIsCameraReady] = useState(false);
   const toggleFacing = () => {
     setFacing(prev => (prev === "back" ? "front" : "back"));
   };
   const takePicture = async () => {
+    if (!isCameraReady) {
+      const asset = Asset.fromModule(DEFUALT_IMAGE);
+      await asset.downloadAsync();
+      setImage(asset.localUri ?? null);
+      return;
+    }
     const photo = await refCamera.current?.takePictureAsync();
     setImage(photo?.uri || null);
   };
@@ -83,14 +113,17 @@ const RenderCamera = ({
         facing={facing}
         flash={flash}
         setUri={setImage}
+        onCameraReadyChange={setIsCameraReady}
       />
       <ControlsCamera flash={flash} setFlash={setFlash} />
       <View className="absolute bottom-14 items-center left-0 w-full flex-row justify-between px-16">
-        <ImagePickerButton setImage={setImage} />
+        <ImagePickerButton setImage={setImage}>
+          <Entypo name="images" size={30} color="white" />
+        </ImagePickerButton>
         <Pressable onPress={takePicture}>
           {({ pressed }) => (
             <View
-              className={`bg-black border-2 border-white w-[95px] h-[95px] rounded-full items-center justify-center bottom-0 ${pressed ? "opacity-70" : "opacity-100"}`}
+              className={`bg-neutral-500 border-2 border-white w-[95px] h-[95px] rounded-full items-center justify-center bottom-0 ${pressed ? "opacity-70" : "opacity-100"}`}
             >
               <View className="w-[85px] h-[85px] rounded-full bg-white bottom-0" />
             </View>
@@ -167,6 +200,13 @@ const ControlsRenderPicture = ({
         >
           <SimpleLineIcons name="camera" size={20} color="white" />
         </Pressable>
+
+        <ImagePickerButton setImage={setUri}>
+          <View className="bg-black items-center justify-center w-12 h-12 rounded-2xl opacity-80">
+            <Entypo name="images" size={20} color="white" />
+          </View>
+        </ImagePickerButton>
+
         <Pressable
           className="bg-black items-center justify-center w-12 h-12 rounded-2xl opacity-80"
           onPress={onPressTune}
@@ -203,8 +243,10 @@ const ControlsRenderPicture = ({
 
 export const ImagePickerButton = ({
   setImage,
+  children,
 }: {
   setImage: (image: string | null) => void;
+  children: React.ReactNode;
 }) => {
   const [mediaLibraryPermission, requestMediaLibraryPermission] =
     useMediaLibraryPermissions();
@@ -239,11 +281,7 @@ export const ImagePickerButton = ({
     }
   };
 
-  return (
-    <Pressable onPress={pickImage}>
-      <Entypo name="images" size={30} color="white" />
-    </Pressable>
-  );
+  return <Pressable onPress={pickImage}>{children}</Pressable>;
 };
 
 const CamaraView = ({
@@ -251,13 +289,21 @@ const CamaraView = ({
   facing,
   flash,
   setUri,
+  onCameraReadyChange,
 }: {
   refCamera: React.RefObject<CameraView>;
   facing: CameraType;
   flash: FlashMode;
   setUri: (uri: string | null) => void;
+  onCameraReadyChange?: (ready: boolean) => void;
 }) => {
   const [permission, requestPermission] = useCameraPermissions();
+  const [isCameraReady, setIsCameraReady] = useState(false);
+
+  const handleCameraReady = () => {
+    setIsCameraReady(true);
+    onCameraReadyChange?.(true);
+  };
 
   if (!permission) {
     return null;
@@ -275,15 +321,26 @@ const CamaraView = ({
   }
 
   return (
-    <CameraView
-      ref={refCamera}
-      style={{ flex: 1 }}
-      mode={"picture"}
-      facing={facing}
-      flash={flash}
-      mute={true}
-      responsiveOrientationWhenOrientationLocked
-    />
+    <View style={{ flex: 1 }}>
+      <CameraView
+        ref={refCamera}
+        style={{ flex: 1, width: "100%" }}
+        mode={"picture"}
+        facing={facing}
+        flash={flash}
+        mute={true}
+        responsiveOrientationWhenOrientationLocked
+        onCameraReady={handleCameraReady}
+      />
+      {!isCameraReady && (
+        <View
+          className="absolute inset-0 items-center justify-center"
+          pointerEvents="none"
+        >
+          <DefaultCameraVideo />
+        </View>
+      )}
+    </View>
   );
 };
 
@@ -317,17 +374,19 @@ const RenderPicture = ({
     setIsImageSearchGuidelinesModalVisible,
   ] = useState(false);
 
-  if (!uri) return null;
   const insets = useSafeAreaInsets();
 
-  const max = 400
-  const minHeight = Math.max(screenHeight - imageHeight, max) + (Platform.OS === "android" ? insets.bottom + insets.top : 0);
+  const max = 400;
+  const minHeight =
+    Math.max(screenHeight - imageHeight, max) +
+    (Platform.OS === "android" ? insets.bottom + insets.top : 0);
 
   let snapPoints = [minHeight, 400, 600, 800, 900].filter(
     point => point >= minHeight
   );
 
   useEffect(() => {
+    if (!uri) return;
     const fetchImageBase64 = async () => {
       setIsLoadingBase64(true);
       const base64 = await convertUriToBase64(uri);
@@ -338,6 +397,8 @@ const RenderPicture = ({
     };
     fetchImageBase64();
   }, [uri]);
+
+  if (!uri) return null;
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -447,7 +508,7 @@ const RenderPicture = ({
           />
         </View>
       </View>
-    </GestureHandlerRootView >
+    </GestureHandlerRootView>
   );
 };
 

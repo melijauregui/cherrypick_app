@@ -14,25 +14,39 @@ export const EmailBrand = () => {
   );
 };
 
-export const EmailResetPassword = (code: string, userName: string | null) => {
-  const escapedCode = code.replace(/'/g, "\\'").replace(/"/g, '\\"');
+export const EmailResetPassword = ({
+  code,
+  userName,
+}: {
+  code: string | number;
+  userName: string | null;
+}) => {
+  const codeStr = String(code);
+  const escapedCode = codeStr.replace(/'/g, "\\'").replace(/"/g, '\\"');
   return (
     <Html lang="es" dir="ltr">
       <Text style={{ color: "#000000" }}>¡Buenas {userName ? userName : ""}!</Text>
       <Text style={{ color: "#000000" }}>Para resetear tu contraseña, por favor ingresá el siguiente código de verificación en nuestra app:<br/>
-      <strong>{code}</strong></Text>
+      <strong>{codeStr}</strong></Text>
       <Text style={{ color: "#000000" }}>¡Gracias!<br/>Equipo <strong>CherryPick</strong></Text>
     </Html>
   );
 };
 
-export const EmailVerification = (code: string, userName: string | null) => {
-  const escapedCode = code.replace(/'/g, "\\'").replace(/"/g, '\\"');
+export const EmailVerification = ({
+  code,
+  userName,
+}: {
+  code: string | number;
+  userName: string | null;
+}) => {
+  const codeStr = String(code);
+  const escapedCode = codeStr.replace(/'/g, "\\'").replace(/"/g, '\\"');
   return (
     <Html lang="es" dir="ltr">
       <Text style={{ color: "#000000" }}>¡Buenas {userName ? userName : ""}!</Text>
       <Text style={{ color: "#000000" }}>Para verificar tu email, por favor ingresá el siguiente código de verificación en nuestra app:<br/>
-      <strong>{code}</strong></Text>
+      <strong>{codeStr}</strong></Text>
     </Html>
   );
 };

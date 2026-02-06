@@ -82,6 +82,7 @@ export default ({ config }) => ({
           photosPermission: "Permitir que Cherrypick acceda a tus foto.",
         },
       ],
+      "expo-video",
     ],
     experiments: {
       typedRoutes: true,
