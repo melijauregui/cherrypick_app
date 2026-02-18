@@ -63,7 +63,7 @@ export default function InsertItemPage() {
     });
     if (!result.success) {
       const newErrors: FormErrors = {};
-      result.error.errors.forEach(error => {
+      result.error.issues.forEach(error => {
         const field = error.path[0] as keyof InsertItemSchema;
         newErrors[field] = error.message;
       });
@@ -82,11 +82,11 @@ export default function InsertItemPage() {
   };
   const isFormValid = Boolean(
     formData.name &&
-      formData.price &&
-      formData.url &&
-      formData.image.url &&
-      formData.description &&
-      formData.price
+    formData.price &&
+    formData.url &&
+    formData.image.url &&
+    formData.description &&
+    formData.price
   );
   return (
     <StandardPageBottomSheet
@@ -109,6 +109,7 @@ export default function InsertItemPage() {
         setErrors={setErrors}
         errors={errors}
         formData={formData}
+        isInsert
       />
     </StandardPageBottomSheet>
   );
@@ -119,11 +120,13 @@ export function ItemsBottomSheetDetails({
   setErrors,
   formData,
   errors,
+  isInsert,
 }: {
   setFormData: React.Dispatch<React.SetStateAction<InsertItemSchema>>;
   setErrors: React.Dispatch<React.SetStateAction<FormErrors>>;
   formData: InsertItemSchema;
   errors: FormErrors;
+  isInsert?: boolean;
 }) {
   const handleFieldChange = (field: keyof InsertItemSchema, value: string) => {
     // Validar que el valor no sea undefined o null para evitar NaN
@@ -184,7 +187,7 @@ export function ItemsBottomSheetDetails({
                   >
                     <View className=" bg-beige-strong rounded-2xl px-4 py-2 mt-3 items-center justify-center">
                       <Text className="text-black text-base font-pmedium">
-                        Editar imagen
+                        {isInsert ? "Seleccionar imagen" : "Editar imagen"}
                       </Text>
                     </View>
                   </ImagePickerButton>

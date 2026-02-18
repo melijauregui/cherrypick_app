@@ -66,7 +66,7 @@ function EditBrandProfile({ brand }: { brand: BrandSchemaType }) {
     const result = BrandSchema.safeParse(data);
     if (!result.success) {
       const newErrors: FormErrors = {};
-      result.error.errors.forEach(error => {
+      result.error.issues.forEach(error => {
         const field = error.path[0] as keyof BrandSchemaType;
         newErrors[field] = error.message;
       });
@@ -223,10 +223,10 @@ function useUpdateBrand(
     onSettled: () => {
       console.log("onSettled");
       void queryClient.invalidateQueries({
-        queryKey: ["self-brand-profile", user.email],
+        queryKey: ["self-brand-profile", user?.email],
       });
       void queryClient.invalidateQueries({
-        queryKey: ["brand-profile-item", user.id],
+        queryKey: ["brand-profile-item", user?.id],
       });
     },
   });
