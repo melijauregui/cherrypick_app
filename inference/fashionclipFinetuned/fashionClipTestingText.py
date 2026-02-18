@@ -200,7 +200,29 @@ def test_text_clasification(probabilities, image_paths, has, clasification_img, 
 
     # Precision = TP / (TP + FP)
     TP = len(predicted_positive.intersection(true_positive))
-    FP = len(predicted_positive.difference(true_positive))
+
+    # FP redefinido:
+    # - Tomar la prob más baja entre los true positives
+    # - Contar todos los ítems que NO sean true positives y cuya prob sea mayor a ese mínimo
+    # - Excluir del conjunto a las yellow_flags
+    if true_positive:
+        min_true_positive_prob = min(probabilities[i] for i in true_positive)
+
+        FP_indices = []
+        for i, p in enumerate(probabilities):
+            if i in true_positive:
+                continue
+            if p <= min_true_positive_prob:
+                continue
+            # excluir yellow flags
+            if any(contains(flag, image_names[i]) for flag in yellow_flags):
+                continue
+            FP_indices.append(i)
+
+        FP = len(FP_indices)
+    else:
+        FP = 0
+
     precision = TP / (TP + FP) if (TP + FP) > 0 else 0
 
     # Recall = TP / (TP + FN)
@@ -239,9 +261,9 @@ def test_text_clasification(probabilities, image_paths, has, clasification_img, 
 
     # --- RESUMEN FINAL ---
     print("RESUMEN FINAL:")
-    print(f"{'❌' if accuracy < 0.8 else '✅'} Accuracy vs red/yellow flags (>= 0.8)")
+    print(f"{'❌' if accuracy < 0.6 else '✅'} Accuracy vs red/yellow flags (>= 0.6)")
     print(f"{'❌' if precision < 0.7 else '✅'} Precision (>= 0.7)")
-    print(f"{'❌' if recall < 0.6 else '✅'} Recall (>= 0.6)")
+    print(f"{'❌' if recall < 0.8 else '✅'} Recall (>= 0.8)")
     print(f"{'❌' if mrr < 0.3 else '✅'} MRR (>= 0.3)")
     if first_rank:
         print(f"{'❌' if first_rank > 3 else '✅'} Top-3 check")

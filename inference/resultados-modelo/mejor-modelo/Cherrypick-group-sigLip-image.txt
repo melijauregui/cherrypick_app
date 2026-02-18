@@ -1,0 +1,626 @@
+fine_tune(csv_path="datasets/unificado/roturas-preferencias-v6.csv", original_model_name="Marqo/marqo-fashionSigLIP", model_name="Marqo/marqo-fashionSigLIP",
+              model_name_to_push="Sofia-gb/cherrypick-sigLip11", data_aug=False,
+              loss_func=contrastive_loss_InfoNCE, batch_size=16, epochs=32, lr=2e-5,
+              n_layers=2)
+Nuevo nombre: Cherrypick-group/sigLip
+
+
+Query imagen: wide-rotura-simetrica-negro1.png
+mayor red flag es recto-rotura-simetrica1.png con 0.500 de similitud
+mayor yellow flag es wide-rotura-simetrica2.png con 0.574 de similitud
+
+green_flags:
+  ✅ wide-rotura-simetrica-negro2.png: 0.863
+
+yellow_flags:
+  ✅ wide-rotura-simetrica2.png: 0.574
+  ✅ recto-rotura-desmechada1.png: 0.551
+  ✅ wide-rotura-simetrica1.png: 0.509
+  ✅ wide-rotura-simetrica-desmechada1.png: 0.546
+
+
+🎯 Porcentaje de acierto: 100.00% (1/1)
+true_positive: {17}
+true_positive_yellow: {0, 1, 4, 25}
+predicted_positive: {0, 1, 4, 17, 25}
+predicted_positive_yellow: {0, 1, 17, 25}
+TP: 5, FP: 0
+FN: 0
+no green flags que no son predicted: 0
+no yellow flags que no son predicted: 0
+📊 Precision: 1.000
+📊 Recall: 1.000
+📊 MRR (Mean Reciprocal Rank): 0.500
+📊 Primer green flag aparece en rank: 2
+
+RESUMEN FINAL:
+✅ Accuracy vs red/yellow flags (>= 0.6)
+✅ Precision (>= 0.7)
+✅ Recall (>= 0.6)
+✅ MRR (>= 0.3)
+✅ Top-3 check
+==============================
+
+
+Query imagen: recto-rotura-desmechada1.png
+mayor red flag es skinny-rotura-desmechada1.png con 0.633 de similitud
+mayor yellow flag es wide-rotura-simetrica1.png con 0.750 de similitud
+
+green_flags:
+  ✅ wide-rotura-simetrica-desmechada1.png: 0.840
+  ✅ recto-rotura-simetrica1.png: 0.784
+  ❌ mom-rotura-desmechada2.png: 0.468
+  🟡 recto-rotura4.png: 0.702
+
+yellow_flags:
+  ❌ recto4.png: 0.370
+  ✅ wide-rotura-simetrica1.png: 0.750
+
+
+🎯 Porcentaje de acierto: 50.00% (2/4)
+🎯 Porcentaje de acierto incluyendo 🟡: 75.00% (3/4)
+true_positive: {25, 42, 28, 39}
+true_positive_yellow: {33, 4}
+predicted_positive: {25, 42, 4, 39}
+predicted_positive_yellow: {0, 2, 4, 39, 9, 42, 14, 17, 25, 28, 30}
+TP: 4, FP: 6
+FN: 2
+no green flags que no son predicted: 1
+no yellow flags que no son predicted: 1
+📊 Precision: 0.400
+📊 Recall: 0.667
+📊 MRR (Mean Reciprocal Rank): 0.500
+📊 Primer green flag aparece en rank: 2
+
+RESUMEN FINAL:
+❌ Accuracy vs red/yellow flags (>= 0.6)
+❌ Precision (>= 0.7)
+❌ Recall (>= 0.6)
+✅ MRR (>= 0.3)
+✅ Top-3 check
+==============================
+
+
+Query imagen: cargo-vintage1.png
+mayor red flag es palazzo5.png con 0.360 de similitud
+mayor yellow flag es cargo-grey1.png con 0.436 de similitud
+
+green_flags:
+  ✅ cargo1.png: 0.690
+  ✅ cargo-vintage2.png: 0.575
+  🟡 wide2.png: 0.383
+
+yellow_flags:
+  ✅ cargo-azul1.png: 0.382
+  ✅ cargo-grey1.png: 0.436
+
+
+🎯 Porcentaje de acierto: 66.67% (2/3)
+🎯 Porcentaje de acierto incluyendo 🟡: 100.00% (3/3)
+true_positive: {8, 26, 6}
+true_positive_yellow: {40, 21}
+predicted_positive: {6, 8, 40, 21, 26}
+predicted_positive_yellow: {8, 26, 21, 6}
+TP: 5, FP: 0
+FN: 0
+no green flags que no son predicted: 0
+no yellow flags que no son predicted: 0
+📊 Precision: 1.000
+📊 Recall: 1.000
+📊 MRR (Mean Reciprocal Rank): 0.500
+📊 Primer green flag aparece en rank: 2
+
+RESUMEN FINAL:
+✅ Accuracy vs red/yellow flags (>= 0.6)
+✅ Precision (>= 0.7)
+✅ Recall (>= 0.6)
+✅ MRR (>= 0.3)
+✅ Top-3 check
+==============================
+
+
+Query imagen: flared1.png
+mayor red flag es skinny1.png con 0.531 de similitud
+mayor yellow flag es flared7.png con 0.619 de similitud
+
+green_flags:
+  ✅ flared2.png: 0.701
+  ✅ flared5.png: 0.650
+  ✅ flared6.png: 0.675
+
+yellow_flags:
+  ✅ flared7.png: 0.619
+
+
+🎯 Porcentaje de acierto: 100.00% (3/3)
+true_positive: {34, 29, 23}
+true_positive_yellow: {19}
+predicted_positive: {34, 19, 29, 23}
+predicted_positive_yellow: {34, 29, 23}
+TP: 4, FP: 0
+FN: 0
+no green flags que no son predicted: 0
+no yellow flags que no son predicted: 0
+📊 Precision: 1.000
+📊 Recall: 1.000
+📊 MRR (Mean Reciprocal Rank): 0.500
+📊 Primer green flag aparece en rank: 2
+
+RESUMEN FINAL:
+✅ Accuracy vs red/yellow flags (>= 0.6)
+✅ Precision (>= 0.7)
+✅ Recall (>= 0.6)
+✅ MRR (>= 0.3)
+✅ Top-3 check
+==============================
+
+
+Query imagen: mom1.png
+mayor red flag es skinny-rotura-simetrica2.png con 0.453 de similitud
+mayor yellow flag es palazzo1.png con 0.480 de similitud
+
+green_flags:
+  ✅ mom3.png: 0.811
+  ✅ mom4.png: 0.713
+  ✅ mom5.png: 0.909
+  ✅ mom6.png: 0.695
+
+yellow_flags:
+  ❌ mom-grey1.png: 0.441
+  ✅ palazzo1.png: 0.480
+
+
+🎯 Porcentaje de acierto: 100.00% (4/4)
+true_positive: {32, 35, 27, 37}
+true_positive_yellow: {43, 13}
+predicted_positive: {32, 35, 37, 43, 27}
+predicted_positive_yellow: {32, 35, 37, 9, 43, 27}
+TP: 5, FP: 1
+FN: 1
+no green flags que no son predicted: 0
+no yellow flags que no son predicted: 1
+📊 Precision: 0.833
+📊 Recall: 0.833
+📊 MRR (Mean Reciprocal Rank): 0.500
+📊 Primer green flag aparece en rank: 2
+
+RESUMEN FINAL:
+✅ Accuracy vs red/yellow flags (>= 0.6)
+✅ Precision (>= 0.7)
+✅ Recall (>= 0.6)
+✅ MRR (>= 0.3)
+✅ Top-3 check
+==============================
+
+
+Query imagen: palazzo2.png
+mayor red flag es cargo-vintage1.png con 0.317 de similitud
+mayor yellow flag es wide2.png con 0.549 de similitud
+
+green_flags:
+  ✅ palazzo5.png: 0.565
+  ✅ palazzo7.png: 0.693
+
+yellow_flags:
+  ✅ wide2.png: 0.549
+  ✅ wide1.png: 0.512
+  ✅ palazzo3.png: 0.321
+  ✅ palazzo4.png: 0.438
+  ✅ palazzo6.png: 0.536
+
+
+🎯 Porcentaje de acierto: 100.00% (2/2)
+true_positive: {44, 47}
+true_positive_yellow: {38, 6, 10, 45, 46}
+predicted_positive: {38, 6, 10, 44, 45, 46, 47}
+predicted_positive_yellow: {6, 10, 44, 45, 46, 47}
+TP: 7, FP: 0
+FN: 0
+no green flags que no son predicted: 0
+no yellow flags que no son predicted: 0
+📊 Precision: 1.000
+📊 Recall: 1.000
+📊 MRR (Mean Reciprocal Rank): 0.500
+📊 Primer green flag aparece en rank: 2
+
+RESUMEN FINAL:
+✅ Accuracy vs red/yellow flags (>= 0.6)
+✅ Precision (>= 0.7)
+✅ Recall (>= 0.6)
+✅ MRR (>= 0.3)
+✅ Top-3 check
+==============================
+
+
+Query imagen: recto1.png
+mayor red flag es wide1.png con 0.511 de similitud
+mayor yellow flag es mom4.png con 0.533 de similitud
+
+green_flags:
+  ✅ recto2.png: 0.861
+  ✅ recto3.png: 0.836
+  ✅ recto4.png: 0.882
+
+yellow_flags:
+  ✅ mom4.png: 0.533
+
+
+🎯 Porcentaje de acierto: 100.00% (3/3)
+true_positive: {24, 33, 18}
+true_positive_yellow: {37}
+predicted_positive: {24, 33, 18, 37}
+predicted_positive_yellow: {24, 33, 18}
+TP: 4, FP: 0
+FN: 0
+no green flags que no son predicted: 0
+no yellow flags que no son predicted: 0
+📊 Precision: 1.000
+📊 Recall: 1.000
+📊 MRR (Mean Reciprocal Rank): 0.500
+📊 Primer green flag aparece en rank: 2
+
+RESUMEN FINAL:
+✅ Accuracy vs red/yellow flags (>= 0.6)
+✅ Precision (>= 0.7)
+✅ Recall (>= 0.6)
+✅ MRR (>= 0.3)
+✅ Top-3 check
+==============================
+
+
+Query imagen: skinny-oscuro.png
+mayor red flag es skinny-rojo.png con 0.588 de similitud
+mayor yellow flag es skinny1.png con 0.843 de similitud
+
+green_flags:
+  ✅ skinny-oscuro2.png: 0.869
+
+yellow_flags:
+  ✅ skinny1.png: 0.843
+
+
+🎯 Porcentaje de acierto: 100.00% (1/1)
+true_positive: {15}
+true_positive_yellow: {20}
+predicted_positive: {20, 15}
+predicted_positive_yellow: {15}
+TP: 2, FP: 0
+FN: 0
+no green flags que no son predicted: 0
+no yellow flags que no son predicted: 0
+📊 Precision: 1.000
+📊 Recall: 1.000
+📊 MRR (Mean Reciprocal Rank): 0.500
+📊 Primer green flag aparece en rank: 2
+
+RESUMEN FINAL:
+✅ Accuracy vs red/yellow flags (>= 0.6)
+✅ Precision (>= 0.7)
+✅ Recall (>= 0.6)
+✅ MRR (>= 0.3)
+✅ Top-3 check
+==============================
+
+
+Query imagen: skinny1.png
+mayor red flag es skinny-rojo.png con 0.614 de similitud
+mayor yellow flag es flared1.png con 0.531 de similitud
+
+green_flags:
+  ✅ skinny-oscuro.png: 0.843
+  ✅ skinny-oscuro2.png: 0.807
+
+yellow_flags:
+  ❌ flared6.png: 0.443
+  ❌ flared2.png: 0.486
+  ❌ flared1.png: 0.531
+
+
+🎯 Porcentaje de acierto: 100.00% (2/2)
+true_positive: {16, 15}
+true_positive_yellow: {34, 31, 23}
+predicted_positive: {16, 15}
+predicted_positive_yellow: {34, 36, 5, 12, 15, 16, 31}
+TP: 2, FP: 3
+FN: 3
+no green flags que no son predicted: 0
+no yellow flags que no son predicted: 3
+📊 Precision: 0.400
+📊 Recall: 0.400
+📊 MRR (Mean Reciprocal Rank): 0.500
+📊 Primer green flag aparece en rank: 2
+
+RESUMEN FINAL:
+✅ Accuracy vs red/yellow flags (>= 0.6)
+❌ Precision (>= 0.7)
+❌ Recall (>= 0.6)
+✅ MRR (>= 0.3)
+✅ Top-3 check
+==============================
+
+
+Query imagen: wide1.png
+mayor red flag es palazzo5.png con 0.588 de similitud
+mayor yellow flag es palazzo7.png con 0.594 de similitud
+
+green_flags:
+  ✅ wide2.png: 0.746
+  ✅ recto4.png: 0.603
+  ✅ recto3.png: 0.599
+
+yellow_flags:
+  ✅ palazzo7.png: 0.594
+
+
+🎯 Porcentaje de acierto: 100.00% (3/3)
+true_positive: {33, 18, 6}
+true_positive_yellow: {47}
+predicted_positive: {33, 18, 6, 47}
+predicted_positive_yellow: {33, 18, 6}
+TP: 4, FP: 0
+FN: 0
+no green flags que no son predicted: 0
+no yellow flags que no son predicted: 0
+📊 Precision: 1.000
+📊 Recall: 1.000
+📊 MRR (Mean Reciprocal Rank): 0.500
+📊 Primer green flag aparece en rank: 2
+
+RESUMEN FINAL:
+✅ Accuracy vs red/yellow flags (>= 0.6)
+✅ Precision (>= 0.7)
+✅ Recall (>= 0.6)
+✅ MRR (>= 0.3)
+✅ Top-3 check
+==============================
+
+
+Query imagen: camisa-celeste-manga-larga.png
+mayor red flag es remera-celeste2.png con 0.549 de similitud
+mayor yellow flag es camisa-rosa-manga-larga.png con 0.736 de similitud
+
+green_flags:
+  ✅ camisa-celeste-blanca-manga-larga.png: 0.746
+
+yellow_flags:
+  ✅ camisa-rosa-manga-larga.png: 0.736
+  ✅ camisa-celeste-manga-corta.png: 0.585
+
+
+🎯 Porcentaje de acierto: 100.00% (1/1)
+true_positive: {18}
+true_positive_yellow: {20, 28}
+predicted_positive: {18, 20, 28}
+predicted_positive_yellow: {18, 20}
+TP: 3, FP: 0
+FN: 0
+no green flags que no son predicted: 0
+no yellow flags que no son predicted: 0
+📊 Precision: 1.000
+📊 Recall: 1.000
+📊 MRR (Mean Reciprocal Rank): 0.500
+📊 Primer green flag aparece en rank: 2
+
+RESUMEN FINAL:
+✅ Accuracy vs red/yellow flags (>= 0.6)
+✅ Precision (>= 0.7)
+✅ Recall (>= 0.6)
+✅ MRR (>= 0.3)
+✅ Top-3 check
+==============================
+
+
+Query imagen: campera-cuero-negra.png
+mayor red flag es sweater-rosa2.png con 0.336 de similitud
+mayor yellow flag es campera-jean-negra.png con 0.633 de similitud
+
+green_flags:
+  ✅ campera-cuero-roja.png: 0.637
+
+yellow_flags:
+  ✅ campera-jean-negra.png: 0.633
+  ❌ campera-jean-azul.png: 0.236
+
+
+🎯 Porcentaje de acierto: 100.00% (1/1)
+true_positive: {22}
+true_positive_yellow: {1, 25}
+predicted_positive: {1, 22}
+predicted_positive_yellow: {1, 2, 4, 8, 10, 13, 14, 16, 17, 20, 22}
+TP: 2, FP: 9
+FN: 1
+no green flags que no son predicted: 0
+no yellow flags que no son predicted: 1
+📊 Precision: 0.182
+📊 Recall: 0.667
+📊 MRR (Mean Reciprocal Rank): 0.500
+📊 Primer green flag aparece en rank: 2
+
+RESUMEN FINAL:
+✅ Accuracy vs red/yellow flags (>= 0.6)
+❌ Precision (>= 0.7)
+❌ Recall (>= 0.6)
+✅ MRR (>= 0.3)
+✅ Top-3 check
+==============================
+
+
+Query imagen: campera-jean-azul.png
+mayor red flag es remera-azul1.png con 0.352 de similitud
+mayor yellow flag es campera-jean-negra.png con 0.331 de similitud
+
+green_flags:
+  ✅ campera-jean-celeste.png: 0.563
+
+yellow_flags:
+  ❌ campera-jean-negra.png: 0.331
+
+
+🎯 Porcentaje de acierto: 100.00% (1/1)
+true_positive: {14}
+true_positive_yellow: {1}
+predicted_positive: {14}
+predicted_positive_yellow: {14, 15}
+TP: 1, FP: 1
+FN: 1
+no green flags que no son predicted: 0
+no yellow flags que no son predicted: 1
+📊 Precision: 0.500
+📊 Recall: 0.500
+📊 MRR (Mean Reciprocal Rank): 0.500
+📊 Primer green flag aparece en rank: 2
+
+RESUMEN FINAL:
+✅ Accuracy vs red/yellow flags (>= 0.6)
+❌ Precision (>= 0.7)
+❌ Recall (>= 0.6)
+✅ MRR (>= 0.3)
+✅ Top-3 check
+==============================
+
+
+Query imagen: remera-celeste1.png
+mayor red flag es remera-rosa1.png con 0.559 de similitud
+mayor yellow flag es remera-azul1.png con 0.608 de similitud
+
+green_flags:
+  ✅ remera-celeste2.png: 0.763
+
+yellow_flags:
+  ❌ remera-celeste-blanca.png: 0.465
+  ✅ remera-azul1.png: 0.608
+
+
+🎯 Porcentaje de acierto: 100.00% (1/1)
+true_positive: {3}
+true_positive_yellow: {26, 15}
+predicted_positive: {3, 15}
+predicted_positive_yellow: {3, 7, 8, 15, 28}
+TP: 2, FP: 3
+FN: 1
+no green flags que no son predicted: 0
+no yellow flags que no son predicted: 1
+📊 Precision: 0.400
+📊 Recall: 0.667
+📊 MRR (Mean Reciprocal Rank): 0.500
+📊 Primer green flag aparece en rank: 2
+
+RESUMEN FINAL:
+✅ Accuracy vs red/yellow flags (>= 0.6)
+❌ Precision (>= 0.7)
+❌ Recall (>= 0.6)
+✅ MRR (>= 0.3)
+✅ Top-3 check
+==============================
+
+
+Query imagen: sweater-rosa.png
+mayor red flag es remera-rosa1.png con 0.671 de similitud
+mayor yellow flag es sweater-verde.png con 0.687 de similitud
+
+green_flags:
+  ✅ sweater-rosa2.png: 0.707
+  ❌ sweater-rosa3.png: 0.579
+
+yellow_flags:
+  ✅ sweater-verde.png: 0.687
+
+
+🎯 Porcentaje de acierto: 50.00% (1/2)
+true_positive: {2, 4}
+true_positive_yellow: {13}
+predicted_positive: {4, 13}
+predicted_positive_yellow: {4}
+TP: 2, FP: 0
+FN: 1
+no green flags que no son predicted: 1
+no yellow flags que no son predicted: 0
+📊 Precision: 1.000
+📊 Recall: 0.667
+📊 MRR (Mean Reciprocal Rank): 0.500
+📊 Primer green flag aparece en rank: 2
+
+RESUMEN FINAL:
+❌ Accuracy vs red/yellow flags (>= 0.6)
+✅ Precision (>= 0.7)
+❌ Recall (>= 0.6)
+✅ MRR (>= 0.3)
+✅ Top-3 check
+==============================
+
+
+Query imagen: vestido-estampado1.png
+mayor red flag es sweater-rosa2.png con 0.269 de similitud
+mayor yellow flag es vestido-rojo-liso1.png con 0.541 de similitud
+
+green_flags:
+  ✅ vestido-estampado2.png: 0.567
+  ✅ vestido-estampado3.png: 0.620
+  ✅ vestido-rojo-estampado.png: 0.735
+
+yellow_flags:
+  ✅ vestido-rojo-liso1.png: 0.541
+  ✅ vestido-rojo-liso2.png: 0.470
+  ✅ vestido-celeste-liso.png: 0.397
+  ✅ vestido-verde-liso.png: 0.461
+
+
+🎯 Porcentaje de acierto: 100.00% (3/3)
+true_positive: {9, 19, 21}
+true_positive_yellow: {27, 12, 5, 6}
+predicted_positive: {5, 6, 9, 12, 19, 21, 27}
+predicted_positive_yellow: {5, 6, 9, 19, 21, 27}
+TP: 7, FP: 0
+FN: 0
+no green flags que no son predicted: 0
+no yellow flags que no son predicted: 0
+📊 Precision: 1.000
+📊 Recall: 1.000
+📊 MRR (Mean Reciprocal Rank): 0.500
+📊 Primer green flag aparece en rank: 2
+
+RESUMEN FINAL:
+✅ Accuracy vs red/yellow flags (>= 0.6)
+✅ Precision (>= 0.7)
+✅ Recall (>= 0.6)
+✅ MRR (>= 0.3)
+✅ Top-3 check
+==============================
+
+
+Query imagen: vestido-rojo-liso1.png
+mayor red flag es vestido-verde-liso.png con 0.493 de similitud
+mayor yellow flag es vestido-estampado1.png con 0.541 de similitud
+
+green_flags:
+  ✅ vestido-rojo-liso2.png: 0.674
+  ✅ vestido-rojo-estampado.png: 0.668
+
+yellow_flags:
+  ✅ vestido-estampado1.png: 0.541
+  ❌ vestido-estampado2.png: 0.379
+
+
+🎯 Porcentaje de acierto: 100.00% (2/2)
+true_positive: {9, 5}
+true_positive_yellow: {24, 21}
+predicted_positive: {24, 9, 5}
+predicted_positive_yellow: {24, 9, 27, 5}
+TP: 3, FP: 1
+FN: 1
+no green flags que no son predicted: 0
+no yellow flags que no son predicted: 1
+📊 Precision: 0.750
+📊 Recall: 0.750
+📊 MRR (Mean Reciprocal Rank): 0.500
+📊 Primer green flag aparece en rank: 2
+
+RESUMEN FINAL:
+✅ Accuracy vs red/yellow flags (>= 0.6)
+✅ Precision (>= 0.7)
+✅ Recall (>= 0.6)
+✅ MRR (>= 0.3)
+✅ Top-3 check
+==============================
+
+
