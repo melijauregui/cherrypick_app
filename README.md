@@ -1,103 +1,75 @@
-# Run 
-- front:  npm run ios/android  
-- server: npm run start:backend
-- inference: (cd inference && source .venv/bin/activate) uvicorn server:app --reload 
-- seed: npm run db:seed-complete
+# 🍒 Cherrypick
+
+**Encontrá la prenda exacta que viste, sacándole una foto.**
+
+Cherrypick es una app mobile de descubrimiento de moda que usa **búsqueda visual por similitud**: sacás una foto (o subís una imagen) de una prenda y la app la matchea contra un catálogo de marcas real usando un modelo de visión propio (**FashionCLIP finetuneado**) y una base de datos vectorial (**Weaviate**), devolviendo los ítems más parecidos rankeados por score de similitud.
+
+Full-stack end-to-end: app mobile en **React Native + Expo**, backend en **Hono + Prisma + PostgreSQL**, autenticación con **better-auth**, storage de imágenes en **S3/R2**, emails transaccionales con **Resend**, y un servicio de inferencia en **Python (FastAPI/uvicorn)** que corre el modelo de embeddings de imágenes.
+
+## ✨ Features
+
+- 📸 Búsqueda visual: sacá una foto y encontrá prendas similares en el catálogo
+- 🧠 Modelo propio de embeddings de imágenes (FashionCLIP finetuneado) + búsqueda vectorial con Weaviate
+- 🏷️ Catálogo de marcas e ítems, con feed de inspiración
+- 🔐 Auth con Google OAuth (better-auth)
+- ☁️ Upload y storage de imágenes en S3/Cloudflare R2
+- ✉️ Notificaciones por email con React Email + Resend
+- 📱 App nativa multiplataforma (iOS/Android) con Expo Router
+
+## 🛠️ Stack
+
+| Capa | Tecnologías |
+|---|---|
+| Mobile | React Native, Expo, Expo Router, NativeWind (Tailwind) |
+| Backend | Hono, Prisma, PostgreSQL, Zod, better-auth |
+| ML / Inference | Python, FastAPI, FashionCLIP (finetuned), Weaviate |
+| Infra | AWS S3, Cloudflare R2, Resend |
 
 
+Este proyecto lo desarrollamos en equipo con Sofía Gómez Belis, con quien fuimos construyendo y refinando CherryPick en cada iteración hasta llegar al MVP. En especial, quiero agradecer a nuestros tutores Cesar F. Caiafa, Maia Naftali y Bruno Lanzillotta, por el acompañamiento durante todo el proceso y el feedback constante, que fue fundamental para orientar decisiones y elevar la calidad en cada iteración.
 
-source venv/bin/activate
-deactivate
+Me quedo con una experiencia enorme en producto + ingeniería, y con ganas de seguir construyendo!
+- Tesis completa: https://lnkd.in/dWH8Ydww
+- Video demo / pitch: https://lnkd.in/dRViwxdu
 
-en ios dentro de Info.plist:
+## 🚀 Correr el proyecto
+
+```bash
+npm install
+
+# App
+npm run ios      # o npm run android
+
+# Backend
+npm run start:backend
+
+# Servicio de inferencia (Python)
+cd inference && source .venv/bin/activate
+uvicorn server:app --reload
+
+# Seed de la base de datos
+npm run db:seed-complete
+```
+
+### Permisos en iOS
+
+En `ios/Info.plist` hay que declarar el acceso a cámara y galería:
+
+```xml
 <key>NSCameraUsageDescription</key>
 <string>Necesitamos acceso a la cámara para tomar fotos y grabar videos.</string>
 <key>NSPhotoLibraryUsageDescription</key>
 <string>Permitir que Cherrypick acceda a tus foto.</string>
-
-
-# Ejemplo en endpoint 3000 en server
-http://localhost:3000/images/jean.webp
-
-deberia devolver:
-[
-  {
-    "id": "9.jpg",
-    "score": 0.699426651,
-    "values": [],
-    "brand": "pinterest",
-    "type": "jean"
-  },
-  {
-    "id": "14.jpg",
-    "score": 0.697699,
-    "values": [],
-    "brand": "pinterest",
-    "type": "jean"
-  },
-  {
-    "id": "11.jpg",
-    "score": 0.661187947,
-    "values": [],
-    "brand": "pinterest",
-    "type": "jean"
-  }
-]
-
-# Welcome to your Expo app 👋
-
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
-
-## Get started
-
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-    npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## 📡 Ejemplo de uso del endpoint de búsqueda
 
-## Learn more
+`GET http://localhost:3000/images/jean.webp`
 
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
-
-
-
-cd /Users/melinajauregui/Documents/cherrypick && rm -rf ios/Pods ios/Podfile.lock ios/build
-cd /Users/melinajauregui/Documents/cherrypick && rm -rf ~/Library/Developer/Xcode/DerivedData/*
-cd /Users/melinajauregui/Documents/cherrypick && npx expo prebuild --clean
-cd /Users/melinajauregui/Documents/cherrypick/ios && LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 pod install
+```json
+[
+  { "id": "9.jpg", "score": 0.699426651, "values": [], "brand": "pinterest", "type": "jean" },
+  { "id": "14.jpg", "score": 0.697699, "values": [], "brand": "pinterest", "type": "jean" },
+  { "id": "11.jpg", "score": 0.661187947, "values": [], "brand": "pinterest", "type": "jean" }
+]
+```
