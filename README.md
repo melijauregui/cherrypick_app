@@ -1,15 +1,15 @@
 # 🍒 Cherrypick
 
-**Encontrá la prenda exacta que viste, sacándole una foto.**
+**Encontrá la prenda exacta que buscás, con una foto o con una descripción.**
 
-Cherrypick es una app mobile de descubrimiento de moda que usa **búsqueda visual por similitud**: sacás una foto (o subís una imagen) de una prenda y la app la matchea contra un catálogo de marcas real usando un modelo de visión propio (**FashionCLIP finetuneado**) y una base de datos vectorial (**Weaviate**), devolviendo los ítems más parecidos rankeados por score de similitud.
+Cherrypick es una app mobile de descubrimiento de moda que usa **búsqueda por texto e imagen**: sacás una foto (o subís una imagen) de una prenda, o simplemente describís lo que buscás, y la app la matchea contra un catálogo de marcas real usando un modelo de visión propio (**FashionCLIP finetuneado**) y una base de datos vectorial (**Weaviate**), devolviendo los ítems más parecidos rankeados por score de similitud.
 
-Full-stack end-to-end: app mobile en **React Native + Expo**, backend en **Hono + Prisma + PostgreSQL**, autenticación con **better-auth**, storage de imágenes en **S3/R2**, emails transaccionales con **Resend**, y un servicio de inferencia en **Python (FastAPI/uvicorn)** que corre el modelo de embeddings de imágenes.
+Full-stack end-to-end: app mobile en **React Native + Expo**, backend en **Hono + Prisma + PostgreSQL**, autenticación con **better-auth**, storage de imágenes en **S3/R2**, emails transaccionales con **Resend**, y un servicio de inferencia en **Python (FastAPI/uvicorn)** que corre el modelo de embeddings de texto e imagen.
 
 ## ✨ Features
 
-- 📸 Búsqueda visual: sacá una foto y encontrá prendas similares en el catálogo
-- 🧠 Modelo propio de embeddings de imágenes (FashionCLIP finetuneado) + búsqueda vectorial con Weaviate
+- 📸🔤 Búsqueda por imagen y por texto: sacá una foto o describí la prenda y encontrá lo más parecido en el catálogo
+- 🧠 Modelo propio de embeddings (FashionCLIP finetuneado) + búsqueda vectorial con Weaviate
 - 🏷️ Catálogo de marcas e ítems, con feed de inspiración
 - 🔐 Auth con Google OAuth (better-auth)
 - ☁️ Upload y storage de imágenes en S3/Cloudflare R2
